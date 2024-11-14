@@ -30,15 +30,7 @@
  * Jan Källman          Total rewrite               2010-03-01
  * Jan Källman		    License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Security;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
+using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.ConditionalFormatting;
 using OfficeOpenXml.DataValidation;
 using OfficeOpenXml.Drawing;
@@ -46,14 +38,21 @@ using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Drawing.Vml;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Sparkline;
 using OfficeOpenXml.Style.XmlAccess;
 using OfficeOpenXml.Table;
 using OfficeOpenXml.Table.PivotTable;
 using OfficeOpenXml.Utils;
-
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
 using System.Linq;
-using OfficeOpenXml.Compatibility;
-using OfficeOpenXml.Sparkline;
+using System.Security;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace OfficeOpenXml;
 
@@ -1495,15 +1494,15 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	}
 
 	private object GetErrorType(string v) => ExcelErrorValue.Parse(ConvertUtil._invariantTextInfo.ToUpper(v));//switch(v.ToUpper())//{//    case "#DIV/0!"://        return new ExcelErrorValue.cre(eErrorType.Div0);//    case "#REF!"://        return new ExcelErrorValue(eErrorType.Ref);//    case "#N/A"://        return new ExcelErrorValue(eErrorType.NA);//    case "#NAME?"://        return new ExcelErrorValue(eErrorType.Name);//    case "#NULL!"://        return new ExcelErrorValue(eErrorType.Null);//    case "#NUM!"://        return new ExcelErrorValue(eErrorType.Num);//    default://        return new ExcelErrorValue(eErrorType.Value);//}
-																																																																																																																																																																	//private string GetSharedString(int stringID)
-																																																																																																																																																																	//{
-																																																																																																																																																																	//    string retValue = null;
-																																																																																																																																																																	//    XmlNodeList stringNodes = xlPackage.Workbook.SharedStringsXml.SelectNodes(string.Format("//d:si", stringID), NameSpaceManager);
-																																																																																																																																																																	//    XmlNode stringNode = stringNodes[stringID];
-																																																																																																																																																																	//    if (stringNode != null)
-																																																																																																																																																																	//        retValue = stringNode.InnerText;
-																																																																																																																																																																	//    return (retValue);
-																																																																																																																																																																	//}
+																											  //private string GetSharedString(int stringID)
+																											  //{
+																											  //    string retValue = null;
+																											  //    XmlNodeList stringNodes = xlPackage.Workbook.SharedStringsXml.SelectNodes(string.Format("//d:si", stringID), NameSpaceManager);
+																											  //    XmlNode stringNode = stringNodes[stringID];
+																											  //    if (stringNode != null)
+																											  //        retValue = stringNode.InnerText;
+																											  //    return (retValue);
+																											  //}
 	#endregion
 	#region HeaderFooter
 	/// <summary>
@@ -2732,14 +2731,14 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <param name="Row">The row number</param>
 	/// <param name="Column">The row number</param>
 	/// <returns>The value. If the value can't be converted to the specified type, the default value will be returned</returns>
-	public T GetValue<T>(int Row, int Column)
+	public T? GetValue<T>(int Row, int Column)
 	{
 		CheckSheetType();
 		//ulong cellID=ExcelCellBase.GetCellID(SheetID, Row, Column);
 		var v = GetValueInner(Row, Column);
 		if (v == null)
 		{
-			return default(T);
+			return default;
 		}
 
 		//var cell=((ExcelCell)_cells[cellID]);

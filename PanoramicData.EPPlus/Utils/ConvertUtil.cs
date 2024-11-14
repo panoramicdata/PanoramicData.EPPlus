@@ -1,9 +1,9 @@
-﻿using System;
+﻿using OfficeOpenXml.Compatibility;
+using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
-using OfficeOpenXml.Compatibility;
 
 namespace OfficeOpenXml.Utils;
 
@@ -257,10 +257,12 @@ internal static class ConvertUtil
 	/// <exception cref="InvalidCastException">
 	///     <paramref name="value"/> is not string and direct conversion fails
 	/// </exception>
-	public static T GetTypedCellValue<T>(object value)
+	public static T? GetTypedCellValue<T>(object value)
 	{
 		if (value == null)
-			return default(T);
+		{
+			return default;
+		}
 
 		var fromType = value.GetType();
 		var toType = typeof(T);
@@ -273,7 +275,7 @@ internal static class ConvertUtil
 
 		// if converting to nullable struct and input is blank string, return null
 		if (toNullableUnderlyingType != null && fromType == typeof(string) && ((string)value).Trim() == string.Empty)
-			return default(T);
+			return default;
 
 		toType = toNullableUnderlyingType ?? toType;
 

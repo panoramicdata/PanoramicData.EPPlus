@@ -107,6 +107,6 @@ public class Average : HiddenValuesHandlingFunction
 			}
 		}
 
-		return default(double?);
+		return default;
 	}
 }

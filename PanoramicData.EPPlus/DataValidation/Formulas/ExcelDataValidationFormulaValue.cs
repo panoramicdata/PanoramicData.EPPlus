@@ -52,11 +52,11 @@ internal abstract class ExcelDataValidationFormulaValue<T> : ExcelDataValidation
 
 	}
 
-	private T _value;
+	private T? _value;
 	/// <summary>
 	/// Typed value
 	/// </summary>
-	public T Value
+	public T? Value
 	{
 		get
 		{
@@ -70,6 +70,6 @@ internal abstract class ExcelDataValidationFormulaValue<T> : ExcelDataValidation
 		}
 	}
 
-	internal override void ResetValue() => Value = default(T);
+	internal override void ResetValue() => Value = default;
 
 }

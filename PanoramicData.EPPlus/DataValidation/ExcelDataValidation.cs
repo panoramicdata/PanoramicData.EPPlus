@@ -235,7 +235,7 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 			var operatorString = GetXmlNodeString(_operatorPath);
 			return !string.IsNullOrEmpty(operatorString)
 				? (ExcelDataValidationOperator)Enum.Parse(typeof(ExcelDataValidationOperator), operatorString)
-				: default(ExcelDataValidationOperator);
+				: default;
 		}
 		set
 		{

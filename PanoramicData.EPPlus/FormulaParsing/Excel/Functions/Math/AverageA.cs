@@ -125,6 +125,6 @@ public class AverageA : HiddenValuesHandlingFunction
 			}
 		}
 
-		return default(double?);
+		return default;
 	}
 }

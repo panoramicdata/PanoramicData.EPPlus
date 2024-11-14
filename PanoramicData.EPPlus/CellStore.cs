@@ -28,10 +28,10 @@
  * ******************************************************************************
  * Jan Källman		    Added       		        2012-11-25
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Collections;
 using OfficeOpenXml;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 internal class IndexBase : IComparable<IndexBase>
 {
@@ -434,46 +434,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	internal T GetValue(int Row, int Column)
 	{
 		var i = GetPointer(Row, Column);
-		return i >= 0 ? _values[i] : default(T);
-		//var col = GetPosition(Column);
-		//if (col >= 0)  
-		//{
-		//    var pos = _columnIndex[col].GetPosition(Row);
-		//    if (pos >= 0) 
-		//    {
-		//        var pageItem = _columnIndex[col].Pages[pos];
-		//        if (pageItem.MinIndex > Row)
-		//        {
-		//            pos--;
-		//            if (pos < 0)
-		//            {
-		//                return default(T);
-		//            }
-		//            else
-		//            {
-		//                pageItem = _columnIndex[col].Pages[pos];
-		//            }
-		//        }
-		//        short ix = (short)(Row - pageItem.IndexOffset);
-		//        var cellPos = Array.BinarySearch(pageItem.Rows, 0, pageItem.RowCount, new IndexBase() { Index = ix });
-		//        if (cellPos >= 0) 
-		//        {
-		//            return _values[pageItem.Rows[cellPos].IndexPointer];
-		//        }
-		//        else //Cell does not exist
-		//        {
-		//            return default(T);
-		//        }
-		//    }
-		//    else //Page does not exist
-		//    {
-		//        return default(T);
-		//    }
-		//}
-		//else //Column does not exist
-		//{
-		//    return default(T);
-		//}
+		return i >= 0 ? _values[i] : default;
 	}
 	int GetPointer(int Row, int Column)
 	{
@@ -665,7 +626,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 							if (cellPos < 0)
 							{
 								cellPos = ~cellPos;
-								AddCell(_columnIndex[col], pos, cellPos, ix, default(T));
+								AddCell(_columnIndex[col], pos, cellPos, ix, default);
 								Updater(_values, pageItem.Rows[cellPos].IndexPointer, rowIx, colIx, Value);
 							}
 							else
@@ -679,7 +640,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 							AddColumn(col, colIx);
 							AddPage(_columnIndex[col], 0, page);
 							var ix = (short)(rowIx - (page << pageBits));
-							AddCell(_columnIndex[col], 0, 0, ix, default(T));
+							AddCell(_columnIndex[col], 0, 0, ix, default);
 							Updater(_values, _columnIndex[col]._pages[0].Rows[0].IndexPointer, rowIx, colIx, Value);
 						}
 					}
@@ -738,7 +699,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				if (cellPos < 0)
 				{
 					cellPos = ~cellPos;
-					AddCell(_columnIndex[col], pos, cellPos, ix, default(T));
+					AddCell(_columnIndex[col], pos, cellPos, ix, default);
 					Updater(_values, pageItem.Rows[cellPos].IndexPointer, Value);
 				}
 				else
@@ -752,7 +713,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				AddColumn(col, Column);
 				AddPage(_columnIndex[col], 0, page);
 				var ix = (short)(Row - (page << pageBits));
-				AddCell(_columnIndex[col], 0, 0, ix, default(T));
+				AddCell(_columnIndex[col], 0, 0, ix, default);
 				Updater(_values, _columnIndex[col]._pages[0].Rows[0].IndexPointer, Value);
 			}
 		}

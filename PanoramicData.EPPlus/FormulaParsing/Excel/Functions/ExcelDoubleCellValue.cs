@@ -7,7 +7,7 @@ public struct ExcelDoubleCellValue : IComparable<ExcelDoubleCellValue>, ICompara
 	public ExcelDoubleCellValue(double val)
 	{
 		Value = val;
-		CellRow = default(int?);
+		CellRow = default;
 	}
 
 	public ExcelDoubleCellValue(double val, int cellRow)
