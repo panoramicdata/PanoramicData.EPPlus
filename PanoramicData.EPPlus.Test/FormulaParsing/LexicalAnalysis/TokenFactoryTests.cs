@@ -1,15 +1,15 @@
-﻿using System.Linq;
+﻿using FakeItEasy;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using FakeItEasy;
+using System.Linq;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.LexicalAnalysis;
 
 [TestClass]
 public class TokenFactoryTests
 {
-	private ITokenFactory _tokenFactory;
+	private TokenFactory _tokenFactory;
 	private INameValueProvider _nameValueProvider;
 
 

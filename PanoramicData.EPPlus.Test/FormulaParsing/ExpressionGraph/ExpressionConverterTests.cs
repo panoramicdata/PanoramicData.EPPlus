@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System.Globalization;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
@@ -8,7 +8,7 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 [TestClass]
 public class ExpressionConverterTests
 {
-	private IExpressionConverter _converter;
+	private ExpressionConverter _converter;
 
 	[TestInitialize]
 	public void Setup() => _converter = new ExpressionConverter();

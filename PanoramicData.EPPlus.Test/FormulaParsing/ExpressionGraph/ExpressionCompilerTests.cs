@@ -1,15 +1,15 @@
-﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using ExpGraph = OfficeOpenXml.FormulaParsing.ExpressionGraph.ExpressionGraph;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System.Linq;
+using ExpGraph = OfficeOpenXml.FormulaParsing.ExpressionGraph.ExpressionGraph;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 
 [TestClass]
 public class ExpressionCompilerTests
 {
-	private IExpressionCompiler _expressionCompiler;
+	private ExpressionCompiler _expressionCompiler;
 	private ExpGraph _graph;
 
 	[TestInitialize]

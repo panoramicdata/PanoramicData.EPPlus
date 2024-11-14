@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing.Exceptions;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+using System;
+using System.Collections.Generic;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.LexicalAnalysis;
 
 [TestClass]
 public class SyntacticAnalyzerTests
 {
-	private ISyntacticAnalyzer _analyser;
+	private SyntacticAnalyzer _analyser;
 
 	[TestInitialize]
 	public void Setup() => _analyser = new SyntacticAnalyzer();

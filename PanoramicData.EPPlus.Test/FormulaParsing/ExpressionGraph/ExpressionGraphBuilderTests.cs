@@ -1,20 +1,20 @@
-﻿using System;
+﻿using FakeItEasy;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OfficeOpenXml.FormulaParsing;
+using OfficeOpenXml.FormulaParsing.Excel.Operators;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph.CompileStrategy;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph.CompileStrategy;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using OfficeOpenXml.FormulaParsing.Excel.Operators;
-using OfficeOpenXml.FormulaParsing;
-using FakeItEasy;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 
 [TestClass]
 public class ExpressionGraphBuilderTests
 {
-	private IExpressionGraphBuilder _graphBuilder;
+	private ExpressionGraphBuilder _graphBuilder;
 	private ExcelDataProvider _excelDataProvider;
 
 	[TestInitialize]
