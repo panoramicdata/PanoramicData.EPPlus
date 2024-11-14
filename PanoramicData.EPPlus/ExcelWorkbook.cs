@@ -366,9 +366,9 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			font = FontSize.FontHeights["Calibri"];
 		}
 
-		if (font.TryGetValue(fontSize, out var value))
+		if (font.TryGetValue(fontSize, out var value2))
 		{
-			return Convert.ToDecimal(value.Width);
+			return Convert.ToDecimal(value2.Width);
 		}
 		else
 		{

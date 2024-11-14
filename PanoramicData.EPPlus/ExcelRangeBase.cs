@@ -2908,9 +2908,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 					_worksheet._flags.SetValue(row, col, value);
 				}
 				//Move formulas
-				if (formulas.TryGetValue(addr, out var value))
+				if (formulas.TryGetValue(addr, out var value2))
 				{
-					_worksheet._formulas.SetValue(row, col, value);
+					_worksheet._formulas.SetValue(row, col, value2);
 					if (formulas[addr] is int)
 					{
 						var sfIx = (int)formulas[addr];
@@ -2930,9 +2930,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 
 				//Move hyperlinks
-				if (hyperLinks.TryGetValue(addr, out var value))
+				if (hyperLinks.TryGetValue(addr, out var value3))
 				{
-					_worksheet._hyperLinks.SetValue(row, col, value);
+					_worksheet._hyperLinks.SetValue(row, col, value3);
 				}
 
 				//Move comments

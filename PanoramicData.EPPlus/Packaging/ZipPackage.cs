@@ -160,9 +160,9 @@ public class ZipPackage : ZipPackageRelationshipBase
 					p.Value.ReadRelation(value, p.Value.Uri.OriginalString);
 				}
 
-				if (_contentTypes.TryGetValue(p.Key, out var value))
+				if (_contentTypes.TryGetValue(p.Key, out var value2))
 				{
-					p.Value.ContentType = value.Name;
+					p.Value.ContentType = value2.Name;
 				}
 				else if (extension.Length > 1 && _contentTypes.ContainsKey(extension[1..]))
 				{

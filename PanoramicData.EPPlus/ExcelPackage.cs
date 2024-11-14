@@ -419,8 +419,7 @@ public sealed class ExcelPackage : IDisposable
 	internal ImageInfo AddImage(byte[] image) => AddImage(image, null, "");
 	internal ImageInfo AddImage(byte[] image, Uri uri, string contentType)
 	{
-		var hashProvider = SHA1.Create();
-		var hash = BitConverter.ToString(hashProvider.ComputeHash(image)).Replace("-", "");
+		var hash = BitConverter.ToString(SHA1.HashData(image)).Replace("-", "");
 		lock (_images)
 		{
 			if (_images.TryGetValue(hash, out var value))

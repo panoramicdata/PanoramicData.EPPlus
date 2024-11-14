@@ -2973,7 +2973,7 @@ IDisposable
 				return value;
 			// workitem 11056
 			key = key.Replace("/", "\\");
-			return _entries.TryGetValue(key, out var value) ? value : null;
+			return _entries.TryGetValue(key, out var value2) ? value2 : null;
 
 #if MESSY
                 foreach (ZipEntry e in _entries.Values)
