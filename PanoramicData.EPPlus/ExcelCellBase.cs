@@ -29,14 +29,14 @@
 * Jan Källman		Initial Release		        2009-10-01
 * Jan Källman		License changed GPL-->LGPL 2011-12-27
 *******************************************************************************/
+using OfficeOpenXml.FormulaParsing;
+using OfficeOpenXml.FormulaParsing.Excel.Functions;
+using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.Excel.Functions;
-using OfficeOpenXml.FormulaParsing;
+using System.Text;
 namespace OfficeOpenXml;
 
 /// <summary>
@@ -276,7 +276,7 @@ public abstract class ExcelCellBase
 			}
 			else
 			{
-				CNum = GetRC(part.Substring(cStart + 1, part.Length - cStart - 1), col, out absoluteCol);
+				CNum = GetRC(part.Substring(cStart + 1), col, out absoluteCol);
 			}
 
 
