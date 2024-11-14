@@ -223,7 +223,7 @@ public class ZipPackage : ZipPackageRelationshipBase
 			? Parts.Single(x => x.Key.Equals(GetUriKey(partUri.OriginalString), StringComparison.OrdinalIgnoreCase)).Value
 			: throw (new InvalidOperationException("Part does not exist."));
 
-	internal string GetUriKey(string uri)
+	internal static string GetUriKey(string uri)
 	{
 		var ret = uri.Replace('\\', '/');
 		if (ret[0] != '/')
@@ -326,11 +326,11 @@ public class ZipPackage : ZipPackageRelationshipBase
 		xml.Append("</Types>");
 		return xml.ToString();
 	}
-	internal void Flush()
+	internal static void Flush()
 	{
 
 	}
-	internal void Close()
+	internal static void Close()
 	{
 
 	}

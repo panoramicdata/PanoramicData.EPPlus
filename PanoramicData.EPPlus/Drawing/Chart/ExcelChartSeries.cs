@@ -307,7 +307,7 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 	}
 	#endregion
 	#region "Xml init Functions"
-	private string AddMarker(eChartType chartType) => chartType is eChartType.Line or
+	private static string AddMarker(eChartType chartType) => chartType is eChartType.Line or
 			eChartType.LineStacked or
 			eChartType.LineStacked100 or
 			eChartType.XYScatterLines or
@@ -316,8 +316,8 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 			eChartType.XYScatterSmoothNoMarkers
 			? "<c:marker><c:symbol val=\"none\" /></c:marker>"
 			: "";
-	private string AddScatterPoint(eChartType chartType) => chartType == eChartType.XYScatter ? "<c:spPr><a:ln w=\"28575\"><a:noFill /></a:ln></c:spPr>" : "";
-	private string AddAxisNodes(eChartType chartType) => chartType is eChartType.XYScatter or
+	private static string AddScatterPoint(eChartType chartType) => chartType == eChartType.XYScatter ? "<c:spPr><a:ln w=\"28575\"><a:noFill /></a:ln></c:spPr>" : "";
+	private static string AddAxisNodes(eChartType chartType) => chartType is eChartType.XYScatter or
 			 eChartType.XYScatterLines or
 			 eChartType.XYScatterLinesNoMarkers or
 			 eChartType.XYScatterSmooth or
@@ -327,7 +327,7 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 			? "<c:xVal /><c:yVal />"
 			: "<c:val />";
 
-	private string AddExplosion(eChartType chartType)
+	private static string AddExplosion(eChartType chartType)
 	{
 		if (chartType is eChartType.PieExploded3D or
 		   eChartType.PieExploded or
@@ -340,7 +340,7 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 			return "";
 		}
 	}
-	private string AddSmooth(eChartType chartType)
+	private static string AddSmooth(eChartType chartType)
 	{
 		if (chartType is eChartType.XYScatterSmooth or
 		   eChartType.XYScatterSmoothNoMarkers)

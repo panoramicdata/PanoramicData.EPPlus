@@ -244,20 +244,20 @@ public sealed class ExcelBarChart : ExcelChart
 	}
 	#endregion
 	#region "Direction Enum Traslation"
-	private string GetDirectionText(eDirection direction) => direction switch
+	private static string GetDirectionText(eDirection direction) => direction switch
 	{
 		eDirection.Bar => "bar",
 		_ => "col",
 	};
 
-	private eDirection GetDirectionEnum(string direction) => direction switch
+	private static eDirection GetDirectionEnum(string direction) => direction switch
 	{
 		"bar" => eDirection.Bar,
 		_ => eDirection.Column,
 	};
 	#endregion
 	#region "Shape Enum Translation"
-	private string GetShapeText(eShape Shape) => Shape switch
+	private static string GetShapeText(eShape Shape) => Shape switch
 	{
 		eShape.Box => "box",
 		eShape.Cone => "cone",
@@ -268,7 +268,7 @@ public sealed class ExcelBarChart : ExcelChart
 		_ => "box",
 	};
 
-	private eShape GetShapeEnum(string text) => text switch
+	private static eShape GetShapeEnum(string text) => text switch
 	{
 		"box" => eShape.Box,
 		"cone" => eShape.Cone,

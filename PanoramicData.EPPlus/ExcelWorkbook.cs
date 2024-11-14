@@ -599,7 +599,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			StreamWriter stream = new(partWorkbook.GetStream(FileMode.Create, FileAccess.Write));
 			_workbookXml.Save(stream);
 			//stream.Close();
-			_package.Package.Flush();
+			Packaging.ZipPackage.Flush();
 		}
 	}
 	#endregion
@@ -641,11 +641,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 
 					_stylesXml.Save(stream);
 					//stream.Close();
-					_package.Package.Flush();
+					Packaging.ZipPackage.Flush();
 
 					// create the relationship between the workbook and the new shared strings part
 					_package.Workbook.Part.CreateRelationship(UriHelper.GetRelativeUri(WorkbookUri, StylesUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/styles");
-					_package.Package.Flush();
+					Packaging.ZipPackage.Flush();
 				}
 			}
 
@@ -969,7 +969,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		}
 	}
 
-	private void SetNameElement(ExcelNamedRange name, XmlElement elem)
+	private static void SetNameElement(ExcelNamedRange name, XmlElement elem)
 	{
 		if (name.IsName)
 		{

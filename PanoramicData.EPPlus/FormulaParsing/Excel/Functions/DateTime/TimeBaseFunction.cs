@@ -51,7 +51,7 @@ public abstract class TimeBaseFunction : ExcelFunction
 		SerialNumber = (double)ArgToDecimal(arguments, 0);
 	}
 
-	protected double SecondsInADay => 24 * 60 * 60;
+	protected static double SecondsInADay => 24 * 60 * 60;
 
 	protected double GetTimeSerialNumber(double seconds) => seconds / SecondsInADay;
 

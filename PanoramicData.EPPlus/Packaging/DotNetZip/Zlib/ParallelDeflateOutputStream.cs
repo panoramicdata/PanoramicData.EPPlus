@@ -1201,7 +1201,7 @@ public class ParallelDeflateOutputStream : Stream
 
 
 
-	private bool DeflateOneSegment(WorkItem workitem)
+	private static bool DeflateOneSegment(WorkItem workitem)
 	{
 		var compressor = workitem.compressor;
 		var rc = 0;

@@ -149,7 +149,7 @@ public sealed class ExcelColor : StyleBase, IColor
 	/// </summary>
 	/// <param name="theColor">The color object</param>
 	/// <returns>The RGB color starting with a #</returns>
-	public string LookupColor(ExcelColor theColor)
+	public static string LookupColor(ExcelColor theColor)
 	{
 		//Thanks to neaves for contributing this method.
 		var iTint = 0;

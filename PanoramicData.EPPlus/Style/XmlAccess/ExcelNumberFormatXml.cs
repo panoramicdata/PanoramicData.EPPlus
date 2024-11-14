@@ -119,7 +119,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 			_format = value;
 		}
 	}
-	internal string GetNewID(int NumFmtId, string Format)
+	internal static string GetNewID(int NumFmtId, string Format)
 	{
 
 		if (NumFmtId < 0)
@@ -635,7 +635,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 			}
 		}
 
-		private string FmtInt(double value, string format)
+		private static string FmtInt(double value, string format)
 		{
 			var v = value.ToString("#");
 			var pad = "";

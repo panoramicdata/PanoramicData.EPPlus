@@ -124,7 +124,7 @@ public static class Sample13
 												  typeof(FileDTO).GetMethod("ToString")]
 											  );
 
-		wsList.Tables.GetFromRange(rng).Columns[2].Name = "Description";
+		ExcelTableCollection.GetFromRange(rng).Columns[2].Name = "Description";
 
 		wsList.Cells[wsList.Dimension.Address].AutoFitColumns();
 

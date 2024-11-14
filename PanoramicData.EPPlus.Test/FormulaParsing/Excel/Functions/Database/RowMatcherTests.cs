@@ -9,7 +9,7 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions.Database;
 [TestClass]
 public class RowMatcherTests
 {
-	private ExcelDatabaseCriteria GetCriteria(Dictionary<ExcelDatabaseCriteriaField, object> items)
+	private static ExcelDatabaseCriteria GetCriteria(Dictionary<ExcelDatabaseCriteriaField, object> items)
 	{
 		var provider = A.Fake<ExcelDataProvider>();
 		var criteria = A.Fake<ExcelDatabaseCriteria>();// (provider, string.Empty);

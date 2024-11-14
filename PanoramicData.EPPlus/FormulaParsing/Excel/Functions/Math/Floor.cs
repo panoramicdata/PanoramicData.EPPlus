@@ -67,7 +67,7 @@ public class Floor : ExcelFunction
 		}
 	}
 
-	private void ValidateNumberAndSign(double number, double sign)
+	private static void ValidateNumberAndSign(double number, double sign)
 	{
 		if (number > 0d && sign < 0)
 		{

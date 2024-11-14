@@ -93,9 +93,9 @@ public class AddressTranslator
 
 	private int GetRowIndexByBehaviour(RangeCalculationBehaviour behaviour) => behaviour == RangeCalculationBehaviour.FirstPart ? 1 : _excelDataProvider.ExcelMaxRows;
 
-	private int GetNumericAlphaValue(char c) => (int)c - 64;
+	private static int GetNumericAlphaValue(char c) => (int)c - 64;
 
-	private string GetAlphaPart(string address) => Regex.Match(address, "[A-Z]+").Value;
+	private static string GetAlphaPart(string address) => Regex.Match(address, "[A-Z]+").Value;
 
-	private int? GetIntPart(string address) => Regex.IsMatch(address, "[0-9]+") ? int.Parse(Regex.Match(address, "[0-9]+").Value) : null;
+	private static int? GetIntPart(string address) => Regex.IsMatch(address, "[0-9]+") ? int.Parse(Regex.Match(address, "[0-9]+").Value) : null;
 }

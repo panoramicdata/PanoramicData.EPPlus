@@ -648,7 +648,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		}
 	}
 
-	private bool IsInfinityValue(object value)
+	private static bool IsInfinityValue(object value)
 	{
 		var valueAsDouble = value as double?;
 
@@ -1643,7 +1643,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			}
 		}
 	}
-	private object ConvertData(ExcelTextFormat Format, string v, int col, bool isText)
+	private static object ConvertData(ExcelTextFormat Format, string v, int col, bool isText)
 	{
 		if (isText && (Format.DataTypes == null || Format.DataTypes.Length < col)) return string.IsNullOrEmpty(v) ? null : v;
 
@@ -2211,7 +2211,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		return [.. list];
 	}
-	private bool IsEOL(string text, int ix, string eol)
+	private static bool IsEOL(string text, int ix, string eol)
 	{
 		for (var i = 0; i < eol.Length; i++)
 		{

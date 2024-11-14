@@ -44,7 +44,7 @@ public class Weekday : ExcelFunction
 	private static List<int> _oneBasedStartOnMonday = [7, 1, 2, 3, 4, 5, 6];
 	private static List<int> _zeroBasedStartOnSunday = [6, 0, 1, 2, 3, 4, 5];
 
-	private int CalculateDayOfWeek(System.DateTime dateTime, int returnType)
+	private static int CalculateDayOfWeek(System.DateTime dateTime, int returnType)
 	{
 		var dayIx = (int)dateTime.DayOfWeek;
 		return returnType switch

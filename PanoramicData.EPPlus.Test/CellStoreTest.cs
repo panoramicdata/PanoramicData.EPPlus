@@ -142,7 +142,7 @@ public class CellStoreTest : TestBase
 		}
 	}
 	private void LoadData(ExcelWorksheet ws) => LoadData(ws, 1000);
-	private void LoadData(ExcelWorksheet ws, int rows, int cols = 1, bool isNumeric = false)
+	private static void LoadData(ExcelWorksheet ws, int rows, int cols = 1, bool isNumeric = false)
 	{
 		for (var r = 0; r < rows; r++)
 		{

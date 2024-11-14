@@ -197,7 +197,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 			}
 		}
 
-		private eHashAlogorithm GetHashAlgorithm(string v)
+		private static eHashAlogorithm GetHashAlgorithm(string v)
 		{
 			switch (v)
 			{
@@ -219,7 +219,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 			}
 		}
 
-		private string GetHashAlgorithmString(eHashAlogorithm value) => value switch
+		private static string GetHashAlgorithmString(eHashAlogorithm value) => value switch
 		{
 			eHashAlogorithm.RIPEMD128 => "RIPEMD-128",
 			eHashAlogorithm.RIPEMD160 => "RIPEMD-160",
@@ -257,7 +257,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 			}
 		}
 
-		private eCipherAlgorithm GetCipherAlgorithm(string v)
+		private static eCipherAlgorithm GetCipherAlgorithm(string v)
 		{
 			switch (v)
 			{
@@ -277,7 +277,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 			}
 		}
 
-		private string GetCipherAlgorithmString(eCipherAlgorithm alg) => alg switch
+		private static string GetCipherAlgorithmString(eCipherAlgorithm alg) => alg switch
 		{
 			eCipherAlgorithm.TRIPLE_DES => "3DES",
 			eCipherAlgorithm.TRIPLE_DES_112 => "3DES_112",

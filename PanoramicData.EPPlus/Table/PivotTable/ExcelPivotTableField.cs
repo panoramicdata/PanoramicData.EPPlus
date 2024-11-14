@@ -628,7 +628,7 @@ public class ExcelPivotTableField : XmlHelper
 	/// </summary>        
 	public ExcelPivotTableFieldGroup Grouping => _grouping;
 	#region Private & internal Methods
-	internal XmlElement AppendField(XmlNode rowsNode, int index, string fieldNodeText, string indexAttrText)
+	internal static XmlElement AppendField(XmlNode rowsNode, int index, string fieldNodeText, string indexAttrText)
 	{
 		XmlElement prevField = null, newElement;
 		foreach (XmlElement field in rowsNode.ChildNodes)
@@ -879,7 +879,7 @@ public class ExcelPivotTableField : XmlHelper
 		}
 	}
 
-	private void AddGroupItem(XmlElement groupItems, string value)
+	private static void AddGroupItem(XmlElement groupItems, string value)
 	{
 		var s = groupItems.OwnerDocument.CreateElement("s", ExcelPackage.schemaMain);
 		s.SetAttribute("v", value);

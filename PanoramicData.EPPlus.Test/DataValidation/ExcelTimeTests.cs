@@ -12,7 +12,7 @@ public class ExcelTimeTests
 	// private readonly decimal HoursPerDay = 24;
 	private readonly decimal SecondsPerDay = 3600 * 24;
 
-	private decimal Round(decimal value) => Math.Round(value, ExcelTime.NumberOfDecimals);
+	private static decimal Round(decimal value) => Math.Round(value, ExcelTime.NumberOfDecimals);
 
 	[TestInitialize]
 	public void Setup() => _time = new ExcelTime();

@@ -88,7 +88,7 @@ public class ExcelRange : ExcelRangeBase
 		}
 	}
 
-	private ExcelRange GetTableAddess(ExcelWorksheet _worksheet, string address)
+	private static ExcelRange GetTableAddess(ExcelWorksheet _worksheet, string address)
 	{
 		var ixStart = address.IndexOf('[');
 		if (ixStart == 0) //External Address

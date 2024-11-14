@@ -618,7 +618,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zip
 									  true);
 
 
-		private string EnsureendInSlash(string s) => s.EndsWith("\\") ? s : s + "\\";
+		private static string EnsureendInSlash(string s) => s.EndsWith("\\") ? s : s + "\\";
 
 		private void _AddOrUpdateSelectedFiles(String selectionCriteria,
 											   String directoryOnDisk,

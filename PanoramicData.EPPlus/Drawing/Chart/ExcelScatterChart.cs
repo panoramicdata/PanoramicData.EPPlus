@@ -75,13 +75,13 @@ public sealed class ExcelScatterChart : ExcelChart
 	}
 	#region "Grouping Enum Translation"
 	string _scatterTypePath = "c:scatterStyle/@val";
-	private eScatterStyle GetScatterEnum(string text) => text switch
+	private static eScatterStyle GetScatterEnum(string text) => text switch
 	{
 		"smoothMarker" => eScatterStyle.SmoothMarker,
 		_ => eScatterStyle.LineMarker,
 	};
 
-	private string GetScatterText(eScatterStyle shatterStyle) => shatterStyle switch
+	private static string GetScatterText(eScatterStyle shatterStyle) => shatterStyle switch
 	{
 		eScatterStyle.SmoothMarker => "smoothMarker",
 		_ => "lineMarker",

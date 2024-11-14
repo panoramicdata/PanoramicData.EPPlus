@@ -139,7 +139,7 @@ public sealed class ExcelDrawingBorder : XmlHelper
 	}
 	#endregion
 	#region "Translate Enum functions"
-	private string TranslateLineStyleText(eLineStyle value)
+	private static string TranslateLineStyleText(eLineStyle value)
 	{
 		var text = value.ToString();
 		return value switch
@@ -150,20 +150,20 @@ public sealed class ExcelDrawingBorder : XmlHelper
 			_ => throw (new Exception("Invalid Linestyle")),
 		};
 	}
-	private eLineStyle TranslateLineStyle(string text) => text switch
+	private static eLineStyle TranslateLineStyle(string text) => text switch
 	{
 		"dash" or "dot" or "dashDot" or "solid" => Enum.Parse<eLineStyle>(text, true),
 		"lgDash" or "lgDashDot" or "lgDashDotDot" => Enum.Parse<eLineStyle>("Long" + text[2..]),
 		"sysDash" or "sysDashDot" or "sysDashDotDot" or "sysDot" => Enum.Parse<eLineStyle>("System" + text[3..]),
 		_ => throw (new Exception("Invalid Linestyle")),
 	};
-	private string TranslateLineCapText(eLineCap value) => value switch
+	private static string TranslateLineCapText(eLineCap value) => value switch
 	{
 		eLineCap.Round => "rnd",
 		eLineCap.Square => "sq",
 		_ => "flat",
 	};
-	private eLineCap TranslateLineCap(string text) => text switch
+	private static eLineCap TranslateLineCap(string text) => text switch
 	{
 		"rnd" => eLineCap.Round,
 		"sq" => eLineCap.Square,

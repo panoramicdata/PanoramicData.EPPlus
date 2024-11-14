@@ -494,7 +494,7 @@ public sealed class ExcelStyles : XmlHelper
 			ws.SetStyleInner(0, column.ColumnMin, newId);
 		}
 	}
-	internal int GetStyleId(ExcelWorksheet ws, int row, int col)
+	internal static int GetStyleId(ExcelWorksheet ws, int row, int col)
 	{
 		var v = 0;
 		if (ws.ExistsStyleInner(row, col, ref v))
@@ -579,7 +579,7 @@ public sealed class ExcelStyles : XmlHelper
 	public ExcelStyleCollection<ExcelNamedStyleXml> NamedStyles = [];
 	public ExcelStyleCollection<ExcelDxfStyleConditionalFormatting> Dxfs = [];
 
-	internal string Id => "";
+	internal static string Id => "";
 
 	public ExcelNamedStyleXml CreateNamedStyle(string name) => CreateNamedStyle(name, null);
 	public ExcelNamedStyleXml CreateNamedStyle(string name, ExcelStyle Template)
@@ -916,7 +916,7 @@ public sealed class ExcelStyles : XmlHelper
 	}
 	#region XmlHelpFunctions
 	private int GetXmlNodeInt(XmlNode node) => int.TryParse(GetXmlNode(node), out var i) ? i : 0;
-	private string GetXmlNode(XmlNode node)
+	private static string GetXmlNode(XmlNode node)
 	{
 		if (node == null)
 		{

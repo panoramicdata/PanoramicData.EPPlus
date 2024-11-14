@@ -484,7 +484,7 @@ public sealed class ExcelPackage : IDisposable
 		return _images.TryGetValue(hash, out var value) ? value : null;
 	}
 	internal static int _id = 1;
-	private Uri GetNewUri(Packaging.ZipPackage package, string sUri)
+	private static Uri GetNewUri(Packaging.ZipPackage package, string sUri)
 	{
 		Uri uri;
 		do
@@ -677,7 +677,7 @@ public sealed class ExcelPackage : IDisposable
 		get;
 		set;
 	}
-	private XmlNamespaceManager CreateDefaultNSM()
+	private static XmlNamespaceManager CreateDefaultNSM()
 	{
 		//  Create a NamespaceManager to handle the default namespace, 
 		//  and create a prefix for the default namespace:
@@ -779,7 +779,7 @@ public sealed class ExcelPackage : IDisposable
 				CloseStream();
 			}
 
-			_package.Close();
+			Packaging.ZipPackage.Close();
 			_workbook?.Dispose();
 
 			_package = null;
@@ -830,7 +830,7 @@ public sealed class ExcelPackage : IDisposable
 				}
 
 				_stream.Flush();
-				_package.Close();
+				Packaging.ZipPackage.Close();
 			}
 			else
 			{
@@ -847,7 +847,7 @@ public sealed class ExcelPackage : IDisposable
 				}
 
 				_package.Save(_stream);
-				_package.Close();
+				Packaging.ZipPackage.Close();
 				if (Stream is MemoryStream stream)
 				{
 					var fi = new FileStream(File.FullName, FileMode.Create);
@@ -1075,7 +1075,7 @@ public sealed class ExcelPackage : IDisposable
 		if (save)
 		{
 			Workbook.Save();
-			_package.Close();
+			Packaging.ZipPackage.Close();
 			_package.Save(_stream);
 		}
 
@@ -1118,7 +1118,7 @@ public sealed class ExcelPackage : IDisposable
 		//Release some resources:
 		if (_package != null)
 		{
-			_package.Close();
+			Packaging.ZipPackage.Close();
 			_package = null;
 		}
 

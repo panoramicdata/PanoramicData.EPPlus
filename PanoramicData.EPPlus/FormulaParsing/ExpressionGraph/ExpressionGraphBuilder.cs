@@ -174,7 +174,7 @@ public class ExpressionGraphBuilder : IExpressionGraphBuilder
 		}
 	}
 
-	private bool IsWaste(Token token) => token.TokenType == TokenType.String;
+	private static bool IsWaste(Token token) => token.TokenType == TokenType.String;
 
 	private void BuildFunctionExpression(Token[] tokens, Expression parent, string funcName)
 	{

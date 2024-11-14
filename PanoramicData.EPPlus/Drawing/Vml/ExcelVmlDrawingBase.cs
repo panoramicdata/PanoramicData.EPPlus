@@ -102,7 +102,7 @@ public class ExcelVmlDrawingBase : XmlHelper
 		}
 	}
 	#region "Style Handling methods"
-	protected bool GetStyle(string style, string key, out string value)
+	protected static bool GetStyle(string style, string key, out string value)
 	{
 		var styles = style.Split(';');
 		foreach (var s in styles)
@@ -126,7 +126,7 @@ public class ExcelVmlDrawingBase : XmlHelper
 		value = "";
 		return false;
 	}
-	protected string SetStyle(string style, string key, string value)
+	protected static string SetStyle(string style, string key, string value)
 	{
 		var styles = style.Split([';'], StringSplitOptions.RemoveEmptyEntries);
 		var newStyle = "";

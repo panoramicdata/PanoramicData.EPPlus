@@ -328,7 +328,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	/// </summary>
 	/// <param name="xPath">xPath to color node</param>
 	/// <returns></returns>
-	private string xPath4Alpha(string xPath)
+	private static string xPath4Alpha(string xPath)
 	{
 		var s = string.Empty;
 		if (xPath.EndsWith("@val"))

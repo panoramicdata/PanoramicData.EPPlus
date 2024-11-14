@@ -55,7 +55,7 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 		};
 		return bi;
 	}
-	private ExcelBorderStyle GetBorderStyleEnum(string style)
+	private static ExcelBorderStyle GetBorderStyleEnum(string style)
 	{
 		if (style == "") return ExcelBorderStyle.None;
 		var sInStyle = style[..1].ToUpper(CultureInfo.InvariantCulture) + style[1..];
@@ -69,7 +69,7 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 		}
 
 	}
-	private ExcelFillStyle GetPatternTypeEnum(string patternType)
+	private static ExcelFillStyle GetPatternTypeEnum(string patternType)
 	{
 		if (patternType == "") return ExcelFillStyle.None;
 		patternType = patternType[..1].ToUpper(CultureInfo.InvariantCulture) + patternType[1..];
@@ -102,7 +102,7 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 		ret.Tint = helper.GetXmlNodeDoubleNull(path + "/@tint");
 		return ret;
 	}
-	private ExcelUnderLineType? GetUnderLineEnum(string value) => value.ToLower(CultureInfo.InvariantCulture) switch
+	private static ExcelUnderLineType? GetUnderLineEnum(string value) => value.ToLower(CultureInfo.InvariantCulture) switch
 	{
 		"single" => (ExcelUnderLineType?)ExcelUnderLineType.Single,
 		"double" => (ExcelUnderLineType?)ExcelUnderLineType.Double,

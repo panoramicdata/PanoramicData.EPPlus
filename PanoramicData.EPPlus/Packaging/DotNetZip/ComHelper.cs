@@ -46,7 +46,7 @@ internal class ComHelper
 	/// </summary>
 	/// <param name="filename">The filename to of the zip file to check.</param>
 	/// <returns>true if the file contains a valid zip file.</returns>
-	public bool IsZipFile(string filename) => ZipFile.IsZipFile(filename);
+	public static bool IsZipFile(string filename) => ZipFile.IsZipFile(filename);
 
 	/// <summary>
 	///  A wrapper for <see cref="ZipFile.IsZipFile(string, bool)">ZipFile.IsZipFile(string, bool)</see>
@@ -57,7 +57,7 @@ internal class ComHelper
 	/// </remarks>
 	/// <param name="filename">The filename to of the zip file to check.</param>
 	/// <returns>true if the file contains a valid zip file.</returns>
-	public bool IsZipFileWithExtract(string filename) => ZipFile.IsZipFile(filename, true);
+	public static bool IsZipFileWithExtract(string filename) => ZipFile.IsZipFile(filename, true);
 
 #if !NETCF
 	/// <summary>
@@ -66,7 +66,7 @@ internal class ComHelper
 	/// <param name="filename">The filename to of the zip file to check.</param>
 	///
 	/// <returns>true if the named zip file checks OK. Otherwise, false. </returns>
-	public bool CheckZip(string filename) => ZipFile.CheckZip(filename);
+	public static bool CheckZip(string filename) => ZipFile.CheckZip(filename);
 
 	/// <summary>
 	///  A COM-friendly wrapper for the static method <see cref="ZipFile.CheckZipPassword(string,string)"/>.
@@ -77,13 +77,13 @@ internal class ComHelper
 	/// <param name="password">The password to check.</param>
 	///
 	/// <returns>true if the named zip file checks OK. Otherwise, false. </returns>
-	public bool CheckZipPassword(string filename, string password) => ZipFile.CheckZipPassword(filename, password);
+	public static bool CheckZipPassword(string filename, string password) => ZipFile.CheckZipPassword(filename, password);
 
 	/// <summary>
 	///  A wrapper for <see cref="ZipFile.FixZipDirectory(string)">ZipFile.FixZipDirectory(string)</see>
 	/// </summary>
 	/// <param name="filename">The filename to of the zip file to fix.</param>
-	public void FixZipDirectory(string filename) => ZipFile.FixZipDirectory(filename);
+	public static void FixZipDirectory(string filename) => ZipFile.FixZipDirectory(filename);
 #endif
 
 	/// <summary>
@@ -92,6 +92,6 @@ internal class ComHelper
 	/// <returns>
 	///  the version number on the DotNetZip assembly, formatted as a string.
 	/// </returns>
-	public string GetZipLibraryVersion() => ZipFile.LibraryVersion.ToString();
+	public static string GetZipLibraryVersion() => ZipFile.LibraryVersion.ToString();
 
 }

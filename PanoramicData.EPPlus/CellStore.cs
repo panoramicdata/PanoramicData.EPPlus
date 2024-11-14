@@ -841,18 +841,18 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 							if (page.RowCount > 0 && page.MinIndex <= fromRow + rows - 1 && page.MaxIndex >= fromRow) //The row is inside the page
 							{
 								var endRow = fromRow + rows;
-								var delEndRow = DeleteCells(column._pages[pagePos], fromRow, endRow, shift);
+								var delEndRow = CellStore<T>.DeleteCells(column._pages[pagePos], fromRow, endRow, shift);
 								if (shift && delEndRow != fromRow) UpdatePageOffset(column, pagePos, delEndRow - fromRow);
 								if (endRow > delEndRow && pagePos < column.PageCount && column._pages[pagePos].MinIndex < endRow)
 								{
 									pagePos = (delEndRow == fromRow ? pagePos : pagePos + 1);
-									var rowsLeft = DeletePage(shift ? fromRow : delEndRow, endRow - delEndRow, column, pagePos, shift);
+									var rowsLeft = CellStore<T>.DeletePage(shift ? fromRow : delEndRow, endRow - delEndRow, column, pagePos, shift);
 									//if (shift) UpdatePageOffset(column, pagePos, endRow - fromRow - rowsLeft);
 									if (rowsLeft > 0)
 									{
 										var fr = shift ? fromRow : endRow - rowsLeft;
 										pagePos = column.GetPosition(fr);
-										delEndRow = DeleteCells(column._pages[pagePos], fr, shift ? fr + rowsLeft : endRow, shift);
+										delEndRow = CellStore<T>.DeleteCells(column._pages[pagePos], fr, shift ? fr + rowsLeft : endRow, shift);
 										if (shift) UpdatePageOffset(column, pagePos, rowsLeft);
 									}
 								}
@@ -937,7 +937,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				if (fromPage.IndexOffset + fromPage.Rows[fromPage.RowCount - 1].Index -
 					toPage.IndexOffset + toPage.Rows[0].Index <= PageSizeMax)
 				{
-					MergePage(column, pagePos - 1);
+					CellStore<T>.MergePage(column, pagePos - 1);
 					//var newPage = new PageIndex(toPage, 0, GetSize(fromPage.RowCount + toPage.RowCount));
 					//newPage.RowCount = fromPage.RowCount + fromPage.RowCount;
 					//Array.Copy(toPage.Rows, 0, newPage.Rows, 0, toPage.RowCount);
@@ -973,7 +973,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		return rows;
 	}
 
-	private int DeletePage(int fromRow, int rows, ColumnIndex column, int pagePos, bool shift)
+	private static int DeletePage(int fromRow, int rows, ColumnIndex column, int pagePos, bool shift)
 	{
 		var page = column._pages[pagePos];
 		var startRows = rows;
@@ -1018,7 +1018,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		return rows;
 	}
 	///
-	private int DeleteCells(PageIndex page, int fromRow, int toRow, bool shift)
+	private static int DeleteCells(PageIndex page, int fromRow, int toRow, bool shift)
 	{
 		var fromPos = page.GetPosition(fromRow - (page.IndexOffset));
 		if (fromPos < 0)
@@ -1149,7 +1149,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				if (column.PageCount - 1 == pagePos) //No page after, create a new one.
 				{
 					//Copy rows to next page.
-					var newPage = CopyNew(page, rowPos, size);
+					var newPage = CellStore<T>.CopyNew(page, rowPos, size);
 					newPage.Index = (short)((row + rows) >> pageBits);
 					newPage.Offset = row + rows - (newPage.Index * PageSize) - newPage.Rows[0].Index;
 					if (newPage.Offset > PageSize)
@@ -1169,7 +1169,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					}
 					else //Copy Page.
 					{
-						CopyMergePage(page, rowPos, rows, size, column._pages[pagePos + 1]);
+						CellStore<T>.CopyMergePage(page, rowPos, rows, size, column._pages[pagePos + 1]);
 					}
 				}
 			}
@@ -1184,10 +1184,10 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 			if (page.Offset + page.Rows[page.RowCount - 1].Index >= PageSizeMax)   //Can not be larger than the max size of the page.
 			{
-				AdjustIndex(column, pagePos);
+				CellStore<T>.AdjustIndex(column, pagePos);
 				if (page.Offset + page.Rows[page.RowCount - 1].Index >= PageSizeMax)
 				{
-					pagePos = SplitPage(column, pagePos);
+					pagePos = CellStore<T>.SplitPage(column, pagePos);
 				}
 				//IndexItem[] newRows = new IndexItem[GetSize(page.RowCount - page.Rows[r].Index)];
 				//var newPage = new PageIndex(newRows, r);
@@ -1235,7 +1235,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		{
 			//Copy to a new page
 			var row = page.IndexOffset;
-			var newPage = CopyNew(page, rStart, rc);
+			var newPage = CellStore<T>.CopyNew(page, rStart, rc);
 			var ix = (short)(page.Index + addPages);
 			var offset = page.IndexOffset + rows - (ix * PageSize);
 			if (offset > PageSize)
@@ -1252,7 +1252,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		//Copy from next Row
 	}
 
-	private void CopyMergePage(PageIndex page, int rowPos, int rows, int size, PageIndex ToPage)
+	private static void CopyMergePage(PageIndex page, int rowPos, int rows, int size, PageIndex ToPage)
 	{
 		var startRow = page.IndexOffset + page.Rows[rowPos].Index + rows;
 		var newRows = new IndexItem[GetSize(ToPage.RowCount + size)];
@@ -1267,7 +1267,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		ToPage.Rows = newRows;
 		ToPage.RowCount += size;
 	}
-	private void MergePage(ColumnIndex column, int pagePos)
+	private static void MergePage(ColumnIndex column, int pagePos)
 	{
 		var Page1 = column._pages[pagePos];
 		var Page2 = column._pages[pagePos + 1];
@@ -1297,7 +1297,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		}
 	}
 
-	private PageIndex CopyNew(PageIndex pageFrom, int rowPos, int size)
+	private static PageIndex CopyNew(PageIndex pageFrom, int rowPos, int size)
 	{
 		var newRows = new IndexItem[GetSize(size)];
 		Array.Copy(pageFrom.Rows, rowPos, newRows, 0, size);
@@ -1321,7 +1321,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		{
 			if (pageItem.RowCount == PageSizeMax) //Max size-->Split
 			{
-				pagePos = SplitPage(columnIndex, pagePos);
+				pagePos = CellStore<T>.SplitPage(columnIndex, pagePos);
 				if (columnIndex._pages[pagePos - 1].RowCount > pos)
 				{
 					pagePos--;
@@ -1351,7 +1351,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		pageItem.RowCount++;
 	}
 
-	private int SplitPage(ColumnIndex columnIndex, int pagePos)
+	private static int SplitPage(ColumnIndex columnIndex, int pagePos)
 	{
 		var page = columnIndex._pages[pagePos];
 		if (page.Offset != 0)
@@ -1398,7 +1398,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		return pagePos + 1;
 	}
 
-	private PageIndex AdjustIndex(ColumnIndex columnIndex, int pagePos)
+	private static PageIndex AdjustIndex(ColumnIndex columnIndex, int pagePos)
 	{
 		var page = columnIndex._pages[pagePos];
 		//First Adjust indexes
@@ -1429,7 +1429,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		return page;
 	}
 
-	private void AddPageRowOffset(PageIndex page, short offset)
+	private static void AddPageRowOffset(PageIndex page, short offset)
 	{
 		for (var r = 0; r < page.RowCount; r++)
 		{
@@ -1438,7 +1438,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	}
 	private void AddPage(ColumnIndex column, int pos, short index)
 	{
-		AddPage(column, pos);
+		CellStore<T>.AddPage(column, pos);
 		column._pages[pos] = new PageIndex() { Index = index };
 		if (pos > 0)
 		{
@@ -1457,7 +1457,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	/// <param name="page">The new page object to add</param>
 	private void AddPage(ColumnIndex column, int pos, PageIndex page)
 	{
-		AddPage(column, pos);
+		CellStore<T>.AddPage(column, pos);
 		column._pages[pos] = page;
 	}
 	/// <summary>
@@ -1465,7 +1465,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	/// </summary>
 	/// <param name="column">The column</param>
 	/// <param name="pos">Position</param>
-	private void AddPage(ColumnIndex column, int pos)
+	private static void AddPage(ColumnIndex column, int pos)
 	{
 		if (column.PageCount == column._pages.Length)
 		{

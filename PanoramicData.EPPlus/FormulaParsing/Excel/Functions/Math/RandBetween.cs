@@ -40,7 +40,7 @@ public class RandBetween : ExcelFunction
 		return CreateResult(low + randPart, DataType.Integer);
 	}
 
-	private double CalulateDiff(double high, double low)
+	private static double CalulateDiff(double high, double low)
 	{
 		if (high > 0 && low < 0)
 		{

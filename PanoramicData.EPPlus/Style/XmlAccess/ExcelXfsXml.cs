@@ -68,14 +68,14 @@ public sealed class ExcelXfs : StyleXmlHelper
 		_quotePrefix = GetXmlNodeBool(quotePrefixPath);
 	}
 
-	private ExcelReadingOrder GetReadingOrder(string value) => value switch
+	private static ExcelReadingOrder GetReadingOrder(string value) => value switch
 	{
 		"1" => ExcelReadingOrder.LeftToRight,
 		"2" => ExcelReadingOrder.RightToLeft,
 		_ => ExcelReadingOrder.ContextDependent,
 	};
 
-	private ExcelHorizontalAlignment GetHorizontalAlign(string align)
+	private static ExcelHorizontalAlignment GetHorizontalAlign(string align)
 	{
 		if (align == "") return ExcelHorizontalAlignment.General;
 		align = align[..1].ToUpper(CultureInfo.InvariantCulture) + align[1..];
@@ -89,7 +89,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 
-	private ExcelVerticalAlignment GetVerticalAlign(string align)
+	private static ExcelVerticalAlignment GetVerticalAlign(string align)
 	{
 		if (align == "") return ExcelVerticalAlignment.Bottom;
 		align = align[..1].ToUpper(CultureInfo.InvariantCulture) + align[1..];
@@ -394,7 +394,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	#endregion
-	internal void RegisterEvent(ExcelXfs xf)
+	internal static void RegisterEvent(ExcelXfs xf)
 	{
 		//                RegisterEvent(xf, xf.Xf_ChangedEvent);
 	}
@@ -555,7 +555,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		return subId == int.MinValue ? _styles.Borders.Add(id, border) : subId;
 	}
 
-	private void SetBorderItem(ExcelBorderItemXml excelBorderItem, eStyleProperty styleProperty, object value)
+	private static void SetBorderItem(ExcelBorderItemXml excelBorderItem, eStyleProperty styleProperty, object value)
 	{
 		if (styleProperty == eStyleProperty.Style)
 		{
@@ -847,7 +847,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		return TopNode;
 	}
 
-	private string SetAlignString(Enum align)
+	private static string SetAlignString(Enum align)
 	{
 		var newName = Enum.GetName(align.GetType(), align);
 		return newName[..1].ToLower(CultureInfo.InvariantCulture) + newName[1..];

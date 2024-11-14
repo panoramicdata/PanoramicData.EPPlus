@@ -248,7 +248,7 @@ internal class CompoundDocumentFile : IDisposable
 			_miniSectors.Add(br.ReadBytes(_miniSectorSize));
 		}
 	}
-	private byte[] GetStream(int startingSectorLocation, long streamSize, List<int> FAT, List<byte[]> sectors)
+	private static byte[] GetStream(int startingSectorLocation, long streamSize, List<int> FAT, List<byte[]> sectors)
 	{
 		var ms = new MemoryStream();
 		var bw = new BinaryWriter(ms);
@@ -321,7 +321,7 @@ internal class CompoundDocumentFile : IDisposable
 
 		return l;
 	}
-	private void ReadDirectory(List<byte[]> sectors, int index, List<CompoundDocumentItem> l)
+	private static void ReadDirectory(List<byte[]> sectors, int index, List<CompoundDocumentItem> l)
 	{
 
 		var br = new BinaryReader(new MemoryStream(sectors[index]));
@@ -369,7 +369,7 @@ internal class CompoundDocumentFile : IDisposable
 			RootItem = e;
 		}
 	}
-	internal void AddLeftSiblingTree(CompoundDocumentItem e, List<CompoundDocumentItem> dirs)
+	internal static void AddLeftSiblingTree(CompoundDocumentItem e, List<CompoundDocumentItem> dirs)
 	{
 		if (e.LeftSibling > 0)
 		{
@@ -383,7 +383,7 @@ internal class CompoundDocumentFile : IDisposable
 			}
 		}
 	}
-	internal void AddRightSiblingTree(CompoundDocumentItem e, List<CompoundDocumentItem> dirs)
+	internal static void AddRightSiblingTree(CompoundDocumentItem e, List<CompoundDocumentItem> dirs)
 	{
 		if (e.RightSibling > 0)
 		{
@@ -441,7 +441,7 @@ internal class CompoundDocumentFile : IDisposable
 		return l;
 	}
 
-	private void InitItem(CompoundDocumentItem item)
+	private static void InitItem(CompoundDocumentItem item)
 	{
 		item.LeftSibling = -1;
 		item.RightSibling = -1;
@@ -472,7 +472,7 @@ internal class CompoundDocumentFile : IDisposable
 		return childId;
 	}
 
-	private void SetUnhandled(int listAdd, List<CompoundDocumentItem> children)
+	private static void SetUnhandled(int listAdd, List<CompoundDocumentItem> children)
 	{
 		for (var i = 0; i < children.Count; i++)
 		{
@@ -529,13 +529,13 @@ internal class CompoundDocumentFile : IDisposable
 		return pos + listAdd;
 	}
 
-	private int GetPos(int fromPos, int toPos)
+	private static int GetPos(int fromPos, int toPos)
 	{
 		var div = (toPos - fromPos) / 2;
 		return fromPos + div;
 	}
 
-	private bool NoGreater(List<CompoundDocumentItem> children, int pos, int lPos, int listAdd)
+	private static bool NoGreater(List<CompoundDocumentItem> children, int pos, int lPos, int listAdd)
 	{
 		if (pos - lPos <= 1) return true;
 		for (var i = lPos + 1; i <= pos; i++)
@@ -546,7 +546,7 @@ internal class CompoundDocumentFile : IDisposable
 
 		return true;
 	}
-	private bool NoLess(List<CompoundDocumentItem> children, int pos, int rPos, int listAdd)
+	private static bool NoLess(List<CompoundDocumentItem> children, int pos, int rPos, int listAdd)
 	{
 		if (rPos - pos <= 1) return true;
 		for (var i = pos + 1; i <= rPos; i++)
@@ -558,7 +558,7 @@ internal class CompoundDocumentFile : IDisposable
 		return true;
 	}
 
-	private int GetLevels(int c)
+	private static int GetLevels(int c)
 	{
 		c--;
 		var i = 0;
@@ -605,7 +605,7 @@ internal class CompoundDocumentFile : IDisposable
 
 		bw.Seek(pos, SeekOrigin.Begin);
 	}
-	private void WritePosition(BinaryWriter bw, int[] sectors, ref int writePos)
+	private static void WritePosition(BinaryWriter bw, int[] sectors, ref int writePos)
 	{
 		var pos = (int)bw.BaseStream.Position;
 		bw.Seek(writePos, SeekOrigin.Begin);
@@ -844,7 +844,7 @@ internal class CompoundDocumentFile : IDisposable
 		_currentFATSectorPos = (int)bw.BaseStream.Position;
 	}
 
-	private int GetSectors(int v, int size) => v % size == 0 ? v / size : v / size + 1;
+	private static int GetSectors(int v, int size) => v % size == 0 ? v / size : v / size + 1;
 
 	private byte[] SetMiniStream(List<CompoundDocumentItem> dirs)
 	{
@@ -942,7 +942,7 @@ internal class CompoundDocumentFile : IDisposable
 		return ret; //Returns the start sector
 	}
 
-	private void AddFAT(List<int> fat, long streamSize, int sectorSize, int addPos)
+	private static void AddFAT(List<int> fat, long streamSize, int sectorSize, int addPos)
 	{
 		var size = 0;
 		while (size < streamSize)

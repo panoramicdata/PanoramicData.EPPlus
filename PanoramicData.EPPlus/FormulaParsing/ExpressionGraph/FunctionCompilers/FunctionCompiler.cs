@@ -56,7 +56,7 @@ public abstract class FunctionCompiler
 		Context = context;
 	}
 
-	protected void BuildFunctionArguments(CompileResult compileResult, DataType dataType, List<FunctionArgument> args)
+	protected static void BuildFunctionArguments(CompileResult compileResult, DataType dataType, List<FunctionArgument> args)
 	{
 		if (compileResult.Result is IEnumerable<object> and not ExcelDataProvider.IRangeInfo)
 		{

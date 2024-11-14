@@ -105,7 +105,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		_height = image.Height;
 		_width = image.Width;
 		SetPosDefaults(image);
-		package.Flush();
+		Packaging.ZipPackage.Flush();
 	}
 	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, FileInfo imageFile, Uri hyperlink) :
 		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
@@ -150,7 +150,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		SetPosDefaults(Image);
 		//Create relationship
 		node.SelectSingleNode("xdr:pic/xdr:blipFill/a:blip/@r:embed", NameSpaceManager).Value = relID;
-		package.Flush();
+		Packaging.ZipPackage.Flush();
 	}
 
 	internal static string GetContentType(string extension) => extension.ToLower(CultureInfo.InvariantCulture) switch
@@ -179,7 +179,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		"image/x-wmf" => ImageFormat.Wmf,
 		_ => ImageFormat.Jpeg,
 	};        //Add a new image to the compare collection
-	private void AddNewPicture(byte[] img, string relID)
+	private static void AddNewPicture(byte[] img, string relID)
 	{
 		var newPic = new ExcelDrawings.ImageCompare
 		{

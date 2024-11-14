@@ -43,7 +43,7 @@ public abstract class ZipPackageRelationshipBase
 		_rels.Remove(id);
 		UpdateMaxRId(id, ref maxRId);
 	}
-	protected void UpdateMaxRId(string id, ref int maxRId)
+	protected static void UpdateMaxRId(string id, ref int maxRId)
 	{
 		if (id.StartsWith("rId"))
 		{

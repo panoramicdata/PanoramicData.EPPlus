@@ -398,7 +398,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			StreamWriter streamChart = new(_part.GetStream(FileMode.Create, FileAccess.Write));
 			DrawingXml.Save(streamChart);
 			streamChart.Close();
-			package.Flush();
+			Packaging.ZipPackage.Flush();
 
 			_drawingRelation = Worksheet.Part.CreateRelationship(UriHelper.GetRelativeUri(Worksheet.WorksheetUri, _uriDrawing), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/drawing");
 			var e = (XmlElement)Worksheet.CreateNode("d:drawing");
@@ -406,7 +406,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			e.SetAttribute("id", ExcelPackage.schemaRelationships, _drawingRelation.Id);
 
 			//Worksheet.WorksheetXml.DocumentElement.AppendChild(e);
-			package.Flush();
+			Packaging.ZipPackage.Flush();
 		}
 
 		var colNode = _drawingsXml.SelectSingleNode("//xdr:wsDr", NameSpaceManager);

@@ -74,7 +74,7 @@ public class SyntacticAnalyzer : ISyntacticAnalyzer
 		}
 	}
 
-	private void EnsureParenthesesAreWellFormed(Token token, AnalyzingContext context)
+	private static void EnsureParenthesesAreWellFormed(Token token, AnalyzingContext context)
 	{
 		if (token.TokenType == TokenType.OpeningParenthesis)
 		{
@@ -86,7 +86,7 @@ public class SyntacticAnalyzer : ISyntacticAnalyzer
 		}
 	}
 
-	private void EnsureStringsAreWellFormed(Token token, AnalyzingContext context)
+	private static void EnsureStringsAreWellFormed(Token token, AnalyzingContext context)
 	{
 		if (!context.IsInString && token.TokenType == TokenType.String)
 		{

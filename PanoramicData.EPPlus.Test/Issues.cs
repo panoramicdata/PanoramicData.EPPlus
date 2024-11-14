@@ -699,7 +699,7 @@ public class Issues : TestBase
 		BuildPivotTable2(MyFile);
 	}
 
-	private void LoadData(FileInfo MyFile)
+	private static void LoadData(FileInfo MyFile)
 	{
 		if (MyFile.Exists)
 		{
@@ -768,7 +768,7 @@ public class Issues : TestBase
 		wsData.Cells.AutoFitColumns(0);
 		EP.Save();
 	}
-	private void BuildPivotTable1(FileInfo MyFile)
+	private static void BuildPivotTable1(FileInfo MyFile)
 	{
 		using ExcelPackage ep = new(MyFile);
 
@@ -804,7 +804,7 @@ public class Issues : TestBase
 
 	}
 
-	private void BuildPivotTable2(FileInfo MyFile)
+	private static void BuildPivotTable2(FileInfo MyFile)
 	{
 		using ExcelPackage ep = new(MyFile);
 
@@ -1062,7 +1062,7 @@ public class Issues : TestBase
 		var ws = p.Workbook.Worksheets.Add("Test");
 		var c = ws.Cells["A1"].Style.Font.Color;
 		c.Indexed = 3;
-		Assert.AreEqual(c.LookupColor(c), "#FF00FF00");
+		Assert.AreEqual(ExcelColor.LookupColor(c), "#FF00FF00");
 	}
 	[TestMethod, Ignore]
 	public void Issue15097()
@@ -1670,7 +1670,7 @@ public class Issues : TestBase
 		fs.Close();
 
 	}
-	private void PrepareDoc(ExcelPackage xlp)
+	private static void PrepareDoc(ExcelPackage xlp)
 	{
 		//generate date/value pairs for October 2017
 		var series = Enumerable.Range(0, 31);
@@ -1692,7 +1692,7 @@ public class Issues : TestBase
 		}
 	}
 
-	private void GenPivot(ExcelPackage xlp)
+	private static void GenPivot(ExcelPackage xlp)
 	{
 		var ws = xlp.Workbook.Worksheets.Add(PIVOT_WS_NAME);
 		var srcws = xlp.Workbook.Worksheets[DATA_WS_NAME];

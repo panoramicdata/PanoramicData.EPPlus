@@ -76,7 +76,7 @@ internal class ExcelVmlDrawingCommentCollection : ExcelVmlDrawingBaseCollection,
 		list.Sort(new Comparison<IRangeID>((r1, r2) => (r1.RangeID < r2.RangeID ? -1 : r1.RangeID > r2.RangeID ? 1 : 0)));  //Vml drawings are not sorted. Sort to avoid missmatches.
 		_drawings = new RangeCollection(list);
 	}
-	private string CreateVmlDrawings()
+	private static string CreateVmlDrawings()
 	{
 		var vml = string.Format("<xml xmlns:v=\"{0}\" xmlns:o=\"{1}\" xmlns:x=\"{2}\">",
 			ExcelPackage.schemaMicrosoftVml,

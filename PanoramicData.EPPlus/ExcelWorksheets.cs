@@ -96,7 +96,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 	}
 
-	private eWorkSheetHidden TranslateHidden(string value) => value switch
+	private static eWorkSheetHidden TranslateHidden(string value) => value switch
 	{
 		"hidden" => eWorkSheetHidden.Hidden,
 		"veryHidden" => eWorkSheetHidden.VeryHidden,
@@ -150,7 +150,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			StreamWriter streamWorksheet = new(worksheetPart.GetStream(FileMode.Create, FileAccess.Write));
 			var worksheetXml = CreateNewWorksheet(isChart);
 			worksheetXml.Save(streamWorksheet);
-			_pck.Package.Flush();
+			Packaging.ZipPackage.Flush();
 
 			var rel = CreateWorkbookRel(Name, sheetID, uriWorksheet, isChart);
 
@@ -169,7 +169,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			if (_pck.Workbook.VbaProject != null)
 			{
 				var name = _pck.Workbook.VbaProject.GetModuleNameFromWorksheet(worksheet);
-				_pck.Workbook.VbaProject.Modules.Add(new ExcelVBAModule(worksheet.CodeNameChange) { Name = name, Code = "", Attributes = _pck.Workbook.VbaProject.GetDocumentAttributes(Name, "0{00020820-0000-0000-C000-000000000046}"), Type = eModuleType.Document, HelpContext = 0 });
+				_pck.Workbook.VbaProject.Modules.Add(new ExcelVBAModule(worksheet.CodeNameChange) { Name = name, Code = "", Attributes = ExcelVbaProject.GetDocumentAttributes(Name, "0{00020820-0000-0000-C000-000000000046}"), Type = eModuleType.Document, HelpContext = 0 });
 				worksheet.CodeModuleName = name;
 
 			}
@@ -204,7 +204,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			XmlDocument worksheetXml = new();
 			worksheetXml.LoadXml(Copy.WorksheetXml.OuterXml);
 			worksheetXml.Save(streamWorksheet);
-			_pck.Package.Flush();
+			Packaging.ZipPackage.Flush();
 
 
 			//Create a relation to the workbook
@@ -253,7 +253,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			if (_pck.Workbook.VbaProject != null)
 			{
 				var name = _pck.Workbook.VbaProject.GetModuleNameFromWorksheet(added);
-				_pck.Workbook.VbaProject.Modules.Add(new ExcelVBAModule(added.CodeNameChange) { Name = name, Code = Copy.CodeModule.Code, Attributes = _pck.Workbook.VbaProject.GetDocumentAttributes(Name, "0{00020820-0000-0000-C000-000000000046}"), Type = eModuleType.Document, HelpContext = 0 });
+				_pck.Workbook.VbaProject.Modules.Add(new ExcelVBAModule(added.CodeNameChange) { Name = name, Code = Copy.CodeModule.Code, Attributes = ExcelVbaProject.GetDocumentAttributes(Name, "0{00020820-0000-0000-C000-000000000046}"), Type = eModuleType.Document, HelpContext = 0 });
 				Copy.CodeModuleName = name;
 			}
 
@@ -290,7 +290,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// <param name="pivotTableSource">The pivottable source</param>
 	/// <returns></returns>
 	public ExcelChartsheet AddChart(string Name, eChartType chartType, ExcelPivotTable pivotTableSource) => (ExcelChartsheet)AddSheet(Name, true, chartType, pivotTableSource);
-	private void CopySheetNames(ExcelWorksheet Copy, ExcelWorksheet added)
+	private static void CopySheetNames(ExcelWorksheet Copy, ExcelWorksheet added)
 	{
 		foreach (var name in Copy.Names)
 		{
@@ -499,7 +499,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 	}
 
-	private void CopyText(ExcelHeaderFooterText from, ExcelHeaderFooterText to)
+	private static void CopyText(ExcelHeaderFooterText from, ExcelHeaderFooterText to)
 	{
 		to.LeftAlignedText = from.LeftAlignedText;
 		to.CenteredText = from.CenteredText;
@@ -575,7 +575,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		added._package.DoAdjustDrawings = doAdjust;
 	}
 
-	private int CopyValues(ExcelWorksheet Copy, ExcelWorksheet added, int row, int col)
+	private static int CopyValues(ExcelWorksheet Copy, ExcelWorksheet added, int row, int col)
 	{
 		added.SetValueInner(row, col, Copy.GetValueInner(row, col));
 		byte fl = 0;
@@ -758,7 +758,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	{
 		//Create the relationship between the workbook and the new worksheet
 		var rel = _pck.Workbook.Part.CreateRelationship(UriHelper.GetRelativeUri(_pck.Workbook.WorkbookUri, uriWorksheet), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/" + (isChart ? "chartsheet" : "worksheet"));
-		_pck.Package.Flush();
+		Packaging.ZipPackage.Flush();
 
 		//Create the new sheet node
 		var worksheetNode = _pck.Workbook.WorkbookXml.CreateElement("sheet", ExcelPackage.schemaMain);
@@ -824,13 +824,13 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// </summary>
 	/// <param name="Name">The Name</param>
 	/// <returns>True if valid</returns>
-	private bool ValidateName(string Name) => System.Text.RegularExpressions.Regex.IsMatch(Name, @":|\?|/|\\|\[|\]");
+	private static bool ValidateName(string Name) => System.Text.RegularExpressions.Regex.IsMatch(Name, @":|\?|/|\\|\[|\]");
 
 	/// <summary>
 	/// Creates the XML document representing a new empty worksheet
 	/// </summary>
 	/// <returns></returns>
-	internal XmlDocument CreateNewWorksheet(bool isChart)
+	internal static XmlDocument CreateNewWorksheet(bool isChart)
 	{
 		XmlDocument xmlDoc = new();
 		var elemWs = xmlDoc.CreateElement(isChart ? "chartsheet" : "worksheet", ExcelPackage.schemaMain);

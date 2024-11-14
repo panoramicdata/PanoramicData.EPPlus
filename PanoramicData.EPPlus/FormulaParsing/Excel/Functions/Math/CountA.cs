@@ -84,5 +84,5 @@ public class CountA : HiddenValuesHandlingFunction
 		}
 	}
 
-	private bool ShouldCount(object value) => value != null && !string.IsNullOrEmpty(value.ToString());
+	private static bool ShouldCount(object value) => value != null && !string.IsNullOrEmpty(value.ToString());
 }

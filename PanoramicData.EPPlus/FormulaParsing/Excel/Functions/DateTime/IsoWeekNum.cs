@@ -19,7 +19,7 @@ public class IsoWeekNum : ExcelFunction
 	/// </summary>
 	/// <param name="fromDate"></param>
 	/// <returns></returns>
-	private int WeekNumber(System.DateTime fromDate)
+	private static int WeekNumber(System.DateTime fromDate)
 	{
 		// Get jan 1st of the year
 		var startOfYear = fromDate.AddDays(-fromDate.Day + 1).AddMonths(-fromDate.Month + 1);

@@ -72,7 +72,7 @@ public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, I
 		}
 	}
 
-	private string CreateVmlDrawings()
+	private static string CreateVmlDrawings()
 	{
 		var vml = string.Format("<xml xmlns:v=\"{0}\" xmlns:o=\"{1}\" xmlns:x=\"{2}\">",
 			ExcelPackage.schemaMicrosoftVml,

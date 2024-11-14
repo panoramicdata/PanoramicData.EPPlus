@@ -35,7 +35,7 @@ public class HolidayWeekdaysFactory
 		return new HolidayWeekdays([.. retVal]);
 	}
 
-	public HolidayWeekdays Create(int code) => code switch
+	public static HolidayWeekdays Create(int code) => code switch
 	{
 		1 => new HolidayWeekdays(DayOfWeek.Saturday, DayOfWeek.Sunday),
 		2 => new HolidayWeekdays(DayOfWeek.Sunday, DayOfWeek.Monday),

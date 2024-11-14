@@ -333,7 +333,7 @@ public class CalculationTests
 		formulaCell.Calculate();
 		Assert.AreEqual(expectedDateWithMath, formulaCell.Value);
 	}
-	private string GetOutput(string file)
+	private static string GetOutput(string file)
 	{
 		using var pck = new ExcelPackage(new FileInfo(file));
 		var fr = new Dictionary<string, object>();

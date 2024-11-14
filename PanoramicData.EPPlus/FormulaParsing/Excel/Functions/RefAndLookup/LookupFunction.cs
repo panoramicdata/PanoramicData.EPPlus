@@ -48,7 +48,7 @@ public abstract class LookupFunction : ExcelFunction
 
 	protected int IsMatch(object o1, object o2) => _valueMatcher.IsMatch(o1, o2);
 
-	protected LookupDirection GetLookupDirection(RangeAddress rangeAddress)
+	protected static LookupDirection GetLookupDirection(RangeAddress rangeAddress)
 	{
 		var nRows = rangeAddress.ToRow - rangeAddress.FromRow;
 		var nCols = rangeAddress.ToCol - rangeAddress.FromCol;

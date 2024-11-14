@@ -7,7 +7,7 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;
 [TestClass]
 public class TimeStringParserTests
 {
-	private double GetSerialNumber(int hour, int minute, int second)
+	private static double GetSerialNumber(int hour, int minute, int second)
 	{
 		var secondsInADay = 24d * 60d * 60d;
 		return ((double)hour * 60 * 60 + (double)minute * 60 + second) / secondsInADay;

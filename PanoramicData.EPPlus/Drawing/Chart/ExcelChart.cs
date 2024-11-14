@@ -494,11 +494,11 @@ public class ExcelChart : ExcelDrawing
 #if !Core
 			streamChart.Close();
 #endif
-			package.Flush();
+			ZipPackage.Flush();
 
 			var chartRelation = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, UriChart), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/chart");
 			graphFrame.SelectSingleNode("a:graphic/a:graphicData/c:chart", NameSpaceManager).Attributes["r:id"].Value = chartRelation.Id;
-			package.Flush();
+			ZipPackage.Flush();
 			_chartNode = ChartXml.SelectSingleNode(string.Format("c:chartSpace/c:chart/c:plotArea/{0}", GetChartNodeText()), NameSpaceManager);
 		}
 		else
@@ -712,14 +712,14 @@ public class ExcelChart : ExcelDrawing
 		eChartType.XYScatter or eChartType.XYScatterLines or eChartType.XYScatterLinesNoMarkers or eChartType.XYScatterSmooth or eChartType.XYScatterSmoothNoMarkers or eChartType.Bubble or eChartType.Bubble3DEffect => "valAx",
 		_ => "catAx",
 	};
-	private string AddScatterType(eChartType type) => type is eChartType.XYScatter or
+	private static string AddScatterType(eChartType type) => type is eChartType.XYScatter or
 			eChartType.XYScatterLines or
 			eChartType.XYScatterLinesNoMarkers or
 			eChartType.XYScatterSmooth or
 			eChartType.XYScatterSmoothNoMarkers
 			? "<c:scatterStyle val=\"\" />"
 			: "";
-	private string AddRadarType(eChartType type) => type is eChartType.Radar or
+	private static string AddRadarType(eChartType type) => type is eChartType.Radar or
 			eChartType.RadarFilled or
 			eChartType.RadarMarkers
 			? "<c:radarStyle val=\"\" />"
@@ -727,16 +727,16 @@ public class ExcelChart : ExcelDrawing
 	private string AddGrouping() =>
 		//IsTypeClustered() || IsTypePercentStacked() || IsTypeStacked() || 
 		IsTypeShape() || IsTypeLine() ? "<c:grouping val=\"standard\"/>" : "";
-	private string AddHoleSize(eChartType type) => type is eChartType.Doughnut or
+	private static string AddHoleSize(eChartType type) => type is eChartType.Doughnut or
 			eChartType.DoughnutExploded
 			? "<c:holeSize val=\"50\" />"
 			: "";
-	private string AddFirstSliceAng(eChartType type) => type is eChartType.Doughnut or
+	private static string AddFirstSliceAng(eChartType type) => type is eChartType.Doughnut or
 			eChartType.DoughnutExploded
 			? "<c:firstSliceAng val=\"0\" />"
 			: "";
 	private string AddVaryColors() => IsTypePieDoughnut() ? "<c:varyColors val=\"1\" />" : "<c:varyColors val=\"0\" />";
-	private string AddHasMarker(eChartType type) => type is eChartType.LineMarkers or
+	private static string AddHasMarker(eChartType type) => type is eChartType.LineMarkers or
 			eChartType.LineMarkersStacked or
 			eChartType.LineMarkersStacked100
 			? "<c:marker val=\"1\"/>"
@@ -748,7 +748,7 @@ public class ExcelChart : ExcelDrawing
 		IsType3D() ? "<c:view3D><c:perspective val=\"30\" /></c:view3D>" : "";
 	private string AddSurfaceXml(eChartType type) => IsTypeSurface() ? AddSurfacePart("floor") + AddSurfacePart("sideWall") + AddSurfacePart("backWall") : "";
 
-	private string AddSurfacePart(string name) => string.Format("<c:{0}><c:thickness val=\"0\"/><c:spPr><a:noFill/><a:ln><a:noFill/></a:ln><a:effectLst/><a:sp3d/></c:spPr></c:{0}>", name);
+	private static string AddSurfacePart(string name) => string.Format("<c:{0}><c:thickness val=\"0\"/><c:spPr><a:noFill/><a:ln><a:noFill/></a:ln><a:effectLst/><a:sp3d/></c:spPr></c:{0}>", name);
 	#endregion
 	#endregion
 	#region "Chart type functions
@@ -1390,18 +1390,18 @@ public class ExcelChart : ExcelDrawing
 	/// Package internal URI
 	/// </summary>
 	internal Uri UriChart { get; set; }
-	internal new string Id => "";
+	internal new static string Id => "";
 	ExcelChartTitle _title = null;
 	#endregion
 	#region "Grouping Enum Translation"
-	private string GetGroupingText(eGrouping grouping) => grouping switch
+	private static string GetGroupingText(eGrouping grouping) => grouping switch
 	{
 		eGrouping.Clustered => "clustered",
 		eGrouping.Stacked => "stacked",
 		eGrouping.PercentStacked => "percentStacked",
 		_ => "standard",
 	};
-	private eGrouping GetGroupingEnum(string grouping) => grouping switch
+	private static eGrouping GetGroupingEnum(string grouping) => grouping switch
 	{
 		"stacked" => eGrouping.Stacked,
 		"percentStacked" => eGrouping.PercentStacked,

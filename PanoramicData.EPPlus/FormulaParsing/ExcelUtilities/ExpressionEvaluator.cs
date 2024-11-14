@@ -52,7 +52,7 @@ public class ExpressionEvaluator
 		_compileResultFactory = compileResultFactory;
 	}
 
-	private string GetNonAlphanumericStartChars(string expression)
+	private static string GetNonAlphanumericStartChars(string expression)
 	{
 		if (!string.IsNullOrEmpty(expression))
 		{
@@ -71,7 +71,7 @@ public class ExpressionEvaluator
 		return result.DataType != DataType.Boolean ? throw new ArgumentException("Illegal operator in expression") : (bool)result.Result;
 	}
 
-	public bool TryConvertToDouble(object op, out double d)
+	public static bool TryConvertToDouble(object op, out double d)
 	{
 		if (op is double or int)
 		{

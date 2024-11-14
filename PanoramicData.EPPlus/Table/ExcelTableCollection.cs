@@ -105,7 +105,7 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 		return Add(new ExcelTable(_ws, Range, Name, _ws.Workbook._nextTableID));
 	}
 
-	private void ValidateTableName(string Name)
+	private static void ValidateTableName(string Name)
 	{
 		if (string.IsNullOrEmpty(Name))
 		{
@@ -192,7 +192,7 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 	/// </summary>
 	/// <param name="Range">The range</param>
 	/// <returns>The table. Null if no range matches</returns>
-	public ExcelTable GetFromRange(ExcelRangeBase Range)
+	public static ExcelTable GetFromRange(ExcelRangeBase Range)
 	{
 		foreach (var tbl in Range.Worksheet.Tables)
 		{

@@ -113,7 +113,7 @@ public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 		return readExcelPackageToString(package, package.Workbook.Worksheets[worksheetName]);
 	}
 
-	private string readExcelPackageToString(ExcelPackage package, ExcelWorksheet worksheet)
+	private static string readExcelPackageToString(ExcelPackage package, ExcelWorksheet worksheet)
 	{
 		var rowCount = worksheet.Dimension?.Rows;
 		var colCount = worksheet.Dimension?.Columns;

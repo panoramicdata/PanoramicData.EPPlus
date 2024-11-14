@@ -1189,7 +1189,7 @@ sealed class InflateCodes
 	// at least ten.  The ten bytes are six bytes for the longest length/
 	// distance pair plus four bytes for overloading the bit buffer.
 
-	internal int InflateFast(int bl, int bd, int[] tl, int tl_index, int[] td, int td_index, InflateBlocks s, ZlibCodec z)
+	internal static int InflateFast(int bl, int bd, int[] tl, int tl_index, int[] td, int td_index, InflateBlocks s, ZlibCodec z)
 	{
 		int t;        // temporary pointer
 		int[] tp;     // temporary pointer

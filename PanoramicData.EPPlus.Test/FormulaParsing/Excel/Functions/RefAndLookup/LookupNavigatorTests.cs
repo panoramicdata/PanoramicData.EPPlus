@@ -12,13 +12,13 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions.RefAndLookup;
 public class LookupNavigatorTests
 {
 	const string WorksheetName = "";
-	private LookupArguments GetArgs(params object[] args)
+	private static LookupArguments GetArgs(params object[] args)
 	{
 		var lArgs = FunctionsHelper.CreateArgs(args);
 		return new LookupArguments(lArgs, ParsingContext.Create());
 	}
 
-	private ParsingContext GetContext(ExcelDataProvider provider)
+	private static ParsingContext GetContext(ExcelDataProvider provider)
 	{
 		var ctx = ParsingContext.Create();
 		ctx.Scopes.NewScope(new RangeAddress() { Worksheet = WorksheetName, FromCol = 1, FromRow = 1 });

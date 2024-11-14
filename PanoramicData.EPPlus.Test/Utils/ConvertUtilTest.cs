@@ -166,7 +166,7 @@ public class ConvertUtilTest
 	public void BadTextToInt() => ConvertUtil.GetTypedCellValue<int>("text1");
 
 	// previous implementation
-	internal T GetTypedValue<T>(object v)
+	internal static T GetTypedValue<T>(object v)
 	{
 		if (v == null)
 		{

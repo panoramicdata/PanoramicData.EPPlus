@@ -42,9 +42,9 @@ public class Replace : ExcelFunction
 		return CreateResult(result, DataType.String);
 	}
 
-	private string GetFirstPart(string text, int startPos) => text[..(startPos - 1)];
+	private static string GetFirstPart(string text, int startPos) => text[..(startPos - 1)];
 
-	private string GetLastPart(string text, int startPos, int nCharactersToReplace)
+	private static string GetLastPart(string text, int startPos, int nCharactersToReplace)
 	{
 		var startIx = startPos - 1;
 		startIx += nCharactersToReplace;

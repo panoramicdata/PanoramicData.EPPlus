@@ -105,7 +105,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 		_fillNode = TopNode.SelectSingleNode(_fillPath + "/a:" + GetStyleText(value), NameSpaceManager);
 	}
 
-	private eFillStyle GetStyleEnum(string name) => name switch
+	private static eFillStyle GetStyleEnum(string name) => name switch
 	{
 		"noFill" => eFillStyle.NoFill,
 		"blipFill" => eFillStyle.BlipFill,
@@ -115,7 +115,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 		_ => eFillStyle.SolidFill,
 	};
 
-	private string GetStyleText(eFillStyle style) => style switch
+	private static string GetStyleText(eFillStyle style) => style switch
 	{
 		eFillStyle.BlipFill => "blipFill",
 		eFillStyle.GradientFill => "gradFill",

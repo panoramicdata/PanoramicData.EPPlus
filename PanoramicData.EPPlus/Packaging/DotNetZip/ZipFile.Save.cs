@@ -50,7 +50,7 @@ internal partial class ZipFile
 	/// </remarks>
 	///
 	/// <param name='filename'>the name of the file to be deleted</param>
-	private void DeleteFileWithRetry(string filename)
+	private static void DeleteFileWithRetry(string filename)
 	{
 		var done = false;
 		var nRetries = 3;

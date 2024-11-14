@@ -228,7 +228,7 @@ public class ExcelTime
 		}
 	}
 
-	private decimal Round(decimal value) => Math.Round(value, NumberOfDecimals);
+	private static decimal Round(decimal value) => Math.Round(value, NumberOfDecimals);
 
 	private decimal ToSeconds()
 	{

@@ -64,7 +64,7 @@ public class Yearfrac : ExcelFunction
 		}
 	}
 
-	private double CalculateAcutalYear(System.DateTime dt1, System.DateTime dt2)
+	private static double CalculateAcutalYear(System.DateTime dt1, System.DateTime dt2)
 	{
 		var calendar = new GregorianCalendar();
 		var perYear = 0d;

@@ -59,7 +59,7 @@ public sealed class ExcelBorderItemXml : StyleXmlHelper
 		}
 	}
 
-	private ExcelBorderStyle GetBorderStyle(string style)
+	private static ExcelBorderStyle GetBorderStyle(string style)
 	{
 		if (style == "") return ExcelBorderStyle.None;
 		var sInStyle = style[..1].ToUpper(CultureInfo.InvariantCulture) + style[1..];
@@ -134,7 +134,7 @@ public sealed class ExcelBorderItemXml : StyleXmlHelper
 		return TopNode;
 	}
 
-	private string SetBorderString(ExcelBorderStyle Style)
+	private static string SetBorderString(ExcelBorderStyle Style)
 	{
 		var newName = Enum.GetName(Style);
 		return newName[..1].ToLower(CultureInfo.InvariantCulture) + newName[1..];

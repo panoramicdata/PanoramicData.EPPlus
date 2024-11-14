@@ -189,7 +189,7 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 	//    }
 	//}
 
-	private void InsertColumns(int colFrom, int cols, ExcelNamedRange namedRange)
+	private static void InsertColumns(int colFrom, int cols, ExcelNamedRange namedRange)
 	{
 		if (colFrom > 0)
 		{
@@ -256,7 +256,7 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 	//    }
 	//}
 
-	private void InsertRows(int rowFrom, int rows, ExcelNamedRange namedRange)
+	private static void InsertRows(int rowFrom, int rows, ExcelNamedRange namedRange)
 	{
 		if (rows > 0)
 		{

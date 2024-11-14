@@ -80,7 +80,7 @@ internal class CompoundDocument
 		GetStorageAndStreams(Storage, doc.RootItem);
 	}
 
-	private void GetStorageAndStreams(StoragePart storage, CompoundDocumentItem parent)
+	private static void GetStorageAndStreams(StoragePart storage, CompoundDocumentItem parent)
 	{
 		foreach (var item in parent.Children)
 		{
@@ -103,7 +103,7 @@ internal class CompoundDocument
 		doc.Write(ms);
 	}
 
-	private void WriteStorageAndStreams(StoragePart storage, CompoundDocumentItem parent)
+	private static void WriteStorageAndStreams(StoragePart storage, CompoundDocumentItem parent)
 	{
 		foreach (var item in storage.SubStorage)
 		{

@@ -232,7 +232,7 @@ public class ExcelWorksheetView : XmlHelper
 		}
 	}
 
-	private bool IsActiveCellInSelection(ExcelAddressBase ac, ExcelAddressBase sd)
+	private static bool IsActiveCellInSelection(ExcelAddressBase ac, ExcelAddressBase sd)
 	{
 		var c = sd.Collide(ac);
 		if (c is ExcelAddressBase.eAddressCollition.Equal or ExcelAddressBase.eAddressCollition.Inside)

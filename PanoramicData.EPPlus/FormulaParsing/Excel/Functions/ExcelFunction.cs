@@ -81,7 +81,7 @@ public abstract class ExcelFunction
 	/// not be compiled before the function is called.
 	/// </summary>
 	//public bool SkipArgumentEvaluation { get; set; }
-	protected object GetFirstValue(IEnumerable<FunctionArgument> val)
+	protected static object GetFirstValue(IEnumerable<FunctionArgument> val)
 	{
 		var arg = ((IEnumerable<FunctionArgument>)val).FirstOrDefault();
 		if (arg.Value is ExcelDataProvider.IRangeInfo)
@@ -190,7 +190,7 @@ public abstract class ExcelFunction
 	/// <param name="arguments"></param>
 	/// <param name="index"></param>
 	/// <returns>Value of the argument as a string.</returns>
-	protected string ArgToString(IEnumerable<FunctionArgument> arguments, int index)
+	protected static string ArgToString(IEnumerable<FunctionArgument> arguments, int index)
 	{
 		var obj = arguments.ElementAt(index).ValueFirst;
 		return obj != null ? obj.ToString() : string.Empty;
@@ -214,9 +214,9 @@ public abstract class ExcelFunction
 	/// <exception cref="ExcelErrorValueException"></exception>
 	protected double ArgToDecimal(IEnumerable<FunctionArgument> arguments, int index) => ArgToDecimal(arguments.ElementAt(index).Value);
 
-	protected double Divide(double left, double right) => System.Math.Abs(right - 0d) < double.Epsilon ? throw new ExcelErrorValueException(eErrorType.Div0) : left / right;
+	protected static double Divide(double left, double right) => System.Math.Abs(right - 0d) < double.Epsilon ? throw new ExcelErrorValueException(eErrorType.Div0) : left / right;
 
-	protected bool IsNumericString(object value) => value != null && !string.IsNullOrEmpty(value.ToString()) && Regex.IsMatch(value.ToString(), @"^[\d]+(\,[\d])?");
+	protected static bool IsNumericString(object value) => value != null && !string.IsNullOrEmpty(value.ToString()) && Regex.IsMatch(value.ToString(), @"^[\d]+(\,[\d])?");
 
 	/// <summary>
 	/// If the argument is a boolean value its value will be returned.
@@ -238,7 +238,7 @@ public abstract class ExcelFunction
 	/// <param name="condition"></param>
 	/// <param name="message"></param>
 	/// <exception cref="ArgumentException"></exception>
-	protected void ThrowArgumentExceptionIf(Func<bool> condition, string message)
+	protected static void ThrowArgumentExceptionIf(Func<bool> condition, string message)
 	{
 		if (condition())
 		{
@@ -262,7 +262,7 @@ public abstract class ExcelFunction
 	/// Throws an <see cref="ExcelErrorValueException"/> with the given <paramref name="errorType"/> set.
 	/// </summary>
 	/// <param name="errorType"></param>
-	protected void ThrowExcelErrorValueException(eErrorType errorType) => throw new ExcelErrorValueException("An excel function error occurred", ExcelErrorValue.Create(errorType));
+	protected static void ThrowExcelErrorValueException(eErrorType errorType) => throw new ExcelErrorValueException("An excel function error occurred", ExcelErrorValue.Create(errorType));
 
 	/// <summary>
 	/// Throws an <see cref="ArgumentException"/> if <paramref name="condition"/> evaluates to true.
@@ -270,7 +270,7 @@ public abstract class ExcelFunction
 	/// <param name="condition"></param>
 	/// <param name="errorType"></param>
 	/// <exception cref="ExcelErrorValueException"></exception>
-	protected void ThrowExcelErrorValueExceptionIf(Func<bool> condition, eErrorType errorType)
+	protected static void ThrowExcelErrorValueExceptionIf(Func<bool> condition, eErrorType errorType)
 	{
 		if (condition())
 		{
@@ -278,7 +278,7 @@ public abstract class ExcelFunction
 		}
 	}
 
-	protected bool IsNumeric(object val) => val != null
+	protected static bool IsNumeric(object val) => val != null
 && (TypeCompat.IsPrimitive(val) || val is double || val is decimal || val is System.DateTime || val is TimeSpan);
 
 	//protected virtual bool IsNumber(object obj)
@@ -293,7 +293,7 @@ public abstract class ExcelFunction
 	/// <param name="d1"></param>
 	/// <param name="d2"></param>
 	/// <returns></returns>
-	protected bool AreEqual(double d1, double d2) => System.Math.Abs(d1 - d2) < double.Epsilon;
+	protected static bool AreEqual(double d1, double d2) => System.Math.Abs(d1 - d2) < double.Epsilon;
 
 	/// <summary>
 	/// Will return the arguments as an enumerable of doubles.
@@ -386,7 +386,7 @@ public abstract class ExcelFunction
 	/// </summary>
 	/// <param name="arg"></param>
 	/// <exception cref="ExcelErrorValueException"></exception>
-	protected void CheckForAndHandleExcelError(FunctionArgument arg)
+	protected static void CheckForAndHandleExcelError(FunctionArgument arg)
 	{
 		if (arg.ValueIsExcelError)
 		{
@@ -399,7 +399,7 @@ public abstract class ExcelFunction
 	/// an <see cref="ExcelErrorValueException"/> with that errorcode will be thrown
 	/// </summary>
 	/// <param name="cell"></param>
-	protected void CheckForAndHandleExcelError(ExcelDataProvider.ICellInfo cell)
+	protected static void CheckForAndHandleExcelError(ExcelDataProvider.ICellInfo cell)
 	{
 		if (cell.IsExcelError)
 		{

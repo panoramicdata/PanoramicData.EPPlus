@@ -280,7 +280,7 @@ internal class CRC32
 	}
 
 
-	private uint gf2_matrix_times(uint[] matrix, uint vec)
+	private static uint gf2_matrix_times(uint[] matrix, uint vec)
 	{
 		uint sum = 0;
 		var i = 0;

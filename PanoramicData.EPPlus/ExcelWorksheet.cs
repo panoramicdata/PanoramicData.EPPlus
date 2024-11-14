@@ -862,7 +862,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// </summary>
 	/// <param name="xr"></param>
 	/// <returns></returns>
-	private int GetAttributeLength(XmlReader xr)
+	private static int GetAttributeLength(XmlReader xr)
 	{
 		if (xr.NodeType != XmlNodeType.Element) return 0;
 		var length = 0;
@@ -942,7 +942,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <param name="end">End position, where &lt;/sheetData&gt; or &lt;sheetData/&gt; is found</param>
 	/// <param name="encoding">Encoding</param>
 	/// <returns>The worksheet xml, with an empty sheetdata. (Sheetdata is in memory in the worksheet)</returns>
-	private string GetWorkSheetXml(Stream stream, long start, long end, out Encoding encoding)
+	private static string GetWorkSheetXml(Stream stream, long start, long end, out Encoding encoding)
 	{
 		StreamReader sr = new(stream);
 		var length = 0;
@@ -1012,7 +1012,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return xml;
 		}
 	}
-	private void GetBlockPos(string xml, string tag, ref int start, ref int end)
+	private static void GetBlockPos(string xml, string tag, ref int start, ref int end)
 	{
 		Match startmMatch, endMatch;
 		startmMatch = Regex.Match(xml[start..], string.Format("(<[^>]*{0}[^>]*>)", tag)); //"<[a-zA-Z:]*" + tag + "[?]*>");
@@ -1040,7 +1040,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		start = startPos;
 	}
-	private bool ReadUntil(XmlReader xr, params string[] tagName)
+	private static bool ReadUntil(XmlReader xr, params string[] tagName)
 	{
 		if (xr.EOF) return false;
 		while (!Array.Exists(tagName, tag => Utils.ConvertUtil._invariantCompareInfo.IsSuffix(xr.LocalName, tag)))
@@ -1168,7 +1168,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 
-	private ExcelHyperLink GetHyperlinkFromRef(XmlReader xr, string refTag, int fromRow = 0, int toRow = 0, int fromCol = 0, int toCol = 0)
+	private static ExcelHyperLink GetHyperlinkFromRef(XmlReader xr, string refTag, int fromRow = 0, int toRow = 0, int fromCol = 0, int toCol = 0)
 	{
 		var hl = new ExcelHyperLink(xr.GetAttribute(refTag), xr.GetAttribute("display"))
 		{
@@ -1359,7 +1359,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		//_formulaCells = new RangeCollection(formulaList);
 	}
 
-	private bool DoAddRow(XmlReader xr)
+	private static bool DoAddRow(XmlReader xr)
 	{
 		var c = xr.GetAttribute("r") == null ? 0 : 1;
 		if (xr.GetAttribute("spans") != null)
@@ -1418,7 +1418,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <param name="xr">The reader</param>
 	/// <param name="row">The row number</param>
 	/// <returns></returns>
-	private RowInternal AddRow(XmlReader xr, int row) => new()
+	private static RowInternal AddRow(XmlReader xr, int row) => new()
 	{
 		Collapsed = (xr.GetAttribute("collapsed") != null && xr.GetAttribute("collapsed") == "1"),
 		OutlineLevel = (xr.GetAttribute("outlineLevel") == null ? (short)0 : short.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture)),
@@ -1494,7 +1494,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 
-	private object GetErrorType(string v) => ExcelErrorValue.Parse(ConvertUtil._invariantTextInfo.ToUpper(v));//switch(v.ToUpper())//{//    case "#DIV/0!"://        return new ExcelErrorValue.cre(eErrorType.Div0);//    case "#REF!"://        return new ExcelErrorValue(eErrorType.Ref);//    case "#N/A"://        return new ExcelErrorValue(eErrorType.NA);//    case "#NAME?"://        return new ExcelErrorValue(eErrorType.Name);//    case "#NULL!"://        return new ExcelErrorValue(eErrorType.Null);//    case "#NUM!"://        return new ExcelErrorValue(eErrorType.Num);//    default://        return new ExcelErrorValue(eErrorType.Value);//}
+	private static object GetErrorType(string v) => ExcelErrorValue.Parse(ConvertUtil._invariantTextInfo.ToUpper(v));//switch(v.ToUpper())//{//    case "#DIV/0!"://        return new ExcelErrorValue.cre(eErrorType.Div0);//    case "#REF!"://        return new ExcelErrorValue(eErrorType.Ref);//    case "#N/A"://        return new ExcelErrorValue(eErrorType.NA);//    case "#NAME?"://        return new ExcelErrorValue(eErrorType.Name);//    case "#NULL!"://        return new ExcelErrorValue(eErrorType.Null);//    case "#NUM!"://        return new ExcelErrorValue(eErrorType.Num);//    default://        return new ExcelErrorValue(eErrorType.Value);//}
 																											  //private string GetSharedString(int stringID)
 																											  //{
 																											  //    string retValue = null;
@@ -3278,7 +3278,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				else
 				{
 					var ws = Workbook.Worksheets[pt.CacheDefinition.SourceRange.WorkSheet];
-					t = ws.Tables.GetFromRange(pt.CacheDefinition.SourceRange);
+					t = ExcelTableCollection.GetFromRange(pt.CacheDefinition.SourceRange);
 					if (t == null)
 					{
 						//Address
@@ -3353,7 +3353,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 
-	private string GetNewName(HashSet<string> flds, string fldName)
+	private static string GetNewName(HashSet<string> flds, string fldName)
 	{
 		var ix = 2;
 		while (flds.Contains(fldName + ix.ToString(CultureInfo.InvariantCulture)))
@@ -3447,7 +3447,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		//sw.Close();
 	}
 
-	private void CleanupMergedCells(MergeCellsCollection _mergedCells)
+	private static void CleanupMergedCells(MergeCellsCollection _mergedCells)
 	{
 		var i = 0;
 		while (i < _mergedCells.List.Count)
@@ -3815,7 +3815,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 
-	private string GetCellType(object v, bool allowStr = false)
+	private static string GetCellType(object v, bool allowStr = false)
 	{
 		if (v is bool)
 		{
@@ -4335,7 +4335,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 
-	private void DisposeInternal(IDisposable candidateDisposable) => candidateDisposable?.Dispose();
+	private static void DisposeInternal(IDisposable candidateDisposable) => candidateDisposable?.Dispose();
 
 
 	public void Dispose()
@@ -4456,7 +4456,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			},
 			values);
 	}
-	private void SetRangeValueUpdate(List<ExcelCoreValue> list, int index, int row, int column, object values) => list[index] = new ExcelCoreValue { _value = ((object[,])values)[row, column], _styleId = list[index]._styleId };
+	private static void SetRangeValueUpdate(List<ExcelCoreValue> list, int index, int row, int column, object values) => list[index] = new ExcelCoreValue { _value = ((object[,])values)[row, column], _styleId = list[index]._styleId };
 
 	/// <summary>
 	/// Existance check of sheet value

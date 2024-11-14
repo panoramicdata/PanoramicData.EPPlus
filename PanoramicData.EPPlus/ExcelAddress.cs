@@ -1287,7 +1287,7 @@ public class ExcelFormulaAddress : ExcelAddressBase
 		}
 	}
 
-	private void GetFixed(string address, out bool rowFixed, out bool colFixed)
+	private static void GetFixed(string address, out bool rowFixed, out bool colFixed)
 	{
 		rowFixed = colFixed = false;
 		var ix = address.IndexOf('$');

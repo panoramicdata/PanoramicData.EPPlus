@@ -221,14 +221,14 @@ public class ExcelTextFont : XmlHelper
 		}
 	}
 	#region "Translate methods"
-	private eUnderLineType TranslateUnderline(string text) => text switch
+	private static eUnderLineType TranslateUnderline(string text) => text switch
 	{
 		"sng" => eUnderLineType.Single,
 		"dbl" => eUnderLineType.Double,
 		"" => eUnderLineType.None,
 		_ => Enum.Parse<eUnderLineType>(text),
 	};
-	private string TranslateUnderlineText(eUnderLineType value)
+	private static string TranslateUnderlineText(eUnderLineType value)
 	{
 		switch (value)
 		{
@@ -241,13 +241,13 @@ public class ExcelTextFont : XmlHelper
 				return ret[..1].ToLower(CultureInfo.InvariantCulture) + ret[1..];
 		}
 	}
-	private eStrikeType TranslateStrike(string text) => text switch
+	private static eStrikeType TranslateStrike(string text) => text switch
 	{
 		"dblStrike" => eStrikeType.Double,
 		"sngStrike" => eStrikeType.Single,
 		_ => eStrikeType.No,
 	};
-	private string TranslateStrikeText(eStrikeType value) => value switch
+	private static string TranslateStrikeText(eStrikeType value) => value switch
 	{
 		eStrikeType.Single => "sngStrike",
 		eStrikeType.Double => "dblStrike",

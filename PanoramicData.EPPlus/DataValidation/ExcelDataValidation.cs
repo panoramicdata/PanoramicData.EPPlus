@@ -146,7 +146,7 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 
 	}
 
-	private string CheckAndFixRangeAddress(string address)
+	private static string CheckAndFixRangeAddress(string address)
 	{
 		if (address.Contains(','))
 		{

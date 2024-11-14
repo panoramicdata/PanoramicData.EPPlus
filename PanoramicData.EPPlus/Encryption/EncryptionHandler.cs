@@ -257,7 +257,7 @@ internal class EncryptedPackageHandler
 		ei.DataIntegrity.EncryptedHmacValue = ms.ToArray();
 	}
 
-	private HMAC GetHmacProvider(EncryptionInfoAgile.EncryptionKeyData ei, byte[] salt) => ei.HashAlgorithm switch
+	private static HMAC GetHmacProvider(EncryptionInfoAgile.EncryptionKeyData ei, byte[] salt) => ei.HashAlgorithm switch
 	{
 		eHashAlogorithm.MD5 => new HMACMD5(salt),
 		eHashAlogorithm.SHA1 => new HMACSHA1(salt),
@@ -321,7 +321,7 @@ internal class EncryptedPackageHandler
 
 		strEncTrans.DataStreams.Add("\x06Primary", CreateTransformInfoPrimary());
 	}
-	private byte[] CreateStrongEncryptionDataSpaceStream()
+	private static byte[] CreateStrongEncryptionDataSpaceStream()
 	{
 		MemoryStream ms = new();
 		BinaryWriter bw = new(ms);
@@ -336,7 +336,7 @@ internal class EncryptedPackageHandler
 		bw.Flush();
 		return ms.ToArray();
 	}
-	private byte[] CreateVersionStream()
+	private static byte[] CreateVersionStream()
 	{
 		MemoryStream ms = new();
 		BinaryWriter bw = new(ms);
@@ -351,7 +351,7 @@ internal class EncryptedPackageHandler
 		bw.Flush();
 		return ms.ToArray();
 	}
-	private byte[] CreateDataSpaceMap()
+	private static byte[] CreateDataSpaceMap()
 	{
 		MemoryStream ms = new();
 		BinaryWriter bw = new(ms);
@@ -371,7 +371,7 @@ internal class EncryptedPackageHandler
 		bw.Flush();
 		return ms.ToArray();
 	}
-	private byte[] CreateTransformInfoPrimary()
+	private static byte[] CreateTransformInfoPrimary()
 	{
 		MemoryStream ms = new();
 		BinaryWriter bw = new(ms);
@@ -456,7 +456,7 @@ internal class EncryptedPackageHandler
 
 		return encryptionInfo;
 	}
-	private byte[] EncryptData(byte[] key, byte[] data, bool useDataSize)
+	private static byte[] EncryptData(byte[] key, byte[] data, bool useDataSize)
 	{
 		var aes = Aes.Create();
 		aes.KeySize = key.Length * 8;
@@ -596,7 +596,7 @@ internal class EncryptedPackageHandler
 
 		return null;
 	}
-	private HashAlgorithm GetHashProvider(EncryptionInfoAgile.EncryptionKeyData encr) => encr.HashAlgorithm switch
+	private static HashAlgorithm GetHashProvider(EncryptionInfoAgile.EncryptionKeyData encr) => encr.HashAlgorithm switch
 	{
 		eHashAlogorithm.MD5 => MD5.Create(),
 		//case eHashAlogorithm.RIPEMD160:
@@ -654,7 +654,7 @@ internal class EncryptedPackageHandler
 	/// <param name="key">The encryption key</param>
 	/// <param name="encryptionInfo">The encryption info extracted from the ENCRYPTIOINFO stream inside the OLE document</param>
 	/// <returns></returns>
-	private bool IsPasswordValid(byte[] key, EncryptionInfoBinary encryptionInfo)
+	private static bool IsPasswordValid(byte[] key, EncryptionInfoBinary encryptionInfo)
 	{
 		var decryptKey = Aes.Create();
 		decryptKey.KeySize = encryptionInfo.Header.KeySize;
@@ -704,7 +704,7 @@ internal class EncryptedPackageHandler
 	/// <param name="sha">The hash algorithm</param>
 	/// <param name="encr">The encryption info extracted from the ENCRYPTIOINFO stream inside the OLE document</param>
 	/// <returns></returns>
-	private bool IsPasswordValid(HashAlgorithm sha, EncryptionInfoAgile.EncryptionKeyEncryptor encr)
+	private static bool IsPasswordValid(HashAlgorithm sha, EncryptionInfoAgile.EncryptionKeyEncryptor encr)
 	{
 		var valHash = sha.ComputeHash(encr.VerifierHashInput);
 
@@ -745,7 +745,7 @@ internal class EncryptedPackageHandler
 		return decryptedData;
 	}
 
-	private SymmetricAlgorithm GetEncryptionAlgorithm(EncryptionInfoAgile.EncryptionKeyData encr) => encr.CipherAlgorithm switch
+	private static SymmetricAlgorithm GetEncryptionAlgorithm(EncryptionInfoAgile.EncryptionKeyData encr) => encr.CipherAlgorithm switch
 	{
 		eCipherAlgorithm.AES => Aes.Create(),
 		//case eCipherAlgorithm.DES:
@@ -877,7 +877,7 @@ internal class EncryptedPackageHandler
 			throw (new Exception("An error occured when the encryptionkey was created", ex));
 		}
 	}
-	private byte[] GetFinalHash(HashAlgorithm hashProvider, byte[] blockKey, byte[] hash)
+	private static byte[] GetFinalHash(HashAlgorithm hashProvider, byte[] blockKey, byte[] hash)
 	{
 		//2.3.4.13 MS-OFFCRYPTO
 		var tempHash = new byte[hash.Length + blockKey.Length];
@@ -903,7 +903,7 @@ internal class EncryptedPackageHandler
 
 		return hash;
 	}
-	private byte[] FixHashSize(byte[] hash, int size, byte fill = 0)
+	private static byte[] FixHashSize(byte[] hash, int size, byte fill = 0)
 	{
 		if (hash.Length == size)
 			return hash;
@@ -925,7 +925,7 @@ internal class EncryptedPackageHandler
 			return buff;
 		}
 	}
-	private byte[] CombinePassword(byte[] salt, string password)
+	private static byte[] CombinePassword(byte[] salt, string password)
 	{
 		if (password == "")
 		{

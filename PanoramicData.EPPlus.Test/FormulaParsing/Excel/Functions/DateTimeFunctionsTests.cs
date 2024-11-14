@@ -16,7 +16,7 @@ public class DateTimeFunctionsTests
 {
 	private ParsingContext _parsingContext = ParsingContext.Create();
 
-	private double GetTime(int hour, int minute, int second)
+	private static double GetTime(int hour, int minute, int second)
 	{
 		var secInADay = DateTime.Today.AddDays(1).Subtract(DateTime.Today).TotalSeconds;
 		var secondsOfExample = (double)(hour * 60 * 60 + minute * 60 + second);

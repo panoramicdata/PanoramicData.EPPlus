@@ -29,7 +29,7 @@ public abstract class ValidationTestBase
 		_namespaceManager = null;
 	}
 
-	protected string GetTestOutputPath(string fileName) => Path.Combine(
+	protected static string GetTestOutputPath(string fileName) => Path.Combine(
 		Path.GetTempPath()      //In Net.Core Output to TempPath 
 			, fileName);
 

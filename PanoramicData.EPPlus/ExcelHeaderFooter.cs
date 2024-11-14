@@ -561,7 +561,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			}
 		}
 	}
-	private string GetText(ExcelHeaderFooterText headerFooter)
+	private static string GetText(ExcelHeaderFooterText headerFooter)
 	{
 		var ret = "";
 		if (headerFooter.LeftAlignedText != null)

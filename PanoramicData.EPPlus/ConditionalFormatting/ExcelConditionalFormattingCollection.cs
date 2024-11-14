@@ -207,7 +207,7 @@ public class ExcelConditionalFormattingCollection
 	/// </summary>
 	/// <param name="address"></param>
 	/// <returns></returns>
-	private ExcelAddress ValidateAddress(
+	private static ExcelAddress ValidateAddress(
 	  ExcelAddress address)
 	{
 		Require.Argument(address).IsNotNull("address");

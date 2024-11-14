@@ -166,7 +166,7 @@ public class ExcelChartDataTable : XmlHelper
 	}
 	#endregion
 	#region "Position Enum Translation"
-	protected string GetPosText(eLabelPosition pos) => pos switch
+	protected static string GetPosText(eLabelPosition pos) => pos switch
 	{
 		eLabelPosition.Bottom => "b",
 		eLabelPosition.Center => "ctr",
@@ -179,7 +179,7 @@ public class ExcelChartDataTable : XmlHelper
 		_ => "bestFit",
 	};
 
-	protected eLabelPosition GetPosEnum(string pos) => pos switch
+	protected static eLabelPosition GetPosEnum(string pos) => pos switch
 	{
 		"b" => eLabelPosition.Bottom,
 		"ctr" => eLabelPosition.Center,

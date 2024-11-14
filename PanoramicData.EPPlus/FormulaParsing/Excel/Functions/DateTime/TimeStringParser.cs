@@ -32,13 +32,13 @@ public class TimeStringParser
 	private const string RegEx24 = @"^[0-9]{1,2}(\:[0-9]{1,2}){0,2}$";
 	private const string RegEx12 = @"^[0-9]{1,2}(\:[0-9]{1,2}){0,2}( PM| AM)$";
 
-	private double GetSerialNumber(int hour, int minute, int second)
+	private static double GetSerialNumber(int hour, int minute, int second)
 	{
 		var secondsInADay = 24d * 60d * 60d;
 		return ((double)hour * 60 * 60 + (double)minute * 60 + (double)second) / secondsInADay;
 	}
 
-	private void ValidateValues(int hour, int minute, int second)
+	private static void ValidateValues(int hour, int minute, int second)
 	{
 		if (second is < 0 or > 59)
 		{

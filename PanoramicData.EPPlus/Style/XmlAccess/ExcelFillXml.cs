@@ -54,7 +54,7 @@ public class ExcelFillXml : StyleXmlHelper
 		_patternColor = new ExcelColorXml(nsm, topNode.SelectSingleNode(_patternColorPath, nsm));
 	}
 
-	private ExcelFillStyle GetPatternType(string patternType)
+	private static ExcelFillStyle GetPatternType(string patternType)
 	{
 		if (patternType == "") return ExcelFillStyle.None;
 		patternType = patternType[..1].ToUpper(CultureInfo.InvariantCulture) + patternType[1..];
@@ -159,7 +159,7 @@ public class ExcelFillXml : StyleXmlHelper
 		return topNode;
 	}
 
-	private string SetPatternString(ExcelFillStyle pattern)
+	private static string SetPatternString(ExcelFillStyle pattern)
 	{
 		var newName = Enum.GetName(pattern);
 		return newName[..1].ToLower(CultureInfo.InvariantCulture) + newName[1..];

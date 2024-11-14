@@ -377,7 +377,7 @@ public class ExcelVbaProject
 
 		return GetString(enc, pos - 1);
 	}
-	private string GetString(byte[] value, int max)
+	private static string GetString(byte[] value, int max)
 	{
 		var ret = "";
 		for (var i = 0; i <= max; i++)
@@ -394,7 +394,7 @@ public class ExcelVbaProject
 
 		return ret.ToUpperInvariant();
 	}
-	private byte[] GetByte(string value)
+	private static byte[] GetByte(string value)
 	{
 		var ret = new byte[value.Length / 2];
 		for (var i = 0; i < ret.Length; i++)
@@ -633,7 +633,7 @@ public class ExcelVbaProject
 	/// MS-OVBA 2.3.4.1
 	/// </summary>
 	/// <returns></returns>
-	private byte[] CreateVBAProjectStream()
+	private static byte[] CreateVBAProjectStream()
 	{
 		BinaryWriter bw = new(new MemoryStream());
 		bw.Write((ushort)0x61CC); //Reserved1
@@ -1007,7 +1007,7 @@ public class ExcelVbaProject
 	private string WriteVisibilityState() => Encrypt([(byte)(Protection.VisibilityState ? 0xFF : 0)]);
 	#endregion
 	private string GetString(BinaryReader br, uint size) => GetString(br, size, System.Text.Encoding.GetEncoding(CodePage));
-	private string GetString(BinaryReader br, uint size, Encoding enc)
+	private static string GetString(BinaryReader br, uint size, Encoding enc)
 	{
 		if (size > 0)
 		{
@@ -1079,7 +1079,7 @@ public class ExcelVbaProject
 
 		return name;
 	}
-	internal ExcelVbaModuleAttributesCollection GetDocumentAttributes(string name, string clsid)
+	internal static ExcelVbaModuleAttributesCollection GetDocumentAttributes(string name, string clsid)
 	{
 		var attr = new ExcelVbaModuleAttributesCollection();
 		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Name", Value = name, DataType = eAttributeDataType.String });

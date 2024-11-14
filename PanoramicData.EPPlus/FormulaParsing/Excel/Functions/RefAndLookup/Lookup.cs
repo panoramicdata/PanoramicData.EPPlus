@@ -40,7 +40,7 @@ public class Lookup : LookupFunction
 		return HaveTwoRanges(arguments) ? HandleTwoRanges(arguments, context) : HandleSingleRange(arguments, context);
 	}
 
-	private bool HaveTwoRanges(IEnumerable<FunctionArgument> arguments) => arguments.Count() >= 3 && arguments.ElementAt(2).Value is RangeInfo;
+	private static bool HaveTwoRanges(IEnumerable<FunctionArgument> arguments) => arguments.Count() >= 3 && arguments.ElementAt(2).Value is RangeInfo;
 
 	private CompileResult HandleSingleRange(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{

@@ -50,7 +50,7 @@ public class FormulaDependencies
 
 	public IEnumerable<KeyValuePair<string, FormulaDependency>> Dependencies => _dependencies;
 
-	public void AddFormulaScope(ParsingScope parsingScope)
+	public static void AddFormulaScope(ParsingScope parsingScope)
 	{
 		//var dependency = _formulaDependencyFactory.Create(parsingScope);
 		//var address = parsingScope.Address.ToString();

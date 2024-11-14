@@ -27,7 +27,7 @@ public class NetworkdaysIntl : ExcelFunction
 			else if (IsNumeric(holidayArg))
 			{
 				var holidayCode = Convert.ToInt32(holidayArg);
-				calculator = new WorkdayCalculator(weekdayFactory.Create(holidayCode));
+				calculator = new WorkdayCalculator(HolidayWeekdaysFactory.Create(holidayCode));
 			}
 			else
 			{

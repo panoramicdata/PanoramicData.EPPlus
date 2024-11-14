@@ -118,11 +118,11 @@ public sealed class OfficeProperties : XmlHelper
 			StreamWriter stream = new(part.GetStream(FileMode.Create, FileAccess.Write));
 			xmlDoc.Save(stream);
 			//stream.Close();
-			_package.Package.Flush();
+			Packaging.ZipPackage.Flush();
 
 			// create the relationship between the workbook and the new shared strings part
 			_package.Package.CreateRelationship(UriHelper.GetRelativeUri(new Uri("/xl", UriKind.Relative), uri), Packaging.TargetMode.Internal, relationship);
-			_package.Package.Flush();
+			Packaging.ZipPackage.Flush();
 		}
 
 		return xmlDoc;

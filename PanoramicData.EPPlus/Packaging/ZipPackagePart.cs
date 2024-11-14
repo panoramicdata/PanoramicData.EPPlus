@@ -44,7 +44,7 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 		Package = package;
 		Entry = entry;
 		SaveHandler = null;
-		Uri = new Uri(package.GetUriKey(entry.FileName), UriKind.Relative);
+		Uri = new Uri(ZipPackage.GetUriKey(entry.FileName), UriKind.Relative);
 	}
 	internal ZipPackagePart(ZipPackage package, Uri partUri, string contentType, CompressionLevel compressionLevel)
 	{
@@ -104,10 +104,10 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 		{
 			if (!string.IsNullOrEmpty(_contentType))
 			{
-				if (Package._contentTypes.ContainsKey(Package.GetUriKey(Uri.OriginalString)))
+				if (Package._contentTypes.ContainsKey(ZipPackage.GetUriKey(Uri.OriginalString)))
 				{
-					Package._contentTypes.Remove(Package.GetUriKey(Uri.OriginalString));
-					Package._contentTypes.Add(Package.GetUriKey(Uri.OriginalString), new ZipPackage.ContentType(value, false, Uri.OriginalString));
+					Package._contentTypes.Remove(ZipPackage.GetUriKey(Uri.OriginalString));
+					Package._contentTypes.Add(ZipPackage.GetUriKey(Uri.OriginalString), new ZipPackage.ContentType(value, false, Uri.OriginalString));
 				}
 			}
 
@@ -115,7 +115,7 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 		}
 	}
 	public Uri Uri { get; private set; }
-	public Stream GetZipStream()
+	public static Stream GetZipStream()
 	{
 		MemoryStream ms = new();
 		ZipOutputStream os = new(ms);

@@ -16,7 +16,7 @@ public class ExcelAddressExpressionTests
 	private ParsingContext _parsingContext;
 	private ParsingScope _scope;
 
-	private ExcelCell CreateItem(object val) => new(val, null, 0, 0);
+	private static ExcelCell CreateItem(object val) => new(val, null, 0, 0);
 
 	[TestInitialize]
 	public void Setup()

@@ -275,7 +275,7 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 	}
 
 	#region Private Methods
-	private double GetFracDT(string v, double def)
+	private static double GetFracDT(string v, double def)
 	{
 		double d;
 		if (v.EndsWith("f"))

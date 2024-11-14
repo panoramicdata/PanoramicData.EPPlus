@@ -74,7 +74,7 @@ public class CompoundDoc
 		File.WriteAllBytes(@"c:\temp\vba.bin", ms.ToArray());
 	}
 
-	private void printitems(CompoundDocumentItem item)
+	private static void printitems(CompoundDocumentItem item)
 	{
 		File.AppendAllText(@"c:\temp\items.txt", item.Name + "\t");
 		foreach (var c in item.Children)
@@ -100,7 +100,7 @@ public class CompoundDoc
 		}
 	}
 
-	private void ReadFile(byte[] b, int noSheets)
+	private static void ReadFile(byte[] b, int noSheets)
 	{
 		var ms = new MemoryStream(b);
 		using var p = new ExcelPackage(ms);
@@ -108,7 +108,7 @@ public class CompoundDoc
 		Assert.AreEqual(noSheets, p.Workbook.Worksheets.Count);
 	}
 
-	public byte[] CreateFile(int noSheets)
+	public static byte[] CreateFile(int noSheets)
 	{
 		using var package = new ExcelPackage();
 		var sheets = Enumerable.Range(1, noSheets)   //460
@@ -140,7 +140,8 @@ public class CompoundDoc
 		var vba = p.Workbook.VbaProject;
 		p.SaveAs(new FileInfo(@"c:\temp\pricecheckSaved.xlsm"));
 	}
-	FileInfo TempFile(string name)
+
+	static FileInfo TempFile(string name)
 	{
 		var baseFolder = Path.Combine(@"c:\temp\bug\");
 		return new FileInfo(Path.Combine(baseFolder, name));

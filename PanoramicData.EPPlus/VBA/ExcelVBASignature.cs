@@ -269,7 +269,7 @@ public class ExcelVbaSignature
 		return ms.ToArray();
 	}
 
-	private void WriteProp(BinaryWriter bw, int id, byte[] data)
+	private static void WriteProp(BinaryWriter bw, int id, byte[] data)
 	{
 		bw.Write((uint)id);
 		bw.Write((uint)1);
@@ -319,7 +319,7 @@ public class ExcelVbaSignature
 		return Verifier.Encode();
 	}
 
-	private byte[] GetContentHash(ExcelVbaProject proj)
+	private static byte[] GetContentHash(ExcelVbaProject proj)
 	{
 		//MS-OVBA 2.4.2
 		var enc = System.Text.Encoding.GetEncoding(proj.CodePage);

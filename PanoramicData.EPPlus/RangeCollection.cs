@@ -233,8 +233,8 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 
 		return index;
 	}
-	internal void InsertColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
-	internal void DeleteColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
+	internal static void InsertColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
+	internal static void DeleteColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
 	#endregion
 	#region "Private Methods"
 	/// <summary>

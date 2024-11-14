@@ -6,7 +6,7 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.ExcelDataPro
 [TestClass]
 public class ExcelDataProviderIntegrationTests
 {
-	private ExcelCell CreateItem(object val, int row) => new(val, null, 0, row);
+	private static ExcelCell CreateItem(object val, int row) => new(val, null, 0, row);
 
 
 
