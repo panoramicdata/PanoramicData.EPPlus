@@ -271,9 +271,9 @@ public sealed class ExcelStyles : XmlHelper
 				newCol._columnMax = address.End.Column;
 
 				var s = ws.GetStyleInner(0, column.ColumnMin);
-				if (styleCashe.ContainsKey(s))
+				if (styleCashe.TryGetValue(s, out var value))
 				{
-					ws.SetStyleInner(0, column.ColumnMin, styleCashe[s]);
+					ws.SetStyleInner(0, column.ColumnMin, value);
 				}
 				else
 				{
@@ -294,9 +294,9 @@ public sealed class ExcelStyles : XmlHelper
 					cse.Column <= address.End.Column &&
 					cse.Value._styleId != 0)
 				{
-					if (styleCashe.ContainsKey(cse.Value._styleId))
+					if (styleCashe.TryGetValue(cse.Value._styleId, out var value))
 					{
-						ws.SetStyleInner(cse.Row, cse.Column, styleCashe[cse.Value._styleId]);
+						ws.SetStyleInner(cse.Row, cse.Column, value);
 					}
 					else
 					{
@@ -319,9 +319,9 @@ public sealed class ExcelStyles : XmlHelper
 					{
 						if (!ws.ExistsStyleInner(cse.Row, c))
 						{
-							if (styleCashe.ContainsKey(cse.Value._styleId))
+							if (styleCashe.TryGetValue(cse.Value._styleId, out var value))
 							{
-								ws.SetStyleInner(cse.Row, c, styleCashe[cse.Value._styleId]);
+								ws.SetStyleInner(cse.Row, c, value);
 							}
 							else
 							{
@@ -367,9 +367,9 @@ public sealed class ExcelStyles : XmlHelper
 					cse.Dispose();
 				}
 
-				if (styleCashe.ContainsKey(s))
+				if (styleCashe.TryGetValue(s, out var value))
 				{
-					ws.SetStyleInner(rowNum, 0, styleCashe[s]);
+					ws.SetStyleInner(rowNum, 0, value);
 				}
 				else
 				{
@@ -386,9 +386,9 @@ public sealed class ExcelStyles : XmlHelper
 			{
 				var s = cse2.Value._styleId;
 				if (s == 0) continue;
-				if (styleCashe.ContainsKey(s))
+				if (styleCashe.TryGetValue(s, out var value))
 				{
-					ws.SetStyleInner(cse2.Row, cse2.Column, styleCashe[s]);
+					ws.SetStyleInner(cse2.Row, cse2.Column, value);
 				}
 				else
 				{
@@ -409,9 +409,9 @@ public sealed class ExcelStyles : XmlHelper
 					if (!ws.ExistsStyleInner(r, cse2.Column))
 					{
 						var s = cse2.Value._styleId;
-						if (styleCashe.ContainsKey(s))
+						if (styleCashe.TryGetValue(s, out var value))
 						{
-							ws.SetStyleInner(r, cse2.Column, styleCashe[s]);
+							ws.SetStyleInner(r, cse2.Column, value);
 						}
 						else
 						{
@@ -462,10 +462,10 @@ public sealed class ExcelStyles : XmlHelper
 						}
 					}
 
-					if (tmpCache.ContainsKey(s))
+					if (tmpCache.TryGetValue(s, out var value))
 					{
 						//ws.SetStyleInner(row, column, tmpCache[s]);
-						list[index] = new ExcelCoreValue { _value = list[index]._value, _styleId = tmpCache[s] };
+						list[index] = new ExcelCoreValue { _value = list[index]._value, _styleId = value };
 					}
 					else
 					{
@@ -483,9 +483,9 @@ public sealed class ExcelStyles : XmlHelper
 
 	private void AddNewStyleColumn(StyleBase sender, StyleChangeEventArgs e, ExcelWorksheet ws, Dictionary<int, int> styleCashe, ExcelColumn column, int s)
 	{
-		if (styleCashe.ContainsKey(s))
+		if (styleCashe.TryGetValue(s, out var value))
 		{
-			ws.SetStyleInner(0, column.ColumnMin, styleCashe[s]);
+			ws.SetStyleInner(0, column.ColumnMin, value);
 		}
 		else
 		{
@@ -1032,9 +1032,8 @@ public sealed class ExcelStyles : XmlHelper
 				else if (style._wb != _wb && allwaysAddCellXfs == false) //Not the same workbook, copy the namedstyle to the workbook or match the id
 				{
 					var nsFind = style.NamedStyles.ToDictionary(d => (d.StyleXfId));
-					if (nsFind.ContainsKey(xfs.XfId))
+					if (nsFind.TryGetValue(xfs.XfId, out var st))
 					{
-						var st = nsFind[xfs.XfId];
 						if (NamedStyles.ExistsKey(st.Name))
 						{
 							newXfs.XfId = NamedStyles.FindIndexByID(st.Name);

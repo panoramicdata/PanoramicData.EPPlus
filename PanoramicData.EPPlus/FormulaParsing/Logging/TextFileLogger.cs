@@ -70,9 +70,9 @@ internal class TextFileLogger : IFormulaParserLogger
 			foreach (var func in funcs)
 			{
 				_sw.Write(func + "  - " + _funcs[func]);
-				if (_funcPerformance.ContainsKey(func))
+				if (_funcPerformance.TryGetValue(func, out var value))
 				{
-					_sw.Write(" - avg: " + _funcPerformance[func] / _funcs[func] + " milliseconds");
+					_sw.Write(" - avg: " + value / _funcs[func] + " milliseconds");
 				}
 
 				_sw.WriteLine();
@@ -86,12 +86,13 @@ internal class TextFileLogger : IFormulaParserLogger
 
 	public void LogFunction(string func)
 	{
-		if (!_funcs.ContainsKey(func))
+		if (!_funcs.TryGetValue(func, out var value))
 		{
-			_funcs.Add(func, 0);
+			value = 0;
+			_funcs.Add(func, value);
 		}
 
-		_funcs[func]++;
+		_funcs[func] = ++value;
 	}
 
 	public void LogFunction(string func, long milliseconds)

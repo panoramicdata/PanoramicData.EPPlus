@@ -56,7 +56,7 @@ public class FunctionCompilerFactory
 	private FunctionCompiler GetCompilerByType(ExcelFunction function)
 	{
 		var funcType = function.GetType();
-		return _specialCompilers.ContainsKey(funcType) ? _specialCompilers[funcType] : new DefaultCompiler(function, _context);
+		return _specialCompilers.TryGetValue(funcType, out var value) ? value : new DefaultCompiler(function, _context);
 	}
 	public virtual FunctionCompiler Create(ExcelFunction function)
 	{

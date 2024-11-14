@@ -423,9 +423,9 @@ public sealed class ExcelPackage : IDisposable
 		var hash = BitConverter.ToString(hashProvider.ComputeHash(image)).Replace("-", "");
 		lock (_images)
 		{
-			if (_images.ContainsKey(hash))
+			if (_images.TryGetValue(hash, out var value))
 			{
-				_images[hash].RefCount++;
+				value.RefCount++;
 			}
 			else
 			{
@@ -452,9 +452,9 @@ public sealed class ExcelPackage : IDisposable
 	internal ImageInfo LoadImage(byte[] image, Uri uri, Packaging.ZipPackagePart imagePart)
 	{
 		var hash = BitConverter.ToString(SHA1.HashData(image)).Replace("-", "");
-		if (_images.ContainsKey(hash))
+		if (_images.TryGetValue(hash, out var value))
 		{
-			_images[hash].RefCount++;
+			value.RefCount++;
 		}
 		else
 		{
@@ -467,9 +467,8 @@ public sealed class ExcelPackage : IDisposable
 	{
 		lock (_images)
 		{
-			if (_images.ContainsKey(hash))
+			if (_images.TryGetValue(hash, out var ii))
 			{
-				var ii = _images[hash];
 				ii.RefCount--;
 				if (ii.RefCount == 0)
 				{
@@ -483,7 +482,7 @@ public sealed class ExcelPackage : IDisposable
 	{
 		var hash = BitConverter.ToString(SHA1.HashData(image)).Replace("-", "");
 
-		return _images.ContainsKey(hash) ? _images[hash] : null;
+		return _images.TryGetValue(hash, out var value) ? value : null;
 	}
 	internal static int _id = 1;
 	private Uri GetNewUri(Packaging.ZipPackage package, string sUri)

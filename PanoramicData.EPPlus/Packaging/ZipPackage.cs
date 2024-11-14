@@ -28,15 +28,15 @@
  *******************************************************************************
  * Jan Källman		Added		25-Oct-2012
  *******************************************************************************/
+using Ionic.Zip;
+using OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
 using System.Xml;
-using OfficeOpenXml.Utils;
-using OfficeOpenXml.Packaging.Ionic.Zip;
-using Ionic.Zip;
 namespace OfficeOpenXml.Packaging;
 
 /// <summary>
@@ -155,14 +155,14 @@ public class ZipPackage : ZipPackageRelationshipBase
 				var name = Path.GetFileName(p.Key);
 				var extension = Path.GetExtension(p.Key);
 				var relFile = string.Format("{0}_rels/{1}.rels", p.Key[..^name.Length], name);
-				if (rels.ContainsKey(relFile))
+				if (rels.TryGetValue(relFile, out var value))
 				{
-					p.Value.ReadRelation(rels[relFile], p.Value.Uri.OriginalString);
+					p.Value.ReadRelation(value, p.Value.Uri.OriginalString);
 				}
 
-				if (_contentTypes.ContainsKey(p.Key))
+				if (_contentTypes.TryGetValue(p.Key, out var value))
 				{
-					p.Value.ContentType = _contentTypes[p.Key].Name;
+					p.Value.ContentType = value.Name;
 				}
 				else if (extension.Length > 1 && _contentTypes.ContainsKey(extension[1..]))
 				{

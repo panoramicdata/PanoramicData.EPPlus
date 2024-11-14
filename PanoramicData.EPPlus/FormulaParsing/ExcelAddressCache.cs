@@ -72,7 +72,7 @@ public class ExcelAddressCache
 	/// </summary>
 	/// <param name="id"></param>
 	/// <returns></returns>
-	public string Get(int id) => !_addressCache.ContainsKey(id) ? string.Empty : _addressCache[id];
+	public string Get(int id) => !_addressCache.TryGetValue(id, out var value) ? string.Empty : value;
 
 	/// <summary>
 	/// Clears the cache

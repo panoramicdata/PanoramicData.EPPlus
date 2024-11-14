@@ -279,9 +279,9 @@ public sealed class ExcelFontXml : StyleXmlHelper
 
 	private static float GetHeightByName(string name, float size)
 	{
-		if (FontSize.FontHeights[name].ContainsKey(size))
+		if (FontSize.FontHeights[name].TryGetValue(size, out var value))
 		{
-			return FontSize.FontHeights[name][size].Height;
+			return value.Height;
 		}
 		else
 		{

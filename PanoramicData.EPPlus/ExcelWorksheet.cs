@@ -3682,14 +3682,14 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 						{
 							var vString = Convert.ToString(v);
 							int ix;
-							if (!ss.ContainsKey(vString))
+							if (!ss.TryGetValue(vString, out var value))
 							{
 								ix = ss.Count;
 								ss.Add(vString, new ExcelWorkbook.SharedStringItem() { isRichText = _flags.GetFlagValue(cse.Row, cse.Column, CellFlags.RichText), pos = ix });
 							}
 							else
 							{
-								ix = ss[vString].pos;
+								ix = value.pos;
 							}
 
 							cache.AppendFormat("<c r=\"{0}\" s=\"{1}\" t=\"s\">", cse.CellAddress, styleID < 0 ? 0 : styleID);
@@ -4038,9 +4038,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					hyp = uri;
 				}
 
-				if (hyps.ContainsKey(hyp.OriginalString))
+				if (hyps.TryGetValue(hyp.OriginalString, out var value))
 				{
-					id = hyps[hyp.OriginalString];
+					id = value;
 				}
 				else
 				{

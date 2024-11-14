@@ -107,7 +107,7 @@ public class ExcelStyleCollection<T> : IEnumerable<T>
 	/// </summary>
 	/// <param name="key"></param>
 	/// <returns></returns>
-	internal int FindIndexByID(string key) => _dic.ContainsKey(key) ? _dic[key] : int.MinValue;
+	internal int FindIndexByID(string key) => _dic.TryGetValue(key, out var value) ? value : int.MinValue;
 	internal bool ExistsKey(string key) => _dic.ContainsKey(key);
 	internal void Sort(Comparison<T> c) => _list.Sort(c);
 }

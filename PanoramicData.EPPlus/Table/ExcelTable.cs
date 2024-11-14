@@ -251,9 +251,8 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 			}
 
 			var prevName = Name;
-			if (WorkSheet.Tables._tableNames.ContainsKey(prevName))
+			if (WorkSheet.Tables._tableNames.TryGetValue(prevName, out var ix))
 			{
-				var ix = WorkSheet.Tables._tableNames[prevName];
 				WorkSheet.Tables._tableNames.Remove(prevName);
 				WorkSheet.Tables._tableNames.Add(value, ix);
 			}

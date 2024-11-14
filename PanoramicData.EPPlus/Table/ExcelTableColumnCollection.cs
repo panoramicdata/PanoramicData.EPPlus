@@ -87,7 +87,7 @@ public class ExcelTableColumnCollection : IEnumerable<ExcelTableColumn>
 	{
 		get
 		{
-			return _colNames.ContainsKey(Name) ? _cols[_colNames[Name]] : null;
+			return _colNames.TryGetValue(Name, out var value) ? _cols[value] : null;
 		}
 	}
 

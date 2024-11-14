@@ -560,9 +560,9 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 
 			if (!sameWorkbook)
 			{
-				if (styleCashe.ContainsKey(styleID))
+				if (styleCashe.TryGetValue(styleID, out var value))
 				{
-					added.SetStyleInner(row, col, styleCashe[styleID]);
+					added.SetStyleInner(row, col, value);
 				}
 				else
 				{
@@ -710,9 +710,9 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 					relAtt.Value = rel.Id;
 				}
 
-				if (_pck._images.ContainsKey(pic.ImageHash))
+				if (_pck._images.TryGetValue(pic.ImageHash, out var value))
 				{
-					_pck._images[pic.ImageHash].RefCount++;
+					value.RefCount++;
 				}
 			}
 		}
@@ -1018,9 +1018,8 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	{
 		get
 		{
-			return _worksheets.ContainsKey(PositionID)
-				? _worksheets[PositionID]
-				:              throw (new IndexOutOfRangeException("Worksheet position out of range."));
+			return _worksheets.TryGetValue(PositionID, out var value)
+				? value :              throw (new IndexOutOfRangeException("Worksheet position out of range."));
 		}
 	}
 

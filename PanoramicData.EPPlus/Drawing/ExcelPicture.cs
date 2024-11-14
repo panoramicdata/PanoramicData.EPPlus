@@ -130,7 +130,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		UriPic = GetNewUri(package, "/xl/media/{0}" + imageFile.Name);
 		var ii = _drawings._package.AddImage(img, UriPic, ContentType);
 		string relID;
-		if (!drawings._hashes.ContainsKey(ii.Hash))
+		if (!drawings._hashes.TryGetValue(ii.Hash, out var value))
 		{
 			Part = ii.Part;
 			RelPic = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, ii.Uri), OfficeOpenXml.Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
@@ -140,7 +140,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		}
 		else
 		{
-			relID = drawings._hashes[ii.Hash];
+			relID = value;
 			var rel = _drawings.Part.GetRelationship(relID);
 			UriPic = UriHelper.ResolvePartUri(rel.SourceUri, rel.TargetUri);
 		}
@@ -197,9 +197,8 @@ public sealed class ExcelPicture : ExcelDrawing
 
 
 		ImageHash = ii.Hash;
-		if (_drawings._hashes.ContainsKey(ii.Hash))
+		if (_drawings._hashes.TryGetValue(ii.Hash, out var relID))
 		{
-			var relID = _drawings._hashes[ii.Hash];
 			var rel = _drawings.Part.GetRelationship(relID);
 			UriPic = UriHelper.ResolvePartUri(rel.SourceUri, rel.TargetUri);
 			return relID;

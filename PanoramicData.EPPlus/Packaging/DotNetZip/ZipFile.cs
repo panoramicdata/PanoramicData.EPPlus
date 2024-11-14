@@ -2969,11 +2969,11 @@ IDisposable
 		get
 		{
 			var key = SharedUtilities.NormalizePathForUseInZipFile(fileName);
-			if (_entries.ContainsKey(key))
-				return _entries[key];
+			if (_entries.TryGetValue(key, out var value))
+				return value;
 			// workitem 11056
 			key = key.Replace("/", "\\");
-			return _entries.ContainsKey(key) ? _entries[key] : null;
+			return _entries.TryGetValue(key, out var value) ? value : null;
 
 #if MESSY
                 foreach (ZipEntry e in _entries.Values)

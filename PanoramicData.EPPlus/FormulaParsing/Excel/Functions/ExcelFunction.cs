@@ -334,9 +334,9 @@ public abstract class ExcelFunction
 		var resultList = new List<double>();
 		for (var row = startRow; row <= endRow; row++)
 		{
-			if (dict.ContainsKey(row))
+			if (dict.TryGetValue(row, out var value))
 			{
-				resultList.Add(dict[row]);
+				resultList.Add(value);
 			}
 			else
 			{

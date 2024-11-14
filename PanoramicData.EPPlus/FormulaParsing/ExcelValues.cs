@@ -112,9 +112,9 @@ public class ExcelErrorValue
 		/// <param name="val"></param>
 		/// <returns></returns>
 		/// <exception cref="ArgumentException">Thrown if the supplied value is not an Excel error</exception>
-		public static eErrorType ToErrorType(string val) => string.IsNullOrEmpty(val) || !_values.ContainsKey(val)
+		public static eErrorType ToErrorType(string val) => string.IsNullOrEmpty(val) || !_values.TryGetValue(val, out var value)
 				? throw new ArgumentException("Invalid error code " + (val ?? "<empty>"))
-				: _values[val];
+				: value;
 	}
 
 	internal static ExcelErrorValue Create(eErrorType errorType) => new(errorType);

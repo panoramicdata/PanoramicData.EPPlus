@@ -29,10 +29,10 @@
  * Jan Källman		Added		30-AUG-2010
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 namespace OfficeOpenXml.Table;
 
 /// <summary>
@@ -225,7 +225,7 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 	{
 		get
 		{
-			return _tableNames.ContainsKey(Name) ? _tables[_tableNames[Name]] : null;
+			return _tableNames.TryGetValue(Name, out var value) ? _tables[value] : null;
 		}
 	}
 	public IEnumerator<ExcelTable> GetEnumerator() => _tables.GetEnumerator();

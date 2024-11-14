@@ -36,18 +36,18 @@
  * Richard Tallent		Fix escaping of quotes					2012-10-31
 >>>>>>> 21c1f80b2e27bc423e3de7f9f2e2b8c9d63934f2
  *******************************************************************************/
-using System;
-using System.Xml;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using System.Globalization;
-using OfficeOpenXml.VBA;
-using OfficeOpenXml.Utils;
+using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using OfficeOpenXml.Packaging.Ionic.Zip;
-using OfficeOpenXml.Compatibility;
+using OfficeOpenXml.Utils;
+using OfficeOpenXml.VBA;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Xml;
 
 namespace OfficeOpenXml;
 
@@ -357,18 +357,18 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	internal static decimal GetWidthPixels(string fontName, float fontSize)
 	{
 		Dictionary<float, FontSizeInfo> font;
-		if (FontSize.FontHeights.ContainsKey(fontName))
+		if (FontSize.FontHeights.TryGetValue(fontName, out var value))
 		{
-			font = FontSize.FontHeights[fontName];
+			font = value;
 		}
 		else
 		{
 			font = FontSize.FontHeights["Calibri"];
 		}
 
-		if (font.ContainsKey(fontSize))
+		if (font.TryGetValue(fontSize, out var value))
 		{
-			return Convert.ToDecimal(font[fontSize].Width);
+			return Convert.ToDecimal(value.Width);
 		}
 		else
 		{
@@ -401,9 +401,9 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		get
 		{
 			_protection ??= new ExcelProtection(NameSpaceManager, TopNode, this)
-				{
-					SchemaNodeOrder = SchemaNodeOrder
-				};
+			{
+				SchemaNodeOrder = SchemaNodeOrder
+			};
 
 			return _protection;
 		}

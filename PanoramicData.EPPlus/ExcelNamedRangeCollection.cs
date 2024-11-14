@@ -29,11 +29,11 @@
  * Jan Källman		Added this class		        2010-01-28
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OfficeOpenXml;
 
@@ -300,10 +300,8 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 	/// <param name="Name">The name</param>
 	public void Remove(string Name)
 	{
-		if (_dic.ContainsKey(Name))
+		if (_dic.TryGetValue(Name, out var ix))
 		{
-			var ix = _dic[Name];
-
 			for (var i = ix + 1; i < _list.Count; i++)
 			{
 				_dic.Remove(_list[i].Name);

@@ -188,7 +188,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	{
 		get
 		{
-			return _drawingNames.ContainsKey(Name) ? _drawings[_drawingNames[Name]] : null;
+			return _drawingNames.TryGetValue(Name, out var value) ? _drawings[value] : null;
 		}
 	}
 	public int Count => _drawings == null ? 0 : _drawings.Count;

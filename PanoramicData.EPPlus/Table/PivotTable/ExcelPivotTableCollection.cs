@@ -137,7 +137,7 @@ public class ExcelPivotTableCollection : IEnumerable<ExcelPivotTable>
 	{
 		get
 		{
-			return _pivotTableNames.ContainsKey(Name) ? _pivotTables[_pivotTableNames[Name]] : null;
+			return _pivotTableNames.TryGetValue(Name, out var value) ? _pivotTables[value] : null;
 		}
 	}
 	public IEnumerator<ExcelPivotTable> GetEnumerator() => _pivotTables.GetEnumerator();

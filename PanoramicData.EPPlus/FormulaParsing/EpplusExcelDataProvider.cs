@@ -303,9 +303,9 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 
 		id = ExcelAddressBase.GetCellID(nameItem.LocalSheetId, nameItem.Index, 0);
 
-		if (_names.ContainsKey(id))
+		if (_names.TryGetValue(id, out var value))
 		{
-			return _names[id];
+			return value;
 		}
 		else
 		{

@@ -833,9 +833,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			if (cell.Merge == true || cell.Style.WrapText) continue;
 			var fntID = styles.CellXfs[cell.StyleID].FontId;
 			Font f;
-			if (fontCache.ContainsKey(fntID))
+			if (fontCache.TryGetValue(fntID, out var value))
 			{
-				f = fontCache[fntID];
+				f = value;
 			}
 			else
 			{
@@ -2428,9 +2428,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 				else
 				{
-					if (styleCashe.ContainsKey(i))
+					if (styleCashe.TryGetValue(i, out var value))
 					{
-						i = styleCashe[i];
+						i = value;
 					}
 					else
 					{
@@ -2481,9 +2481,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 				else
 				{
-					if (styleCashe.ContainsKey(i))
+					if (styleCashe.TryGetValue(i, out var value))
 					{
-						i = styleCashe[i];
+						i = value;
 					}
 					else
 					{
@@ -2903,14 +2903,14 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				_worksheet._values.SetValueSpecial(row, col, SortSetValue, l[r].Items[c]);
 				var addr = GetAddress(l[r].Row, _fromCol + c);
 				//Move flags
-				if (flags.ContainsKey(addr))
+				if (flags.TryGetValue(addr, out var value))
 				{
-					_worksheet._flags.SetValue(row, col, flags[addr]);
+					_worksheet._flags.SetValue(row, col, value);
 				}
 				//Move formulas
-				if (formulas.ContainsKey(addr))
+				if (formulas.TryGetValue(addr, out var value))
 				{
-					_worksheet._formulas.SetValue(row, col, formulas[addr]);
+					_worksheet._formulas.SetValue(row, col, value);
 					if (formulas[addr] is int)
 					{
 						var sfIx = (int)formulas[addr];
@@ -2930,15 +2930,14 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 
 				//Move hyperlinks
-				if (hyperLinks.ContainsKey(addr))
+				if (hyperLinks.TryGetValue(addr, out var value))
 				{
-					_worksheet._hyperLinks.SetValue(row, col, hyperLinks[addr]);
+					_worksheet._hyperLinks.SetValue(row, col, value);
 				}
 
 				//Move comments
-				if (comments.ContainsKey(addr))
+				if (comments.TryGetValue(addr, out var i))
 				{
-					var i = comments[addr];
 					_worksheet._commentsStore.SetValue(row, col, i);
 					var comment = _worksheet._comments[i];
 					comment.Reference = GetAddress(row, col);

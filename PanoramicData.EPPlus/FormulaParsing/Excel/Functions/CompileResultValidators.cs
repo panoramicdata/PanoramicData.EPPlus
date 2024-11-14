@@ -33,9 +33,9 @@ public class CompileResultValidators
 
 	private CompileResultValidator CreateOrGet(DataType dataType)
 	{
-		if (_validators.ContainsKey(dataType))
+		if (_validators.TryGetValue(dataType, out var value))
 		{
-			return _validators[dataType];
+			return value;
 		}
 
 		return dataType == DataType.Decimal

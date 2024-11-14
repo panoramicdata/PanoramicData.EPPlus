@@ -486,10 +486,10 @@ class Sample6
 	private static void AddStatistics(FileInfo file)
 	{
 		//Extension
-		if (_extStat.ContainsKey(file.Extension))
+		if (_extStat.TryGetValue(file.Extension, out var value))
 		{
-			_extStat[file.Extension].Count++;
-			_extStat[file.Extension].Size += file.Length;
+			value.Count++;
+			value.Size += file.Length;
 		}
 		else
 		{
