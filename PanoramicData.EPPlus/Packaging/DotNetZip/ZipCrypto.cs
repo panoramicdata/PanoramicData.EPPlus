@@ -194,8 +194,7 @@ internal class ZipCrypto
 	/// <returns>The plaintext.</returns>
 	public byte[] DecryptMessage(byte[] cipherText, int length)
 	{
-		if (cipherText == null)
-			throw new ArgumentNullException(nameof(cipherText));
+		ArgumentNullException.ThrowIfNull(cipherText);
 
 		if (length > cipherText.Length)
 			throw new ArgumentOutOfRangeException(nameof(length),
@@ -227,8 +226,7 @@ internal class ZipCrypto
 	/// <returns>The ciphertext.</returns>
 	public byte[] EncryptMessage(byte[] plainText, int length)
 	{
-		if (plainText == null)
-			throw new ArgumentNullException("plaintext");
+		ArgumentNullException.ThrowIfNull(plainText);
 
 		if (length > plainText.Length)
 			throw new ArgumentOutOfRangeException(nameof(length),
@@ -377,8 +375,7 @@ internal class ZipCipherStream : System.IO.Stream
 		if (_mode == CryptoMode.Encrypt)
 			throw new NotSupportedException("This stream does not encrypt via Read()");
 
-		if (buffer == null)
-			throw new ArgumentNullException(nameof(buffer));
+		ArgumentNullException.ThrowIfNull(buffer);
 
 		var db = new byte[count];
 		var n = _s.Read(db, 0, count);
@@ -396,8 +393,7 @@ internal class ZipCipherStream : System.IO.Stream
 		if (_mode == CryptoMode.Decrypt)
 			throw new NotSupportedException("This stream does not Decrypt via Write()");
 
-		if (buffer == null)
-			throw new ArgumentNullException(nameof(buffer));
+		ArgumentNullException.ThrowIfNull(buffer);
 
 		// workitem 7696
 		if (count == 0) return;

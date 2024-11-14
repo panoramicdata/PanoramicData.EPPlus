@@ -563,8 +563,7 @@ internal partial class ZipFile
 	/// </param>
 	public void Save(Stream outputStream)
 	{
-		if (outputStream == null)
-			throw new ArgumentNullException(nameof(outputStream));
+		ArgumentNullException.ThrowIfNull(outputStream);
 		if (!outputStream.CanWrite)
 			throw new ArgumentException("Must be a writable stream.", nameof(outputStream));
 

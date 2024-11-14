@@ -3260,8 +3260,7 @@ IDisposable
 	{
 		//if (!_entries.Values.Contains(entry))
 		//    throw new ArgumentException("The entry you specified does not exist in the zip archive.");
-		if (entry == null)
-			throw new ArgumentNullException(nameof(entry));
+		ArgumentNullException.ThrowIfNull(entry);
 
 		_entries.Remove(SharedUtilities.NormalizePathForUseInZipFile(entry.FileName));
 		_zipEntriesAsList = null;

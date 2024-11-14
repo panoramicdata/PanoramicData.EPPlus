@@ -418,8 +418,7 @@ internal partial class ZipFile
 	/// <seealso cref="Ionic.Zip.ZipFile.RemoveSelectedEntries(String)" />
 	public void RemoveEntries(System.Collections.Generic.ICollection<ZipEntry> entriesToRemove)
 	{
-		if (entriesToRemove == null)
-			throw new ArgumentNullException(nameof(entriesToRemove));
+		ArgumentNullException.ThrowIfNull(entriesToRemove);
 
 		foreach (var e in entriesToRemove)
 		{
@@ -442,8 +441,7 @@ internal partial class ZipFile
 	/// <seealso cref="Ionic.Zip.ZipFile.RemoveSelectedEntries(String)" />
 	public void RemoveEntries(System.Collections.Generic.ICollection<String> entriesToRemove)
 	{
-		if (entriesToRemove == null)
-			throw new ArgumentNullException(nameof(entriesToRemove));
+		ArgumentNullException.ThrowIfNull(entriesToRemove);
 
 		foreach (var e in entriesToRemove)
 		{
@@ -647,8 +645,7 @@ internal partial class ZipFile
 						 bool preserveDirHierarchy,
 						 String directoryPathInArchive)
 	{
-		if (fileNames == null)
-			throw new ArgumentNullException(nameof(fileNames));
+		ArgumentNullException.ThrowIfNull(fileNames);
 
 		_addOperationCanceled = false;
 		OnAddStarted();
@@ -722,8 +719,7 @@ internal partial class ZipFile
 	/// <seealso cref="Ionic.Zip.ZipFile.AddSelectedFiles(String, String)" />
 	public void UpdateFiles(System.Collections.Generic.IEnumerable<String> fileNames, String directoryPathInArchive)
 	{
-		if (fileNames == null)
-			throw new ArgumentNullException(nameof(fileNames));
+		ArgumentNullException.ThrowIfNull(fileNames);
 
 		OnAddStarted();
 		foreach (var f in fileNames)

@@ -1350,8 +1350,7 @@ namespace OfficeOpenXml.Packaging.Ionic
 		/// <returns>a collection of ZipEntry objects that conform to the criteria.</returns>
 		public ICollection<ZipEntry> SelectEntries(ZipFile zip)
 		{
-			if (zip == null)
-				throw new ArgumentNullException(nameof(zip));
+			ArgumentNullException.ThrowIfNull(zip);
 
 			var list = new List<ZipEntry>();
 
@@ -1405,8 +1404,7 @@ namespace OfficeOpenXml.Packaging.Ionic
 		/// <returns>a collection of ZipEntry objects that conform to the criteria.</returns>
 		public ICollection<ZipEntry> SelectEntries(ZipFile zip, string directoryPathInArchive)
 		{
-			if (zip == null)
-				throw new ArgumentNullException(nameof(zip));
+			ArgumentNullException.ThrowIfNull(zip);
 
 			var list = new List<ZipEntry>();
 			// workitem 8559

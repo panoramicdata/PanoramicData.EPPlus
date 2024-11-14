@@ -1796,10 +1796,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <returns>The filled range</returns>
 	public ExcelRangeBase LoadFromDataTable(DataTable Table, bool PrintHeaders)
 	{
-		if (Table == null)
-		{
-			throw (new ArgumentNullException("Table can't be null"));
-		}
+		ArgumentNullException.ThrowIfNull(Table);
 
 		if (Table.Rows.Count == 0 && PrintHeaders == false)
 		{
@@ -1843,7 +1840,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	public ExcelRangeBase LoadFromArrays(IEnumerable<object[]> Data)
 	{
 		//thanx to Abdullin for the code contribution
-		if (Data == null) throw new ArgumentNullException("data");
+		ArgumentNullException.ThrowIfNull(Data);
 
 		var rowArray = new List<object[]>();
 		var maxColumn = 0;
