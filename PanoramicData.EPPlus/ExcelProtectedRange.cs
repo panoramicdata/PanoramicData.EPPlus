@@ -107,12 +107,11 @@ public class ExcelProtectedRange : XmlHelper
 #if Core
             var hp = SHA512.Create();
 #else
-		var hp = new SHA512CryptoServiceProvider();
 #endif
 		var buffer = new byte[byPwd.Length + bySalt.Length];
 		Array.Copy(bySalt, buffer, bySalt.Length);
 		Array.Copy(byPwd, 0, buffer, 16, byPwd.Length);
-		var hash = hp.ComputeHash(buffer);
+		var hash = SHA512.HashData(buffer);
 
 		//Now iterate the number of spinns.
 		for (var i = 0; i < SpinCount; i++)
@@ -120,7 +119,7 @@ public class ExcelProtectedRange : XmlHelper
 			buffer = new byte[hash.Length + 4];
 			Array.Copy(hash, buffer, hash.Length);
 			Array.Copy(BitConverter.GetBytes(i), 0, buffer, hash.Length, 4);
-			hash = hp.ComputeHash(buffer);
+			hash = SHA512.HashData(buffer);
 		}
 
 		Salt = Convert.ToBase64String(bySalt);

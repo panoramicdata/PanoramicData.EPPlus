@@ -97,8 +97,7 @@ public class ExcelVbaProtection
 			Array.Copy(PasswordKey, 0, data, data.Length - 4, 4);
 
 			//Calculate Hash
-			var provider = SHA1.Create();
-			PasswordHash = provider.ComputeHash(data);
+			PasswordHash = SHA1.HashData(data);
 			_project.ProjectID = "{00000000-0000-0000-0000-000000000000}";
 		}
 	}

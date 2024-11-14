@@ -370,8 +370,7 @@ public class ExcelVbaSignature
 		}
 
 		var buffer = (bw.BaseStream as MemoryStream).ToArray();
-		var hp = System.Security.Cryptography.MD5.Create();
-		return hp.ComputeHash(buffer);
+		return System.Security.Cryptography.MD5.HashData(buffer);
 	}
 	/// <summary>
 	/// The certificate to sign the VBA project.

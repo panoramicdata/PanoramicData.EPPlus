@@ -451,8 +451,7 @@ public sealed class ExcelPackage : IDisposable
 	}
 	internal ImageInfo LoadImage(byte[] image, Uri uri, Packaging.ZipPackagePart imagePart)
 	{
-		var hashProvider = SHA1.Create();
-		var hash = BitConverter.ToString(hashProvider.ComputeHash(image)).Replace("-", "");
+		var hash = BitConverter.ToString(SHA1.HashData(image)).Replace("-", "");
 		if (_images.ContainsKey(hash))
 		{
 			_images[hash].RefCount++;
@@ -482,8 +481,7 @@ public sealed class ExcelPackage : IDisposable
 	}
 	internal ImageInfo GetImageInfo(byte[] image)
 	{
-		var hashProvider = SHA1.Create();
-		var hash = BitConverter.ToString(hashProvider.ComputeHash(image)).Replace("-", "");
+		var hash = BitConverter.ToString(SHA1.HashData(image)).Replace("-", "");
 
 		return _images.ContainsKey(hash) ? _images[hash] : null;
 	}

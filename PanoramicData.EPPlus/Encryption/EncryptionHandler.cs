@@ -450,8 +450,7 @@ internal class EncryptedPackageHandler
 
 		//AES = 32 Bits
 		encryptionInfo.Verifier.VerifierHashSize = 0x20;
-		var sha = SHA1.Create();
-		var verifierHash = sha.ComputeHash(verifier);
+		var verifierHash = SHA1.HashData(verifier);
 
 		encryptionInfo.Verifier.EncryptedVerifierHash = EncryptData(key, verifierHash, false);
 
@@ -686,8 +685,7 @@ internal class EncryptedPackageHandler
 		cryptoStream.Read(decryptedVerifierHash, 0, (int)16);
 
 		//Get the hash for the decrypted verifier
-		var sha = SHA1.Create();
-		var hash = sha.ComputeHash(decryptedVerifier);
+		var hash = SHA1.HashData(decryptedVerifier);
 
 		//Equal?
 		for (var i = 0; i < 16; i++)
