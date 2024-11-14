@@ -118,7 +118,7 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 			throw new ArgumentException("Tablename start with invalid character");
 		}
 
-		if (Name.Contains(" "))
+		if (Name.Contains(' '))
 		{
 			throw new ArgumentException("Tablename has spaces");
 		}

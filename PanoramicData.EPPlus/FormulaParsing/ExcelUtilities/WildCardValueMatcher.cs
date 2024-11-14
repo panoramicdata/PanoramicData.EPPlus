@@ -36,7 +36,7 @@ public class WildCardValueMatcher : ValueMatcher
 {
 	protected override int CompareStringToString(string s1, string s2)
 	{
-		if (s1.Contains("*") || s1.Contains("?"))
+		if (s1.Contains('*') || s1.Contains('?'))
 		{
 			var regexPattern = Regex.Escape(s1);
 			regexPattern = string.Format("^{0}$", regexPattern);

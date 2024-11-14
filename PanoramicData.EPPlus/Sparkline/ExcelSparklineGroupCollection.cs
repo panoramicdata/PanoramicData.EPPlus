@@ -321,7 +321,7 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 
 	private static string BuildNewAddress(ExcelAddressBase namedRange, string newAddress)
 	{
-		if (namedRange.FullAddress.Contains("!"))
+		if (namedRange.FullAddress.Contains('!'))
 		{
 			var worksheet = namedRange.FullAddress.Split('!')[0];
 			worksheet = worksheet.Trim('\'');

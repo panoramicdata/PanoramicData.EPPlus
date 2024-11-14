@@ -38,14 +38,14 @@ public class ExcelAddressInfo
 	{
 		var addressOnSheet = address;
 		Worksheet = string.Empty;
-		if (address.Contains("!"))
+		if (address.Contains('!'))
 		{
 			var worksheetArr = address.Split('!');
 			Worksheet = worksheetArr[0];
 			addressOnSheet = worksheetArr[1];
 		}
 
-		if (addressOnSheet.Contains(":"))
+		if (addressOnSheet.Contains(':'))
 		{
 			var rangeArr = addressOnSheet.Split(':');
 			StartCell = rangeArr[0];

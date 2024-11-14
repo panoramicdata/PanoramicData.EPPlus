@@ -229,7 +229,7 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 
 	private static string BuildNewAddress(ExcelNamedRange namedRange, string newAddress)
 	{
-		if (namedRange.FullAddress.Contains("!"))
+		if (namedRange.FullAddress.Contains('!'))
 		{
 			var worksheet = namedRange.FullAddress.Split('!')[0];
 			worksheet = worksheet.Trim('\'');

@@ -861,11 +861,11 @@ public class ExcelAddressBase : ExcelCellBase
 			{
 				if (SplitAddress(Address, out var wb, out var ws, out var intAddress))
 				{
-					if (intAddress.Contains("[")) //Table reference
+					if (intAddress.Contains('[')) //Table reference
 					{
 						return string.IsNullOrEmpty(wb) ? AddressType.InternalAddress : AddressType.ExternalAddress;
 					}
-					else if (intAddress.Contains(","))
+					else if (intAddress.Contains(','))
 					{
 						intAddress = intAddress[..intAddress.IndexOf(',')];
 					}
