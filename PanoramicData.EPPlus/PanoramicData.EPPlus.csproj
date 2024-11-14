@@ -10,7 +10,7 @@
 		<Company></Company>
 		<Product>EPPlus Free Edition</Product>
 		<Title>Panoramic Data's EPPlus Free Edition</Title>
-		<Description>EPPlusFree is an unofficial EPPlus library, it is a continuous version of EPPlus Free Edition 4.5.3.3.</Description>
+		<Description>PanoramicData.EPPlus is an unofficial EPPlus library, targeting .NET 9 and above.</Description>
 		<AssemblyName>PanoramicData.EPPlus</AssemblyName>
 		<RootNamespace>OfficeOpenXml</RootNamespace>
 		<RepositoryUrl>https://github.com/panoramicdata/PanoramicData.EPPlus</RepositoryUrl>

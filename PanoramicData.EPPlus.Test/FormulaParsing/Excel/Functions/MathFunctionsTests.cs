@@ -368,7 +368,7 @@ public class MathFunctionsTests
 		var errorType = eErrorType.Value;
 
 		var func = new Average();
-		var args = new FunctionArgument[0];
+		var args = Array.Empty<FunctionArgument>();
 		try
 		{
 			func.Execute(args, _parsingContext);
@@ -494,7 +494,7 @@ public class MathFunctionsTests
 	public void RandShouldReturnAValueBetween0and1()
 	{
 		var func = new Rand();
-		var args = new FunctionArgument[0];
+		var args = Array.Empty<FunctionArgument>();
 		var result1 = func.Execute(args, _parsingContext);
 		Assert.IsTrue((double)result1.Result is > 0 and < 1);
 		var result2 = func.Execute(args, _parsingContext);

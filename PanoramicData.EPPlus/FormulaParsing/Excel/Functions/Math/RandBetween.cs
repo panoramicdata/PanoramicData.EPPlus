@@ -34,7 +34,7 @@ public class RandBetween : ExcelFunction
 		ValidateArguments(arguments, 2);
 		var low = ArgToDecimal(arguments, 0);
 		var high = ArgToDecimal(arguments, 1);
-		var rand = new Rand().Execute(new FunctionArgument[0], context).Result;
+		var rand = new Rand().Execute(System.Array.Empty<FunctionArgument>(), context).Result;
 		var randPart = (CalulateDiff(high, low) * (double)rand) + 1;
 		randPart = System.Math.Floor(randPart);
 		return CreateResult(low + randPart, DataType.Integer);

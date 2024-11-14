@@ -57,7 +57,7 @@ public class DateTimeFunctionsTests
 		var startTime = DateTime.Now;
 		Thread.Sleep(1);
 		var func = new Now();
-		var args = new FunctionArgument[0];
+		var args = Array.Empty<FunctionArgument>();
 		var result = func.Execute(args, _parsingContext);
 		Thread.Sleep(1);
 		var endTime = DateTime.Now;
@@ -69,7 +69,7 @@ public class DateTimeFunctionsTests
 	public void TodayFunctionShouldReturnTodaysDate()
 	{
 		var func = new Today();
-		var args = new FunctionArgument[0];
+		var args = Array.Empty<FunctionArgument>();
 		var result = func.Execute(args, _parsingContext);
 		var resultDate = DateTime.FromOADate((double)result.Result);
 		Assert.AreEqual(DateTime.Now.Date, resultDate);
