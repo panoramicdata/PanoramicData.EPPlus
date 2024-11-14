@@ -214,7 +214,7 @@ public sealed class ExcelBarChart : ExcelChart
 			_chartXmlHelper.SetXmlNodeString(_shapePath, GetShapeText(value));
 		}
 	}
-	ExcelChartDataLabel _DataLabel = null;
+	ExcelChartDataLabel? _dataLabel = null;
 	/// <summary>
 	/// Access to datalabel properties
 	/// </summary>
@@ -222,9 +222,9 @@ public sealed class ExcelBarChart : ExcelChart
 	{
 		get
 		{
-			_DataLabel ??= new ExcelChartDataLabel(NameSpaceManager, ChartNode);
+			_dataLabel ??= new ExcelChartDataLabel(NameSpaceManager, ChartNode);
 
-			return _DataLabel;
+			return _dataLabel;
 		}
 	}
 	readonly string _gapWidthPath = "c:gapWidth/@val";
