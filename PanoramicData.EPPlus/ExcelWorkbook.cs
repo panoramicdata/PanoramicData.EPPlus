@@ -190,7 +190,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				ExcelRangeBase range;
 				ExcelNamedRange namedRange;
 
-				if (fullAddress.IndexOf("[") == 0)
+				if (fullAddress.StartsWith("["))
 				{
 					var start = fullAddress.IndexOf("[");
 					var end = fullAddress.IndexOf("]", start);
