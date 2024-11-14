@@ -65,8 +65,8 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// Reference to the worksheet
 	/// </summary>
 	protected ExcelWorksheet _worksheet;
-	internal ExcelWorkbook _workbook = null;
-	private delegate void _changeProp(ExcelRangeBase range, _setValue method, object value);
+	internal ExcelWorkbook? _workbook = null;
+	private delegate void _changeProp(ExcelRangeBase range, _setValue method, object? value);
 	private delegate void _setValue(ExcelRangeBase range, object value, int row, int col);
 	private _changeProp _changePropMethod;
 	private int _styleID;
@@ -74,7 +74,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		internal int Row { get; set; }
 		internal int Column { get; set; }
-		internal object Value { get; set; }
+		internal object? Value { get; set; }
 		internal string Type { get; set; }
 		internal object Formula { get; set; }
 		internal int? StyleID { get; set; }
@@ -154,7 +154,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="range"></param>
 	/// <param name="valueMethod"></param>
 	/// <param name="value"></param>
-	private static void SetUnknown(ExcelRangeBase range, _setValue valueMethod, object value)
+	private static void SetUnknown(ExcelRangeBase range, _setValue valueMethod, object? value)
 	{
 		//Address is not set use, selected range
 		if (range._fromRow == -1)
@@ -171,21 +171,21 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="range"></param>
 	/// <param name="valueMethod"></param>
 	/// <param name="value"></param>
-	private static void SetSingle(ExcelRangeBase range, _setValue valueMethod, object value) => valueMethod(range, value, range._fromRow, range._fromCol);
+	private static void SetSingle(ExcelRangeBase range, _setValue valueMethod, object? value) => valueMethod(range, value, range._fromRow, range._fromCol);
 	/// <summary>
 	/// Set a range
 	/// </summary>
 	/// <param name="range"></param>
 	/// <param name="valueMethod"></param>
 	/// <param name="value"></param>
-	private static void SetRange(ExcelRangeBase range, _setValue valueMethod, object value) => range.SetValueAddress(range, valueMethod, value);
+	private static void SetRange(ExcelRangeBase range, _setValue valueMethod, object? value) => range.SetValueAddress(range, valueMethod, value);
 	/// <summary>
 	/// Set a multirange (A1:A2,C1:C2)
 	/// </summary>
 	/// <param name="range"></param>
 	/// <param name="valueMethod"></param>
 	/// <param name="value"></param>
-	private static void SetMultiRange(ExcelRangeBase range, _setValue valueMethod, object value)
+	private static void SetMultiRange(ExcelRangeBase range, _setValue valueMethod, object? value)
 	{
 		range.SetValueAddress(range, valueMethod, value);
 		foreach (var address in range.Addresses)
@@ -199,7 +199,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="address"></param>
 	/// <param name="valueMethod"></param>
 	/// <param name="value"></param>
-	private void SetValueAddress(ExcelAddress address, _setValue valueMethod, object value)
+	private void SetValueAddress(ExcelAddress address, _setValue valueMethod, object? value)
 	{
 		IsRangeValid("");
 		if (_fromRow == 1 && _fromCol == 1 && _toRow == ExcelPackage.MaxRows && _toCol == ExcelPackage.MaxColumns)  //Full sheet (ex ws.Cells.Value=0). Set value for A1 only to avoid hanging 
@@ -615,7 +615,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <summary>
 	/// Set the range to a specific value
 	/// </summary>
-	public object Value
+	public object? Value
 	{
 		get
 		{
@@ -713,10 +713,12 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	}
 
 	private object GetSingleValue() => IsRichText ? RichText.Text : _worksheet.GetValueInner(_fromRow, _fromCol);
+
 	/// <summary>
 	/// Returns the formatted value.
 	/// </summary>
 	public string Text => GetFormattedText(false);
+
 	/// <summary>
 	/// Set the column width from the content of the range. The minimum width is the value of the ExcelWorksheet.defaultColumnWidth property.
 	/// Note: Cells containing formulas must be calculated before autofit is called.
@@ -778,7 +780,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			}
 		}
 
-		//Get any autofilter to widen these columns
+		//Get any auto filter to widen these columns
 		var afAddr = new List<ExcelAddressBase>();
 		if (_worksheet.AutoFilterAddress != null)
 		{
@@ -816,7 +818,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		Graphics g = null;
 		try
 		{
-			//Check for missing GDI+, then use WPF istead.
+			//Check for missing GDI+, then use WPF instead.
 			b = new Bitmap(1, 1);
 			g = Graphics.FromImage(b);
 			g.PageUnit = GraphicsUnit.Pixel;
@@ -1268,7 +1270,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			return _worksheet._flags.GetFlagValue(_fromRow, _fromCol, CellFlags.ArrayFormula);
 		}
 	}
-	protected ExcelRichTextCollection _rtc = null;
+	protected ExcelRichTextCollection? _rtc = null;
 	/// <summary>
 	/// Cell value is richtext formatted. 
 	/// Richtext-property only apply to the left-top cell of the range.
@@ -1876,7 +1878,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <summary>
 	/// Load a collection into a the worksheet starting from the top left row of the range.
 	/// </summary>
-	/// <typeparam name="T">The datatype in the collection</typeparam>
+	/// <typeparam name="T">The data type in the collection</typeparam>
 	/// <param name="Collection">The collection to load</param>
 	/// <returns>The filled range</returns>
 	public ExcelRangeBase LoadFromCollection<T>(IEnumerable<T> Collection) => LoadFromCollection<T>(Collection, false, TableStyles.None, BindingFlags.Public | BindingFlags.Instance, null);
@@ -1884,7 +1886,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// Load a collection of T into the worksheet starting from the top left row of the range.
 	/// Default option will load all public instance properties of T
 	/// </summary>
-	/// <typeparam name="T">The datatype in the collection</typeparam>
+	/// <typeparam name="T">The data type in the collection</typeparam>
 	/// <param name="Collection">The collection to load</param>
 	/// <param name="PrintHeaders">Print the property names on the first row. If the property is decorated with a <see cref="DisplayNameAttribute"/> or a <see cref="DescriptionAttribute"/> that attribute will be used instead of the reflected member name.</param>
 	/// <returns>The filled range</returns>
@@ -1909,7 +1911,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="memberFlags">Property flags to use</param>
 	/// <param name="Members">The properties to output. Must be of type T</param>
 	/// <returns>The filled range</returns>
-	public ExcelRangeBase LoadFromCollection<T>(IEnumerable<T> Collection, bool PrintHeaders, TableStyles TableStyle, BindingFlags memberFlags, MemberInfo[] Members)
+	public ExcelRangeBase LoadFromCollection<T>(IEnumerable<T> Collection, bool PrintHeaders, TableStyles TableStyle, BindingFlags memberFlags, MemberInfo[]? Members)
 	{
 		var type = typeof(T);
 		var isSameType = true;
@@ -2310,7 +2312,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="RowOffset">Row Offset</param>
 	/// <param name="ColumnOffset">Column Offset</param>
 	/// <param name="NumberOfRows">Number of rows. Minimum 1</param>
-	/// <param name="NumberOfColumns">Number of colums. Minimum 1</param>
+	/// <param name="NumberOfColumns">Number of columns. Minimum 1</param>
 	/// <returns></returns>
 	public ExcelRangeBase Offset(int RowOffset, int ColumnOffset, int NumberOfRows, int NumberOfColumns)
 	{
@@ -2492,7 +2494,8 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			}
 		}
 
-		var copiedMergedCells = new Dictionary<int, ExcelAddress>();
+		var copiedMergedCells = new Dictionary<int, ExcelAddress?>();
+
 		//Merged cells
 		var csem = new CellsStoreEnumerator<int>(_worksheet.MergedCells._cells, _fromRow, _fromCol, _toRow, _toCol);
 		while (csem.Next())
@@ -2835,7 +2838,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="descending">Descending if true, otherwise Ascending. Default Ascending. Zerobased</param>
 	/// <param name="culture">The CultureInfo used to compare values. A null value means CurrentCulture</param>
 	/// <param name="compareOptions">String compare option</param>
-	public void Sort(int[] columns, bool[] descending = null, CultureInfo culture = null, CompareOptions compareOptions = CompareOptions.None)
+	public void Sort(int[] columns, bool[]? descending = null, CultureInfo? culture = null, CompareOptions compareOptions = CompareOptions.None)
 	{
 		columns ??= [0];
 

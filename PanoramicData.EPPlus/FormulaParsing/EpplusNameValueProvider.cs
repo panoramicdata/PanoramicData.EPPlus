@@ -29,11 +29,11 @@ public class EpplusNameValueProvider : INameValueProvider
 		_values = _excelDataProvider.GetWorkbookNameValues();
 	}
 
-	public virtual bool IsNamedValue(string key, string ws)
+	public virtual bool IsNamedValue(string key, string? worksheet)
 	{
-		if (ws != null)
+		if (worksheet != null)
 		{
-			var wsNames = _excelDataProvider.GetWorksheetNames(ws);
+			var wsNames = _excelDataProvider.GetWorksheetNames(worksheet);
 			if (wsNames != null && wsNames.ContainsKey(key))
 			{
 				return true;

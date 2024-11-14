@@ -22,14 +22,14 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
 public class FunctionArgument
 {
-	public FunctionArgument(object val)
+	public FunctionArgument(object? val)
 	{
 		Value = val;
 		DataType = DataType.Unknown;
@@ -47,7 +47,7 @@ public class FunctionArgument
 
 	public bool ExcelStateFlagIsSet(ExcelCellState state) => (_excelCellState & state) != 0;
 
-	public object Value { get; private set; }
+	public object? Value { get; private set; }
 
 	public DataType DataType { get; }
 

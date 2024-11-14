@@ -30,9 +30,9 @@
  * Jan Källman		                License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
 using System;
-using System.Xml;
 using System.Globalization;
 using System.Linq;
+using System.Xml;
 
 namespace OfficeOpenXml;
 
@@ -658,7 +658,7 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	/// The printarea.
 	/// Null if no print area is set.
 	/// </summary>
-	public ExcelRangeBase PrintArea
+	public ExcelRangeBase? PrintArea
 	{
 		get
 		{

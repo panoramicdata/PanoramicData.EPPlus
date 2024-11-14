@@ -27,7 +27,7 @@ public class NameValueProvider : INameValueProvider
 
 	public static INameValueProvider Empty => new NameValueProvider();
 
-	public bool IsNamedValue(string key, string worksheet) => false;
+	public bool IsNamedValue(string key, string? worksheet) => false;
 
 	public object GetNamedValue(string key) => null;
 

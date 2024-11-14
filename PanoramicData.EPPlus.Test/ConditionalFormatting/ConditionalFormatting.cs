@@ -13,7 +13,7 @@ namespace PanoramicData.EPPlus.Test.ConditionalFormatting;
 public class ConditionalFormatting
 {
 	private TestContext _testContextInstance;
-	private static ExcelPackage _pck;
+	private static ExcelPackage? _excelPackage;
 
 	/// <summary>
 	///Gets or sets the test context which provides
@@ -42,12 +42,12 @@ public class ConditionalFormatting
 			Directory.CreateDirectory(string.Format("Test"));
 		}
 
-		_pck = new ExcelPackage(new FileInfo(@"Test\ConditionalFormatting.xlsx"));
+		_excelPackage = new ExcelPackage(new FileInfo(@"Test\ConditionalFormatting.xlsx"));
 	}
 
 	// Use ClassCleanup to run code after all tests in a class have run
 	[ClassCleanup()]
-	public static void MyClassCleanup() => _pck = null;
+	public static void MyClassCleanup() => _excelPackage = null;
 
 	// //Use TestInitialize to run code before running each test 
 	// [TestInitialize()]
@@ -68,7 +68,7 @@ public class ConditionalFormatting
 	[TestMethod]
 	public void TwoColorScale()
 	{
-		var ws = _pck.Workbook.Worksheets.Add("ColorScale");
+		var ws = _excelPackage.Workbook.Worksheets.Add("ColorScale");
 		ws.ConditionalFormatting.AddTwoColorScale(ws.Cells["A1:A5"]);
 		ws.SetValue(1, 1, 1);
 		ws.SetValue(2, 1, 2);
@@ -114,7 +114,7 @@ public class ConditionalFormatting
 	[TestMethod]
 	public void TwoBackColor()
 	{
-		var ws = _pck.Workbook.Worksheets.Add("TwoBackColor");
+		var ws = _excelPackage.Workbook.Worksheets.Add("TwoBackColor");
 		var condition1 = ws.ConditionalFormatting.AddEqual(ws.Cells["A1"]);
 		condition1.StopIfTrue = true;
 		condition1.Priority = 1;
@@ -129,7 +129,7 @@ public class ConditionalFormatting
 	[TestMethod]
 	public void Databar()
 	{
-		var ws = _pck.Workbook.Worksheets.Add("Databar");
+		var ws = _excelPackage.Workbook.Worksheets.Add("Databar");
 		var cf = ws.ConditionalFormatting.AddDatabar(ws.Cells["A1:A5"], Color.BlueViolet);
 		ws.SetValue(1, 1, 1);
 		ws.SetValue(2, 1, 2);
@@ -140,7 +140,7 @@ public class ConditionalFormatting
 	[TestMethod]
 	public void DatabarChangingAddressAddsConditionalFormatNodeInSchemaOrder()
 	{
-		var ws = _pck.Workbook.Worksheets.Add("DatabarAddressing");
+		var ws = _excelPackage.Workbook.Worksheets.Add("DatabarAddressing");
 		// Ensure there is at least one element that always exists below ConditionalFormatting nodes.   
 		ws.HeaderFooter.AlignWithMargins = true;
 		var cf = ws.ConditionalFormatting.AddDatabar(ws.Cells["A1:A5"], Color.BlueViolet);
@@ -153,7 +153,7 @@ public class ConditionalFormatting
 	[TestMethod]
 	public void IconSet()
 	{
-		var ws = _pck.Workbook.Worksheets.Add("IconSet");
+		var ws = _excelPackage.Workbook.Worksheets.Add("IconSet");
 		var cf = ws.ConditionalFormatting.AddThreeIconSet(ws.Cells["A1:A3"], eExcelconditionalFormatting3IconsSetType.Symbols);
 		ws.SetValue(1, 1, 1);
 		ws.SetValue(2, 1, 2);

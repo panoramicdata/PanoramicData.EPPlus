@@ -30,17 +30,17 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Xml;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.Drawing.Vml;
 
 internal class ExcelVmlDrawingCommentCollection : ExcelVmlDrawingBaseCollection, IEnumerable
 {
 	internal RangeCollection _drawings;
-	internal ExcelVmlDrawingCommentCollection(ExcelPackage pck, ExcelWorksheet ws, Uri uri) :
+	internal ExcelVmlDrawingCommentCollection(ExcelPackage pck, ExcelWorksheet ws, Uri? uri) :
 		base(pck, ws, uri)
 	{
 		if (uri == null)

@@ -159,7 +159,7 @@ public class ExcelAddressBase : ExcelCellBase
 		SetRCFromTable(pck, referenceAddress);
 	}
 
-	internal void SetRCFromTable(ExcelPackage pck, ExcelAddressBase referenceAddress)
+	internal void SetRCFromTable(ExcelPackage pck, ExcelAddressBase? referenceAddress)
 	{
 		if (string.IsNullOrEmpty(_wb) && Table != null)
 		{
@@ -409,7 +409,7 @@ public class ExcelAddressBase : ExcelCellBase
 		return adr;
 	}
 	#endregion
-	protected ExcelCellAddress _start = null;
+	protected ExcelCellAddress? _start = null;
 	/// <summary>
 	/// Gets the row and column of the top left cell.
 	/// </summary>
@@ -423,7 +423,7 @@ public class ExcelAddressBase : ExcelCellBase
 			return _start;
 		}
 	}
-	protected ExcelCellAddress _end = null;
+	protected ExcelCellAddress? _end = null;
 	/// <summary>
 	/// Gets the row and column of the bottom right cell.
 	/// </summary>
@@ -437,8 +437,8 @@ public class ExcelAddressBase : ExcelCellBase
 			return _end;
 		}
 	}
-	protected ExcelTableAddress _table = null;
-	public ExcelTableAddress Table => _table;
+	protected ExcelTableAddress? _table = null;
+	public ExcelTableAddress? Table => _table;
 
 	/// <summary>
 	/// The address for the range
@@ -491,8 +491,8 @@ public class ExcelAddressBase : ExcelCellBase
 		}
 	}
 	internal string WorkSheet => _ws;
-	internal protected List<ExcelAddress> _addresses = null;
-	internal virtual List<ExcelAddress> Addresses => _addresses;
+	internal protected List<ExcelAddress>? _addresses = null;
+	internal virtual List<ExcelAddress>? Addresses => _addresses;
 
 	private bool ExtractAddress(string fullAddress)
 	{

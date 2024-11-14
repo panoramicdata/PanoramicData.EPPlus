@@ -54,19 +54,24 @@ public abstract class XmlHelper
 		NameSpaceManager = nameSpaceManager;
 	}
 
-	internal XmlHelper(XmlNamespaceManager nameSpaceManager, XmlNode topNode)
+	internal XmlHelper(XmlNamespaceManager nameSpaceManager, XmlNode? topNode)
 	{
 		TopNode = topNode;
 		NameSpaceManager = nameSpaceManager;
 	}
+
 	//internal bool ChangedFlag;
+
 	internal XmlNamespaceManager NameSpaceManager { get; set; }
-	internal XmlNode TopNode { get; set; }
-	string[] _schemaNodeOrder = null;
+
+	internal XmlNode? TopNode { get; set; }
+
+	string[]? _schemaNodeOrder = null;
+
 	/// <summary>
 	/// Schema order list
 	/// </summary>
-	internal string[] SchemaNodeOrder
+	internal string[]? SchemaNodeOrder
 	{
 		get
 		{

@@ -182,9 +182,13 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		{
 
 		}
+
 		internal CellStore<int> _cells = new();
-		readonly List<string> _list = [];
-		internal List<string> List => _list;
+
+		private readonly List<string?> _list = [];
+
+		internal List<string?> List => _list;
+
 		public string this[int row, int column]
 		{
 			get
@@ -317,26 +321,26 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	//internal CellStore<object> _values;
 	//internal CellStore<string> _types;
 	//internal CellStore<int> _styles;
-	internal CellStore<ExcelCoreValue> _values;
-	internal CellStore<object> _formulas;
-	internal FlagCellStore _flags;
-	internal CellStore<List<Token>> _formulaTokens;
+	internal CellStore<ExcelCoreValue>? _values;
+	internal CellStore<object>? _formulas;
+	internal FlagCellStore? _flags;
+	internal CellStore<List<Token>>? _formulaTokens;
 
-	internal CellStore<Uri> _hyperLinks;
-	internal CellStore<int> _commentsStore;
+	internal CellStore<Uri>? _hyperLinks;
+	internal CellStore<int>? _commentsStore;
 
-	internal Dictionary<int, Formulas> _sharedFormulas = [];
+	internal Dictionary<int, Formulas>? _sharedFormulas = [];
 	internal int _minCol = ExcelPackage.MaxColumns;
 	internal int _maxCol = 0;
 	#region Worksheet Private Properties
-	internal ExcelPackage _package;
+	internal ExcelPackage? _package;
 	private readonly Uri _worksheetUri;
 	private string _name;
 	private readonly int _sheetID;
 	private int _positionID;
 	private readonly string _relationshipID;
 	private XmlDocument _worksheetXml;
-	internal ExcelWorksheetView _sheetView;
+	internal ExcelWorksheetView? _sheetView;
 	internal ExcelHeaderFooter _headerFooter;
 	#endregion
 	#region ExcelWorksheet Constructor
@@ -410,7 +414,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// Address for autofilter
 	/// <seealso cref="ExcelRangeBase.AutoFilter" />        
 	/// </summary>
-	public ExcelAddressBase AutoFilterAddress
+	public ExcelAddressBase? AutoFilterAddress
 	{
 		get
 		{
@@ -751,7 +755,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// All column, row, cell, pagebreak, merged cell and hyperlink-data are loaded into memory and removed from the document when loading the document.        
 	/// </summary>
 	public XmlDocument WorksheetXml => (_worksheetXml);
-	internal ExcelVmlDrawingCommentCollection _vmlDrawings = null;
+	internal ExcelVmlDrawingCommentCollection? _vmlDrawings = null;
 	/// <summary>
 	/// Vml drawings. underlaying object for comments
 	/// </summary>
@@ -767,7 +771,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _vmlDrawings;
 		}
 	}
-	internal ExcelCommentCollection _comments = null;
+	internal ExcelCommentCollection? _comments = null;
 	/// <summary>
 	/// Collection of comments
 	/// </summary>
@@ -1495,15 +1499,15 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	}
 
 	private static object GetErrorType(string v) => ExcelErrorValue.Parse(ConvertUtil._invariantTextInfo.ToUpper(v));//switch(v.ToUpper())//{//    case "#DIV/0!"://        return new ExcelErrorValue.cre(eErrorType.Div0);//    case "#REF!"://        return new ExcelErrorValue(eErrorType.Ref);//    case "#N/A"://        return new ExcelErrorValue(eErrorType.NA);//    case "#NAME?"://        return new ExcelErrorValue(eErrorType.Name);//    case "#NULL!"://        return new ExcelErrorValue(eErrorType.Null);//    case "#NUM!"://        return new ExcelErrorValue(eErrorType.Num);//    default://        return new ExcelErrorValue(eErrorType.Value);//}
-																											  //private string GetSharedString(int stringID)
-																											  //{
-																											  //    string retValue = null;
-																											  //    XmlNodeList stringNodes = xlPackage.Workbook.SharedStringsXml.SelectNodes(string.Format("//d:si", stringID), NameSpaceManager);
-																											  //    XmlNode stringNode = stringNodes[stringID];
-																											  //    if (stringNode != null)
-																											  //        retValue = stringNode.InnerText;
-																											  //    return (retValue);
-																											  //}
+																													 //private string GetSharedString(int stringID)
+																													 //{
+																													 //    string retValue = null;
+																													 //    XmlNodeList stringNodes = xlPackage.Workbook.SharedStringsXml.SelectNodes(string.Format("//d:si", stringID), NameSpaceManager);
+																													 //    XmlNode stringNode = stringNodes[stringID];
+																													 //    if (stringNode != null)
+																													 //        retValue = stringNode.InnerText;
+																													 //    return (retValue);
+																													 //}
 	#endregion
 	#region HeaderFooter
 	/// <summary>
@@ -3755,7 +3759,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		remove.ForEach(i => _sharedFormulas.Remove(i));
 	}
-	private Dictionary<int, int> columnStyles = null;
+	private Dictionary<int, int>? columnStyles = null;
 	// get StyleID without cell style for UpdateRowCellData
 	internal int GetStyleIdDefaultWithMemo(int row, int col)
 	{
@@ -4082,7 +4086,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// Top left cell to Bottom right.
 	/// If the worksheet has no cells, null is returned
 	/// </summary>
-	public ExcelAddressBase Dimension
+	public ExcelAddressBase? Dimension
 	{
 		get
 		{
@@ -4101,7 +4105,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 	}
-	ExcelSheetProtection _protection = null;
+	ExcelSheetProtection? _protection = null;
 	/// <summary>
 	/// Access to sheet protection properties
 	/// </summary>
@@ -4126,7 +4130,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	}
 
 	#region Drawing
-	ExcelDrawings _drawings = null;
+	ExcelDrawings? _drawings = null;
 	/// <summary>
 	/// Collection of drawing-objects like shapes, images and charts
 	/// </summary>
@@ -4140,8 +4144,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 	#endregion
+
 	#region SparklineGroups
-	ExcelSparklineGroupCollection _sparklineGroups = null;
+	ExcelSparklineGroupCollection? _sparklineGroups = null;
 	/// <summary>
 	/// Collection of Sparkline-objects. 
 	/// Sparklines are small in-cell charts.
@@ -4156,7 +4161,8 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 	#endregion
-	ExcelTableCollection _tables = null;
+
+	ExcelTableCollection? _tables = null;
 	/// <summary>
 	/// Tables defined in the worksheet.
 	/// </summary>
@@ -4171,7 +4177,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _tables;
 		}
 	}
-	internal ExcelPivotTableCollection _pivotTables = null;
+	internal ExcelPivotTableCollection? _pivotTables = null;
 	/// <summary>
 	/// Pivottables defined in the worksheet.
 	/// </summary>
@@ -4189,7 +4195,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _pivotTables;
 		}
 	}
-	private ExcelConditionalFormattingCollection _conditionalFormatting = null;
+	private ExcelConditionalFormattingCollection? _conditionalFormatting = null;
 	/// <summary>
 	/// ConditionalFormatting defined in the worksheet. Use the Add methods to create ConditionalFormatting and add them to the worksheet. Then
 	/// set the properties on the instance returned.
@@ -4205,7 +4211,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _conditionalFormatting;
 		}
 	}
-	private ExcelDataValidationCollection _dataValidation = null;
+	private ExcelDataValidationCollection? _dataValidation = null;
 	/// <summary>
 	/// DataValidation defined in the worksheet. Use the Add methods to create DataValidations and add them to the worksheet. Then
 	/// set the properties on the instance returned.
@@ -4224,7 +4230,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 	internal void ClearValidations() => _dataValidation = null;
 
-	ExcelBackgroundImage _backgroundImage = null;
+	ExcelBackgroundImage? _backgroundImage = null;
 	/// <summary>
 	/// An image displayed as the background of the worksheet.
 	/// </summary>
@@ -4419,7 +4425,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <param name="row">row</param>
 	/// <param name="col">column</param>
 	/// <param name="value">value</param>
-	internal void SetValueInner(int row, int col, object value) => _values.SetValueSpecial(row, col, _setValueInnerUpdateDelegate, value);
+	internal void SetValueInner(int row, int col, object? value) => _values.SetValueSpecial(row, col, _setValueInnerUpdateDelegate, value);
 	private static readonly CellStore<ExcelCoreValue>.SetValueDelegate _setValueInnerUpdateDelegate = SetValueInnerUpdate;
 	private static void SetValueInnerUpdate(List<ExcelCoreValue> list, int index, object value) => list[index] = new ExcelCoreValue { _value = value, _styleId = list[index]._styleId };
 	/// <summary>

@@ -36,7 +36,7 @@ namespace OfficeOpenXml.Drawing.Vml;
 
 public class ExcelVmlDrawingBaseCollection
 {
-	internal ExcelVmlDrawingBaseCollection(ExcelPackage pck, ExcelWorksheet ws, Uri uri)
+	internal ExcelVmlDrawingBaseCollection(ExcelPackage pck, ExcelWorksheet ws, Uri? uri)
 	{
 		VmlDrawingXml = new XmlDocument
 		{
@@ -59,9 +59,14 @@ public class ExcelVmlDrawingBaseCollection
 			XmlHelper.LoadXmlSafe(VmlDrawingXml, Part.GetStream());
 		}
 	}
+
 	internal XmlDocument VmlDrawingXml { get; set; }
-	internal Uri Uri { get; set; }
+
+	internal Uri? Uri { get; set; }
+
 	internal string RelId { get; set; }
-	internal Packaging.ZipPackagePart Part { get; set; }
+
+	internal Packaging.ZipPackagePart? Part { get; set; }
+
 	internal XmlNamespaceManager NameSpaceManager { get; set; }
 }

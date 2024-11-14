@@ -19,19 +19,17 @@ using System.Threading;
 
 namespace PanoramicData.EPPlus.Test;
 
-
 internal class BaseItem
 {
 	public int Ref { get; set; }
 	public string BaseProp1 { get; set; }
 }
+
 internal class InhItem : BaseItem
 {
 	public int TophRef { get; set; }
 	public string TopProp1 { get; set; }
 }
-
-
 
 [TestClass]
 public class WorkSheetTest : TestBase

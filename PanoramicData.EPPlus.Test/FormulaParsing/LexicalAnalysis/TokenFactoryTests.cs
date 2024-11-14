@@ -8,8 +8,8 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.LexicalAnalysis;
 [TestClass]
 public class TokenFactoryTests
 {
-	private TokenFactory _tokenFactory;
-	private INameValueProvider _nameValueProvider;
+	private TokenFactory? _tokenFactory;
+	private INameValueProvider? _nameValueProvider;
 
 
 	[TestInitialize]

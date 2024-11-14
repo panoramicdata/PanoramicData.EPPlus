@@ -169,7 +169,7 @@ internal class ColumnIndex : IndexBase, IDisposable
 		var p = GetPosition(Page);
 		return p < 0 ? ~p : p;
 	}
-	internal PageIndex[] _pages;
+	internal PageIndex[]? _pages;
 	internal int PageCount;
 
 	public void Dispose()
@@ -216,7 +216,7 @@ internal class PageIndex : IndexBase, IDisposable
 	internal int Offset = 0;
 	internal int IndexOffset => IndexExpanded + (int)Offset;
 	internal int IndexExpanded => (Index << CellStore<int>.pageBits);
-	internal IndexItem[] Rows { get; set; }
+	internal IndexItem[]? Rows { get; set; }
 	internal int RowCount;
 
 	internal int GetPosition(int offset)
@@ -256,8 +256,8 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	internal const int ColSizeMin = 32;
 	internal const int PagesPerColumnMin = 32;
 
-	List<T> _values = [];
-	internal ColumnIndex[] _columnIndex;
+	List<T>? _values = [];
+	internal ColumnIndex[]? _columnIndex;
 	internal IndexBase _searchIx = new();
 	internal IndexItem _searchItem = new();
 	internal int ColumnCount;
@@ -487,7 +487,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			return false;
 		}
 	}
-	internal void SetValue(int Row, int Column, T Value)
+	internal void SetValue(int Row, int Column, T? Value)
 	{
 		lock (_columnIndex)
 		{
@@ -651,7 +651,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 	internal delegate void SetValueDelegate(List<T> list, int index, object value);
 	// Set object's property atomically
-	internal void SetValueSpecial(int Row, int Column, SetValueDelegate Updater, object Value)
+	internal void SetValueSpecial(int Row, int Column, SetValueDelegate Updater, object? Value)
 	{
 		lock (_columnIndex)
 		{
