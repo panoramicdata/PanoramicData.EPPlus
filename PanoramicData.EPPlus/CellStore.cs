@@ -1907,15 +1907,17 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 }
 internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 {
-	readonly CellStore<T> _cellStore;
-	int row, colPos;
-	int[] pagePos, cellPos;
-	readonly int _startRow, _startCol, _endRow, _endCol;
-	int minRow, minColPos, maxRow, maxColPos;
+	private readonly CellStore<T> _cellStore;
+	private int _row, _colPos;
+	private int[] _pagePos, _cellPos;
+	private readonly int _startRow, _startCol, _endRow, _endCol;
+	private int _minRow, _minColPos, _maxRow, _maxColPos;
+
 	public CellsStoreEnumerator(CellStore<T> cellStore) :
 		this(cellStore, 0, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns)
 	{
 	}
+
 	public CellsStoreEnumerator(CellStore<T> cellStore, int StartRow, int StartCol, int EndRow, int EndCol)
 	{
 		_cellStore = cellStore;
@@ -1931,32 +1933,32 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 
 	internal void Init()
 	{
-		minRow = _startRow;
-		maxRow = _endRow;
+		_minRow = _startRow;
+		_maxRow = _endRow;
 
-		minColPos = _cellStore.GetPosition(_startCol);
-		if (minColPos < 0) minColPos = ~minColPos;
-		maxColPos = _cellStore.GetPosition(_endCol);
-		if (maxColPos < 0) maxColPos = ~maxColPos - 1;
-		row = minRow;
-		colPos = minColPos - 1;
+		_minColPos = _cellStore.GetPosition(_startCol);
+		if (_minColPos < 0) _minColPos = ~_minColPos;
+		_maxColPos = _cellStore.GetPosition(_endCol);
+		if (_maxColPos < 0) _maxColPos = ~_maxColPos - 1;
+		_row = _minRow;
+		_colPos = _minColPos - 1;
 
-		var cols = maxColPos - minColPos + 1;
-		pagePos = new int[cols];
-		cellPos = new int[cols];
+		var cols = _maxColPos - _minColPos + 1;
+		_pagePos = new int[cols];
+		_cellPos = new int[cols];
 		for (var i = 0; i < cols; i++)
 		{
-			pagePos[i] = -1;
-			cellPos[i] = -1;
+			_pagePos[i] = -1;
+			_cellPos[i] = -1;
 		}
 	}
-	internal int Row => row;
+	internal int Row => _row;
 	internal int Column
 	{
 		get
 		{
-			if (colPos == -1) MoveNext();
-			return colPos == -1 ? 0 : _cellStore._columnIndex[colPos].Index;
+			if (_colPos == -1) MoveNext();
+			return _colPos == -1 ? 0 : _cellStore._columnIndex[_colPos].Index;
 		}
 	}
 	internal T Value
@@ -1965,25 +1967,25 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 		{
 			lock (_cellStore)
 			{
-				return _cellStore.GetValue(row, Column);
+				return _cellStore.GetValue(_row, Column);
 			}
 		}
 		set
 		{
 			lock (_cellStore)
 			{
-				_cellStore.SetValue(row, Column, value);
+				_cellStore.SetValue(_row, Column, value);
 			}
 		}
 	}
 	internal bool Next() =>
 		//return _cellStore.GetNextCell(ref row, ref colPos, minColPos, maxRow, maxColPos);
-		_cellStore.GetNextCell(ref row, ref colPos, minColPos, maxRow, maxColPos);
+		_cellStore.GetNextCell(ref _row, ref _colPos, _minColPos, _maxRow, _maxColPos);
 	internal bool Previous()
 	{
 		lock (_cellStore)
 		{
-			return _cellStore.GetPrevCell(ref row, ref colPos, minRow, minColPos, maxColPos);
+			return _cellStore.GetPrevCell(ref _row, ref _colPos, _minRow, _minColPos, _maxColPos);
 		}
 	}
 

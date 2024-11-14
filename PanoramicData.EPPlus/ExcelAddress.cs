@@ -1045,7 +1045,8 @@ public class ExcelAddressBase : ExcelCellBase
 		return true;
 	}
 
-	private static readonly HashSet<char> FormulaCharacters = new(['(', ')', '+', '-', '*', '/', '=', '^', '&', '%', '\"']);
+	private static readonly HashSet<char> _formulaCharacters = new(['(', ')', '+', '-', '*', '/', '=', '^', '&', '%', '\"']);
+
 	private static bool IsFormula(string address)
 	{
 		var isText = false;
@@ -1063,7 +1064,7 @@ public class ExcelAddressBase : ExcelCellBase
 				// formulas cannot contain [ ], we should be safe doing this check.
 				if (addressChar is '[' or ']')
 					return false;
-				if (isText == false && FormulaCharacters.Contains(addressChar))
+				if (isText == false && _formulaCharacters.Contains(addressChar))
 				{
 					return true;
 				}

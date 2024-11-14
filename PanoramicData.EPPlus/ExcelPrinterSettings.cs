@@ -351,7 +351,9 @@ public sealed class ExcelPrinterSettings : XmlHelper
 		_ws = ws;
 		SchemaNodeOrder = ws.SchemaNodeOrder;
 	}
-	const string _leftMarginPath = "d:pageMargins/@left";
+
+	private const string LeftMarginPath = "d:pageMargins/@left";
+
 	/// <summary>
 	/// Left margin in inches
 	/// </summary>
@@ -359,15 +361,17 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeDecimal(_leftMarginPath);
+			return GetXmlNodeDecimal(LeftMarginPath);
 		}
 		set
 		{
 			CreateMargins();
-			SetXmlNodeString(_leftMarginPath, value.ToString(CultureInfo.InvariantCulture));
+			SetXmlNodeString(LeftMarginPath, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-	const string _rightMarginPath = "d:pageMargins/@right";
+
+	const string RightMarginPath = "d:pageMargins/@right";
+
 	/// <summary>
 	/// Right margin in inches
 	/// </summary>
@@ -375,15 +379,17 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeDecimal(_rightMarginPath);
+			return GetXmlNodeDecimal(RightMarginPath);
 		}
 		set
 		{
 			CreateMargins();
-			SetXmlNodeString(_rightMarginPath, value.ToString(CultureInfo.InvariantCulture));
+			SetXmlNodeString(RightMarginPath, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-	const string _topMarginPath = "d:pageMargins/@top";
+
+	const string TopMarginPath = "d:pageMargins/@top";
+
 	/// <summary>
 	/// Top margin in inches
 	/// </summary>
@@ -391,15 +397,17 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeDecimal(_topMarginPath);
+			return GetXmlNodeDecimal(TopMarginPath);
 		}
 		set
 		{
 			CreateMargins();
-			SetXmlNodeString(_topMarginPath, value.ToString(CultureInfo.InvariantCulture));
+			SetXmlNodeString(TopMarginPath, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-	const string _bottomMarginPath = "d:pageMargins/@bottom";
+
+	private const string BottomMarginPath = "d:pageMargins/@bottom";
+
 	/// <summary>
 	/// Bottom margin in inches
 	/// </summary>
@@ -407,15 +415,17 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeDecimal(_bottomMarginPath);
+			return GetXmlNodeDecimal(BottomMarginPath);
 		}
 		set
 		{
 			CreateMargins();
-			SetXmlNodeString(_bottomMarginPath, value.ToString(CultureInfo.InvariantCulture));
+			SetXmlNodeString(BottomMarginPath, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-	const string _headerMarginPath = "d:pageMargins/@header";
+
+	private const string HeaderMarginPath = "d:pageMargins/@header";
+
 	/// <summary>
 	/// Header margin in inches
 	/// </summary>
@@ -423,15 +433,17 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeDecimal(_headerMarginPath);
+			return GetXmlNodeDecimal(HeaderMarginPath);
 		}
 		set
 		{
 			CreateMargins();
-			SetXmlNodeString(_headerMarginPath, value.ToString(CultureInfo.InvariantCulture));
+			SetXmlNodeString(HeaderMarginPath, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-	const string _footerMarginPath = "d:pageMargins/@footer";
+
+	private const string FooterMarginPath = "d:pageMargins/@footer";
+
 	/// <summary>
 	/// Footer margin in inches
 	/// </summary>
@@ -439,15 +451,17 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeDecimal(_footerMarginPath);
+			return GetXmlNodeDecimal(FooterMarginPath);
 		}
 		set
 		{
 			CreateMargins();
-			SetXmlNodeString(_footerMarginPath, value.ToString(CultureInfo.InvariantCulture));
+			SetXmlNodeString(FooterMarginPath, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-	const string _orientationPath = "d:pageSetup/@orientation";
+
+	private const string OrientationPath = "d:pageSetup/@orientation";
+
 	/// <summary>
 	/// Orientation 
 	/// Portrait or Landscape
@@ -456,14 +470,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return Enum.Parse<eOrientation>(GetXmlNodeString(_orientationPath), true);
+			return Enum.Parse<eOrientation>(GetXmlNodeString(OrientationPath), true);
 		}
 		set
 		{
-			SetXmlNodeString(_orientationPath, value.ToString().ToLower(CultureInfo.InvariantCulture));
+			SetXmlNodeString(OrientationPath, value.ToString().ToLower(CultureInfo.InvariantCulture));
 		}
 	}
-	const string _fitToWidthPath = "d:pageSetup/@fitToWidth";
+
+	private const string FitToWidthPath = "d:pageSetup/@fitToWidth";
+
 	/// <summary>
 	/// Fit to Width in pages. 
 	/// Set FitToPage to true when using this one. 
@@ -473,14 +489,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeInt(_fitToWidthPath);
+			return GetXmlNodeInt(FitToWidthPath);
 		}
 		set
 		{
-			SetXmlNodeString(_fitToWidthPath, value.ToString());
+			SetXmlNodeString(FitToWidthPath, value.ToString());
 		}
 	}
-	const string _fitToHeightPath = "d:pageSetup/@fitToHeight";
+
+	private const string FitToHeightPath = "d:pageSetup/@fitToHeight";
+
 	/// <summary>
 	/// Fit to height in pages. 
 	/// Set FitToPage to true when using this one. 
@@ -490,14 +508,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeInt(_fitToHeightPath);
+			return GetXmlNodeInt(FitToHeightPath);
 		}
 		set
 		{
-			SetXmlNodeString(_fitToHeightPath, value.ToString());
+			SetXmlNodeString(FitToHeightPath, value.ToString());
 		}
 	}
-	const string _scalePath = "d:pageSetup/@scale";
+
+	private const string ScalePath = "d:pageSetup/@scale";
+
 	/// <summary>
 	/// Print scale
 	/// </summary>
@@ -505,14 +525,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeInt(_scalePath);
+			return GetXmlNodeInt(ScalePath);
 		}
 		set
 		{
-			SetXmlNodeString(_scalePath, value.ToString());
+			SetXmlNodeString(ScalePath, value.ToString());
 		}
 	}
-	const string _fitToPagePath = "d:sheetPr/d:pageSetUpPr/@fitToPage";
+
+	private const string FitToPagePath = "d:sheetPr/d:pageSetUpPr/@fitToPage";
+
 	/// <summary>
 	/// Fit To Page.
 	/// </summary>
@@ -520,14 +542,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeBool(_fitToPagePath);
+			return GetXmlNodeBool(FitToPagePath);
 		}
 		set
 		{
-			SetXmlNodeString(_fitToPagePath, value ? "1" : "0");
+			SetXmlNodeString(FitToPagePath, value ? "1" : "0");
 		}
 	}
-	const string _headersPath = "d:printOptions/@headings";
+
+	private const string HeadersPath = "d:printOptions/@headings";
+
 	/// <summary>
 	/// Print headings (column letter and row numbers)
 	/// </summary>
@@ -535,11 +559,11 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeBool(_headersPath, false);
+			return GetXmlNodeBool(HeadersPath, false);
 		}
 		set
 		{
-			SetXmlNodeBool(_headersPath, value, false);
+			SetXmlNodeBool(HeadersPath, value, false);
 		}
 	}
 	/// <summary>
@@ -680,7 +704,9 @@ public sealed class ExcelPrinterSettings : XmlHelper
 			}
 		}
 	}
-	const string _gridLinesPath = "d:printOptions/@gridLines";
+
+	private const string GridLinesPath = "d:printOptions/@gridLines";
+
 	/// <summary>
 	/// Print gridlines 
 	/// </summary>
@@ -688,14 +714,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeBool(_gridLinesPath, false);
+			return GetXmlNodeBool(GridLinesPath, false);
 		}
 		set
 		{
-			SetXmlNodeBool(_gridLinesPath, value, false);
+			SetXmlNodeBool(GridLinesPath, value, false);
 		}
 	}
-	const string _horizontalCenteredPath = "d:printOptions/@horizontalCentered";
+
+	private const string HorizontalCenteredPath = "d:printOptions/@horizontalCentered";
+
 	/// <summary>
 	/// Horizontal centered when printing 
 	/// </summary>w
@@ -703,14 +731,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeBool(_horizontalCenteredPath, false);
+			return GetXmlNodeBool(HorizontalCenteredPath, false);
 		}
 		set
 		{
-			SetXmlNodeBool(_horizontalCenteredPath, value, false);
+			SetXmlNodeBool(HorizontalCenteredPath, value, false);
 		}
 	}
-	const string _verticalCenteredPath = "d:printOptions/@verticalCentered";
+
+	private const string VerticalCenteredPath = "d:printOptions/@verticalCentered";
+
 	/// <summary>
 	/// Vertical centered when printing 
 	/// </summary>
@@ -718,14 +748,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeBool(_verticalCenteredPath, false);
+			return GetXmlNodeBool(VerticalCenteredPath, false);
 		}
 		set
 		{
-			SetXmlNodeBool(_verticalCenteredPath, value, false);
+			SetXmlNodeBool(VerticalCenteredPath, value, false);
 		}
 	}
-	const string _pageOrderPath = "d:pageSetup/@pageOrder";
+
+	private const string PageOrderPath = "d:pageSetup/@pageOrder";
+
 	/// <summary>
 	/// Specifies printed page order
 	/// </summary>
@@ -733,21 +765,23 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeString(_pageOrderPath) == "overThenDown" ? ePageOrder.OverThenDown : ePageOrder.DownThenOver;
+			return GetXmlNodeString(PageOrderPath) == "overThenDown" ? ePageOrder.OverThenDown : ePageOrder.DownThenOver;
 		}
 		set
 		{
 			if (value == ePageOrder.OverThenDown)
 			{
-				SetXmlNodeString(_pageOrderPath, "overThenDown");
+				SetXmlNodeString(PageOrderPath, "overThenDown");
 			}
 			else
 			{
-				DeleteNode(_pageOrderPath);
+				DeleteNode(PageOrderPath);
 			}
 		}
 	}
-	const string _blackAndWhitePath = "d:pageSetup/@blackAndWhite";
+
+	private const string BlackAndWhitePath = "d:pageSetup/@blackAndWhite";
+
 	/// <summary>
 	/// Print black and white
 	/// </summary>
@@ -755,14 +789,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeBool(_blackAndWhitePath, false);
+			return GetXmlNodeBool(BlackAndWhitePath, false);
 		}
 		set
 		{
-			SetXmlNodeBool(_blackAndWhitePath, value, false);
+			SetXmlNodeBool(BlackAndWhitePath, value, false);
 		}
 	}
-	const string _draftPath = "d:pageSetup/@draft";
+
+	private const string DraftPath = "d:pageSetup/@draft";
+
 	/// <summary>
 	/// Print a draft
 	/// </summary>
@@ -770,14 +806,16 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeBool(_draftPath, false);
+			return GetXmlNodeBool(DraftPath, false);
 		}
 		set
 		{
-			SetXmlNodeBool(_draftPath, value, false);
+			SetXmlNodeBool(DraftPath, value, false);
 		}
 	}
-	const string _paperSizePath = "d:pageSetup/@paperSize";
+
+	private const string PaperSizePath = "d:pageSetup/@paperSize";
+
 	/// <summary>
 	/// Paper size 
 	/// </summary>
@@ -785,12 +823,12 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			var s = GetXmlNodeString(_paperSizePath);
+			var s = GetXmlNodeString(PaperSizePath);
 			return s != "" ? (ePaperSize)int.Parse(s) : ePaperSize.Letter;
 		}
 		set
 		{
-			SetXmlNodeString(_paperSizePath, ((int)value).ToString());
+			SetXmlNodeString(PaperSizePath, ((int)value).ToString());
 		}
 	}
 	/// <summary>
@@ -798,7 +836,7 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	/// </summary>
 	private void CreateMargins()
 	{
-		if (_marginsCreated == false && TopNode.SelectSingleNode(_leftMarginPath, NameSpaceManager) == null)
+		if (_marginsCreated == false && TopNode.SelectSingleNode(LeftMarginPath, NameSpaceManager) == null)
 		{
 			_marginsCreated = true;
 			LeftMargin = 0.7087M;

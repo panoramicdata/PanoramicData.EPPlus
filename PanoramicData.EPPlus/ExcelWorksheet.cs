@@ -667,8 +667,10 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 	}
+
 	/** <outlinePr applyStyles="1" summaryBelow="0" summaryRight="0" /> **/
-	const string outLineSummaryBelowPath = "d:sheetPr/d:outlinePr/@summaryBelow";
+	private const string OutLineSummaryBelowPath = "d:sheetPr/d:outlinePr/@summaryBelow";
+
 	/// <summary>
 	/// Summary rows below details 
 	/// </summary>
@@ -677,15 +679,17 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		get
 		{
 			CheckSheetType();
-			return GetXmlNodeBool(outLineSummaryBelowPath);
+			return GetXmlNodeBool(OutLineSummaryBelowPath);
 		}
 		set
 		{
 			CheckSheetType();
-			SetXmlNodeString(outLineSummaryBelowPath, value ? "1" : "0");
+			SetXmlNodeString(OutLineSummaryBelowPath, value ? "1" : "0");
 		}
 	}
-	const string outLineSummaryRightPath = "d:sheetPr/d:outlinePr/@summaryRight";
+
+	const string OutLineSummaryRightPath = "d:sheetPr/d:outlinePr/@summaryRight";
+
 	/// <summary>
 	/// Summary rows to right of details
 	/// </summary>
@@ -694,15 +698,17 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		get
 		{
 			CheckSheetType();
-			return GetXmlNodeBool(outLineSummaryRightPath);
+			return GetXmlNodeBool(OutLineSummaryRightPath);
 		}
 		set
 		{
 			CheckSheetType();
-			SetXmlNodeString(outLineSummaryRightPath, value ? "1" : "0");
+			SetXmlNodeString(OutLineSummaryRightPath, value ? "1" : "0");
 		}
 	}
-	const string outLineApplyStylePath = "d:sheetPr/d:outlinePr/@applyStyles";
+
+	private const string OutLineApplyStylePath = "d:sheetPr/d:outlinePr/@applyStyles";
+
 	/// <summary>
 	/// Automatic styles
 	/// </summary>
@@ -711,15 +717,17 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		get
 		{
 			CheckSheetType();
-			return GetXmlNodeBool(outLineApplyStylePath);
+			return GetXmlNodeBool(OutLineApplyStylePath);
 		}
 		set
 		{
 			CheckSheetType();
-			SetXmlNodeString(outLineApplyStylePath, value ? "1" : "0");
+			SetXmlNodeString(OutLineApplyStylePath, value ? "1" : "0");
 		}
 	}
-	const string tabColorPath = "d:sheetPr/d:tabColor/@rgb";
+
+	private const string TabColorPath = "d:sheetPr/d:tabColor/@rgb";
+
 	/// <summary>
 	/// Color of the sheet tab
 	/// </summary>
@@ -727,35 +735,42 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	{
 		get
 		{
-			var col = GetXmlNodeString(tabColorPath);
+			var col = GetXmlNodeString(TabColorPath);
 			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, System.Globalization.NumberStyles.AllowHexSpecifier));
 		}
 		set
 		{
-			SetXmlNodeString(tabColorPath, value.ToArgb().ToString("X"));
+			SetXmlNodeString(TabColorPath, value.ToArgb().ToString("X"));
 		}
 	}
-	const string codeModuleNamePath = "d:sheetPr/@codeName";
+
+	private const string CodeModuleNamePath = "d:sheetPr/@codeName";
+
 	internal string CodeModuleName
 	{
 		get
 		{
-			return GetXmlNodeString(codeModuleNamePath);
+			return GetXmlNodeString(CodeModuleNamePath);
 		}
 		set
 		{
-			SetXmlNodeString(codeModuleNamePath, value);
+			SetXmlNodeString(CodeModuleNamePath, value);
 		}
 	}
+
 	internal void CodeNameChange(string value) => CodeModuleName = value;
+
 	public VBA.ExcelVBAModule CodeModule => _package.Workbook.VbaProject != null ? _package.Workbook.VbaProject.Modules[CodeModuleName] : null;
+
 	#region WorksheetXml
 	/// <summary>
 	/// The XML document holding the worksheet data.
 	/// All column, row, cell, pagebreak, merged cell and hyperlink-data are loaded into memory and removed from the document when loading the document.        
 	/// </summary>
 	public XmlDocument WorksheetXml => (_worksheetXml);
+
 	internal ExcelVmlDrawingCommentCollection? _vmlDrawings = null;
+
 	/// <summary>
 	/// Vml drawings. underlaying object for comments
 	/// </summary>
@@ -771,6 +786,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _vmlDrawings;
 		}
 	}
+
 	internal ExcelCommentCollection? _comments = null;
 	/// <summary>
 	/// Collection of comments
@@ -3590,7 +3606,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		FixSharedFormulas(); //Fixes Issue #32
 
-		columnStyles = [];
+		_columnStyles = [];
 		var cse = new CellsStoreEnumerator<ExcelCoreValue>(_values, 1, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
 		while (cse.Next())
 		{
@@ -3717,7 +3733,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 
-		columnStyles = null;
+		_columnStyles = null;
 
 		if (row != -1) cache.Append("</row>");
 		cache.Append("</sheetData>");
@@ -3759,7 +3775,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		remove.ForEach(i => _sharedFormulas.Remove(i));
 	}
-	private Dictionary<int, int>? columnStyles = null;
+
+	private Dictionary<int, int>? _columnStyles = null;
+
 	// get StyleID without cell style for UpdateRowCellData
 	internal int GetStyleIdDefaultWithMemo(int row, int col)
 	{
@@ -3770,11 +3788,11 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 		else // then column
 		{
-			if (!columnStyles.ContainsKey(col))
+			if (!_columnStyles.ContainsKey(col))
 			{
 				if (ExistsStyleInner(0, col, ref v))
 				{
-					columnStyles.Add(col, v);
+					_columnStyles.Add(col, v);
 				}
 				else
 				{
@@ -3787,21 +3805,21 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 						if (column != null && column.ColumnMax >= col) //Fixes issue 15174
 						{
 							//return ws.GetStyleInner(0, c);
-							columnStyles.Add(col, val._styleId);
+							_columnStyles.Add(col, val._styleId);
 						}
 						else
 						{
-							columnStyles.Add(col, 0);
+							_columnStyles.Add(col, 0);
 						}
 					}
 					else
 					{
-						columnStyles.Add(col, 0);
+						_columnStyles.Add(col, 0);
 					}
 				}
 			}
 
-			return columnStyles[col];
+			return _columnStyles[col];
 		}
 	}
 
