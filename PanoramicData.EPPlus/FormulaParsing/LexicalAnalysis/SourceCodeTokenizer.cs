@@ -59,7 +59,7 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 	{
 		if (string.IsNullOrEmpty(input))
 		{
-			return Enumerable.Empty<Token>();
+			return [];
 		}
 		// MA 1401: Ignore leading plus in formula.
 		input = input.TrimStart('+');

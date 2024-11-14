@@ -14,11 +14,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = 123.45;
 		var digits = 0;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(123D, result.Result);
 	}
 	[TestMethod]
@@ -27,11 +27,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = 123.65;
 		var digits = 0;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(124D, result.Result);
 	}
 
@@ -41,11 +41,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = 123.44;
 		var digits = 1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(123.4D, result.Result);
 	}
 	[TestMethod]
@@ -54,11 +54,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = 123.456;
 		var digits = 1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(123.5D, result.Result);
 	}
 	[TestMethod]
@@ -67,11 +67,11 @@ public class RoundTests
 		Round round = new();
 		double value1 = 124;
 		var digits = -1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(120D, result.Result);
 	}
 	[TestMethod]
@@ -80,11 +80,11 @@ public class RoundTests
 		Round round = new();
 		double value1 = 125;
 		var digits = -1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(130D, result.Result);
 	}
 
@@ -94,11 +94,11 @@ public class RoundTests
 		Round round = new();
 		double value1 = -124;
 		var digits = -1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(-120D, result.Result);
 	}
 	[TestMethod]
@@ -107,11 +107,11 @@ public class RoundTests
 		Round round = new();
 		double value1 = -125;
 		var digits = -1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(-130D, result.Result);
 	}
 	[TestMethod]
@@ -120,11 +120,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = -123.44;
 		var digits = 1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(-123.4D, result.Result);
 	}
 	[TestMethod]
@@ -133,11 +133,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = -123.456;
 		var digits = 1;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(-123.5D, result.Result);
 	}
 	[TestMethod]
@@ -146,11 +146,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = -123.5;
 		var digits = 0;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(-124D, result.Result);
 	}
 	[TestMethod]
@@ -159,11 +159,11 @@ public class RoundTests
 		Round round = new();
 		var value1 = 123.5;
 		var digits = 0;
-		var result = round.Execute(new FunctionArgument[]
-		{
+		var result = round.Execute(
+		[
 			new(value1),
 			new(digits)
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(124D, result.Result);
 	}
 }

@@ -1154,13 +1154,13 @@ public class WorkSheetTest : TestBase
 	{
 		_pck = new ExcelPackage();
 		var ws = _pck.Workbook.Worksheets.Add("PivotTable");
-		ws.Cells["A1"].LoadFromArrays(new object[][] { new[] { "A&B", "B\"", "C'", "<D>" } });
-		ws.Cells["A2"].LoadFromArrays(new object[][]
-		{
+		ws.Cells["A1"].LoadFromArrays([["A&B", "B\"", "C'", "<D>"]]);
+		ws.Cells["A2"].LoadFromArrays(
+		[
 			[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
 			[9, 8, 7 ,6, 5, 4, 3, 2, 1, 0],
 			[1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
-		});
+		]);
 		var table = ws.Tables.Add(ws.Cells["A1:D4"], "PivotData");
 		var pt = ws.PivotTables.Add(ws.Cells["G20"], ws.Cells["A1:D4"], "PivotTable1");
 		pt.ColumnFields.Add(pt.Fields[1]);
@@ -1822,7 +1822,7 @@ public class WorkSheetTest : TestBase
 	public void LoadArray()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Loaded Array");
-		List<object[]> testArray = [[3, 4, 5, 6], new string[] { "Test1", "test", "5", "6" }];
+		List<object[]> testArray = [[3, 4, 5, 6], ["Test1", "test", "5", "6"]];
 		ws.Cells["A1"].LoadFromArrays(testArray);
 	}
 	[Ignore]

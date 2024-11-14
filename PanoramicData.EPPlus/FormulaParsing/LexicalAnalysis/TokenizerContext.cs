@@ -40,7 +40,7 @@ public class TokenizerContext
 	{
 		if (!string.IsNullOrEmpty(formula))
 		{
-			_chars = formula.ToArray();
+			_chars = [.. formula];
 		}
 
 		_result = [];

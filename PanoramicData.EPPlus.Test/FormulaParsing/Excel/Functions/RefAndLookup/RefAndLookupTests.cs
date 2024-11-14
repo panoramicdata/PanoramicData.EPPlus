@@ -363,7 +363,7 @@ public class RefAndLookupTests
 		var parsingContext = ParsingContext.Create();
 		var rangeAddressFactory = new RangeAddressFactory(A.Fake<ExcelDataProvider>());
 		parsingContext.Scopes.NewScope(rangeAddressFactory.Create("A2"));
-		var result = func.Execute(Enumerable.Empty<FunctionArgument>(), parsingContext);
+		var result = func.Execute([], parsingContext);
 		Assert.AreEqual(2, result.Result);
 	}
 
@@ -384,7 +384,7 @@ public class RefAndLookupTests
 		var parsingContext = ParsingContext.Create();
 		var rangeAddressFactory = new RangeAddressFactory(A.Fake<ExcelDataProvider>());
 		parsingContext.Scopes.NewScope(rangeAddressFactory.Create("B2"));
-		var result = func.Execute(Enumerable.Empty<FunctionArgument>(), parsingContext);
+		var result = func.Execute([], parsingContext);
 		Assert.AreEqual(2, result.Result);
 	}
 

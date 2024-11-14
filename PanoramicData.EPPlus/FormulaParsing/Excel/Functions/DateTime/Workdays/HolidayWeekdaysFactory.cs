@@ -32,7 +32,7 @@ public class HolidayWeekdaysFactory
 			}
 		}
 
-		return new HolidayWeekdays(retVal.ToArray());
+		return new HolidayWeekdays([.. retVal]);
 	}
 
 	public HolidayWeekdays Create(int code) => code switch

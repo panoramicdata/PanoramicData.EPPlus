@@ -47,7 +47,7 @@ public abstract class HiddenValuesHandlingFunction : ExcelFunction
 	{
 		if (!arguments.Any())
 		{
-			return Enumerable.Empty<ExcelDoubleCellValue>();
+			return [];
 		}
 
 		if (IgnoreHiddenValues)

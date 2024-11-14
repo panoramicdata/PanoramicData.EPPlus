@@ -26,15 +26,15 @@ public class AverageATests
 		double value4 = 1;
 		var value5 = date1.ToOADate();
 		var value6 = date2.ToOADate();
-		var result = average.Execute(new FunctionArgument[]
-		{
+		var result = average.Execute(
+		[
 			new(value1.ToString("n")),
 			new(value2),
 			new(value3.ToString("n")),
 			new(true),
 			new(date1),
 			new(date2.ToString("d"))
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual((value1 + value2 + value3 + value4 + value5 + value6) / 6, result.Result);
 	}
 
@@ -75,12 +75,12 @@ public class AverageATests
 		var address = new OfficeOpenXml.FormulaParsing.ExcelUtilities.RangeAddress();
 		address.FromRow = address.ToRow = address.FromCol = address.ToCol = 2;
 		context.Scopes.NewScope(address);
-		var result = average.Execute(new FunctionArgument[]
-		{
+		var result = average.Execute(
+		[
 			new(rangeInfo1),
 			new(rangeInfo2),
 			new(rangeInfo3)
-		}, context);
+		], context);
 		Assert.AreEqual(values.Average(), result.Result);
 	}
 
@@ -99,8 +99,8 @@ public class AverageATests
 			0,
 			0
 		];
-		var result = average.Execute(new FunctionArgument[]
-		{
+		var result = average.Execute(
+		[
 			new(new FunctionArgument[]
 			{
 				new(1000.ToString("n")),
@@ -110,7 +110,7 @@ public class AverageATests
 				new(date.ToString("d")),
 				new("test")
 			})
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 		Assert.AreEqual(values.Average(), result.Result);
 	}
 
@@ -120,10 +120,10 @@ public class AverageATests
 	{
 		// In the case of literals, any unparsable string literal results in a #VALUE.
 		AverageA average = new();
-		var result = average.Execute(new FunctionArgument[]
-		{
+		var result = average.Execute(
+		[
 			new(1000),
 			new("Test")
-		}, ParsingContext.Create());
+		], ParsingContext.Create());
 	}
 }

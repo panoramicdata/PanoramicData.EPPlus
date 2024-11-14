@@ -1620,7 +1620,7 @@ public class Issues : TestBase
 	{
 		ExcelPackage pck = new();
 		var ws = pck.Workbook.Worksheets.Add("test");
-		ws.Cells["A1"].LoadFromArrays(Enumerable.Empty<object[]>());
+		ws.Cells["A1"].LoadFromArrays([]);
 	}
 	[TestMethod, Ignore]
 	public void Issue55()

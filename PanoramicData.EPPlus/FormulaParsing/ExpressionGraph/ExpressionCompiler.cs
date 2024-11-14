@@ -77,7 +77,7 @@ public class ExpressionCompiler : IExpressionCompiler
 
 	private IEnumerable<Expression> HandleGroupedExpressions()
 	{
-		if (!_expressions.Any()) return Enumerable.Empty<Expression>();
+		if (!_expressions.Any()) return [];
 		var first = _expressions.First();
 		var groupedExpressions = _expressions.Where(x => x.IsGroupedExpression);
 		foreach (var groupedExpression in groupedExpressions)

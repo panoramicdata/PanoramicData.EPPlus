@@ -1045,7 +1045,7 @@ public class ExcelAddressBase : ExcelCellBase
 		return true;
 	}
 
-	private static readonly HashSet<char> FormulaCharacters = new(new char[] { '(', ')', '+', '-', '*', '/', '=', '^', '&', '%', '\"' });
+	private static readonly HashSet<char> FormulaCharacters = new(['(', ')', '+', '-', '*', '/', '=', '^', '&', '%', '\"']);
 	private static bool IsFormula(string address)
 	{
 		var isText = false;

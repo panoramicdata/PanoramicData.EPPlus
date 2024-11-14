@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using System.Linq;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.LexicalAnalysis;
 
@@ -32,7 +31,7 @@ public class TokenFactoryTests
 	public void ShouldCreateAStringToken()
 	{
 		var input = "\"";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("\"", token.Value);
 		Assert.AreEqual(TokenType.String, token.TokenType);
@@ -42,7 +41,7 @@ public class TokenFactoryTests
 	public void ShouldCreatePlusAsOperatorToken()
 	{
 		var input = "+";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("+", token.Value);
 		Assert.AreEqual(TokenType.Operator, token.TokenType);
@@ -52,7 +51,7 @@ public class TokenFactoryTests
 	public void ShouldCreateMinusAsOperatorToken()
 	{
 		var input = "-";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("-", token.Value);
 		Assert.AreEqual(TokenType.Operator, token.TokenType);
@@ -62,7 +61,7 @@ public class TokenFactoryTests
 	public void ShouldCreateMultiplyAsOperatorToken()
 	{
 		var input = "*";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("*", token.Value);
 		Assert.AreEqual(TokenType.Operator, token.TokenType);
@@ -72,7 +71,7 @@ public class TokenFactoryTests
 	public void ShouldCreateDivideAsOperatorToken()
 	{
 		var input = "/";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("/", token.Value);
 		Assert.AreEqual(TokenType.Operator, token.TokenType);
@@ -82,7 +81,7 @@ public class TokenFactoryTests
 	public void ShouldCreateEqualsAsOperatorToken()
 	{
 		var input = "=";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("=", token.Value);
 		Assert.AreEqual(TokenType.Operator, token.TokenType);
@@ -92,7 +91,7 @@ public class TokenFactoryTests
 	public void ShouldCreateIntegerAsIntegerToken()
 	{
 		var input = "23";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("23", token.Value);
 		Assert.AreEqual(TokenType.Integer, token.TokenType);
@@ -102,7 +101,7 @@ public class TokenFactoryTests
 	public void ShouldCreateBooleanAsBooleanToken()
 	{
 		var input = "true";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("true", token.Value);
 		Assert.AreEqual(TokenType.Boolean, token.TokenType);
@@ -112,7 +111,7 @@ public class TokenFactoryTests
 	public void ShouldCreateDecimalAsDecimalToken()
 	{
 		var input = "23.3";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 
 		Assert.AreEqual("23.3", token.Value);
 		Assert.AreEqual(TokenType.Decimal, token.TokenType);
@@ -122,7 +121,7 @@ public class TokenFactoryTests
 	public void CreateShouldReadFunctionsFromFuncRepository()
 	{
 		var input = "Text";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 		Assert.AreEqual(TokenType.Function, token.TokenType);
 		Assert.AreEqual("Text", token.Value);
 	}
@@ -131,7 +130,7 @@ public class TokenFactoryTests
 	public void CreateShouldCreateExcelAddressAsExcelAddressToken()
 	{
 		var input = "A1";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 		Assert.AreEqual(TokenType.ExcelAddress, token.TokenType);
 		Assert.AreEqual("A1", token.Value);
 	}
@@ -140,7 +139,7 @@ public class TokenFactoryTests
 	public void CreateShouldCreateExcelRangeAsExcelAddressToken()
 	{
 		var input = "A1:B15";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 		Assert.AreEqual(TokenType.ExcelAddress, token.TokenType);
 		Assert.AreEqual("A1:B15", token.Value);
 	}
@@ -149,7 +148,7 @@ public class TokenFactoryTests
 	public void CreateShouldCreateExcelRangeOnOtherSheetAsExcelAddressToken()
 	{
 		var input = "ws!A1:B15";
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 		Assert.AreEqual(TokenType.ExcelAddress, token.TokenType);
 		Assert.AreEqual("WS!A1:B15", token.Value);
 	}
@@ -160,7 +159,7 @@ public class TokenFactoryTests
 		var input = "NamedValue";
 		A.CallTo(() => _nameValueProvider.IsNamedValue("NamedValue", "")).Returns(true);
 		A.CallTo(() => _nameValueProvider.IsNamedValue("NamedValue", null)).Returns(true);
-		var token = _tokenFactory.Create(Enumerable.Empty<Token>(), input);
+		var token = _tokenFactory.Create([], input);
 		Assert.AreEqual(TokenType.NameValue, token.TokenType);
 		Assert.AreEqual("NamedValue", token.Value);
 	}

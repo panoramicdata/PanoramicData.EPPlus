@@ -545,7 +545,7 @@ public class ExcelChart : ExcelDrawing
 			}
 		}
 
-		_axis = l.ToArray();
+		_axis = [.. l];
 
 		if (_axis.Length > 0) XAxis = _axis[0];
 		if (_axis.Length > 1) YAxis = _axis[1];

@@ -2208,7 +2208,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			list.Add(text[prevLineStart..]);
 		}
 
-		return list.ToArray();
+		return [.. list];
 	}
 	private bool IsEOL(string text, int ix, string eol)
 	{

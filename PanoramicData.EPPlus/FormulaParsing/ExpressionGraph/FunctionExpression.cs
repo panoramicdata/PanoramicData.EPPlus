@@ -80,7 +80,7 @@ public class FunctionExpression : AtomicExpression
 			}
 
 			var compiler = _functionCompilerFactory.Create(function);
-			var result = compiler.Compile(HasChildren ? Children : Enumerable.Empty<Expression>());
+			var result = compiler.Compile(HasChildren ? Children : []);
 			if (_isNegated)
 			{
 				if (!result.IsNumeric)

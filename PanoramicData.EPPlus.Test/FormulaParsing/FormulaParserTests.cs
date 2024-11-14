@@ -33,7 +33,7 @@ public class FormulaParserTests
 	public void ParserShouldCallLexer()
 	{
 		var lexer = A.Fake<ILexer>();
-		A.CallTo(() => lexer.Tokenize("ABC")).Returns(Enumerable.Empty<Token>());
+		A.CallTo(() => lexer.Tokenize("ABC")).Returns([]);
 		_parser.Configure(x => x.SetLexer(lexer));
 
 		_parser.Parse("ABC");
