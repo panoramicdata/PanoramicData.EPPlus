@@ -85,7 +85,7 @@ public class TokenizerContext
 
 	public void AddToken(Token token) => _result.Add(token);
 
-	public void AppendToCurrentToken(char c) => _currentToken.Append(c.ToString());
+	public void AppendToCurrentToken(char c) => _currentToken.Append(c);
 
 	public void AppendToLastToken(string stringToAppend) => _result.Last().Append(stringToAppend);
 

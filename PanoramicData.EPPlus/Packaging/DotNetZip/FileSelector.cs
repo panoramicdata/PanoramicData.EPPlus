@@ -48,12 +48,12 @@
 
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.ComponentModel;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
 #if SILVERLIGHT
 using System.Linq;
 #endif
@@ -122,7 +122,7 @@ internal partial class SizeCriterion : SelectionCriterion
 	public override String ToString()
 	{
 		StringBuilder sb = new();
-		sb.Append("size ").Append(EnumUtil.GetDescription(Operator)).Append(" ").Append(Size.ToString());
+		sb.Append("size ").Append(EnumUtil.GetDescription(Operator)).Append(" ").Append(Size);
 		return sb.ToString();
 	}
 
