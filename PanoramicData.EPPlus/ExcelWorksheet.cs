@@ -1871,7 +1871,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations)
+			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				var newAddr = addr.AddRow(rowFrom, rows).Address;
@@ -2074,7 +2074,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations)
+			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				var newAddr = addr.AddColumn(columnFrom, columns).Address;
@@ -2486,7 +2486,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				}
 			}
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations)
+			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				if (addr.Start.Row > rowFrom + rows)
@@ -2598,7 +2598,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations)
+			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				if (addr.Start.Column > columnFrom + columns)
