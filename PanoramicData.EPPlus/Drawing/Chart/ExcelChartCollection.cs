@@ -39,8 +39,8 @@ namespace OfficeOpenXml.Drawing.Chart;
 /// </summary>
 public class ExcelChartCollection : IEnumerable<ExcelChart>
 {
-	List<ExcelChart> _list = [];
-	ExcelChart _topChart;
+	readonly List<ExcelChart> _list = [];
+	readonly ExcelChart _topChart;
 	internal ExcelChartCollection(ExcelChart chart)
 	{
 		_topChart = chart;

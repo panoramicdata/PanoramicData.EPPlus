@@ -39,9 +39,9 @@ namespace OfficeOpenXml.Table.PivotTable;
 /// </summary>
 public class ExcelPivotTableCollection : IEnumerable<ExcelPivotTable>
 {
-	List<ExcelPivotTable> _pivotTables = [];
+	readonly List<ExcelPivotTable> _pivotTables = [];
 	internal Dictionary<string, int> _pivotTableNames = [];
-	ExcelWorksheet _ws;
+	readonly ExcelWorksheet _ws;
 	internal ExcelPivotTableCollection(ExcelWorksheet ws)
 	{
 		var pck = ws._package.Package;

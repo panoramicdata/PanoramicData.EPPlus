@@ -7,7 +7,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 public class Rank : ExcelFunction
 {
-	bool _isAvg;
+	readonly bool _isAvg;
 	public Rank(bool isAvg = false)
 	{
 		_isAvg = isAvg;

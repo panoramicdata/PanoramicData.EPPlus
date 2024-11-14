@@ -121,7 +121,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			_tokenizer = tokenizer;
 		}
 
-		private ISourceCodeTokenizer _tokenizer;
+		private readonly ISourceCodeTokenizer _tokenizer;
 		internal int Index { get; set; }
 		internal string Address { get; set; }
 		internal bool IsArray { get; set; }
@@ -183,7 +183,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		}
 		internal CellStore<int> _cells = new();
-		List<string> _list = [];
+		readonly List<string> _list = [];
 		internal List<string> List => _list;
 		public string this[int row, int column]
 		{
@@ -330,11 +330,11 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	internal int _maxCol = 0;
 	#region Worksheet Private Properties
 	internal ExcelPackage _package;
-	private Uri _worksheetUri;
+	private readonly Uri _worksheetUri;
 	private string _name;
-	private int _sheetID;
+	private readonly int _sheetID;
 	private int _positionID;
-	private string _relationshipID;
+	private readonly string _relationshipID;
 	private XmlDocument _worksheetXml;
 	internal ExcelWorksheetView _sheetView;
 	internal ExcelHeaderFooter _headerFooter;
@@ -1591,7 +1591,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return new ExcelRange(this, View.SelectedRange);
 		}
 	}
-	MergeCellsCollection _mergedCells = [];
+	readonly MergeCellsCollection _mergedCells = [];
 	/// <summary>
 	/// Addresses to merged ranges
 	/// </summary>
@@ -4420,7 +4420,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <param name="col">column</param>
 	/// <param name="value">value</param>
 	internal void SetValueInner(int row, int col, object value) => _values.SetValueSpecial(row, col, _setValueInnerUpdateDelegate, value);
-	private static CellStore<ExcelCoreValue>.SetValueDelegate _setValueInnerUpdateDelegate = SetValueInnerUpdate;
+	private static readonly CellStore<ExcelCoreValue>.SetValueDelegate _setValueInnerUpdateDelegate = SetValueInnerUpdate;
 	private static void SetValueInnerUpdate(List<ExcelCoreValue> list, int index, object value) => list[index] = new ExcelCoreValue { _value = value, _styleId = list[index]._styleId };
 	/// <summary>
 	/// Set accessor of sheet styleId

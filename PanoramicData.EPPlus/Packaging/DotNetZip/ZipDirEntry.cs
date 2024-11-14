@@ -113,7 +113,7 @@ partial class ZipEntry
 	// workitem 10330
 	private class CopyHelper
 	{
-		private static System.Text.RegularExpressions.Regex re =
+		private static readonly System.Text.RegularExpressions.Regex re =
 			new(" \\(copy (\\d+)\\)$");
 
 		private static int callCount = 0;

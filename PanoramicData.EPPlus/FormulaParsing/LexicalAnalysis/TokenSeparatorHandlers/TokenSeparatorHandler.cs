@@ -36,7 +36,7 @@ namespace OfficeOpenXml.FormulaParsing.LexicalAnalysis.TokenSeparatorHandlers;
 /// </summary>
 public static class TokenSeparatorHandler
 {
-	private static SeparatorHandler[] _handlers =
+	private static readonly SeparatorHandler[] _handlers =
 	[
 		new StringHandler(),
 		new BracketHandler(),

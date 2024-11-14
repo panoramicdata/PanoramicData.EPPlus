@@ -688,7 +688,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	#endregion
 
 	#region CalcMode
-	private string CALC_MODE_PATH = "d:calcPr/@calcMode";
+	private readonly string CALC_MODE_PATH = "d:calcPr/@calcMode";
 	/// <summary>
 	/// Calculation mode for the workbook.
 	/// </summary>

@@ -32,7 +32,7 @@ namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 public class BooleanExpression : AtomicExpression
 {
-	private bool? _precompiledValue;
+	private readonly bool? _precompiledValue;
 
 	public BooleanExpression(string expression)
 		: base(expression)

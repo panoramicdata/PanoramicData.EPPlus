@@ -8,7 +8,7 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;
 [TestClass]
 public class NumberFunctionsTests
 {
-	private ParsingContext _parsingContext = ParsingContext.Create();
+	private readonly ParsingContext _parsingContext = ParsingContext.Create();
 
 	[TestMethod]
 	public void CIntShouldConvertTextToInteger()

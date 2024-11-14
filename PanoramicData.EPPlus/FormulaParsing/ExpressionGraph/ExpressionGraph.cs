@@ -34,7 +34,7 @@ namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 public class ExpressionGraph
 {
-	private List<Expression> _expressions = [];
+	private readonly List<Expression> _expressions = [];
 	public IEnumerable<Expression> Expressions => _expressions;
 	public Expression Current { get; private set; }
 

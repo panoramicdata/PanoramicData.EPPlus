@@ -20,7 +20,7 @@ namespace OfficeOpenXml.FormulaParsing;
 
 public class EpplusNameValueProvider : INameValueProvider
 {
-	private ExcelDataProvider _excelDataProvider;
+	private readonly ExcelDataProvider _excelDataProvider;
 	private ExcelNamedRangeCollection _values;
 
 	public EpplusNameValueProvider(ExcelDataProvider excelDataProvider)

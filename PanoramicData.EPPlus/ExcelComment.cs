@@ -41,7 +41,7 @@ namespace OfficeOpenXml;
 public class ExcelComment : ExcelVmlDrawingComment
 {
 	internal XmlHelper _commentHelper;
-	private string _text;
+	private readonly string _text;
 	internal ExcelComment(XmlNamespaceManager ns, XmlNode commentTopNode, ExcelRangeBase cell)
 		: base(null, cell, cell.Worksheet.VmlDrawingsComments.NameSpaceManager)
 	{

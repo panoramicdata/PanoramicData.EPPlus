@@ -51,7 +51,7 @@ internal class ZlibBaseStream : Stream
 	protected internal CompressionStrategy Strategy = CompressionStrategy.Default;
 
 	// workitem 7159
-	CRC32 crc;
+	readonly CRC32 crc;
 	protected internal string _GzipFileName;
 	protected internal string _GzipComment;
 	protected internal DateTime _GzipMtime;

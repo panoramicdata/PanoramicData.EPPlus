@@ -44,7 +44,7 @@ internal class ExcelDataValidationFormulaList : ExcelDataValidationFormula, IExc
 	#region class DataValidationList
 	private class DataValidationList : IList<string>, ICollection
 	{
-		private IList<string> _items = [];
+		private readonly IList<string> _items = [];
 		private EventHandler<EventArgs> _listChanged;
 
 		public event EventHandler<EventArgs> ListChanged
@@ -142,7 +142,7 @@ internal class ExcelDataValidationFormulaList : ExcelDataValidationFormula, IExc
 		SetInitialValues();
 	}
 
-	private string _formulaPath;
+	private readonly string _formulaPath;
 
 	private void SetInitialValues()
 	{

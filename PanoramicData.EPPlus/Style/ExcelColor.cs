@@ -40,8 +40,8 @@ namespace OfficeOpenXml.Style;
 /// </summary>
 public sealed class ExcelColor : StyleBase, IColor
 {
-	eStyleClass _cls;
-	StyleBase _parent;
+	readonly eStyleClass _cls;
+	readonly StyleBase _parent;
 	internal ExcelColor(ExcelStyles styles, OfficeOpenXml.XmlHelper.ChangedEventHandler ChangedEvent, int worksheetID, string address, eStyleClass cls, StyleBase parent) :
 		base(styles, ChangedEvent, worksheetID, address)
 	{

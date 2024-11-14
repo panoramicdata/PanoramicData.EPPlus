@@ -29,10 +29,10 @@
  * Jan Källman		Added		2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
-using System;
-using System.Xml;
 using OfficeOpenXml.Table.PivotTable;
+using System;
 using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.Drawing.Chart;
 
@@ -184,7 +184,7 @@ public sealed class ExcelBarChart : ExcelChart
 	}
 	#endregion
 	#region "Properties"
-	string _directionPath = "c:barDir/@val";
+	readonly string _directionPath = "c:barDir/@val";
 	/// <summary>
 	/// Direction, Bar or columns
 	/// </summary>
@@ -199,7 +199,7 @@ public sealed class ExcelBarChart : ExcelChart
 			_chartXmlHelper.SetXmlNodeString(_directionPath, GetDirectionText(value));
 		}
 	}
-	string _shapePath = "c:shape/@val";
+	readonly string _shapePath = "c:shape/@val";
 	/// <summary>
 	/// The shape of the bar/columns
 	/// </summary>
@@ -227,7 +227,7 @@ public sealed class ExcelBarChart : ExcelChart
 			return _DataLabel;
 		}
 	}
-	string _gapWidthPath = "c:gapWidth/@val";
+	readonly string _gapWidthPath = "c:gapWidth/@val";
 	/// <summary>
 	/// The size of the gap between two adjacent bars/columns
 	/// </summary>

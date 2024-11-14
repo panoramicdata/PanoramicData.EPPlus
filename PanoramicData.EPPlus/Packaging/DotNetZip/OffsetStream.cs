@@ -33,8 +33,8 @@ namespace OfficeOpenXml.Packaging.DotNetZip;
 
 internal class OffsetStream : Stream, IDisposable
 {
-	private long _originalPosition;
-	private Stream _innerStream;
+	private readonly long _originalPosition;
+	private readonly Stream _innerStream;
 
 	public OffsetStream(Stream s)
 		: base()

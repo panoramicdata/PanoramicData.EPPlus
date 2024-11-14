@@ -207,7 +207,7 @@ public class ExcelChartDataLabel : XmlHelper
 			return _border;
 		}
 	}
-	string[] _paragraphSchemaOrder = ["spPr", "txPr", "dLblPos", "showVal", "showCatName", "showSerName", "showPercent", "separator", "showLeaderLines", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
+	readonly string[] _paragraphSchemaOrder = ["spPr", "txPr", "dLblPos", "showVal", "showCatName", "showSerName", "showPercent", "separator", "showLeaderLines", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
 	ExcelTextFont _font = null;
 	/// <summary>
 	/// Access font properties

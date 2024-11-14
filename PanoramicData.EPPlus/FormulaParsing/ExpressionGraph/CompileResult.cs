@@ -37,7 +37,7 @@ namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 public class CompileResult
 {
-	private static CompileResult _empty = new(null, DataType.Empty);
+	private static readonly CompileResult _empty = new(null, DataType.Empty);
 
 	public static CompileResult Empty => _empty;
 

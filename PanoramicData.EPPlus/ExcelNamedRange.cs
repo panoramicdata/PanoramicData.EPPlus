@@ -36,7 +36,7 @@ namespace OfficeOpenXml;
 /// </summary>
 public sealed class ExcelNamedRange : ExcelRangeBase
 {
-	ExcelWorksheet _sheet;
+	readonly ExcelWorksheet _sheet;
 	/// <summary>
 	/// A named range
 	/// </summary>

@@ -91,7 +91,7 @@ public class ExcelOfPieChart : ExcelPieChart
 			_chartXmlHelper.SetXmlNodeString(pieTypePath, value == ePieType.Bar ? "bar" : "pie");
 		}
 	}
-	string _gapWidthPath = "c:gapWidth/@val";
+	readonly string _gapWidthPath = "c:gapWidth/@val";
 	/// <summary>
 	/// The size of the gap between two adjacent bars/columns
 	/// </summary>

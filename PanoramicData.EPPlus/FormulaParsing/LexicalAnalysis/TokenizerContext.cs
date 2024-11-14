@@ -47,8 +47,8 @@ public class TokenizerContext
 		_currentToken = new StringBuilder();
 	}
 
-	private char[] _chars;
-	private List<Token> _result;
+	private readonly char[] _chars;
+	private readonly List<Token> _result;
 	private StringBuilder _currentToken;
 
 	public char[] FormulaChars => _chars;

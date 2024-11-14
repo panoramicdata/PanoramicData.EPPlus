@@ -16,8 +16,8 @@ public class ValidationResult : IValidationResult
 		_errorMessage = errorMessage;
 	}
 
-	private bool _result;
-	private string _errorMessage;
+	private readonly bool _result;
+	private readonly string _errorMessage;
 
 	private void Throw()
 	{

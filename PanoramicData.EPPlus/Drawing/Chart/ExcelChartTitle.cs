@@ -118,7 +118,7 @@ public class ExcelChartTitle : XmlHelper
 			return _richText[0];
 		}
 	}
-	string[] paragraphNodeOrder = ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
+	readonly string[] paragraphNodeOrder = ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
 	ExcelParagraphCollection _richText = null;
 	/// <summary>
 	/// Richtext

@@ -47,7 +47,7 @@ public class ExcelConditionalFormattingIconDataBarValue
 
 	#region Private Properties
 	private eExcelConditionalFormattingRuleType _ruleType;
-	private ExcelWorksheet _worksheet;
+	private readonly ExcelWorksheet _worksheet;
 	#endregion Private Properties
 
 	/****************************************************************************************/

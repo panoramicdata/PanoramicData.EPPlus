@@ -40,9 +40,9 @@ public class Weekday : ExcelFunction
 		return CreateResult(CalculateDayOfWeek(System.DateTime.FromOADate(serialNumber), returnType), DataType.Integer);
 	}
 
-	private static List<int> _oneBasedStartOnSunday = [1, 2, 3, 4, 5, 6, 7];
-	private static List<int> _oneBasedStartOnMonday = [7, 1, 2, 3, 4, 5, 6];
-	private static List<int> _zeroBasedStartOnSunday = [6, 0, 1, 2, 3, 4, 5];
+	private static readonly List<int> _oneBasedStartOnSunday = [1, 2, 3, 4, 5, 6, 7];
+	private static readonly List<int> _oneBasedStartOnMonday = [7, 1, 2, 3, 4, 5, 6];
+	private static readonly List<int> _zeroBasedStartOnSunday = [6, 0, 1, 2, 3, 4, 5];
 
 	private static int CalculateDayOfWeek(System.DateTime dateTime, int returnType)
 	{

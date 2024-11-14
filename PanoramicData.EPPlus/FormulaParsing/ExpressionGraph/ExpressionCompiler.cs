@@ -37,8 +37,8 @@ namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 public class ExpressionCompiler : IExpressionCompiler
 {
 	private IEnumerable<Expression> _expressions;
-	private IExpressionConverter _expressionConverter;
-	private ICompileStrategyFactory _compileStrategyFactory;
+	private readonly IExpressionConverter _expressionConverter;
+	private readonly ICompileStrategyFactory _compileStrategyFactory;
 
 	public ExpressionCompiler()
 		: this(new ExpressionConverter(), new CompileStrategyFactory())

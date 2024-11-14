@@ -2578,5 +2578,5 @@ internal partial class ZipEntry
 		}
 	}
 
-	private object _outputLock = new();
+	private readonly object _outputLock = new();
 }

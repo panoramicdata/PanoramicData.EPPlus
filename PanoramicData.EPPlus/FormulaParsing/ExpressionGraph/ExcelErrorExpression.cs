@@ -32,7 +32,7 @@ namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 public class ExcelErrorExpression : Expression
 {
-	ExcelErrorValue _error;
+	readonly ExcelErrorValue _error;
 	public ExcelErrorExpression(string expression, ExcelErrorValue error)
 		: base(expression)
 	{

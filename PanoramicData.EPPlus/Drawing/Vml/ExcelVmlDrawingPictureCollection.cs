@@ -41,8 +41,8 @@ namespace OfficeOpenXml.Drawing.Vml;
 public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, IEnumerable
 {
 	internal List<ExcelVmlDrawingPicture> _images;
-	ExcelPackage _pck;
-	ExcelWorksheet _ws;
+	readonly ExcelPackage _pck;
+	readonly ExcelWorksheet _ws;
 	internal ExcelVmlDrawingPictureCollection(ExcelPackage pck, ExcelWorksheet ws, Uri uri) :
 		base(pck, ws, uri)
 	{

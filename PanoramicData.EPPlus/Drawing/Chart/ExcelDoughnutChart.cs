@@ -75,7 +75,7 @@ public class ExcelDoughnutChart : ExcelPieChart
 	//    _holeSizePath = string.Format(_holeSizePath, chartNodeText);
 	//}
 	//string _firstSliceAngPath = "c:chartSpace/c:chart/c:plotArea/{0}/c:firstSliceAng/@val";
-	string _firstSliceAngPath = "c:firstSliceAng/@val";
+	readonly string _firstSliceAngPath = "c:firstSliceAng/@val";
 	/// <summary>
 	/// Angle of the first slize
 	/// </summary>
@@ -91,7 +91,7 @@ public class ExcelDoughnutChart : ExcelPieChart
 		}
 	}
 	//string _holeSizePath = "c:chartSpace/c:chart/c:plotArea/{0}/c:holeSize/@val";
-	string _holeSizePath = "c:holeSize/@val";
+	readonly string _holeSizePath = "c:holeSize/@val";
 	/// <summary>
 	/// Size of the doubnut hole
 	/// </summary>

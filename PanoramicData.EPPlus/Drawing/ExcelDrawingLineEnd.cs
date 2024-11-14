@@ -58,14 +58,14 @@ public enum eEndSize
 /// </summary>
 public sealed class ExcelDrawingLineEnd : XmlHelper
 {
-	string _linePath;
+	readonly string _linePath;
 	internal ExcelDrawingLineEnd(XmlNamespaceManager nameSpaceManager, XmlNode topNode, string linePath) :
 		base(nameSpaceManager, topNode)
 	{
 		SchemaNodeOrder = ["headEnd", "tailEnd"];
 		_linePath = linePath;
 	}
-	string _headEndStylePath = "xdr:sp/xdr:spPr/a:ln/a:headEnd/@type";
+	readonly string _headEndStylePath = "xdr:sp/xdr:spPr/a:ln/a:headEnd/@type";
 	/// <summary>
 	/// HeaderEnd
 	/// </summary>
@@ -81,7 +81,7 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 			SetXmlNodeString(_headEndStylePath, TranslateEndStyleText(value));
 		}
 	}
-	string _tailEndStylePath = "xdr:sp/xdr:spPr/a:ln/a:tailEnd/@type";
+	readonly string _tailEndStylePath = "xdr:sp/xdr:spPr/a:ln/a:tailEnd/@type";
 	/// <summary>
 	/// HeaderEnd
 	/// </summary>
@@ -98,7 +98,7 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 		}
 	}
 
-	string _tailEndSizeWidthPath = "xdr:sp/xdr:spPr/a:ln/a:tailEnd/@w";
+	readonly string _tailEndSizeWidthPath = "xdr:sp/xdr:spPr/a:ln/a:tailEnd/@w";
 	/// <summary>
 	/// TailEndSizeWidth
 	/// </summary>
@@ -115,7 +115,7 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 		}
 	}
 
-	string _tailEndSizeHeightPath = "xdr:sp/xdr:spPr/a:ln/a:tailEnd/@len";
+	readonly string _tailEndSizeHeightPath = "xdr:sp/xdr:spPr/a:ln/a:tailEnd/@len";
 	/// <summary>
 	/// TailEndSizeHeight
 	/// </summary>
@@ -132,7 +132,7 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 		}
 	}
 
-	string _headEndSizeWidthPath = "xdr:sp/xdr:spPr/a:ln/a:headEnd/@w";
+	readonly string _headEndSizeWidthPath = "xdr:sp/xdr:spPr/a:ln/a:headEnd/@w";
 	/// <summary>
 	/// TailEndSizeWidth
 	/// </summary>
@@ -149,7 +149,7 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 		}
 	}
 
-	string _headEndSizeHeightPath = "xdr:sp/xdr:spPr/a:ln/a:headEnd/@len";
+	readonly string _headEndSizeHeightPath = "xdr:sp/xdr:spPr/a:ln/a:headEnd/@len";
 	/// <summary>
 	/// TailEndSizeHeight
 	/// </summary>

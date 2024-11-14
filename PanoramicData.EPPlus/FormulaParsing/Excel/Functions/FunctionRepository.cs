@@ -35,9 +35,9 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 /// </summary>
 public class FunctionRepository : IFunctionNameProvider
 {
-	private Dictionary<Type, FunctionCompiler> _customCompilers = [];
+	private readonly Dictionary<Type, FunctionCompiler> _customCompilers = [];
 
-	private Dictionary<string, ExcelFunction> _functions = new(StringComparer.Ordinal);
+	private readonly Dictionary<string, ExcelFunction> _functions = new(StringComparer.Ordinal);
 
 	/// <summary>
 	/// Gets a <see cref="Dictionary{Type, FunctionCompiler}" /> of custom <see cref="FunctionCompiler"/>s.

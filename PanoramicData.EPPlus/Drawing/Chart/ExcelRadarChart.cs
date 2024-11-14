@@ -75,7 +75,7 @@ public class ExcelRadarChart : ExcelChart
 		}
 	}
 
-	string STYLE_PATH = "c:radarStyle/@val";
+	readonly string STYLE_PATH = "c:radarStyle/@val";
 	/// <summary>
 	/// The type of radarchart
 	/// </summary>

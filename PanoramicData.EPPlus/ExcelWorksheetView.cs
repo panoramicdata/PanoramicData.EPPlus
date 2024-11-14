@@ -116,7 +116,7 @@ public class ExcelWorksheetView : XmlHelper
 			}
 		}
 	}
-	private ExcelWorksheet _worksheet;
+	private readonly ExcelWorksheet _worksheet;
 
 	#region ExcelWorksheetView Constructor
 	/// <summary>
@@ -426,8 +426,8 @@ public class ExcelWorksheetView : XmlHelper
 		get;
 		internal set;
 	}
-	string _paneNodePath = "d:pane";
-	string _selectionNodePath = "d:selection";
+	readonly string _paneNodePath = "d:pane";
+	readonly string _selectionNodePath = "d:selection";
 	/// <summary>
 	/// Freeze the columns/rows to left and above the cell
 	/// </summary>

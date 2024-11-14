@@ -71,8 +71,8 @@ public class ExcelConditionalFormattingCollection
 	/****************************************************************************************/
 
 	#region Private Properties
-	private List<IExcelConditionalFormattingRule> _rules = [];
-	private ExcelWorksheet _worksheet = null;
+	private readonly List<IExcelConditionalFormattingRule> _rules = [];
+	private readonly ExcelWorksheet _worksheet = null;
 	#endregion Private Properties
 
 	/****************************************************************************************/

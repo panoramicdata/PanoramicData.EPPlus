@@ -51,10 +51,10 @@ public sealed class ExcelBubbleChartSeries : ExcelChartSeries
 /// </summary>
 public class ExcelChartSeries : XmlHelper, IEnumerable
 {
-	List<ExcelChartSerie> _list = [];
+	readonly List<ExcelChartSerie> _list = [];
 	internal ExcelChart _chart;
-	XmlNode _node;
-	XmlNamespaceManager _ns;
+	readonly XmlNode _node;
+	readonly XmlNamespaceManager _ns;
 	internal ExcelChartSeries(ExcelChart chart, XmlNamespaceManager ns, XmlNode node, bool isPivot)
 		: base(ns, node)
 	{

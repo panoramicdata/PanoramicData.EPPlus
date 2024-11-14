@@ -74,8 +74,8 @@ public enum eStrikeType
 /// </summary>
 public class ExcelTextFont : XmlHelper
 {
-	string _path;
-	XmlNode _rootNode;
+	readonly string _path;
+	readonly XmlNode _rootNode;
 	internal ExcelTextFont(XmlNamespaceManager namespaceManager, XmlNode rootNode, string path, string[] schemaNodeOrder)
 		: base(namespaceManager, rootNode)
 	{
@@ -92,7 +92,7 @@ public class ExcelTextFont : XmlHelper
 
 		_path = path;
 	}
-	string _fontLatinPath = "a:latin/@typeface";
+	readonly string _fontLatinPath = "a:latin/@typeface";
 	public string LatinFont
 	{
 		get
@@ -114,7 +114,7 @@ public class ExcelTextFont : XmlHelper
 			TopNode = _rootNode.SelectSingleNode(_path, NameSpaceManager);
 		}
 	}
-	string _fontCsPath = "a:cs/@typeface";
+	readonly string _fontCsPath = "a:cs/@typeface";
 	public string ComplexFont
 	{
 		get
@@ -127,7 +127,7 @@ public class ExcelTextFont : XmlHelper
 			SetXmlNodeString(_fontCsPath, value);
 		}
 	}
-	string _boldPath = "@b";
+	readonly string _boldPath = "@b";
 	public bool Bold
 	{
 		get
@@ -140,7 +140,7 @@ public class ExcelTextFont : XmlHelper
 			SetXmlNodeString(_boldPath, value ? "1" : "0");
 		}
 	}
-	string _underLinePath = "@u";
+	readonly string _underLinePath = "@u";
 	public eUnderLineType UnderLine
 	{
 		get
@@ -153,7 +153,7 @@ public class ExcelTextFont : XmlHelper
 			SetXmlNodeString(_underLinePath, TranslateUnderlineText(value));
 		}
 	}
-	string _underLineColorPath = "a:uFill/a:solidFill/a:srgbClr/@val";
+	readonly string _underLineColorPath = "a:uFill/a:solidFill/a:srgbClr/@val";
 	public Color UnderLineColor
 	{
 		get
@@ -167,7 +167,7 @@ public class ExcelTextFont : XmlHelper
 			SetXmlNodeString(_underLineColorPath, value.ToArgb().ToString("X").Substring(2, 6));
 		}
 	}
-	string _italicPath = "@i";
+	readonly string _italicPath = "@i";
 	public bool Italic
 	{
 		get
@@ -180,7 +180,7 @@ public class ExcelTextFont : XmlHelper
 			SetXmlNodeString(_italicPath, value ? "1" : "0");
 		}
 	}
-	string _strikePath = "@strike";
+	readonly string _strikePath = "@strike";
 	public eStrikeType Strike
 	{
 		get
@@ -193,7 +193,7 @@ public class ExcelTextFont : XmlHelper
 			SetXmlNodeString(_strikePath, TranslateStrikeText(value));
 		}
 	}
-	string _sizePath = "@sz";
+	readonly string _sizePath = "@sz";
 	public float Size
 	{
 		get
@@ -206,7 +206,7 @@ public class ExcelTextFont : XmlHelper
 			SetXmlNodeString(_sizePath, ((int)(value * 100)).ToString());
 		}
 	}
-	string _colorPath = "a:solidFill/a:srgbClr/@val";
+	readonly string _colorPath = "a:solidFill/a:srgbClr/@val";
 	public Color Color
 	{
 		get

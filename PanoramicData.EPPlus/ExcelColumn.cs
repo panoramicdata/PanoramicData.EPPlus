@@ -39,8 +39,8 @@ namespace OfficeOpenXml;
 /// </summary>
 public class ExcelColumn : IRangeID
 {
-	private ExcelWorksheet _worksheet;
-	private XmlElement _colElement = null;
+	private readonly ExcelWorksheet _worksheet;
+	private readonly XmlElement _colElement = null;
 
 	#region ExcelColumn Constructor
 	/// <summary>

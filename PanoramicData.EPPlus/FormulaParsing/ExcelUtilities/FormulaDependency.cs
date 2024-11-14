@@ -45,9 +45,9 @@ public class FormulaDependency
 
 	public RangeAddress Address { get; private set; }
 
-	private List<RangeAddress> _referencedBy = [];
+	private readonly List<RangeAddress> _referencedBy = [];
 
-	private List<RangeAddress> _references = [];
+	private readonly List<RangeAddress> _references = [];
 
 	public virtual void AddReferenceFrom(RangeAddress rangeAddress)
 	{

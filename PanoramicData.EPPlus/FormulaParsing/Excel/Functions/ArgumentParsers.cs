@@ -30,7 +30,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
 public class ArgumentParsers
 {
-	private static object _syncRoot = new();
+	private static readonly object _syncRoot = new();
 	private readonly Dictionary<DataType, ArgumentParser> _parsers = [];
 	private readonly ArgumentParserFactory _parserFactory;
 

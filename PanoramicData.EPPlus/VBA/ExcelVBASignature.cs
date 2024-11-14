@@ -44,7 +44,7 @@ namespace OfficeOpenXml.VBA;
 public class ExcelVbaSignature
 {
 	const string schemaRelVbaSignature = "http://schemas.microsoft.com/office/2006/relationships/vbaProjectSignature";
-	Packaging.ZipPackagePart _vbaPart = null;
+	readonly Packaging.ZipPackagePart _vbaPart = null;
 	internal ExcelVbaSignature(Packaging.ZipPackagePart vbaPart)
 	{
 		_vbaPart = vbaPart;

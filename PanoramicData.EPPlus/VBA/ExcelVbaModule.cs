@@ -63,7 +63,7 @@ internal delegate void ModuleNameChange(string value);
 public class ExcelVBAModule
 {
 	string _name = "";
-	ModuleNameChange _nameChangeCallback = null;
+	readonly ModuleNameChange _nameChangeCallback = null;
 	internal ExcelVBAModule()
 	{
 		Attributes = new ExcelVbaModuleAttributesCollection();

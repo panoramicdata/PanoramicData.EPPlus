@@ -41,7 +41,7 @@ namespace OfficeOpenXml.Drawing;
 public sealed class ExcelDrawingFill : XmlHelper
 {
 	//ExcelShape _shp;                
-	string _fillPath;
+	readonly string _fillPath;
 	XmlNode _fillNode;
 	internal ExcelDrawingFill(XmlNamespaceManager nameSpaceManager, XmlNode topNode, string fillPath) :
 		base(nameSpaceManager, topNode)
@@ -61,7 +61,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 		}
 	}
 	eFillStyle _style;
-	XmlNode _fillTypeNode = null;
+	readonly XmlNode _fillTypeNode = null;
 	/// <summary>
 	/// Fill style
 	/// </summary>

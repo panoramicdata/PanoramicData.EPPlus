@@ -39,8 +39,8 @@ namespace OfficeOpenXml.Style;
 /// </summary>
 public sealed class ExcelBorderItem : StyleBase
 {
-	eStyleClass _cls;
-	StyleBase _parent;
+	readonly eStyleClass _cls;
+	readonly StyleBase _parent;
 	internal ExcelBorderItem(ExcelStyles styles, OfficeOpenXml.XmlHelper.ChangedEventHandler ChangedEvent, int worksheetID, string address, eStyleClass cls, StyleBase parent) :
 		base(styles, ChangedEvent, worksheetID, address)
 	{

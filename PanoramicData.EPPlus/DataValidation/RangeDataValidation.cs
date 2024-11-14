@@ -44,8 +44,8 @@ internal class RangeDataValidation : IRangeDataValidation
 		_address = address;
 	}
 
-	ExcelWorksheet _worksheet;
-	string _address;
+	readonly ExcelWorksheet _worksheet;
+	readonly string _address;
 
 	public IExcelDataValidationAny AddAnyDataValidation() => _worksheet.DataValidations.AddAnyValidation(_address);
 

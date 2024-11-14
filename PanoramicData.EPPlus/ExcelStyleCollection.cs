@@ -45,14 +45,14 @@ public class ExcelStyleCollection<T> : IEnumerable<T>
 	{
 		_setNextIdManual = false;
 	}
-	bool _setNextIdManual;
+	readonly bool _setNextIdManual;
 	public ExcelStyleCollection(bool SetNextIdManual)
 	{
 		_setNextIdManual = SetNextIdManual;
 	}
 	public XmlNode TopNode { get; set; }
 	internal List<T> _list = [];
-	Dictionary<string, int> _dic = new(StringComparer.OrdinalIgnoreCase);
+	readonly Dictionary<string, int> _dic = new(StringComparer.OrdinalIgnoreCase);
 	internal int NextId = 0;
 	#region IEnumerable<T> Members
 

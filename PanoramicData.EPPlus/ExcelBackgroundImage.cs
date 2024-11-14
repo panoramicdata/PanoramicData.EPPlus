@@ -44,7 +44,7 @@ namespace OfficeOpenXml;
 /// </summary>
 public class ExcelBackgroundImage : XmlHelper
 {
-	ExcelWorksheet _workSheet;
+	readonly ExcelWorksheet _workSheet;
 	/// <summary>
 	/// 
 	/// </summary>

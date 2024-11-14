@@ -40,7 +40,7 @@ namespace OfficeOpenXml.Style.XmlAccess;
 /// </summary>
 public sealed class ExcelXfs : StyleXmlHelper
 {
-	ExcelStyles _styles;
+	readonly ExcelStyles _styles;
 	internal ExcelXfs(XmlNamespaceManager nameSpaceManager, ExcelStyles styles) : base(nameSpaceManager)
 	{
 		_styles = styles;
@@ -281,7 +281,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 			_wrapText = value;
 		}
 	}
-	string textRotationPath = "d:alignment/@textRotation";
+	readonly string textRotationPath = "d:alignment/@textRotation";
 	int _textRotation = 0;
 	/// <summary>
 	/// Text rotation angle

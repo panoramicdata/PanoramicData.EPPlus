@@ -34,7 +34,7 @@ namespace OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
 public static class ExcelAddressUtil
 {
-	static char[] SheetNameInvalidChars = ['?', ':', '*', '/', '\\'];
+	static readonly char[] SheetNameInvalidChars = ['?', ':', '*', '/', '\\'];
 	public static bool IsValidAddress(string token)
 	{
 		int ix;

@@ -69,7 +69,7 @@ public class ZipPackage : ZipPackageRelationshipBase
 			Match = match;
 		}
 	}
-	Dictionary<string, ZipPackagePart> Parts = new(StringComparer.OrdinalIgnoreCase);
+	readonly Dictionary<string, ZipPackagePart> Parts = new(StringComparer.OrdinalIgnoreCase);
 	internal Dictionary<string, ContentType> _contentTypes = new(StringComparer.OrdinalIgnoreCase);
 	internal char _dirSeparator = '/';
 	internal ZipPackage()

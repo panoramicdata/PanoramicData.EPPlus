@@ -122,7 +122,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 
 	//new properties for excel scatter-plots: LineColor, MarkerSize, MarkerColor, LineWidth and MarkerLineColor
 	//implemented according to https://epplus.codeplex.com/discussions/287917
-	string LINECOLOR_PATH = "c:spPr/a:ln/a:solidFill/a:srgbClr/@val";
+	readonly string LINECOLOR_PATH = "c:spPr/a:ln/a:solidFill/a:srgbClr/@val";
 	/// <summary>
 	/// Line color.
 	/// </summary>
@@ -157,7 +157,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 			setAlphaChannel(value, LINECOLOR_PATH);
 		}
 	}
-	string MARKERSIZE_PATH = "c:marker/c:size/@val";
+	readonly string MARKERSIZE_PATH = "c:marker/c:size/@val";
 	/// <summary>
 	/// Gets or sets the size of the marker.
 	/// </summary>
@@ -184,7 +184,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 			SetXmlNodeString(MARKERSIZE_PATH, size.ToString(), true);
 		}
 	}
-	string MARKERCOLOR_PATH = "c:marker/c:spPr/a:solidFill/a:srgbClr/@val";
+	readonly string MARKERCOLOR_PATH = "c:marker/c:spPr/a:solidFill/a:srgbClr/@val";
 	/// <summary>
 	/// Marker color.
 	/// </summary>
@@ -220,7 +220,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 		}
 	}
 
-	string LINEWIDTH_PATH = "c:spPr/a:ln/@w";
+	readonly string LINEWIDTH_PATH = "c:spPr/a:ln/@w";
 	/// <summary>
 	/// Gets or sets the width of the line in pt.
 	/// </summary>
@@ -241,7 +241,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 		}
 	}
 	//marker line color
-	string MARKERLINECOLOR_PATH = "c:marker/c:spPr/a:ln/a:solidFill/a:srgbClr/@val";
+	readonly string MARKERLINECOLOR_PATH = "c:marker/c:spPr/a:ln/a:solidFill/a:srgbClr/@val";
 	/// <summary>
 	/// Marker Line color.
 	/// (not to be confused with LineColor)

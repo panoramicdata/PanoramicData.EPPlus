@@ -76,7 +76,7 @@ public class ExcelErrorValue
 		public const string Ref = "#REF!";
 		public const string Value = "#VALUE!";
 
-		private static Dictionary<string, eErrorType> _values = new()
+		private static readonly Dictionary<string, eErrorType> _values = new()
 			{
 				{Div0, eErrorType.Div0},
 				{NA, eErrorType.NA},

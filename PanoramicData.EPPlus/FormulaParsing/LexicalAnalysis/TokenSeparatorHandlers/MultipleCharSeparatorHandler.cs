@@ -32,7 +32,7 @@ namespace OfficeOpenXml.FormulaParsing.LexicalAnalysis.TokenSeparatorHandlers;
 
 public class MultipleCharSeparatorHandler : SeparatorHandler
 {
-	ITokenSeparatorProvider _tokenSeparatorProvider;
+	readonly ITokenSeparatorProvider _tokenSeparatorProvider;
 
 	public MultipleCharSeparatorHandler()
 		: this(new TokenSeparatorProvider())

@@ -37,7 +37,7 @@ public sealed class ExcelBubbleChart : ExcelChart
 	{
 		_chartSeries = new ExcelBubbleChartSeries(this, _drawings.NameSpaceManager, _chartNode, false);
 	}
-	string BUBBLESCALE_PATH = "c:bubbleScale/@val";
+	readonly string BUBBLESCALE_PATH = "c:bubbleScale/@val";
 	/// <summary>
 	/// Specifies the scale factor for the bubble chart. Can range from 0 to 300, corresponding to a percentage of the default size,
 	/// </summary>
@@ -57,7 +57,7 @@ public sealed class ExcelBubbleChart : ExcelChart
 			_chartXmlHelper.SetXmlNodeString(BUBBLESCALE_PATH, value.ToString());
 		}
 	}
-	string SHOWNEGBUBBLES_PATH = "c:showNegBubbles/@val";
+	readonly string SHOWNEGBUBBLES_PATH = "c:showNegBubbles/@val";
 	/// <summary>
 	/// Specifies negative sized bubbles shall be shown on a bubble chart
 	/// </summary>
@@ -72,7 +72,7 @@ public sealed class ExcelBubbleChart : ExcelChart
 			_chartXmlHelper.SetXmlNodeBool(BUBBLESCALE_PATH, value, true);
 		}
 	}
-	string BUBBLE3D_PATH = "c:bubble3D/@val";
+	readonly string BUBBLE3D_PATH = "c:bubble3D/@val";
 	/// <summary>
 	/// Specifies if the bubblechart is three dimensional
 	/// </summary>
@@ -88,7 +88,7 @@ public sealed class ExcelBubbleChart : ExcelChart
 			ChartType = value ? eChartType.Bubble3DEffect : eChartType.Bubble;
 		}
 	}
-	string SIZEREPRESENTS_PATH = "c:sizeRepresents/@val";
+	readonly string SIZEREPRESENTS_PATH = "c:sizeRepresents/@val";
 	/// <summary>
 	/// Specifies the scale factor for the bubble chart. Can range from 0 to 300, corresponding to a percentage of the default size,
 	/// </summary>

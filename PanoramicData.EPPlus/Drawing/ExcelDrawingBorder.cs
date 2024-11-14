@@ -66,7 +66,7 @@ public enum eLineStyle
 /// </summary>    
 public sealed class ExcelDrawingBorder : XmlHelper
 {
-	string _linePath;
+	readonly string _linePath;
 	internal ExcelDrawingBorder(XmlNamespaceManager nameSpaceManager, XmlNode topNode, string linePath) :
 		base(nameSpaceManager, topNode)
 	{
@@ -90,7 +90,7 @@ public sealed class ExcelDrawingBorder : XmlHelper
 			return _fill;
 		}
 	}
-	string _lineStylePath = "{0}/a:prstDash/@val";
+	readonly string _lineStylePath = "{0}/a:prstDash/@val";
 	/// <summary>
 	/// Linestyle
 	/// </summary>
@@ -106,7 +106,7 @@ public sealed class ExcelDrawingBorder : XmlHelper
 			SetXmlNodeString(_lineStylePath, TranslateLineStyleText(value));
 		}
 	}
-	string _lineCapPath = "{0}/@cap";
+	readonly string _lineCapPath = "{0}/@cap";
 	/// <summary>
 	/// Linecap
 	/// </summary>
@@ -122,7 +122,7 @@ public sealed class ExcelDrawingBorder : XmlHelper
 			SetXmlNodeString(_lineCapPath, TranslateLineCapText(value));
 		}
 	}
-	string _lineWidth = "{0}/@w";
+	readonly string _lineWidth = "{0}/@w";
 	/// <summary>
 	/// Width in pixels
 	/// </summary>

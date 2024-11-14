@@ -52,7 +52,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	#region Private Properties
 	private ExcelPackage _pck;
 	private Dictionary<int, ExcelWorksheet> _worksheets;
-	private XmlNamespaceManager _namespaceManager;
+	private readonly XmlNamespaceManager _namespaceManager;
 	#endregion
 	#region ExcelWorksheets Constructor
 	internal ExcelWorksheets(ExcelPackage pck, XmlNamespaceManager nsm, XmlNode topNode) :

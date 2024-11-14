@@ -58,7 +58,7 @@ public class TokenFactory : ITokenFactory
 	private readonly ITokenSeparatorProvider _tokenSeparatorProvider;
 	private readonly IFunctionNameProvider _functionNameProvider;
 	private readonly INameValueProvider _nameValueProvider;
-	private bool _r1c1;
+	private readonly bool _r1c1;
 	public Token Create(IEnumerable<Token> tokens, string token) => Create(tokens, token, null);
 	public Token Create(IEnumerable<Token> tokens, string token, string worksheet)
 	{

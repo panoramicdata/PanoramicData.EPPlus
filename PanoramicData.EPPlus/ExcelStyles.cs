@@ -54,9 +54,9 @@ public sealed class ExcelStyles : XmlHelper
 	const string dxfsPath = "d:styleSheet/d:dxfs";
 
 	//internal Dictionary<int, ExcelXfs> Styles = new Dictionary<int, ExcelXfs>();
-	XmlDocument _styleXml;
-	ExcelWorkbook _wb;
-	XmlNamespaceManager _nameSpaceManager;
+	readonly XmlDocument _styleXml;
+	readonly ExcelWorkbook _wb;
+	readonly XmlNamespaceManager _nameSpaceManager;
 	internal int _nextDfxNumFmtID = 164;
 	internal ExcelStyles(XmlNamespaceManager NameSpaceManager, XmlDocument xml, ExcelWorkbook wb) :
 		base(NameSpaceManager, xml)

@@ -448,9 +448,9 @@ internal class CRC32
 	public void Reset() => _register = 0xFFFFFFFFU;
 
 	// private member vars
-	private uint dwPolynomial;
+	private readonly uint dwPolynomial;
 	private long _TotalBytesRead;
-	private bool reverseBits;
+	private readonly bool reverseBits;
 	private uint[] crc32Table;
 	private const int BUFFER_SIZE = 8192;
 	private uint _register = 0xFFFFFFFFU;
@@ -481,8 +481,8 @@ internal class CrcCalculatorStream : System.IO.Stream, IDisposable
 	private static readonly long UnsetLengthLimit = -99;
 
 	internal System.IO.Stream _innerStream;
-	private CRC32 _Crc32;
-	private long _lengthLimit = -99;
+	private readonly CRC32 _Crc32;
+	private readonly long _lengthLimit = -99;
 	private bool _leaveOpen;
 
 	/// <summary>

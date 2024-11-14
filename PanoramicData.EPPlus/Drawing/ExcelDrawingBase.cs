@@ -100,9 +100,9 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	public class ExcelPosition : XmlHelper
 	{
 		internal delegate void SetWidthCallback();
-		XmlNode _node;
-		XmlNamespaceManager _ns;
-		SetWidthCallback _setWidthCallback;
+		readonly XmlNode _node;
+		readonly XmlNamespaceManager _ns;
+		readonly SetWidthCallback _setWidthCallback;
 		internal ExcelPosition(XmlNamespaceManager ns, XmlNode node, SetWidthCallback setWidthCallback) :
 			base(ns, node)
 		{
@@ -179,7 +179,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	}
 	protected ExcelDrawings _drawings;
 	protected XmlNode _topNode;
-	string _nameXPath;
+	readonly string _nameXPath;
 	protected internal int _id;
 	const float STANDARD_DPI = 96;
 	public const int EMU_PER_PIXEL = 9525;

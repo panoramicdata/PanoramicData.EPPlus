@@ -56,7 +56,7 @@ public class ExcelLineChart : ExcelChart
 		Smooth = false;
 	}
 	#endregion
-	string MARKER_PATH = "c:marker/@val";
+	readonly string MARKER_PATH = "c:marker/@val";
 	/// <summary>
 	/// If the series has markers
 	/// </summary>
@@ -72,7 +72,7 @@ public class ExcelLineChart : ExcelChart
 		}
 	}
 
-	string SMOOTH_PATH = "c:smooth/@val";
+	readonly string SMOOTH_PATH = "c:smooth/@val";
 	/// <summary>
 	/// If the series has smooth lines
 	/// </summary>

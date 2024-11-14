@@ -2602,7 +2602,7 @@ internal partial class ZipEntry
 	private bool _ntfsTimesAreSet;
 	private bool _emitNtfsTimes = true;
 	private bool _emitUnixTimes;  // by default, false
-	private bool _TrimVolumeFromFullyQualifiedPaths = true;  // by default, trim them.
+	private readonly bool _TrimVolumeFromFullyQualifiedPaths = true;  // by default, trim them.
 	internal string _LocalFileName;
 	private string _FileNameInArchive;
 	internal Int16 _VersionNeeded;
@@ -2626,7 +2626,7 @@ internal partial class ZipEntry
 	private bool _skippedDuringSave;
 	private UInt32 _diskNumber;
 
-	private static System.Text.Encoding ibm437 = System.Text.Encoding.GetEncoding("UTF-8");
+	private static readonly System.Text.Encoding ibm437 = System.Text.Encoding.GetEncoding("UTF-8");
 	private System.Text.Encoding _actualEncoding;
 
 	internal ZipContainer _container;
@@ -2657,9 +2657,9 @@ internal partial class ZipEntry
 	private bool _IsText; // workitem 7801
 	private ZipEntryTimestamp _timestamp;
 
-	private static System.DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-	private static System.DateTime _win32Epoch = System.DateTime.FromFileTimeUtc(0L);
-	private static System.DateTime _zeroHour = new(1, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+	private static readonly System.DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+	private static readonly System.DateTime _win32Epoch = System.DateTime.FromFileTimeUtc(0L);
+	private static readonly System.DateTime _zeroHour = new(1, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 	private WriteDelegate _WriteDelegate;
 	private OpenDelegate _OpenDelegate;

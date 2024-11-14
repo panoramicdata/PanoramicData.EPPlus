@@ -346,7 +346,7 @@ public sealed class ExcelShape : ExcelDrawing
 			return _ends;
 		}
 	}
-	string[] paragraphNodeOrder = ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
+	readonly string[] paragraphNodeOrder = ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
 	const string PARAGRAPH_PATH = "xdr:sp/xdr:txBody/a:p";
 	ExcelTextFont _font = null;
 	public ExcelTextFont Font
@@ -384,7 +384,7 @@ public sealed class ExcelShape : ExcelDrawing
 		}
 
 	}
-	string _lockTextPath = "xdr:sp/@fLocksText";
+	readonly string _lockTextPath = "xdr:sp/@fLocksText";
 	/// <summary>
 	/// Lock drawing
 	/// </summary>

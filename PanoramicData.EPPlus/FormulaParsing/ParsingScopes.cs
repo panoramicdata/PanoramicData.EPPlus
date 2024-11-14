@@ -35,7 +35,7 @@ public class ParsingScopes
 	{
 		_lifetimeEventHandler = lifetimeEventHandler;
 	}
-	private Stack<ParsingScope> _scopes = new();
+	private readonly Stack<ParsingScope> _scopes = new();
 
 	/// <summary>
 	/// Creates a new <see cref="ParsingScope"/> and puts it on top of the stack.

@@ -49,14 +49,14 @@ public sealed class OfficeProperties : XmlHelper
 	private XmlDocument _xmlPropertiesExtended;
 	private XmlDocument _xmlPropertiesCustom;
 
-	private Uri _uriPropertiesCore = new("/docProps/core.xml", UriKind.Relative);
-	private Uri _uriPropertiesExtended = new("/docProps/app.xml", UriKind.Relative);
-	private Uri _uriPropertiesCustom = new("/docProps/custom.xml", UriKind.Relative);
+	private readonly Uri _uriPropertiesCore = new("/docProps/core.xml", UriKind.Relative);
+	private readonly Uri _uriPropertiesExtended = new("/docProps/app.xml", UriKind.Relative);
+	private readonly Uri _uriPropertiesCustom = new("/docProps/custom.xml", UriKind.Relative);
 
-	XmlHelper _coreHelper;
-	XmlHelper _extendedHelper;
-	XmlHelper _customHelper;
-	private ExcelPackage _package;
+	readonly XmlHelper _coreHelper;
+	readonly XmlHelper _extendedHelper;
+	readonly XmlHelper _customHelper;
+	private readonly ExcelPackage _package;
 	#endregion
 
 	#region ExcelProperties Constructor

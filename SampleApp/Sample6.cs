@@ -62,8 +62,8 @@ class Sample6
 	}
 	static int _maxLevels;
 
-	static Dictionary<string, StatItem> _extStat = [];
-	static List<StatItem> _fileSize = [];
+	static readonly Dictionary<string, StatItem> _extStat = [];
+	static readonly List<StatItem> _fileSize = [];
 	/// <summary>
 	/// Sample 6 - Reads the filesystem and makes a report.
 	/// </summary>

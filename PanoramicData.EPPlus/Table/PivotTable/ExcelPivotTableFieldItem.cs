@@ -39,7 +39,7 @@ namespace OfficeOpenXml.Table.PivotTable;
 /// </summary>
 public class ExcelPivotTableFieldItem : XmlHelper
 {
-	ExcelPivotTableField _field;
+	readonly ExcelPivotTableField _field;
 	internal ExcelPivotTableFieldItem(XmlNamespaceManager ns, XmlNode topNode, ExcelPivotTableField field) :
 		base(ns, topNode)
 	{

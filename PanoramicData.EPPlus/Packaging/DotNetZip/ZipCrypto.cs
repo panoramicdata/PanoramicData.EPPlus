@@ -337,8 +337,8 @@ internal class ZipCrypto
 	//}
 
 	// private fields for the crypto stuff:
-	private uint[] _Keys = [0x12345678, 0x23456789, 0x34567890];
-	private CRC32 crc32 = new();
+	private readonly uint[] _Keys = [0x12345678, 0x23456789, 0x34567890];
+	private readonly CRC32 crc32 = new();
 
 }
 
@@ -354,9 +354,9 @@ internal enum CryptoMode
 /// </summary>
 internal class ZipCipherStream : System.IO.Stream
 {
-	private ZipCrypto _cipher;
-	private System.IO.Stream _s;
-	private CryptoMode _mode;
+	private readonly ZipCrypto _cipher;
+	private readonly System.IO.Stream _s;
+	private readonly CryptoMode _mode;
 
 	/// <summary>  The constructor. </summary>
 	/// <param name="s">The underlying stream</param>

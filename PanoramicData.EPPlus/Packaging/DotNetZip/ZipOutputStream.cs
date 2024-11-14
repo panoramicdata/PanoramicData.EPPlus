@@ -1615,9 +1615,9 @@ internal class ZipOutputStream : Stream
 
 internal class ZipContainer
 {
-	private ZipFile _zf;
-	private ZipOutputStream _zos;
-	private ZipInputStream _zis;
+	private readonly ZipFile _zf;
+	private readonly ZipOutputStream _zos;
+	private readonly ZipInputStream _zis;
 
 	public ZipContainer(object o)
 	{

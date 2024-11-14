@@ -62,8 +62,8 @@ internal class RowInternal
 /// </summary>
 public class ExcelRow : IRangeID
 {
-	private ExcelWorksheet _worksheet;
-	private XmlElement _rowElement = null;
+	private readonly ExcelWorksheet _worksheet;
+	private readonly XmlElement _rowElement = null;
 	/// <summary>
 	/// Internal RowID.
 	/// </summary>

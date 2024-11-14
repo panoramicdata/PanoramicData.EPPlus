@@ -39,7 +39,7 @@ namespace OfficeOpenXml.VBA;
 /// </summary>
 public class ExcelVbaProtection
 {
-	ExcelVbaProject _project;
+	readonly ExcelVbaProject _project;
 	internal ExcelVbaProtection(ExcelVbaProject project)
 	{
 		_project = project;

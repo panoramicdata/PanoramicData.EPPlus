@@ -8,7 +8,7 @@ namespace PanoramicData.EPPlus.Test;
 [TestClass]
 public class SparkLineTests : TestBase
 {
-	string _pckfile;
+	readonly string _pckfile;
 	public SparkLineTests()
 	{
 		InitBase();

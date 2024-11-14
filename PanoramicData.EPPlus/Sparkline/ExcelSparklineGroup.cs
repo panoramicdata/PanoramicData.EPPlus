@@ -67,7 +67,7 @@ public class ExcelSparklineGroup : XmlHelper
      <xsd:attribute ref="xr2:uid"/>
    </xsd:complexType>
    */
-	ExcelWorksheet _ws;
+	readonly ExcelWorksheet _ws;
 	internal ExcelSparklineGroup(XmlNamespaceManager ns, XmlElement topNode, ExcelWorksheet ws) : base(ns, topNode)
 	{
 		SchemaNodeOrder = ["colorSeries", "colorNegative", "colorAxis", "colorMarkers", "colorFirst", "colorLast", "colorHigh", "colorLow", "f", "sparklines"];

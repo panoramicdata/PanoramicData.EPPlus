@@ -475,7 +475,7 @@ internal class AddProgressEventArgs : ZipProgressEventArgs
 /// </summary>
 internal class SaveProgressEventArgs : ZipProgressEventArgs
 {
-	private int _entriesSaved;
+	private readonly int _entriesSaved;
 
 	/// <summary>
 	/// Constructor for the SaveProgressEventArgs.
@@ -536,7 +536,7 @@ internal class SaveProgressEventArgs : ZipProgressEventArgs
 /// </summary>
 internal class ExtractProgressEventArgs : ZipProgressEventArgs
 {
-	private int _entriesExtracted;
+	private readonly int _entriesExtracted;
 	private string _target;
 
 	/// <summary>

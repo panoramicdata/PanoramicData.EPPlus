@@ -65,8 +65,8 @@ public enum PictureAlignment
 /// </summary>
 public class ExcelHeaderFooterText
 {
-	ExcelWorksheet _ws;
-	string _hf;
+	readonly ExcelWorksheet _ws;
+	readonly string _hf;
 	internal ExcelHeaderFooterText(XmlNode TextNode, ExcelWorksheet ws, string hf)
 	{
 		_ws = ws;
@@ -263,7 +263,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 	internal ExcelHeaderFooterText _evenFooter;
 	internal ExcelHeaderFooterText _firstHeader;
 	internal ExcelHeaderFooterText _firstFooter;
-	private ExcelWorksheet _ws;
+	private readonly ExcelWorksheet _ws;
 	#endregion
 
 	#region ExcelHeaderFooter Constructor

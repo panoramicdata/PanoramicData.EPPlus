@@ -97,7 +97,7 @@ public class ExcelVBACollectionBase<T> : IEnumerable<T>
 /// </summary>
 public class ExcelVbaModuleCollection : ExcelVBACollectionBase<ExcelVBAModule>
 {
-	ExcelVbaProject _project;
+	readonly ExcelVbaProject _project;
 	internal ExcelVbaModuleCollection(ExcelVbaProject project)
 	{
 		_project = project;

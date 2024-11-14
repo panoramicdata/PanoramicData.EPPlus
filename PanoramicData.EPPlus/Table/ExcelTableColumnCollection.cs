@@ -41,8 +41,8 @@ namespace OfficeOpenXml.Table;
 /// </summary>
 public class ExcelTableColumnCollection : IEnumerable<ExcelTableColumn>
 {
-	List<ExcelTableColumn> _cols = [];
-	Dictionary<string, int> _colNames = new(StringComparer.OrdinalIgnoreCase);
+	readonly List<ExcelTableColumn> _cols = [];
+	readonly Dictionary<string, int> _colNames = new(StringComparer.OrdinalIgnoreCase);
 	public ExcelTableColumnCollection(ExcelTable table)
 	{
 		Table = table;

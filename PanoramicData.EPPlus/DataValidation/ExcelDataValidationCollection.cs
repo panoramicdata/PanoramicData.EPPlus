@@ -68,8 +68,8 @@ namespace OfficeOpenXml.DataValidation;
 /// </summary>
 public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataValidation>
 {
-	private List<IExcelDataValidation> _validations = [];
-	private ExcelWorksheet _worksheet = null;
+	private readonly List<IExcelDataValidation> _validations = [];
+	private readonly ExcelWorksheet _worksheet = null;
 
 	private const string DataValidationPath = "//d:dataValidations";
 	private readonly string DataValidationItemsPath = string.Format("{0}/d:dataValidation", DataValidationPath);

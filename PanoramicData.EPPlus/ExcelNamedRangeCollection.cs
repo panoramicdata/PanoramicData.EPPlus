@@ -54,8 +54,8 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 		_wb = wb;
 		_ws = ws;
 	}
-	List<ExcelNamedRange> _list = [];
-	Dictionary<string, int> _dic = new(StringComparer.OrdinalIgnoreCase);
+	readonly List<ExcelNamedRange> _list = [];
+	readonly Dictionary<string, int> _dic = new(StringComparer.OrdinalIgnoreCase);
 	/// <summary>
 	/// Add a new named range
 	/// </summary>

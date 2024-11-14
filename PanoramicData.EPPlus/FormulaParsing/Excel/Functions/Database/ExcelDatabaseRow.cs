@@ -28,7 +28,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 
 public class ExcelDatabaseRow
 {
-	private Dictionary<int, string> _fieldIndexes = [];
+	private readonly Dictionary<int, string> _fieldIndexes = [];
 	private readonly Dictionary<string, object> _items = [];
 	private int _colIndex = 1;
 	public object this[string field]

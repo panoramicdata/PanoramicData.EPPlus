@@ -248,7 +248,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			}
 		}
 	}
-	private string AXIS_POSITION_PATH = "c:axPos/@val";
+	private readonly string AXIS_POSITION_PATH = "c:axPos/@val";
 	/// <summary>
 	/// Where the axis is located
 	/// </summary>

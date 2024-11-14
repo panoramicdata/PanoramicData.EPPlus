@@ -42,7 +42,7 @@ namespace OfficeOpenXml.Drawing.Vml;
 /// </summary>
 public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 {
-	ExcelWorksheet _worksheet;
+	readonly ExcelWorksheet _worksheet;
 	internal ExcelVmlDrawingPicture(XmlNode topNode, XmlNamespaceManager ns, ExcelWorksheet ws) :
 		base(topNode, ns)
 	{

@@ -37,7 +37,7 @@ namespace OfficeOpenXml.Style.XmlAccess;
 /// </summary>
 public sealed class ExcelNamedStyleXml : StyleXmlHelper
 {
-	ExcelStyles _styles;
+	readonly ExcelStyles _styles;
 	internal ExcelNamedStyleXml(XmlNamespaceManager nameSpaceManager, ExcelStyles styles)
 		: base(nameSpaceManager)
 	{

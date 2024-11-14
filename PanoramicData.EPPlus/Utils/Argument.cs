@@ -38,7 +38,7 @@ internal class Argument<T> : IArgument<T>
 		_value = @value;
 	}
 
-	private T _value;
+	private readonly T _value;
 
 	T IArgument<T>.Value => _value;
 }

@@ -41,7 +41,7 @@ namespace OfficeOpenXml;
 public class ExcelCommentCollection : IEnumerable, IDisposable
 {
 	//internal RangeCollection _comments;
-	List<ExcelComment> _list = [];
+	readonly List<ExcelComment> _list = [];
 	internal ExcelCommentCollection(ExcelPackage pck, ExcelWorksheet ws, XmlNamespaceManager ns)
 	{
 		CommentXml = new XmlDocument

@@ -1907,10 +1907,10 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 }
 internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 {
-	CellStore<T> _cellStore;
+	readonly CellStore<T> _cellStore;
 	int row, colPos;
 	int[] pagePos, cellPos;
-	int _startRow, _startCol, _endRow, _endCol;
+	readonly int _startRow, _startCol, _endRow, _endCol;
 	int minRow, minColPos, maxRow, maxColPos;
 	public CellsStoreEnumerator(CellStore<T> cellStore) :
 		this(cellStore, 0, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns)

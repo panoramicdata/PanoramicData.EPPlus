@@ -40,9 +40,9 @@ namespace OfficeOpenXml.Table;
 /// </summary>
 public class ExcelTableCollection : IEnumerable<ExcelTable>
 {
-	List<ExcelTable> _tables = [];
+	readonly List<ExcelTable> _tables = [];
 	internal Dictionary<string, int> _tableNames = new(StringComparer.OrdinalIgnoreCase);
-	ExcelWorksheet _ws;
+	readonly ExcelWorksheet _ws;
 	internal ExcelTableCollection(ExcelWorksheet ws)
 	{
 		var pck = ws._package.Package;

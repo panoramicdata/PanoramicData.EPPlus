@@ -47,7 +47,7 @@ public abstract class ExcelConditionalFormattingRule
 
 	#region Private Properties
 	private eExcelConditionalFormattingRuleType? _type;
-	private ExcelWorksheet _worksheet;
+	private readonly ExcelWorksheet _worksheet;
 
 	/// <summary>
 	/// Sinalize that we are in a Cnaging Priorities opeartion so that we won't enter

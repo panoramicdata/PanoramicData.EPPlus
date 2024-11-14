@@ -35,7 +35,7 @@ namespace OfficeOpenXml.Compatibility;
 /// </summary>
 public class CompatibilitySettings
 {
-	private ExcelPackage excelPackage;
+	private readonly ExcelPackage excelPackage;
 
 
 	internal CompatibilitySettings(ExcelPackage excelPackage)

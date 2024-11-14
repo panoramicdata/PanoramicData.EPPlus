@@ -7,12 +7,12 @@ namespace OfficeOpenXml.FormulaParsing.Logging;
 
 internal class TextFileLogger : IFormulaParserLogger
 {
-	private StreamWriter _sw;
+	private readonly StreamWriter _sw;
 	private const string Separator = "=================================";
 	private int _count;
-	private DateTime _startTime = DateTime.Now;
-	private Dictionary<string, int> _funcs = [];
-	private Dictionary<string, long> _funcPerformance = [];
+	private readonly DateTime _startTime = DateTime.Now;
+	private readonly Dictionary<string, int> _funcs = [];
+	private readonly Dictionary<string, long> _funcPerformance = [];
 	internal TextFileLogger(FileInfo fileInfo)
 	{
 		_sw = new StreamWriter(new FileStream(fileInfo.FullName, FileMode.Append));

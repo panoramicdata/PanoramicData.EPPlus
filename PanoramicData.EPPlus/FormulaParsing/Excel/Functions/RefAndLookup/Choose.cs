@@ -57,7 +57,7 @@ public class Choose : ExcelFunction
 
 public class ChoosenInfo : ExcelDataProvider.IRangeInfo
 {
-	private string[] chosenIndeces = null;
+	private readonly string[] chosenIndeces = null;
 
 	public ChoosenInfo(string[] chosenIndeces)
 	{

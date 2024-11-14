@@ -7,7 +7,7 @@ namespace OfficeOpenXml.Style.Dxf;
 
 public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleConditionalFormatting>
 {
-	XmlHelperInstance _helper;
+	readonly XmlHelperInstance _helper;
 	internal ExcelDxfStyleConditionalFormatting(XmlNamespaceManager nameSpaceManager, XmlNode topNode, ExcelStyles styles) : base(styles)
 	{
 		NumberFormat = new ExcelDxfNumberFormat(_styles);

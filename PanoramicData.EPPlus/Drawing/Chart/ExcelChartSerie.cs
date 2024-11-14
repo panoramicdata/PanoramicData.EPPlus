@@ -140,8 +140,8 @@ public class ExcelChartSerie : XmlHelper
 			SetXmlNodeString("c:tx/c:strRef/c:strCache/c:ptCount/@val", "0");
 		}
 	}
-	string _seriesTopPath;
-	string _seriesPath = "{0}/c:numRef/c:f";
+	readonly string _seriesTopPath;
+	readonly string _seriesPath = "{0}/c:numRef/c:f";
 	/// <summary>
 	/// Set this to a valid address or the drawing will be invalid.
 	/// </summary>
@@ -169,8 +169,8 @@ public class ExcelChartSerie : XmlHelper
 		}
 
 	}
-	string _xSeriesTopPath;
-	string _xSeriesPath = "{0}/{1}/c:f";
+	readonly string _xSeriesTopPath;
+	readonly string _xSeriesPath = "{0}/{1}/c:f";
 	/// <summary>
 	/// Set an address for the horisontal labels
 	/// </summary>

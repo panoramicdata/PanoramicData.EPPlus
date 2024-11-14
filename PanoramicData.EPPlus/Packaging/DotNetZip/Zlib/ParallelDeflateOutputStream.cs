@@ -105,7 +105,7 @@ public class ParallelDeflateOutputStream : Stream
 	private static readonly int BufferPairsPerCore = 4;
 
 	private List<WorkItem> _pool;
-	private bool _leaveOpen;
+	private readonly bool _leaveOpen;
 	private bool emitting;
 	private Stream _outStream;
 	private int _maxBufferPairs;
@@ -113,7 +113,7 @@ public class ParallelDeflateOutputStream : Stream
 	private AutoResetEvent _newlyCompressedBlob;
 	//private ManualResetEvent            _writingDone;
 	//private ManualResetEvent            _sessionReset;
-	private object _outputLock = new();
+	private readonly object _outputLock = new();
 	private bool _isClosed;
 	private bool _firstWriteDone;
 	private int _currentlyFilling;
@@ -122,14 +122,14 @@ public class ParallelDeflateOutputStream : Stream
 	private int _latestCompressed;
 	private int _Crc32;
 	private CRC32 _runningCrc;
-	private object _latestLock = new();
+	private readonly object _latestLock = new();
 	private Queue<int> _toWrite;
 	private Queue<int> _toFill;
 	private long _totalBytesProcessed;
-	private CompressionLevel _compressLevel;
+	private readonly CompressionLevel _compressLevel;
 	private volatile Exception _pendingException;
 	private bool _handlingException;
-	private object _eLock = new();  // protects _pendingException
+	private readonly object _eLock = new();  // protects _pendingException
 
 	// This bitfield is used only when Trace is defined.
 	//private TraceBits _DesiredTrace = TraceBits.Write | TraceBits.WriteBegin |
@@ -138,7 +138,7 @@ public class ParallelDeflateOutputStream : Stream
 
 	//private TraceBits _DesiredTrace = TraceBits.WriteBegin | TraceBits.WriteDone | TraceBits.Synch | TraceBits.Lifecycle  | TraceBits.Session ;
 
-	private TraceBits _DesiredTrace =
+	private readonly TraceBits _DesiredTrace =
 		TraceBits.Session |
 		TraceBits.Compress |
 		TraceBits.WriteTake |

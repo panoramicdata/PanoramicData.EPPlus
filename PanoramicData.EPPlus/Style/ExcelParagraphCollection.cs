@@ -40,8 +40,8 @@ namespace OfficeOpenXml.Style;
 /// </summary>
 public class ExcelParagraphCollection : XmlHelper, IEnumerable<ExcelParagraph>
 {
-	List<ExcelParagraph> _list = [];
-	string _path;
+	readonly List<ExcelParagraph> _list = [];
+	readonly string _path;
 	internal ExcelParagraphCollection(XmlNamespaceManager ns, XmlNode topNode, string path, string[] schemaNodeOrder) :
 		base(ns, topNode)
 	{

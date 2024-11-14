@@ -1174,7 +1174,7 @@ public sealed class ExcelPackage : IDisposable
 		//Clear the workbook so that it gets reinitialized next time
 		_workbook = null;
 	}
-	static object _lock = new();
+	static readonly object _lock = new();
 	internal int _worksheetAdd = 0;
 	/// <summary>
 	/// Copies the input stream to the output stream.

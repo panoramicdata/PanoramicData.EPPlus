@@ -41,8 +41,8 @@ namespace OfficeOpenXml.Drawing.Chart;
 /// </summary>
 public class ExcelChartTrendlineCollection : IEnumerable<ExcelChartTrendline>
 {
-	List<ExcelChartTrendline> _list = [];
-	ExcelChartSerie _serie;
+	readonly List<ExcelChartTrendline> _list = [];
+	readonly ExcelChartSerie _serie;
 	internal ExcelChartTrendlineCollection(ExcelChartSerie serie)
 	{
 		_serie = serie;

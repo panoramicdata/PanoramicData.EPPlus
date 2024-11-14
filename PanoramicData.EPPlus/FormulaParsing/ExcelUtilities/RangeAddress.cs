@@ -51,7 +51,7 @@ public class RangeAddress
 
 	public override string ToString() => Address;
 
-	private static RangeAddress _empty = new();
+	private static readonly RangeAddress _empty = new();
 	public static RangeAddress Empty => _empty;
 
 	/// <summary>

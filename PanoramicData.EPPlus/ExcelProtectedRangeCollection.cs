@@ -19,7 +19,7 @@ public class ExcelProtectedRangeCollection : XmlHelper, IEnumerable<ExcelProtect
 		}
 	}
 
-	private List<ExcelProtectedRange> _baseList = [];
+	private readonly List<ExcelProtectedRange> _baseList = [];
 
 	public ExcelProtectedRange Add(string name, ExcelAddress address)
 	{

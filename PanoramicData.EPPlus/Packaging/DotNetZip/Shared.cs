@@ -64,7 +64,7 @@ internal static class SharedUtilities
 		// It's required only on NETCF.
 		s.Flush();
 
-	private static System.Text.RegularExpressions.Regex doubleDotRegex1 =
+	private static readonly System.Text.RegularExpressions.Regex doubleDotRegex1 =
 		new(@"^(.*/)?([^/\\.]+/\\.\\./)(.+)$");
 
 	private static string SimplifyFwdSlashPath(string path)
@@ -104,8 +104,8 @@ internal static class SharedUtilities
 	}
 
 
-	static System.Text.Encoding ibm437 = System.Text.Encoding.GetEncoding("UTF-8");
-	static System.Text.Encoding utf8 = System.Text.Encoding.GetEncoding("UTF-8");
+	static readonly System.Text.Encoding ibm437 = System.Text.Encoding.GetEncoding("UTF-8");
+	static readonly System.Text.Encoding utf8 = System.Text.Encoding.GetEncoding("UTF-8");
 
 	internal static byte[] StringToByteArray(string value, System.Text.Encoding encoding)
 	{
@@ -646,10 +646,10 @@ internal static class SharedUtilities
 internal class CountingStream : Stream
 {
 	// workitem 12374: this class is now public
-	private Stream _s;
+	private readonly Stream _s;
 	private long _bytesWritten;
 	private long _bytesRead;
-	private long _initialOffset;
+	private readonly long _initialOffset;
 
 	/// <summary>
 	/// The constructor.

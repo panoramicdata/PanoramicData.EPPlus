@@ -1350,7 +1350,7 @@ public class ExcelChart : ExcelDrawing
 				? new ExcelView3D(NameSpaceManager, ChartXml.SelectSingleNode("//c:view3D", NameSpaceManager))
 				: throw (new Exception("Charttype does not support 3D"));
 	//string _groupingPath = "c:chartSpace/c:chart/c:plotArea/{0}/c:grouping/@val";
-	string _groupingPath = "c:grouping/@val";
+	readonly string _groupingPath = "c:grouping/@val";
 	public eGrouping Grouping
 	{
 		get
@@ -1363,7 +1363,7 @@ public class ExcelChart : ExcelDrawing
 		}
 	}
 	//string _varyColorsPath = "c:chartSpace/c:chart/c:plotArea/{0}/c:varyColors/@val";
-	string _varyColorsPath = "c:varyColors/@val";
+	readonly string _varyColorsPath = "c:varyColors/@val";
 	/// <summary>
 	/// If the chart has only one serie this varies the colors for each point.
 	/// </summary>

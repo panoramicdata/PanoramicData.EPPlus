@@ -30,7 +30,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 public class Subtotal : ExcelFunction
 {
-	private Dictionary<int, HiddenValuesHandlingFunction> _functions = [];
+	private readonly Dictionary<int, HiddenValuesHandlingFunction> _functions = [];
 
 	public Subtotal()
 	{

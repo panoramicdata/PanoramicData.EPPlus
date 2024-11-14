@@ -52,7 +52,7 @@ public enum eLegendPosition
 /// </summary>
 public class ExcelChartLegend : XmlHelper
 {
-	ExcelChart _chart;
+	readonly ExcelChart _chart;
 	internal ExcelChartLegend(XmlNamespaceManager ns, XmlNode node, ExcelChart chart)
 	   : base(ns, node)
 	{

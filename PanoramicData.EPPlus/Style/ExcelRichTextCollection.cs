@@ -43,8 +43,8 @@ namespace OfficeOpenXml.Style;
 /// </summary>
 public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 {
-	List<ExcelRichText> _list = [];
-	ExcelRangeBase _cells = null;
+	readonly List<ExcelRichText> _list = [];
+	readonly ExcelRangeBase _cells = null;
 	internal ExcelRichTextCollection(XmlNamespaceManager ns, XmlNode topNode) :
 		base(ns, topNode)
 	{

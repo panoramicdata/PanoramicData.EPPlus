@@ -342,7 +342,7 @@ public enum ePageOrder
 /// </summary>
 public sealed class ExcelPrinterSettings : XmlHelper
 {
-	ExcelWorksheet _ws;
+	readonly ExcelWorksheet _ws;
 	bool _marginsCreated = false;
 
 	internal ExcelPrinterSettings(XmlNamespaceManager ns, XmlNode topNode, ExcelWorksheet ws) :

@@ -3568,7 +3568,7 @@ IDisposable
 	private bool _hasBeenSaved;
 	private String _TempFileFolder;
 	private bool _ReadStreamIsOurs = true;
-	private object LOCK = new();
+	private readonly object LOCK = new();
 	private bool _saveOperationCanceled;
 	private bool _extractOperationCanceled;
 	private bool _addOperationCanceled;
@@ -3581,7 +3581,7 @@ IDisposable
 	internal bool _inExtractAll;
 	private System.Text.Encoding _alternateEncoding = System.Text.Encoding.GetEncoding("UTF-8");
 	private ZipOption _alternateEncodingUsage = ZipOption.Never;
-	private static System.Text.Encoding _defaultEncoding = System.Text.Encoding.GetEncoding("UTF-8");
+	private static readonly System.Text.Encoding _defaultEncoding = System.Text.Encoding.GetEncoding("UTF-8");
 
 	private int _BufferSize = BufferSizeDefault;
 
@@ -3591,7 +3591,7 @@ IDisposable
 
 	internal Zip64Option _zip64 = Zip64Option.Default;
 #pragma warning disable 649
-	private bool _SavingSfx;
+	private readonly bool _SavingSfx;
 #pragma warning restore 649
 
 	/// <summary>

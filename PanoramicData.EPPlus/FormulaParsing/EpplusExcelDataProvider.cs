@@ -30,11 +30,11 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 	public class RangeInfo : IRangeInfo
 	{
 		internal ExcelWorksheet _ws;
-		CellsStoreEnumerator<ExcelCoreValue> _values = null;
-		int _fromRow, _toRow, _fromCol, _toCol;
+		readonly CellsStoreEnumerator<ExcelCoreValue> _values = null;
+		readonly int _fromRow, _toRow, _fromCol, _toCol;
 		int _cellCount = 0;
-		ExcelAddressBase _address;
-		ICellInfo _cell;
+		readonly ExcelAddressBase _address;
+		readonly ICellInfo _cell;
 
 		public RangeInfo(ExcelWorksheet ws, int fromRow, int fromCol, int toRow, int toCol)
 		{
@@ -158,8 +158,8 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 
 	public class CellInfo : ICellInfo
 	{
-		ExcelWorksheet _ws;
-		CellsStoreEnumerator<ExcelCoreValue> _values;
+		readonly ExcelWorksheet _ws;
+		readonly CellsStoreEnumerator<ExcelCoreValue> _values;
 		internal CellInfo(ExcelWorksheet ws, CellsStoreEnumerator<ExcelCoreValue> values)
 		{
 			_ws = ws;
@@ -202,7 +202,7 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 
 	private readonly ExcelPackage _package;
 	private ExcelWorksheet _currentWorksheet;
-	private RangeAddressFactory _rangeAddressFactory;
+	private readonly RangeAddressFactory _rangeAddressFactory;
 	private Dictionary<ulong, INameInfo> _names = [];
 
 	public EpplusExcelDataProvider(ExcelPackage package)

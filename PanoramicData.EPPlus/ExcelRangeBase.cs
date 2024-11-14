@@ -122,10 +122,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	}
 	#endregion
 	#region Set Value Delegates        
-	private static _changeProp _setUnknownProp = SetUnknown;
-	private static _changeProp _setSingleProp = SetSingle;
-	private static _changeProp _setRangeProp = SetRange;
-	private static _changeProp _setMultiProp = SetMultiRange;
+	private static readonly _changeProp _setUnknownProp = SetUnknown;
+	private static readonly _changeProp _setSingleProp = SetSingle;
+	private static readonly _changeProp _setRangeProp = SetRange;
+	private static readonly _changeProp _setMultiProp = SetMultiRange;
 	private void SetDelegate()
 	{
 		if (_fromRow == -1)
@@ -227,12 +227,12 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	}
 	#endregion
 	#region Set property methods
-	private static _setValue _setStyleIdDelegate = Set_StyleID;
-	private static _setValue _setValueDelegate = Set_Value;
-	private static _setValue _setHyperLinkDelegate = Set_HyperLink;
-	private static _setValue _setIsRichTextDelegate = Set_IsRichText;
-	private static _setValue _setExistsCommentDelegate = Exists_Comment;
-	private static _setValue _setCommentDelegate = Set_Comment;
+	private static readonly _setValue _setStyleIdDelegate = Set_StyleID;
+	private static readonly _setValue _setValueDelegate = Set_Value;
+	private static readonly _setValue _setHyperLinkDelegate = Set_HyperLink;
+	private static readonly _setValue _setIsRichTextDelegate = Set_IsRichText;
+	private static readonly _setValue _setExistsCommentDelegate = Exists_Comment;
+	private static readonly _setValue _setCommentDelegate = Set_Comment;
 
 	private static void Set_StyleID(ExcelRangeBase range, object value, int row, int col) => range._worksheet.SetStyleInner(row, col, (int)value);
 	private static void Set_StyleName(ExcelRangeBase range, object value, int row, int col) => range._worksheet.SetStyleInner(row, col, range._styleID);

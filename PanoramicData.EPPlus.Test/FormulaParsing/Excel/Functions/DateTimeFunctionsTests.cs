@@ -14,7 +14,7 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;
 [TestClass]
 public class DateTimeFunctionsTests
 {
-	private ParsingContext _parsingContext = ParsingContext.Create();
+	private readonly ParsingContext _parsingContext = ParsingContext.Create();
 
 	private static double GetTime(int hour, int minute, int second)
 	{

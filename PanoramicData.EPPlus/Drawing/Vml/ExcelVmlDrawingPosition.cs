@@ -39,7 +39,7 @@ namespace OfficeOpenXml.Drawing.Vml;
 /// </summary>
 public class ExcelVmlDrawingPosition : XmlHelper
 {
-	int _startPos;
+	readonly int _startPos;
 	internal ExcelVmlDrawingPosition(XmlNamespaceManager ns, XmlNode topNode, int startPos) :
 		base(ns, topNode)
 	{

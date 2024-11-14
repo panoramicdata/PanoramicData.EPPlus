@@ -40,8 +40,8 @@ namespace OfficeOpenXml.Sparkline;
 /// </summary>
 public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 {
-	ExcelWorksheet _ws;
-	List<ExcelSparklineGroup> _lst;
+	readonly ExcelWorksheet _ws;
+	readonly List<ExcelSparklineGroup> _lst;
 	internal ExcelSparklineGroupCollection(ExcelWorksheet ws)
 	{
 		_ws = ws;

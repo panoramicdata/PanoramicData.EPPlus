@@ -1655,8 +1655,8 @@ public class Issues : TestBase
 		pck.Save();
 	}
 	#region Issue 44
-	private static string PIVOT_WS_NAME = "Pivot";
-	private static string DATA_WS_NAME = "Data";
+	private static readonly string PIVOT_WS_NAME = "Pivot";
+	private static readonly string DATA_WS_NAME = "Data";
 	[TestMethod, Ignore]
 	public void Issue44()
 	{
