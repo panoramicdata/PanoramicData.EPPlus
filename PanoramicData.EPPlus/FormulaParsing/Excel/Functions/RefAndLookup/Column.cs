@@ -34,7 +34,7 @@ public class Column : LookupFunction
 {
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
-		if (arguments == null || arguments.Count() == 0)
+		if (arguments == null || !arguments.Any())
 		{
 			return CreateResult(context.Scopes.Current.Address.FromCol, DataType.Integer);
 		}

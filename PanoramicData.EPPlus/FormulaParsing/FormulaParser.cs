@@ -90,7 +90,7 @@ public class FormulaParser : IDisposable
 		using var scope = _parsingContext.Scopes.NewScope(rangeAddress);
 		var tokens = _lexer.Tokenize(formula);
 		var graph = _graphBuilder.Build(tokens);
-		return graph.Expressions.Count() == 0 ? null : _compiler.Compile(graph.Expressions).Result;
+		return !graph.Expressions.Any() ? null : _compiler.Compile(graph.Expressions).Result;
 	}
 
 	internal virtual object Parse(IEnumerable<Token> tokens, string worksheet, string address)
@@ -98,7 +98,7 @@ public class FormulaParser : IDisposable
 		var rangeAddress = _parsingContext.RangeAddressFactory.Create(address);
 		using var scope = _parsingContext.Scopes.NewScope(rangeAddress);
 		var graph = _graphBuilder.Build(tokens);
-		return graph.Expressions.Count() == 0 ? null : _compiler.Compile(graph.Expressions).Result;
+		return !graph.Expressions.Any() ? null : _compiler.Compile(graph.Expressions).Result;
 	}
 	internal virtual object ParseCell(IEnumerable<Token> tokens, string worksheet, int row, int column)
 	{
@@ -106,7 +106,7 @@ public class FormulaParser : IDisposable
 		using var scope = _parsingContext.Scopes.NewScope(rangeAddress);
 		//    _parsingContext.Dependencies.AddFormulaScope(scope);
 		var graph = _graphBuilder.Build(tokens);
-		if (graph.Expressions.Count() == 0)
+		if (!graph.Expressions.Any())
 		{
 			return 0d;
 		}

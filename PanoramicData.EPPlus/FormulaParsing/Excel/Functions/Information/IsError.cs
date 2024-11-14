@@ -33,7 +33,7 @@ public class IsError : ErrorHandlingFunction
 {
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
-		if (arguments == null || arguments.Count() == 0)
+		if (arguments == null || !arguments.Any())
 		{
 			return CreateResult(false, DataType.Boolean);
 		}
