@@ -355,7 +355,7 @@ public class ExcelPivotTableField : XmlHelper
 		get
 		{
 			var v = GetXmlNodeString("@sortType");
-			return v == "" ? eSortType.None : (eSortType)Enum.Parse(typeof(eSortType), v, true);
+			return v == "" ? eSortType.None : Enum.Parse<eSortType>(v, true);
 		}
 		set
 		{
@@ -397,7 +397,7 @@ public class ExcelPivotTableField : XmlHelper
 			{
 				try
 				{
-					ret |= (eSubTotalFunctions)Enum.Parse(typeof(eSubTotalFunctions), item.Value, true);
+					ret |= Enum.Parse<eSubTotalFunctions>(item.Value, true);
 				}
 				catch (ArgumentException ex)
 				{
@@ -442,7 +442,7 @@ public class ExcelPivotTableField : XmlHelper
 			{
 				var innerXml = "";
 				var count = 0;
-				foreach (eSubTotalFunctions e in Enum.GetValues(typeof(eSubTotalFunctions)))
+				foreach (eSubTotalFunctions e in Enum.GetValues<eSubTotalFunctions>())
 				{
 					if ((value & e) == e)
 					{
@@ -671,7 +671,7 @@ public class ExcelPivotTableField : XmlHelper
 			}
 			else
 			{
-				DateGrouping = (eDateGroupBy)Enum.Parse(typeof(eDateGroupBy), groupBy.Value, true);
+				DateGrouping = Enum.Parse<eDateGroupBy>(groupBy.Value, true);
 				_grouping = new ExcelPivotTableFieldDateGroup(NameSpaceManager, groupNode);
 			}
 		}

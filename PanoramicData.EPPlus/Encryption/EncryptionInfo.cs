@@ -210,7 +210,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 				default:
 					try
 					{
-						return (eHashAlogorithm)Enum.Parse(typeof(eHashAlogorithm), v);
+						return Enum.Parse<eHashAlogorithm>(v);
 					}
 					catch
 					{
@@ -233,7 +233,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 				var v = GetXmlNodeString("@cipherChaining");
 				try
 				{
-					return (eChainingMode)Enum.Parse(typeof(eChainingMode), v);
+					return Enum.Parse<eChainingMode>(v);
 				}
 				catch
 				{
@@ -268,7 +268,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 				default:
 					try
 					{
-						return (eCipherAlgorithm)Enum.Parse(typeof(eCipherAlgorithm), v);
+						return Enum.Parse<eCipherAlgorithm>(v);
 					}
 					catch
 					{

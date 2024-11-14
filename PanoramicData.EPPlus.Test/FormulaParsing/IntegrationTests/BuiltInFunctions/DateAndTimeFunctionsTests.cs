@@ -40,14 +40,14 @@ public class DateAndTimeFunctionsTests : FormulaParserTestBase
 	public void TodayShouldReturnAResult()
 	{
 		var result = _parser.Parse("Today()");
-		Assert.IsInstanceOfType(DateTime.FromOADate((double)result), typeof(DateTime));
+		Assert.IsInstanceOfType<DateTime>(DateTime.FromOADate((double)result));
 	}
 
 	[TestMethod]
 	public void NowShouldReturnAResult()
 	{
 		var result = _parser.Parse("now()");
-		Assert.IsInstanceOfType(DateTime.FromOADate((double)result), typeof(DateTime));
+		Assert.IsInstanceOfType<DateTime>(DateTime.FromOADate((double)result));
 	}
 
 	[TestMethod]
@@ -132,28 +132,28 @@ public class DateAndTimeFunctionsTests : FormulaParserTestBase
 	public void YearfracShouldReturnAResult()
 	{
 		var result = _parser.Parse("Yearfrac(Date(2012, 4, 2), Date(2012, 5, 2))");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void IsoWeekNumShouldReturnAResult()
 	{
 		var result = _parser.Parse("IsoWeekNum(Date(2012, 4, 2))");
-		Assert.IsInstanceOfType(result, typeof(int));
+		Assert.IsInstanceOfType<int>(result);
 	}
 
 	[TestMethod]
 	public void EomonthShouldReturnAResult()
 	{
 		var result = _parser.Parse("Eomonth(Date(2013, 2, 2), 3)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void WorkdayShouldReturnAResult()
 	{
 		var result = _parser.Parse("Workday(Date(2013, 2, 2), 3)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]

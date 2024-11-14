@@ -152,9 +152,9 @@ public sealed class ExcelDrawingBorder : XmlHelper
 	}
 	private eLineStyle TranslateLineStyle(string text) => text switch
 	{
-		"dash" or "dot" or "dashDot" or "solid" => (eLineStyle)Enum.Parse(typeof(eLineStyle), text, true),
-		"lgDash" or "lgDashDot" or "lgDashDotDot" => (eLineStyle)Enum.Parse(typeof(eLineStyle), "Long" + text[2..]),
-		"sysDash" or "sysDashDot" or "sysDashDotDot" or "sysDot" => (eLineStyle)Enum.Parse(typeof(eLineStyle), "System" + text[3..]),
+		"dash" or "dot" or "dashDot" or "solid" => Enum.Parse<eLineStyle>(text, true),
+		"lgDash" or "lgDashDot" or "lgDashDotDot" => Enum.Parse<eLineStyle>("Long" + text[2..]),
+		"sysDash" or "sysDashDot" or "sysDashDotDot" or "sysDot" => Enum.Parse<eLineStyle>("System" + text[3..]),
 		_ => throw (new Exception("Invalid Linestyle")),
 	};
 	private string TranslateLineCapText(eLineCap value) => value switch

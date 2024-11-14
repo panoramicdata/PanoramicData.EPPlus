@@ -998,7 +998,7 @@ internal partial class FileSelector
 					if (tokens.Length <= i + 3)
 						throw new ArgumentException(String.Join(" ", tokens, i, tokens.Length - i));
 
-					pendingConjunction = (LogicalConjunction)Enum.Parse(typeof(LogicalConjunction), tokens[i].ToUpper(CultureInfo.InvariantCulture), true);
+					pendingConjunction = Enum.Parse<LogicalConjunction>(tokens[i].ToUpper(CultureInfo.InvariantCulture), true);
 					current = new CompoundCriterion { Left = current, Right = null, Conjunction = pendingConjunction };
 					stateStack.Push(state);
 					stateStack.Push(ParseState.ConjunctionPending);
@@ -1065,7 +1065,7 @@ internal partial class FileSelector
 					t = DateTime.SpecifyKind(t, DateTimeKind.Local).ToUniversalTime();
 					current = new TimeCriterion
 					{
-						Which = (WhichTime)Enum.Parse(typeof(WhichTime), tokens[i], true),
+						Which = Enum.Parse<WhichTime>(tokens[i], true),
 						Operator = (ComparisonOperator)EnumUtil.Parse(typeof(ComparisonOperator), tokens[i + 1]),
 						Time = t
 					};

@@ -174,7 +174,7 @@ public class ExcelProtectedRange : XmlHelper
 		get
 		{
 			var v = GetXmlNodeString("@algorithmName");
-			return (eProtectedRangeAlgorithm)Enum.Parse(typeof(eProtectedRangeAlgorithm), v.Replace("-", ""));
+			return Enum.Parse<eProtectedRangeAlgorithm>(v.Replace("-", ""));
 		}
 		set
 		{

@@ -25,7 +25,7 @@ public class ExpressionFactoryTests
 	{
 		var token = new Token("2", TokenType.Integer);
 		var expression = _factory.Create(token);
-		Assert.IsInstanceOfType(expression, typeof(IntegerExpression));
+		Assert.IsInstanceOfType<IntegerExpression>(expression);
 	}
 
 	[TestMethod]
@@ -33,7 +33,7 @@ public class ExpressionFactoryTests
 	{
 		var token = new Token("true", TokenType.Boolean);
 		var expression = _factory.Create(token);
-		Assert.IsInstanceOfType(expression, typeof(BooleanExpression));
+		Assert.IsInstanceOfType<BooleanExpression>(expression);
 	}
 
 	[TestMethod]
@@ -41,7 +41,7 @@ public class ExpressionFactoryTests
 	{
 		var token = new Token("2.5", TokenType.Decimal);
 		var expression = _factory.Create(token);
-		Assert.IsInstanceOfType(expression, typeof(DecimalExpression));
+		Assert.IsInstanceOfType<DecimalExpression>(expression);
 	}
 
 	[TestMethod]
@@ -49,7 +49,7 @@ public class ExpressionFactoryTests
 	{
 		var token = new Token("A1", TokenType.ExcelAddress);
 		var expression = _factory.Create(token);
-		Assert.IsInstanceOfType(expression, typeof(ExcelAddressExpression));
+		Assert.IsInstanceOfType<ExcelAddressExpression>(expression);
 	}
 
 	[TestMethod]
@@ -57,6 +57,6 @@ public class ExpressionFactoryTests
 	{
 		var token = new Token("NamedValue", TokenType.NameValue);
 		var expression = _factory.Create(token);
-		Assert.IsInstanceOfType(expression, typeof(NamedValueExpression));
+		Assert.IsInstanceOfType<NamedValueExpression>(expression);
 	}
 }

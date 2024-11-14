@@ -51,6 +51,6 @@ public class WorksheetRefsTest
 		sheet.Cells["A2"].Value = 2;
 		_secondSheet.Cells["A1"].Formula = "SUM('ab#k..2A1:A2')";
 		_secondSheet.Calculate();
-		Assert.IsInstanceOfType(_secondSheet.Cells["A1"].Value, typeof(ExcelErrorValue));
+		Assert.IsInstanceOfType<ExcelErrorValue>(_secondSheet.Cells["A1"].Value);
 	}
 }

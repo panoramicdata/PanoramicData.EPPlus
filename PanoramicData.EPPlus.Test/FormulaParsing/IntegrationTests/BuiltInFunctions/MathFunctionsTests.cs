@@ -99,42 +99,42 @@ public class MathFunctionsTests : FormulaParserTestBase
 	public void StdevShouldReturnAResult()
 	{
 		var result = _parser.Parse("stdev(1;2;3;4)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void StdevPShouldReturnAResult()
 	{
 		var result = _parser.Parse("stdevp(2,3,4)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void ExpShouldReturnAResult()
 	{
 		var result = _parser.Parse("exp(4)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void MaxShouldReturnAResult()
 	{
 		var result = _parser.Parse("Max(4, 5)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void MaxaShouldReturnAResult()
 	{
 		var result = _parser.Parse("Maxa(4, 5)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void MinShouldReturnAResult()
 	{
 		var result = _parser.Parse("min(4, 5)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
@@ -191,7 +191,7 @@ public class MathFunctionsTests : FormulaParserTestBase
 	public void SqrtPiShouldReturnAResult()
 	{
 		var result = _parser.Parse("SqrtPi(2.2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
@@ -205,14 +205,14 @@ public class MathFunctionsTests : FormulaParserTestBase
 	public void RandShouldReturnAResult()
 	{
 		var result = _parser.Parse("Rand()");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void RandBetweenShouldReturnAResult()
 	{
 		var result = _parser.Parse("RandBetween(1,2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
@@ -240,98 +240,98 @@ public class MathFunctionsTests : FormulaParserTestBase
 	public void VarShouldReturnAResult()
 	{
 		var result = _parser.Parse("Var(1,2,3)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void VarPShouldReturnAResult()
 	{
 		var result = _parser.Parse("VarP(1,2,3)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void ModShouldReturnAResult()
 	{
 		var result = _parser.Parse("Mod(5,2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void SubtotalShouldReturnAResult()
 	{
 		var result = _parser.Parse("Subtotal(1, 10, 20)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void TruncShouldReturnAResult()
 	{
 		var result = _parser.Parse("Trunc(1.2345)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void ProductShouldReturnAResult()
 	{
 		var result = _parser.Parse("Product(1,2,3)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void CosShouldReturnAResult()
 	{
 		var result = _parser.Parse("Cos(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void CoshShouldReturnAResult()
 	{
 		var result = _parser.Parse("Cosh(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void SinShouldReturnAResult()
 	{
 		var result = _parser.Parse("Sin(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void SinhShouldReturnAResult()
 	{
 		var result = _parser.Parse("Sinh(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void TanShouldReturnAResult()
 	{
 		var result = _parser.Parse("Tan(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void AtanShouldReturnAResult()
 	{
 		var result = _parser.Parse("Atan(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void Atan2ShouldReturnAResult()
 	{
 		var result = _parser.Parse("Atan2(2,1)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void TanhShouldReturnAResult()
 	{
 		var result = _parser.Parse("Tanh(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
@@ -345,14 +345,14 @@ public class MathFunctionsTests : FormulaParserTestBase
 	public void Log10ShouldReturnAResult()
 	{
 		var result = _parser.Parse("Log10(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]
 	public void LnShouldReturnAResult()
 	{
 		var result = _parser.Parse("Ln(2)");
-		Assert.IsInstanceOfType(result, typeof(double));
+		Assert.IsInstanceOfType<double>(result);
 	}
 
 	[TestMethod]

@@ -64,7 +64,7 @@ public class ExcelPivotTableFieldDateGroup : ExcelPivotTableFieldGroup
 		get
 		{
 			var v = GetXmlNodeString(groupByPath);
-			return v != "" ? (eDateGroupBy)Enum.Parse(typeof(eDateGroupBy), v, true) : throw (new Exception("Invalid date Groupby"));
+			return v != "" ? Enum.Parse<eDateGroupBy>(v, true) : throw (new Exception("Invalid date Groupby"));
 		}
 		private set
 		{

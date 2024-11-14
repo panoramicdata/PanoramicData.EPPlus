@@ -32,7 +32,7 @@ public class LookupNavigatorFactoryTests
 	{
 		var args = new LookupArguments(FunctionsHelper.CreateArgs(8, "A:B", 1), ParsingContext.Create());
 		var navigator = LookupNavigatorFactory.Create(LookupDirection.Horizontal, args, _context);
-		Assert.IsInstanceOfType(navigator, typeof(ExcelLookupNavigator));
+		Assert.IsInstanceOfType<ExcelLookupNavigator>(navigator);
 	}
 
 	[TestMethod]
@@ -40,6 +40,6 @@ public class LookupNavigatorFactoryTests
 	{
 		var args = new LookupArguments(FunctionsHelper.CreateArgs(8, FunctionsHelper.CreateArgs(1, 2), 1), ParsingContext.Create());
 		var navigator = LookupNavigatorFactory.Create(LookupDirection.Horizontal, args, _context);
-		Assert.IsInstanceOfType(navigator, typeof(ArrayLookupNavigator));
+		Assert.IsInstanceOfType<ArrayLookupNavigator>(navigator);
 	}
 }

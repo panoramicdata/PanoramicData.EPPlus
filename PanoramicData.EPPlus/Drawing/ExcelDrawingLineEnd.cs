@@ -170,7 +170,7 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 	private string TranslateEndStyleText(eEndStyle value) => value.ToString().ToLower();
 	private eEndStyle TranslateEndStyle(string text) => text switch
 	{
-		"none" or "arrow" or "diamond" or "oval" or "stealth" or "triangle" => (eEndStyle)Enum.Parse(typeof(eEndStyle), text, true),
+		"none" or "arrow" or "diamond" or "oval" or "stealth" or "triangle" => Enum.Parse<eEndStyle>(text, true),
 		_ => throw (new Exception("Invalid Endstyle")),
 	};
 
@@ -187,7 +187,7 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 	}
 	private eEndSize TranslateEndSize(string text) => text switch
 	{
-		"sm" or "med" or "lg" => (eEndSize)Enum.Parse(typeof(eEndSize), text, true),
+		"sm" or "med" or "lg" => Enum.Parse<eEndSize>(text, true),
 		_ => throw (new Exception("Invalid Endsize")),
 	};
 	#endregion

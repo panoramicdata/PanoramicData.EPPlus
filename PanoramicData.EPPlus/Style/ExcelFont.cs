@@ -189,7 +189,7 @@ public sealed class ExcelFont : StyleBase
 		{
 			return _styles.Fonts[Index].VerticalAlign == ""
 				? ExcelVerticalAlignmentFont.None
-				: (ExcelVerticalAlignmentFont)Enum.Parse(typeof(ExcelVerticalAlignmentFont), _styles.Fonts[Index].VerticalAlign, true);
+				: Enum.Parse<ExcelVerticalAlignmentFont>(_styles.Fonts[Index].VerticalAlign, true);
 		}
 		set
 		{

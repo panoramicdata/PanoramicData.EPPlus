@@ -187,11 +187,11 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 			else if (v == "1 1")
 			{
 				v = GetXmlNodeString(ENDCAP_PATH);
-				return (eLineStyleVml)Enum.Parse(typeof(eLineStyleVml), v, true);
+				return Enum.Parse<eLineStyleVml>(v, true);
 			}
 			else
 			{
-				return (eLineStyleVml)Enum.Parse(typeof(eLineStyleVml), v, true);
+				return Enum.Parse<eLineStyleVml>(v, true);
 			}
 		}
 		set

@@ -81,7 +81,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		align = align[..1].ToUpper(CultureInfo.InvariantCulture) + align[1..];
 		try
 		{
-			return (ExcelHorizontalAlignment)Enum.Parse(typeof(ExcelHorizontalAlignment), align);
+			return Enum.Parse<ExcelHorizontalAlignment>(align);
 		}
 		catch
 		{
@@ -95,7 +95,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		align = align[..1].ToUpper(CultureInfo.InvariantCulture) + align[1..];
 		try
 		{
-			return (ExcelVerticalAlignment)Enum.Parse(typeof(ExcelVerticalAlignment), align);
+			return Enum.Parse<ExcelVerticalAlignment>(align);
 		}
 		catch
 		{

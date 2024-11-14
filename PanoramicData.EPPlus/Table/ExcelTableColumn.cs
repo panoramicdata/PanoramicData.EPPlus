@@ -146,7 +146,7 @@ public class ExcelTableColumn : XmlHelper
 		{
 			return GetXmlNodeString("@totalsRowFunction") == ""
 				? RowFunctions.None
-				: (RowFunctions)Enum.Parse(typeof(RowFunctions), GetXmlNodeString("@totalsRowFunction"), true);
+				: Enum.Parse<RowFunctions>(GetXmlNodeString("@totalsRowFunction"), true);
 		}
 		set
 		{

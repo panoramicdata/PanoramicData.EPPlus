@@ -1123,10 +1123,10 @@ public class MathFunctionsTests
 		Assert.AreEqual(w.GetValue(2, 4), 3.5D);
 		Assert.AreEqual(w.GetValue(2, 5), 2.5D);
 
-		Assert.IsInstanceOfType(w.GetValue(3, 2), typeof(ExcelErrorValue));
-		Assert.IsInstanceOfType(w.GetValue(3, 3), typeof(ExcelErrorValue));
-		Assert.IsInstanceOfType(w.GetValue(3, 4), typeof(ExcelErrorValue));
-		Assert.IsInstanceOfType(w.GetValue(3, 5), typeof(ExcelErrorValue));
+		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 2));
+		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 3));
+		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 4));
+		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 5));
 
 		Assert.AreEqual(w.GetValue(4, 2), 1D);
 		Assert.AreEqual(w.GetValue(4, 3), 5D);

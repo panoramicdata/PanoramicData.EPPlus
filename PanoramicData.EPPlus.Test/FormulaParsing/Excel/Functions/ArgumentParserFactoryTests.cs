@@ -16,20 +16,20 @@ public class ArgumentParserFactoryTests
 	public void ShouldReturnIntArgumentParserWhenDataTypeIsInteger()
 	{
 		var parser = _parserFactory.CreateArgumentParser(DataType.Integer);
-		Assert.IsInstanceOfType(parser, typeof(IntArgumentParser));
+		Assert.IsInstanceOfType<IntArgumentParser>(parser);
 	}
 
 	[TestMethod]
 	public void ShouldReturnBoolArgumentParserWhenDataTypeIsBoolean()
 	{
 		var parser = _parserFactory.CreateArgumentParser(DataType.Boolean);
-		Assert.IsInstanceOfType(parser, typeof(BoolArgumentParser));
+		Assert.IsInstanceOfType<BoolArgumentParser>(parser);
 	}
 
 	[TestMethod]
 	public void ShouldReturnDoubleArgumentParserWhenDataTypeIsDecial()
 	{
 		var parser = _parserFactory.CreateArgumentParser(DataType.Decimal);
-		Assert.IsInstanceOfType(parser, typeof(DoubleArgumentParser));
+		Assert.IsInstanceOfType<DoubleArgumentParser>(parser);
 	}
 }

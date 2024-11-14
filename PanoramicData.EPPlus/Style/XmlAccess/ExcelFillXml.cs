@@ -60,7 +60,7 @@ public class ExcelFillXml : StyleXmlHelper
 		patternType = patternType[..1].ToUpper(CultureInfo.InvariantCulture) + patternType[1..];
 		try
 		{
-			return (ExcelFillStyle)Enum.Parse(typeof(ExcelFillStyle), patternType);
+			return Enum.Parse<ExcelFillStyle>(patternType);
 		}
 		catch
 		{
@@ -161,7 +161,7 @@ public class ExcelFillXml : StyleXmlHelper
 
 	private string SetPatternString(ExcelFillStyle pattern)
 	{
-		var newName = Enum.GetName(typeof(ExcelFillStyle), pattern);
+		var newName = Enum.GetName(pattern);
 		return newName[..1].ToLower(CultureInfo.InvariantCulture) + newName[1..];
 	}
 }

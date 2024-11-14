@@ -329,7 +329,7 @@ public class ExcelSparklineGroup : XmlHelper
 		get
 		{
 			var s = GetXmlNodeString(_dispBlanksAsPath);
-			return string.IsNullOrEmpty(s) ? eDispBlanksAs.Zero : (eDispBlanksAs)Enum.Parse(typeof(eDispBlanksAs), s, true);
+			return string.IsNullOrEmpty(s) ? eDispBlanksAs.Zero : Enum.Parse<eDispBlanksAs>(s, true);
 		}
 		set
 		{
@@ -345,7 +345,7 @@ public class ExcelSparklineGroup : XmlHelper
 		get
 		{
 			var type = GetXmlNodeString(_typePath);
-			return string.IsNullOrEmpty(type) ? eSparklineType.Line : (eSparklineType)Enum.Parse(typeof(eSparklineType), type, true);
+			return string.IsNullOrEmpty(type) ? eSparklineType.Line : Enum.Parse<eSparklineType>(type, true);
 		}
 		set
 		{
@@ -474,7 +474,7 @@ public class ExcelSparklineGroup : XmlHelper
 			var s = GetXmlNodeString(_minAxisTypePath);
 			return string.IsNullOrEmpty(s)
 				? eSparklineAxisMinMax.Individual
-				: (eSparklineAxisMinMax)Enum.Parse(typeof(eSparklineAxisMinMax), s, true);
+				: Enum.Parse<eSparklineAxisMinMax>(s, true);
 		}
 		set
 		{
@@ -497,7 +497,7 @@ public class ExcelSparklineGroup : XmlHelper
 			var s = GetXmlNodeString(_maxAxisTypePath);
 			return string.IsNullOrEmpty(s)
 				? eSparklineAxisMinMax.Individual
-				: (eSparklineAxisMinMax)Enum.Parse(typeof(eSparklineAxisMinMax), s, true);
+				: Enum.Parse<eSparklineAxisMinMax>(s, true);
 		}
 		set
 		{

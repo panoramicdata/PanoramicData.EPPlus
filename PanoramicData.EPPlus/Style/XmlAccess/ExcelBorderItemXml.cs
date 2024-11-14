@@ -65,7 +65,7 @@ public sealed class ExcelBorderItemXml : StyleXmlHelper
 		var sInStyle = style[..1].ToUpper(CultureInfo.InvariantCulture) + style[1..];
 		try
 		{
-			return (ExcelBorderStyle)Enum.Parse(typeof(ExcelBorderStyle), sInStyle);
+			return Enum.Parse<ExcelBorderStyle>(sInStyle);
 		}
 		catch
 		{
@@ -136,7 +136,7 @@ public sealed class ExcelBorderItemXml : StyleXmlHelper
 
 	private string SetBorderString(ExcelBorderStyle Style)
 	{
-		var newName = Enum.GetName(typeof(ExcelBorderStyle), Style);
+		var newName = Enum.GetName(Style);
 		return newName[..1].ToLower(CultureInfo.InvariantCulture) + newName[1..];
 	}
 	public bool Exists { get; private set; }

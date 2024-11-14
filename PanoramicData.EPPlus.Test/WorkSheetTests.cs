@@ -265,24 +265,24 @@ public class WorkSheetTest : TestBase
 			Assert.AreEqual(ws.Cells["Y20"].GetValue<bool>(), true);
 			Assert.AreEqual(ws.Cells["Y20"].GetValue<bool?>(), true);
 
-			Assert.IsInstanceOfType(GetValueException<DateTime>(ws.Cells["Y20"]), typeof(InvalidCastException));
-			Assert.IsInstanceOfType(GetValueException<DateTime?>(ws.Cells["Y20"]), typeof(InvalidCastException));
-			Assert.IsInstanceOfType(GetValueException<TimeSpan>(ws.Cells["Y20"]), typeof(InvalidCastException));
-			Assert.IsInstanceOfType(GetValueException<TimeSpan?>(ws.Cells["Y20"]), typeof(InvalidCastException));
+			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<DateTime>(ws.Cells["Y20"]));
+			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<DateTime?>(ws.Cells["Y20"]));
+			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<TimeSpan>(ws.Cells["Y20"]));
+			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<TimeSpan?>(ws.Cells["Y20"]));
 
 			Assert.AreEqual(ws.Cells["Z20"].GetValue<string>(), "Text2");
-			Assert.IsInstanceOfType(GetValueException<int>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<int?>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<double>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<double?>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<decimal>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<decimal?>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<bool>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<bool?>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<DateTime>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<DateTime?>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<TimeSpan>(ws.Cells["Z20"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<TimeSpan?>(ws.Cells["Z20"]), typeof(FormatException));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<int>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<int?>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<double>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<double?>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<decimal>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<decimal?>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<bool>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<bool?>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime?>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<TimeSpan>(ws.Cells["Z20"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<TimeSpan?>(ws.Cells["Z20"]));
 			Assert.AreEqual(ws.Cells["Z20"].Text, "Text2");
 
 			// even though value is set as integer, it is stored/exposed by EPPlust as double; feature?
@@ -303,7 +303,7 @@ public class WorkSheetTest : TestBase
 			Assert.IsNull(GetValueException<TimeSpan?>(ws.Cells["X19"]));
 			Assert.AreEqual(ws.Cells["X19"].Text, "210");
 
-			Assert.IsInstanceOfType(ws.Cells["AA19"].Value, typeof(string));
+			Assert.IsInstanceOfType<string>(ws.Cells["AA19"].Value);
 			Assert.AreEqual(ws.Cells["AA19"].GetValue<string>(), "210");
 			Assert.AreEqual(ws.Cells["AA19"].GetValue<int>(), 210);
 			Assert.AreEqual(ws.Cells["AA19"].GetValue<int?>(), 210);
@@ -311,22 +311,22 @@ public class WorkSheetTest : TestBase
 			Assert.AreEqual(ws.Cells["AA19"].GetValue<double?>(), 210d);
 			Assert.AreEqual(ws.Cells["AA19"].GetValue<decimal>(), 210m);
 			Assert.AreEqual(ws.Cells["AA19"].GetValue<decimal?>(), 210m);
-			Assert.IsInstanceOfType(GetValueException<bool>(ws.Cells["AA19"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<bool?>(ws.Cells["AA19"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<DateTime>(ws.Cells["AA19"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<DateTime?>(ws.Cells["AA19"]), typeof(FormatException));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<bool>(ws.Cells["AA19"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<bool?>(ws.Cells["AA19"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime>(ws.Cells["AA19"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime?>(ws.Cells["AA19"]));
 			Assert.AreEqual(TimeSpan.FromDays(210), ws.Cells["AA19"].GetValue<TimeSpan>());
 			Assert.AreEqual(TimeSpan.FromDays(210), ws.Cells["AA19"].GetValue<TimeSpan?>());
 			Assert.AreEqual(ws.Cells["AA19"].Text, "210");
 
 			// blank string produces null for nullable primitive types and conversion to non-nullable types throws FormatException
-			Assert.IsInstanceOfType(ws.Cells["AA18"].Value, typeof(string));
-			Assert.IsInstanceOfType(GetValueException<int>(ws.Cells["AA18"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<double>(ws.Cells["AA18"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<decimal>(ws.Cells["AA18"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<bool>(ws.Cells["AA18"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<DateTime>(ws.Cells["AA18"]), typeof(FormatException));
-			Assert.IsInstanceOfType(GetValueException<TimeSpan>(ws.Cells["AA18"]), typeof(FormatException));
+			Assert.IsInstanceOfType<string>(ws.Cells["AA18"].Value);
+			Assert.IsInstanceOfType<FormatException>(GetValueException<int>(ws.Cells["AA18"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<double>(ws.Cells["AA18"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<decimal>(ws.Cells["AA18"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<bool>(ws.Cells["AA18"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime>(ws.Cells["AA18"]));
+			Assert.IsInstanceOfType<FormatException>(GetValueException<TimeSpan>(ws.Cells["AA18"]));
 
 			Assert.IsNull(GetValueException<int?>(ws.Cells["AA18"]));
 			Assert.IsNull(GetValueException<double?>(ws.Cells["AA18"]));

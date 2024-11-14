@@ -75,7 +75,7 @@ public sealed class ExcelFontXml : StyleXmlHelper
 			}
 			else
 			{
-				_underlineType = (ExcelUnderLineType)Enum.Parse(typeof(ExcelUnderLineType), ut, true);
+				_underlineType = Enum.Parse<ExcelUnderLineType>(ut, true);
 			}
 		}
 		else

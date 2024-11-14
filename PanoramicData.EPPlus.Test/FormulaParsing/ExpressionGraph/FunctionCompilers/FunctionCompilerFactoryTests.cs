@@ -27,7 +27,7 @@ public class FunctionCompilerFactoryTests
 		var functionCompilerFactory = new FunctionCompilerFactory(functionRepository, _context);
 		var function = new Sum();
 		var functionCompiler = functionCompilerFactory.Create(function);
-		Assert.IsInstanceOfType(functionCompiler, typeof(DefaultCompiler));
+		Assert.IsInstanceOfType<DefaultCompiler>(functionCompiler);
 	}
 
 	[TestMethod]
@@ -37,7 +37,7 @@ public class FunctionCompilerFactoryTests
 		var functionCompilerFactory = new FunctionCompilerFactory(functionRepository, _context);
 		var function = new If();
 		var functionCompiler = functionCompilerFactory.Create(function);
-		Assert.IsInstanceOfType(functionCompiler, typeof(IfFunctionCompiler));
+		Assert.IsInstanceOfType<IfFunctionCompiler>(functionCompiler);
 	}
 
 	[TestMethod]
@@ -47,7 +47,7 @@ public class FunctionCompilerFactoryTests
 		var functionCompilerFactory = new FunctionCompilerFactory(functionRepository, _context);
 		var function = new IfError();
 		var functionCompiler = functionCompilerFactory.Create(function);
-		Assert.IsInstanceOfType(functionCompiler, typeof(IfErrorFunctionCompiler));
+		Assert.IsInstanceOfType<IfErrorFunctionCompiler>(functionCompiler);
 	}
 
 	[TestMethod]
@@ -57,7 +57,7 @@ public class FunctionCompilerFactoryTests
 		var functionCompilerFactory = new FunctionCompilerFactory(functionRepository, _context);
 		var function = new IfNa();
 		var functionCompiler = functionCompilerFactory.Create(function);
-		Assert.IsInstanceOfType(functionCompiler, typeof(IfNaFunctionCompiler));
+		Assert.IsInstanceOfType<IfNaFunctionCompiler>(functionCompiler);
 	}
 
 	[TestMethod]
@@ -67,7 +67,7 @@ public class FunctionCompilerFactoryTests
 		var functionCompilerFactory = new FunctionCompilerFactory(functionRepository, _context);
 		var function = new Column();
 		var functionCompiler = functionCompilerFactory.Create(function);
-		Assert.IsInstanceOfType(functionCompiler, typeof(LookupFunctionCompiler));
+		Assert.IsInstanceOfType<LookupFunctionCompiler>(functionCompiler);
 	}
 
 	[TestMethod]
@@ -77,7 +77,7 @@ public class FunctionCompilerFactoryTests
 		var functionCompilerFactory = new FunctionCompilerFactory(functionRepository, _context);
 		var function = new IsError();
 		var functionCompiler = functionCompilerFactory.Create(function);
-		Assert.IsInstanceOfType(functionCompiler, typeof(ErrorHandlingFunctionCompiler));
+		Assert.IsInstanceOfType<ErrorHandlingFunctionCompiler>(functionCompiler);
 	}
 
 	[TestMethod]
@@ -88,7 +88,7 @@ public class FunctionCompilerFactoryTests
 		var functionCompilerFactory = new FunctionCompilerFactory(functionRepository, _context);
 		var function = new MyFunction();
 		var functionCompiler = functionCompilerFactory.Create(function);
-		Assert.IsInstanceOfType(functionCompiler, typeof(MyFunctionCompiler));
+		Assert.IsInstanceOfType<MyFunctionCompiler>(functionCompiler);
 	}
 	#endregion
 

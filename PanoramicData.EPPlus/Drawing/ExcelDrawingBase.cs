@@ -251,7 +251,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 			try
 			{
 				var s = GetXmlNodeString("@editAs");
-				return s == "" ? eEditAs.TwoCell : (eEditAs)Enum.Parse(typeof(eEditAs), s, true);
+				return s == "" ? eEditAs.TwoCell : Enum.Parse<eEditAs>(s, true);
 			}
 			catch
 			{

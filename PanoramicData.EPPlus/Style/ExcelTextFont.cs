@@ -226,7 +226,7 @@ public class ExcelTextFont : XmlHelper
 		"sng" => eUnderLineType.Single,
 		"dbl" => eUnderLineType.Double,
 		"" => eUnderLineType.None,
-		_ => (eUnderLineType)Enum.Parse(typeof(eUnderLineType), text),
+		_ => Enum.Parse<eUnderLineType>(text),
 	};
 	private string TranslateUnderlineText(eUnderLineType value)
 	{

@@ -293,7 +293,7 @@ public sealed class ExcelShape : ExcelDrawing
 			var v = GetXmlNodeString(ShapeStylePath);
 			try
 			{
-				return (eShapeStyle)Enum.Parse(typeof(eShapeStyle), v, true);
+				return Enum.Parse<eShapeStyle>(v, true);
 			}
 			catch
 			{

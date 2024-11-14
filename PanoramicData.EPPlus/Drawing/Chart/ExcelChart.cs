@@ -1146,7 +1146,7 @@ public class ExcelChart : ExcelDrawing
 			}
 			else
 			{
-				return (eDisplayBlanksAs)Enum.Parse(typeof(eDisplayBlanksAs), v, true);
+				return Enum.Parse<eDisplayBlanksAs>(v, true);
 			}
 		}
 		set

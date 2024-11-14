@@ -61,7 +61,7 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 		var sInStyle = style[..1].ToUpper(CultureInfo.InvariantCulture) + style[1..];
 		try
 		{
-			return (ExcelBorderStyle)Enum.Parse(typeof(ExcelBorderStyle), sInStyle);
+			return Enum.Parse<ExcelBorderStyle>(sInStyle);
 		}
 		catch
 		{
@@ -75,7 +75,7 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 		patternType = patternType[..1].ToUpper(CultureInfo.InvariantCulture) + patternType[1..];
 		try
 		{
-			return (ExcelFillStyle)Enum.Parse(typeof(ExcelFillStyle), patternType);
+			return Enum.Parse<ExcelFillStyle>(patternType);
 		}
 		catch
 		{

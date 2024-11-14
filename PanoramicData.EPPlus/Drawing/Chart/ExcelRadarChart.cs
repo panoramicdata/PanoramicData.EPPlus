@@ -84,7 +84,7 @@ public class ExcelRadarChart : ExcelChart
 		get
 		{
 			var v = _chartXmlHelper.GetXmlNodeString(STYLE_PATH);
-			return string.IsNullOrEmpty(v) ? eRadarStyle.Standard : (eRadarStyle)Enum.Parse(typeof(eRadarStyle), v, true);
+			return string.IsNullOrEmpty(v) ? eRadarStyle.Standard : Enum.Parse<eRadarStyle>(v, true);
 		}
 		set
 		{

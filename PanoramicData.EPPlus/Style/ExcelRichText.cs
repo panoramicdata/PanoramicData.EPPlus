@@ -224,7 +224,7 @@ public class ExcelRichText : XmlHelper
 			{
 				try
 				{
-					return (ExcelVerticalAlignmentFont)Enum.Parse(typeof(ExcelVerticalAlignmentFont), v, true);
+					return Enum.Parse<ExcelVerticalAlignmentFont>(v, true);
 				}
 				catch
 				{

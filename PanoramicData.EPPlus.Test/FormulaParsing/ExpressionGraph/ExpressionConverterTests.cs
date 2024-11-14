@@ -18,7 +18,7 @@ public class ExpressionConverterTests
 	{
 		var integerExpression = new IntegerExpression("2");
 		var result = _converter.ToStringExpression(integerExpression);
-		Assert.IsInstanceOfType(result, typeof(StringExpression));
+		Assert.IsInstanceOfType<StringExpression>(result);
 		Assert.AreEqual("2", result.Compile().Result);
 	}
 
@@ -38,7 +38,7 @@ public class ExpressionConverterTests
 	{
 		var decimalExpression = new DecimalExpression("2.5");
 		var result = _converter.ToStringExpression(decimalExpression);
-		Assert.IsInstanceOfType(result, typeof(StringExpression));
+		Assert.IsInstanceOfType<StringExpression>(result);
 		Assert.AreEqual($"2{CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}5", result.Compile().Result);
 	}
 
@@ -47,7 +47,7 @@ public class ExpressionConverterTests
 	{
 		var compileResult = new CompileResult(1, DataType.Integer);
 		var result = _converter.FromCompileResult(compileResult);
-		Assert.IsInstanceOfType(result, typeof(IntegerExpression));
+		Assert.IsInstanceOfType<IntegerExpression>(result);
 		Assert.AreEqual(1d, result.Compile().Result);
 	}
 
@@ -56,7 +56,7 @@ public class ExpressionConverterTests
 	{
 		var compileResult = new CompileResult("abc", DataType.String);
 		var result = _converter.FromCompileResult(compileResult);
-		Assert.IsInstanceOfType(result, typeof(StringExpression));
+		Assert.IsInstanceOfType<StringExpression>(result);
 		Assert.AreEqual("abc", result.Compile().Result);
 	}
 
@@ -65,7 +65,7 @@ public class ExpressionConverterTests
 	{
 		var compileResult = new CompileResult(2.5d, DataType.Decimal);
 		var result = _converter.FromCompileResult(compileResult);
-		Assert.IsInstanceOfType(result, typeof(DecimalExpression));
+		Assert.IsInstanceOfType<DecimalExpression>(result);
 		Assert.AreEqual(2.5d, result.Compile().Result);
 	}
 
@@ -74,7 +74,7 @@ public class ExpressionConverterTests
 	{
 		var compileResult = new CompileResult("true", DataType.Boolean);
 		var result = _converter.FromCompileResult(compileResult);
-		Assert.IsInstanceOfType(result, typeof(BooleanExpression));
+		Assert.IsInstanceOfType<BooleanExpression>(result);
 		Assert.IsTrue((bool)result.Compile().Result);
 	}
 }

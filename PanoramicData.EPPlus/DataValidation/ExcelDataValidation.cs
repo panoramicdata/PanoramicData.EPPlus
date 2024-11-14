@@ -234,7 +234,7 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 		{
 			var operatorString = GetXmlNodeString(_operatorPath);
 			return !string.IsNullOrEmpty(operatorString)
-				? (ExcelDataValidationOperator)Enum.Parse(typeof(ExcelDataValidationOperator), operatorString)
+				? Enum.Parse<ExcelDataValidationOperator>(operatorString)
 				: default;
 		}
 		set
@@ -257,7 +257,7 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 		{
 			var errorStyleString = GetXmlNodeString(_errorStylePath);
 			return !string.IsNullOrEmpty(errorStyleString)
-				? (ExcelDataValidationWarningStyle)Enum.Parse(typeof(ExcelDataValidationWarningStyle), errorStyleString)
+				? Enum.Parse<ExcelDataValidationWarningStyle>(errorStyleString)
 				: ExcelDataValidationWarningStyle.undefined;
 		}
 		set

@@ -16,7 +16,7 @@ public class EnumerableExpressionTests
 		expression.AddChild(new IntegerExpression("3"));
 		var result = expression.Compile();
 
-		Assert.IsInstanceOfType(result.Result, typeof(IEnumerable<object>));
+		Assert.IsInstanceOfType<IEnumerable<object>>(result.Result);
 		var resultList = (IEnumerable<object>)result.Result;
 		Assert.AreEqual(2d, resultList.ElementAt(0));
 		Assert.AreEqual(3d, resultList.ElementAt(1));

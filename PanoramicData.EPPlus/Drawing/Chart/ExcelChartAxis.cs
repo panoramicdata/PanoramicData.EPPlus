@@ -186,7 +186,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				try
 				{
-					return (eAxisTickMark)Enum.Parse(typeof(eAxisTickMark), v);
+					return Enum.Parse<eAxisTickMark>(v);
 				}
 				catch
 				{
@@ -218,7 +218,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				try
 				{
-					return (eAxisTickMark)Enum.Parse(typeof(eAxisTickMark), v);
+					return Enum.Parse<eAxisTickMark>(v);
 				}
 				catch
 				{
@@ -240,7 +240,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		{
 			try
 			{
-				return (eAxisType)Enum.Parse(typeof(eAxisType), TopNode.LocalName[..3], true);
+				return Enum.Parse<eAxisType>(TopNode.LocalName[..3], true);
 			}
 			catch
 			{
@@ -286,7 +286,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				try
 				{
-					return (eCrosses)Enum.Parse(typeof(eCrosses), v, true);
+					return Enum.Parse<eCrosses>(v, true);
 				}
 				catch
 				{
@@ -319,7 +319,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				try
 				{
-					return (eCrossBetween)Enum.Parse(typeof(eCrossBetween), v, true);
+					return Enum.Parse<eCrossBetween>(v, true);
 				}
 				catch
 				{
@@ -409,7 +409,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				try
 				{
-					return (eTickLabelPosition)Enum.Parse(typeof(eTickLabelPosition), v, true);
+					return Enum.Parse<eTickLabelPosition>(v, true);
 				}
 				catch
 				{
@@ -494,7 +494,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		get
 		{
 			var v = GetXmlNodeString(_ticLblPos_Path);
-			return v == "" ? eTickLabelPosition.None : (eTickLabelPosition)Enum.Parse(typeof(eTickLabelPosition), v, true);
+			return v == "" ? eTickLabelPosition.None : Enum.Parse<eTickLabelPosition>(v, true);
 		}
 		set
 		{
@@ -519,7 +519,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				try
 				{
-					return (double)(long)Enum.Parse(typeof(eBuildInUnits), v, true);
+					return (double)(long)Enum.Parse<eBuildInUnits>(v, true);
 				}
 				catch
 				{
@@ -531,7 +531,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		{
 			if (AxisType == eAxisType.Val && value >= 0)
 			{
-				foreach (var v in Enum.GetValues(typeof(eBuildInUnits)))
+				foreach (var v in Enum.GetValues<eBuildInUnits>())
 				{
 					if ((double)(long)v == value)
 					{
@@ -780,7 +780,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		get
 		{
 			var v = GetXmlNodeString(_orientationPath);
-			return v == "" ? eAxisOrientation.MinMax : (eAxisOrientation)Enum.Parse(typeof(eAxisOrientation), v, true);
+			return v == "" ? eAxisOrientation.MinMax : Enum.Parse<eAxisOrientation>(v, true);
 		}
 		set
 		{

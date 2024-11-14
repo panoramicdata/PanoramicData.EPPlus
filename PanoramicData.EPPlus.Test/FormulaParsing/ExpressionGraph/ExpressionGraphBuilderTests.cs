@@ -95,7 +95,7 @@ public class ExpressionGraphBuilderTests
 		};
 		var result = _graphBuilder.Build(tokens);
 
-		Assert.IsInstanceOfType(result.Expressions.First(), typeof(GroupExpression));
+		Assert.IsInstanceOfType<GroupExpression>(result.Expressions.First());
 		Assert.AreEqual(2, result.Expressions.First().Children.Count());
 	}
 
@@ -115,7 +115,7 @@ public class ExpressionGraphBuilderTests
 		var result = _graphBuilder.Build(tokens);
 
 		Assert.IsNotNull(result.Expressions.First().Next);
-		Assert.IsInstanceOfType(result.Expressions.First().Next, typeof(IntegerExpression));
+		Assert.IsInstanceOfType<IntegerExpression>(result.Expressions.First().Next);
 
 	}
 
@@ -132,7 +132,7 @@ public class ExpressionGraphBuilderTests
 		var result = _graphBuilder.Build(tokens);
 
 		Assert.AreEqual(1, result.Expressions.Count());
-		Assert.IsInstanceOfType(result.Expressions.First(), typeof(FunctionExpression));
+		Assert.IsInstanceOfType<FunctionExpression>(result.Expressions.First());
 	}
 
 	[TestMethod]
@@ -148,8 +148,8 @@ public class ExpressionGraphBuilderTests
 		var result = _graphBuilder.Build(tokens);
 
 		Assert.AreEqual(1, result.Expressions.First().Children.Count());
-		Assert.IsInstanceOfType(result.Expressions.First().Children.First(), typeof(GroupExpression));
-		Assert.IsInstanceOfType(result.Expressions.First().Children.First().Children.First(), typeof(IntegerExpression));
+		Assert.IsInstanceOfType<GroupExpression>(result.Expressions.First().Children.First());
+		Assert.IsInstanceOfType<IntegerExpression>(result.Expressions.First().Children.First().Children.First());
 		Assert.AreEqual(2d, result.Expressions.First().Children.First().Compile().Result);
 	}
 
@@ -223,11 +223,11 @@ public class ExpressionGraphBuilderTests
 
 		var result = _graphBuilder.Build(tokens);
 		var funcArgExpression = result.Expressions.First().Children.First();
-		Assert.IsInstanceOfType(funcArgExpression, typeof(FunctionArgumentExpression));
+		Assert.IsInstanceOfType<FunctionArgumentExpression>(funcArgExpression);
 
 		var enumerableExpression = funcArgExpression.Children.First();
 
-		Assert.IsInstanceOfType(enumerableExpression, typeof(EnumerableExpression));
+		Assert.IsInstanceOfType<EnumerableExpression>(enumerableExpression);
 		Assert.AreEqual(2, enumerableExpression.Children.Count(), "Enumerable.Count was not 2");
 	}
 
@@ -291,6 +291,6 @@ public class ExpressionGraphBuilderTests
 		};
 
 		var result = _graphBuilder.Build(tokens);
-		Assert.IsInstanceOfType(result.Expressions.First(), typeof(ExcelAddressExpression));
+		Assert.IsInstanceOfType<ExcelAddressExpression>(result.Expressions.First());
 	}
 }

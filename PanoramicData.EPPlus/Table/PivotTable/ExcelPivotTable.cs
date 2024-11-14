@@ -895,7 +895,7 @@ public class ExcelPivotTable : XmlHelper
 			{
 				try
 				{
-					_tableStyle = (TableStyles)Enum.Parse(typeof(TableStyles), value[10..], true);
+					_tableStyle = Enum.Parse<TableStyles>(value[10..], true);
 				}
 				catch
 				{

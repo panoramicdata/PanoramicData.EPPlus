@@ -456,7 +456,7 @@ public sealed class ExcelPrinterSettings : XmlHelper
 	{
 		get
 		{
-			return (eOrientation)Enum.Parse(typeof(eOrientation), GetXmlNodeString(_orientationPath), true);
+			return Enum.Parse<eOrientation>(GetXmlNodeString(_orientationPath), true);
 		}
 		set
 		{

@@ -175,7 +175,7 @@ public class ExcelPivotTableDataField : XmlHelper
 		get
 		{
 			var s = GetXmlNodeString("@subtotal");
-			return s == "" ? DataFieldFunctions.None : (DataFieldFunctions)Enum.Parse(typeof(DataFieldFunctions), s, true);
+			return s == "" ? DataFieldFunctions.None : Enum.Parse<DataFieldFunctions>(s, true);
 		}
 		set
 		{

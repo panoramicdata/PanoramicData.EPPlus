@@ -74,7 +74,7 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 		get
 		{
 			var marker = GetXmlNodeString(markerPath);
-			return marker == "" ? eMarkerStyle.None : (eMarkerStyle)Enum.Parse(typeof(eMarkerStyle), marker, true);
+			return marker == "" ? eMarkerStyle.None : Enum.Parse<eMarkerStyle>(marker, true);
 		}
 		set
 		{

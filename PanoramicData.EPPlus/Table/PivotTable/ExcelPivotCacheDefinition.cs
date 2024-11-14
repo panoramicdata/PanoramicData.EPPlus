@@ -256,7 +256,7 @@ public class ExcelPivotCacheDefinition : XmlHelper
 		get
 		{
 			var s = GetXmlNodeString("d:cacheSource/@type");
-			return s == "" ? eSourceType.Worksheet : (eSourceType)Enum.Parse(typeof(eSourceType), s, true);
+			return s == "" ? eSourceType.Worksheet : Enum.Parse<eSourceType>(s, true);
 		}
 	}
 	private string GetStartXml(ExcelRangeBase sourceAddress)
