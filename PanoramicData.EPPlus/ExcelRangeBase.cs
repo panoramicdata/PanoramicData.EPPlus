@@ -1031,13 +1031,13 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			return d.Minute.ToString();
 		}
-		else if (format.ToLower() == "y" || format.ToLower() == "yy")
+		else if (format.ToLower() is "y" or "yy")
 		{
 			return d.ToString("yy", nf.Culture);
 		}
 		else
 		{
-			return format.ToLower() == "yyy" || format.ToLower() == "yyyy" ? d.ToString("yyy", nf.Culture) : d.ToString(format, nf.Culture);
+			return format.ToLower() is "yyy" or "yyyy" ? d.ToString("yyy", nf.Culture) : d.ToString(format, nf.Culture);
 		}
 
 	}

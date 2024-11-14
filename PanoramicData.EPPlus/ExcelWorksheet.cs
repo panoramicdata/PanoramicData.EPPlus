@@ -298,7 +298,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				if (!used.Contains(v) && _list[v] != null)
 				{
 					var adr = new ExcelAddressBase(_list[v]);
-					if (!(Destination.Collide(adr) == ExcelAddressBase.eAddressCollition.Inside || Destination.Collide(adr) == ExcelAddressBase.eAddressCollition.Equal))
+					if (Destination.Collide(adr) is not (ExcelAddressBase.eAddressCollition.Inside or ExcelAddressBase.eAddressCollition.Equal))
 					{
 						throw (new InvalidOperationException(string.Format("Can't delete/overwrite merged cells. A range is partly merged with the another merged range. {0}", adr._address)));
 					}
@@ -1068,11 +1068,11 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					{
 						ColumnMax = int.Parse(xr.GetAttribute("max")),
 						Width = xr.GetAttribute("width") == null ? 0 : double.Parse(xr.GetAttribute("width"), CultureInfo.InvariantCulture),
-						BestFit = xr.GetAttribute("bestFit") != null && xr.GetAttribute("bestFit") == "1",
-						Collapsed = xr.GetAttribute("collapsed") != null && xr.GetAttribute("collapsed") == "1",
-						Phonetic = xr.GetAttribute("phonetic") != null && xr.GetAttribute("phonetic") == "1",
+						BestFit = xr.GetAttribute("bestFit") is not null and "1",
+						Collapsed = xr.GetAttribute("collapsed") is not null and "1",
+						Phonetic = xr.GetAttribute("phonetic") is not null and "1",
 						OutlineLevel = (short)(xr.GetAttribute("outlineLevel") == null ? 0 : int.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture)),
-						Hidden = xr.GetAttribute("hidden") != null && xr.GetAttribute("hidden") == "1"
+						Hidden = xr.GetAttribute("hidden") is not null and "1"
 					};
 					SetValueInner(0, min, col);
 
@@ -1420,12 +1420,12 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <returns></returns>
 	private static RowInternal AddRow(XmlReader xr, int row) => new()
 	{
-		Collapsed = (xr.GetAttribute("collapsed") != null && xr.GetAttribute("collapsed") == "1"),
+		Collapsed = (xr.GetAttribute("collapsed") is not null and "1"),
 		OutlineLevel = (xr.GetAttribute("outlineLevel") == null ? (short)0 : short.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture)),
 		Height = (xr.GetAttribute("ht") == null ? -1 : double.Parse(xr.GetAttribute("ht"), CultureInfo.InvariantCulture)),
-		Hidden = (xr.GetAttribute("hidden") != null && xr.GetAttribute("hidden") == "1"),
-		Phonetic = xr.GetAttribute("ph") != null && xr.GetAttribute("ph") == "1",
-		CustomHeight = xr.GetAttribute("customHeight") != null && xr.GetAttribute("customHeight") == "1"
+		Hidden = (xr.GetAttribute("hidden") is not null and "1"),
+		Phonetic = xr.GetAttribute("ph") is not null and "1",
+		CustomHeight = xr.GetAttribute("customHeight") is not null and "1"
 	};
 
 	private void SetValueFromXml(XmlReader xr, string type, int styleID, int row, int col)
