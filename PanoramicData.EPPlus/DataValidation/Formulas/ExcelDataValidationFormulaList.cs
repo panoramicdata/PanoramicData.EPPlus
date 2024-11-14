@@ -29,13 +29,13 @@
  * Mats Alm   		                Added       		        2011-01-08
  * Jan Källman		    License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
+using OfficeOpenXml.DataValidation.Formulas.Contracts;
+using OfficeOpenXml.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using OfficeOpenXml.Utils;
-using OfficeOpenXml.DataValidation.Formulas.Contracts;
-using System.Collections;
 
 namespace OfficeOpenXml.DataValidation.Formulas;
 
@@ -194,7 +194,7 @@ internal class ExcelDataValidationFormulaList : ExcelDataValidationFormula, IExc
 		{
 			if (sb.Length == 0)
 			{
-				sb.Append("\"");
+				sb.Append('"');
 				sb.Append(val);
 			}
 			else
@@ -203,7 +203,7 @@ internal class ExcelDataValidationFormulaList : ExcelDataValidationFormula, IExc
 			}
 		}
 
-		sb.Append("\"");
+		sb.Append('"');
 		return sb.ToString();
 	}
 

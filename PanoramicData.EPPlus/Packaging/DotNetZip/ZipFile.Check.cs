@@ -337,7 +337,7 @@ internal partial class ZipFile
 				builder.Append(string.Format("      CD64 offset: 0x{0:X16}\n", _OffsetOfCentralDirectory64));
 			else
 				builder.Append(string.Format("        CD offset: 0x{0:X8}\n", _OffsetOfCentralDirectory));
-			builder.Append("\n");
+			builder.Append('\n');
 			foreach (var entry in _entries.Values)
 			{
 				builder.Append(entry.Info);

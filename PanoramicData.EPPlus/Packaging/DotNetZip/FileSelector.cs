@@ -122,7 +122,7 @@ internal partial class SizeCriterion : SelectionCriterion
 	public override String ToString()
 	{
 		StringBuilder sb = new();
-		sb.Append("size ").Append(EnumUtil.GetDescription(Operator)).Append(" ").Append(Size);
+		sb.Append("size ").Append(EnumUtil.GetDescription(Operator)).Append(' ').Append(Size);
 		return sb.ToString();
 	}
 
@@ -163,7 +163,7 @@ internal partial class TimeCriterion : SelectionCriterion
 	public override String ToString()
 	{
 		StringBuilder sb = new();
-		sb.Append(Which.ToString()).Append(" ").Append(EnumUtil.GetDescription(Operator)).Append(" ").Append(Time.ToString("yyyy-MM-dd-HH:mm:ss"));
+		sb.Append(Which.ToString()).Append(' ').Append(EnumUtil.GetDescription(Operator)).Append(' ').Append(Time.ToString("yyyy-MM-dd-HH:mm:ss"));
 		return sb.ToString();
 	}
 
@@ -243,7 +243,7 @@ internal partial class NameCriterion : SelectionCriterion
 		sb.Append("name ").Append(EnumUtil.GetDescription(Operator))
 			.Append(" '")
 			.Append(_MatchingFileSpec)
-			.Append("'");
+			.Append('\'');
 		return sb.ToString();
 	}
 
@@ -295,7 +295,7 @@ internal partial class TypeCriterion : SelectionCriterion
 	public override String ToString()
 	{
 		StringBuilder sb = new();
-		sb.Append("type ").Append(EnumUtil.GetDescription(Operator)).Append(" ").Append(AttributeString);
+		sb.Append("type ").Append(EnumUtil.GetDescription(Operator)).Append(' ').Append(AttributeString);
 		return sb.ToString();
 	}
 
@@ -393,7 +393,7 @@ internal partial class AttributesCriterion : SelectionCriterion
 	public override String ToString()
 	{
 		StringBuilder sb = new();
-		sb.Append("attributes ").Append(EnumUtil.GetDescription(Operator)).Append(" ").Append(AttributeString);
+		sb.Append("attributes ").Append(EnumUtil.GetDescription(Operator)).Append(' ').Append(AttributeString);
 		return sb.ToString();
 	}
 
@@ -498,13 +498,13 @@ internal partial class CompoundCriterion : SelectionCriterion
 	public override String ToString()
 	{
 		StringBuilder sb = new();
-		sb.Append("(")
+		sb.Append('(')
 		.Append((Left != null) ? Left.ToString() : "null")
-		.Append(" ")
+		.Append(' ')
 		.Append(Conjunction.ToString())
-		.Append(" ")
+		.Append(' ')
 		.Append((Right != null) ? Right.ToString() : "null")
-		.Append(")");
+		.Append(')');
 		return sb.ToString();
 	}
 }

@@ -28,7 +28,7 @@ public class CustomValidationTests : ValidationTestBase
 	{
 		// Arrange
 		var sb = new StringBuilder();
-		for (var x = 0; x < 257; x++) sb.Append("x");
+		for (var x = 0; x < 257; x++) sb.Append('x');
 
 		// Act
 		var validation = _sheet.DataValidations.AddCustomValidation("A1");

@@ -103,7 +103,7 @@ partial class ZipEntry
 				builder.Append(string.Format("           Comment: {0}\n", _Comment));
 			}
 
-			builder.Append("\n");
+			builder.Append('\n');
 			return builder.ToString();
 		}
 	}

@@ -248,7 +248,7 @@ class Sample11
 			{
 				if (sb.Length > 0)
 				{
-					sb.Append(",");
+					sb.Append(',');
 				}
 
 				sb.Append(listValue);

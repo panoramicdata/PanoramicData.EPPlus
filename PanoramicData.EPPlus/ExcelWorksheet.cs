@@ -3938,7 +3938,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			cache.AppendFormat(" s=\"{0}\" customFormat=\"1\"", cellXfs[s].newID);
 		}
 
-		cache.Append(">");
+		cache.Append('>');
 	}
 	private void WriteRow(StreamWriter sw, ExcelStyleCollection<ExcelXfs> cellXfs, int prevRow, int row)
 	{
