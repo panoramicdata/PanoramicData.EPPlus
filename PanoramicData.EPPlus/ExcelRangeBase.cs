@@ -1651,7 +1651,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		DateTime dt;
 		if (Format.DataTypes == null || Format.DataTypes.Length <= col || Format.DataTypes[col] == eDataTypes.Unknown)
 		{
-			var v2 = v.EndsWith("%") ? v[..^1] : v;
+			var v2 = v.EndsWith('%') ? v[..^1] : v;
 			if (double.TryParse(v2, NumberStyles.Any, Format.Culture, out d))
 			{
 				return v2 == v ? d : (object)(d / 100);
@@ -1675,7 +1675,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				case eDataTypes.DateTime:
 					return DateTime.TryParse(v, Format.Culture, DateTimeStyles.None, out dt) ? dt : v;
 				case eDataTypes.Percent:
-					var v2 = v.EndsWith("%") ? v[..^1] : v;
+					var v2 = v.EndsWith('%') ? v[..^1] : v;
 					return double.TryParse(v2, NumberStyles.Any, Format.Culture, out d) ? d / 100 : v;
 				case eDataTypes.String:
 					return v;
