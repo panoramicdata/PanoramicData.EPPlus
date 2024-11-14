@@ -31,7 +31,7 @@
 using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 /// <summary>
 /// ExcelConditionalFormattingTwoColorScale
@@ -77,7 +77,7 @@ public class ExcelConditionalFormattingTwoColorScale
 		priority,
 		worksheet,
 		itemElementNode,
-		(namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 		// If the node is not null, parse values out of it instead of clobbering it.
 		if (itemElementNode == null)

@@ -24,6 +24,7 @@
 // ------------------------------------------------------------------
 //
 
+using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 
 namespace OfficeOpenXml.Packaging.Ionic.Zip;

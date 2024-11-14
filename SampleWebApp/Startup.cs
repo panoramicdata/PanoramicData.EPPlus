@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SampleWebApp.Core;
+namespace SampleWebApp;
 
 public class Startup
 {

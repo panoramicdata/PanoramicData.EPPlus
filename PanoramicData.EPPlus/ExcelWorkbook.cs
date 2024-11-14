@@ -39,7 +39,7 @@
 using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.DotNetZip;
 using OfficeOpenXml.Utils;
 using OfficeOpenXml.VBA;
 using System;
@@ -868,7 +868,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 
 		//StreamWriter sw = new StreamWriter(stringPart.GetStream(FileMode.Create, FileAccess.Write));
 		//Init Zip
-		stream.CompressionLevel = (OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel)compressionLevel;
+		stream.CompressionLevel = (Packaging.DotNetZip.Zlib.CompressionLevel)compressionLevel;
 		stream.PutNextEntry(fileName);
 
 		var cache = new StringBuilder();

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using OfficeOpenXml;
+using OfficeOpenXml.FormulaParsing;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 class Sample_FormulaCalc
 {

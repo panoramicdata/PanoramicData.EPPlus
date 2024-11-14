@@ -34,7 +34,7 @@ using System.Drawing;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.ConditionalFormatting;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 class Sample14
 {

@@ -90,7 +90,7 @@
 
 using Interop = System.Runtime.InteropServices;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 
 /// <summary>
@@ -261,7 +261,7 @@ public enum CompressionMode
 /// <summary>
 /// A general purpose exception class for exceptions in the Zlib library.
 /// </summary>
-[Interop.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000E")]
+[Interop.Guid("ebc25cf6-9120-4283-b972-0e5520d0000E")]
 public class ZlibException : System.Exception
 {
 	/// <summary>
@@ -277,7 +277,7 @@ public class ZlibException : System.Exception
 	/// This ctor collects a message attached to the exception.
 	/// </summary>
 	/// <param name="s">the message for the exception.</param>
-	public ZlibException(System.String s)
+	public ZlibException(string s)
 		: base(s)
 	{
 	}
@@ -322,7 +322,7 @@ internal class SharedUtils
 	///   count depending on the data available in the source TextReader. Returns -1
 	///   if the end of the stream is reached.
 	/// </returns>
-	public static System.Int32 ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
+	public static int ReadInput(System.IO.TextReader sourceTextReader, byte[] target, int start, int count)
 	{
 		// Returns 0 bytes if not enough space in target
 		if (target.Length == 0) return 0;
@@ -340,10 +340,10 @@ internal class SharedUtils
 	}
 
 
-	internal static byte[] ToByteArray(System.String sourceString) => System.Text.UTF8Encoding.UTF8.GetBytes(sourceString);
+	internal static byte[] ToByteArray(string sourceString) => System.Text.Encoding.UTF8.GetBytes(sourceString);
 
 
-	internal static char[] ToCharArray(byte[] byteArray) => System.Text.UTF8Encoding.UTF8.GetChars(byteArray);
+	internal static char[] ToCharArray(byte[] byteArray) => System.Text.Encoding.UTF8.GetChars(byteArray);
 }
 
 internal static class InternalConstants
@@ -353,7 +353,7 @@ internal static class InternalConstants
 	internal static readonly int D_CODES = 30;
 	internal static readonly int LITERALS = 256;
 	internal static readonly int LENGTH_CODES = 29;
-	internal static readonly int L_CODES = (LITERALS + 1 + LENGTH_CODES);
+	internal static readonly int L_CODES = LITERALS + 1 + LENGTH_CODES;
 
 	// Bit length codes must not exceed MAX_BL_BITS bits
 	internal static readonly int MAX_BL_BITS = 7;
@@ -486,8 +486,8 @@ public sealed class Adler
 		if (buf == null)
 			return 1;
 
-		var s1 = (uint)(adler & 0xffff);
-		var s2 = (uint)((adler >> 16) & 0xffff);
+		var s1 = adler & 0xffff;
+		var s2 = adler >> 16 & 0xffff;
 
 		while (len > 0)
 		{
@@ -529,7 +529,7 @@ public sealed class Adler
 			s2 %= BASE;
 		}
 
-		return (uint)((s2 << 16) | s1);
+		return s2 << 16 | s1;
 	}
 #pragma warning restore 3001
 #pragma warning restore 3002

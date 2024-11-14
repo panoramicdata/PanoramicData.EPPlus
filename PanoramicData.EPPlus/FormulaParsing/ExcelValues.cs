@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace OfficeOpenXml;
+namespace OfficeOpenXml.FormulaParsing;
 
 /// <summary>
 /// Represents the errortypes in excel
@@ -96,7 +96,7 @@ public class ExcelErrorValue
 		{
 			if (candidate is null or not ExcelErrorValue) return false;
 			var candidateString = candidate.ToString();
-			return (!string.IsNullOrEmpty(candidateString) && _values.ContainsKey(candidateString));
+			return !string.IsNullOrEmpty(candidateString) && _values.ContainsKey(candidateString);
 		}
 
 		/// <summary>
@@ -104,7 +104,7 @@ public class ExcelErrorValue
 		/// </summary>
 		/// <param name="candidate"></param>
 		/// <returns></returns>
-		public static bool StringIsErrorValue(string candidate) => (!string.IsNullOrEmpty(candidate) && _values.ContainsKey(candidate));
+		public static bool StringIsErrorValue(string candidate) => !string.IsNullOrEmpty(candidate) && _values.ContainsKey(candidate);
 
 		/// <summary>
 		/// Converts a string to an <see cref="eErrorType"/>

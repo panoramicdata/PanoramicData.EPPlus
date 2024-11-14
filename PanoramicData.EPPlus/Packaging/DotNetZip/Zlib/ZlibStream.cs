@@ -28,7 +28,7 @@
 using System;
 using System.IO;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 
 /// <summary>
@@ -39,7 +39,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zlib;
 /// <para>
 /// The ZlibStream is a <see
 /// href="http://en.wikipedia.org/wiki/Decorator_pattern">Decorator</see> on a <see
-/// cref="System.IO.Stream"/>.  It adds ZLIB compression or decompression to any
+/// cref="Stream"/>.  It adds ZLIB compression or decompression to any
 /// stream.
 /// </para>
 ///
@@ -68,7 +68,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zlib;
 /// </remarks>
 /// <seealso cref="DeflateStream" />
 /// <seealso cref="GZipStream" />
-public class ZlibStream : System.IO.Stream
+public class ZlibStream : Stream
 {
 	internal ZlibBaseStream _baseStream;
 	bool _disposed;
@@ -126,7 +126,7 @@ public class ZlibStream : System.IO.Stream
 	///
 	/// <param name="stream">The stream which will be read or written.</param>
 	/// <param name="mode">Indicates whether the ZlibStream will compress or decompress.</param>
-	public ZlibStream(System.IO.Stream stream, CompressionMode mode)
+	public ZlibStream(Stream stream, CompressionMode mode)
 		: this(stream, mode, CompressionLevel.Default, false)
 	{
 	}
@@ -190,7 +190,7 @@ public class ZlibStream : System.IO.Stream
 	/// <param name="stream">The stream to be read or written while deflating or inflating.</param>
 	/// <param name="mode">Indicates whether the ZlibStream will compress or decompress.</param>
 	/// <param name="level">A tuning knob to trade speed for effectiveness.</param>
-	public ZlibStream(System.IO.Stream stream, CompressionMode mode, CompressionLevel level)
+	public ZlibStream(Stream stream, CompressionMode mode, CompressionLevel level)
 		: this(stream, mode, level, false)
 	{
 	}
@@ -213,7 +213,7 @@ public class ZlibStream : System.IO.Stream
 	///   remain open after the deflation or inflation occurs.  By default, after
 	///   <c>Close()</c> is called on the stream, the captive stream is also
 	///   closed. In some cases this is not desired, for example if the stream is a
-	///   <see cref="System.IO.MemoryStream"/> that will be re-read after
+	///   <see cref="MemoryStream"/> that will be re-read after
 	///   compression.  Specify true for the <paramref name="leaveOpen"/> parameter to leave the stream
 	///   open.
 	/// </para>
@@ -229,7 +229,7 @@ public class ZlibStream : System.IO.Stream
 	/// <param name="mode">Indicates whether the ZlibStream will compress or decompress.</param>
 	/// <param name="leaveOpen">true if the application would like the stream to remain
 	/// open after inflation/deflation.</param>
-	public ZlibStream(System.IO.Stream stream, CompressionMode mode, bool leaveOpen)
+	public ZlibStream(Stream stream, CompressionMode mode, bool leaveOpen)
 		: this(stream, mode, CompressionLevel.Default, leaveOpen)
 	{
 	}
@@ -247,7 +247,7 @@ public class ZlibStream : System.IO.Stream
 	///   stream remain open after the deflation or inflation occurs.  By
 	///   default, after <c>Close()</c> is called on the stream, the captive
 	///   stream is also closed. In some cases this is not desired, for example
-	///   if the stream is a <see cref="System.IO.MemoryStream"/> that will be
+	///   if the stream is a <see cref="MemoryStream"/> that will be
 	///   re-read after compression.  Specify true for the <paramref
 	///   name="leaveOpen"/> parameter to leave the stream open.
 	/// </para>
@@ -315,7 +315,7 @@ public class ZlibStream : System.IO.Stream
 	/// A tuning knob to trade speed for effectiveness. This parameter is
 	/// effective only when mode is <c>CompressionMode.Compress</c>.
 	/// </param>
-	public ZlibStream(System.IO.Stream stream, CompressionMode mode, CompressionLevel level, bool leaveOpen)
+	public ZlibStream(Stream stream, CompressionMode mode, CompressionLevel level, bool leaveOpen)
 	{
 		_baseStream = new ZlibBaseStream(stream, mode, level, ZlibStreamFlavor.ZLIB, leaveOpen);
 	}
@@ -328,7 +328,7 @@ public class ZlibStream : System.IO.Stream
 	/// </summary>
 	virtual public FlushType FlushMode
 	{
-		get { return (_baseStream._flushMode); }
+		get { return _baseStream._flushMode; }
 		set
 		{
 			if (_disposed) throw new ObjectDisposedException("ZlibStream");
@@ -365,7 +365,7 @@ public class ZlibStream : System.IO.Stream
 			if (_baseStream._workingBuffer != null)
 				throw new ZlibException("The working buffer is already set.");
 			if (value < ZlibConstants.WorkingBufferSizeMin)
-				throw new ZlibException(String.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
+				throw new ZlibException(string.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
 			_baseStream._bufferSize = value;
 		}
 	}
@@ -409,7 +409,7 @@ public class ZlibStream : System.IO.Stream
 		{
 			if (!_disposed)
 			{
-				if (disposing && (_baseStream != null))
+				if (disposing && _baseStream != null)
 					_baseStream.Close();
 				_disposed = true;
 			}
@@ -474,9 +474,9 @@ public class ZlibStream : System.IO.Stream
 	{
 		get
 		{
-			if (_baseStream._streamMode == Ionic.Zlib.ZlibBaseStream.StreamMode.Writer)
+			if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer)
 				return _baseStream._z.TotalBytesOut;
-			return _baseStream._streamMode == Ionic.Zlib.ZlibBaseStream.StreamMode.Reader ? _baseStream._z.TotalBytesIn : 0;
+			return _baseStream._streamMode == ZlibBaseStream.StreamMode.Reader ? _baseStream._z.TotalBytesIn : 0;
 		}
 
 		set { throw new NotSupportedException(); }
@@ -530,7 +530,7 @@ public class ZlibStream : System.IO.Stream
 	/// </param>
 	///
 	/// <returns>nothing. This method always throws.</returns>
-	public override long Seek(long offset, System.IO.SeekOrigin origin) => throw new NotSupportedException();
+	public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
 	/// <summary>
 	/// Calling this method always throws a <see cref="NotSupportedException"/>.
@@ -580,11 +580,11 @@ public class ZlibStream : System.IO.Stream
 	/// </summary>
 	///
 	/// <remarks>
-	///   Uncompress it with <see cref="ZlibStream.UncompressString(byte[])"/>.
+	///   Uncompress it with <see cref="UncompressString(byte[])"/>.
 	/// </remarks>
 	///
-	/// <seealso cref="ZlibStream.UncompressString(byte[])"/>
-	/// <seealso cref="ZlibStream.CompressBuffer(byte[])"/>
+	/// <seealso cref="UncompressString(byte[])"/>
+	/// <seealso cref="CompressBuffer(byte[])"/>
 	/// <seealso cref="GZipStream.CompressString(string)"/>
 	///
 	/// <param name="s">
@@ -593,7 +593,7 @@ public class ZlibStream : System.IO.Stream
 	/// </param>
 	///
 	/// <returns>The string in compressed form</returns>
-	public static byte[] CompressString(String s)
+	public static byte[] CompressString(string s)
 	{
 		using var ms = new MemoryStream();
 		Stream compressor =
@@ -608,11 +608,11 @@ public class ZlibStream : System.IO.Stream
 	/// </summary>
 	///
 	/// <remarks>
-	///   Uncompress it with <see cref="ZlibStream.UncompressBuffer(byte[])"/>.
+	///   Uncompress it with <see cref="UncompressBuffer(byte[])"/>.
 	/// </remarks>
 	///
-	/// <seealso cref="ZlibStream.CompressString(string)"/>
-	/// <seealso cref="ZlibStream.UncompressBuffer(byte[])"/>
+	/// <seealso cref="CompressString(string)"/>
+	/// <seealso cref="UncompressBuffer(byte[])"/>
 	///
 	/// <param name="b">
 	/// A buffer to compress.
@@ -634,15 +634,15 @@ public class ZlibStream : System.IO.Stream
 	///   Uncompress a ZLIB-compressed byte array into a single string.
 	/// </summary>
 	///
-	/// <seealso cref="ZlibStream.CompressString(String)"/>
-	/// <seealso cref="ZlibStream.UncompressBuffer(byte[])"/>
+	/// <seealso cref="CompressString(string)"/>
+	/// <seealso cref="UncompressBuffer(byte[])"/>
 	///
 	/// <param name="compressed">
 	///   A buffer containing ZLIB-compressed data.
 	/// </param>
 	///
 	/// <returns>The uncompressed string</returns>
-	public static String UncompressString(byte[] compressed)
+	public static string UncompressString(byte[] compressed)
 	{
 		using var input = new MemoryStream(compressed);
 		Stream decompressor =
@@ -656,8 +656,8 @@ public class ZlibStream : System.IO.Stream
 	///   Uncompress a ZLIB-compressed byte array into a byte array.
 	/// </summary>
 	///
-	/// <seealso cref="ZlibStream.CompressBuffer(byte[])"/>
-	/// <seealso cref="ZlibStream.UncompressString(byte[])"/>
+	/// <seealso cref="CompressBuffer(byte[])"/>
+	/// <seealso cref="UncompressString(byte[])"/>
 	///
 	/// <param name="compressed">
 	///   A buffer containing ZLIB-compressed data.

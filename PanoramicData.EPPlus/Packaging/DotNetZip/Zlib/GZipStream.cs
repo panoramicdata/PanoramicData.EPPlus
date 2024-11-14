@@ -30,7 +30,7 @@
 using System;
 using System.IO;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 /// <summary>
 ///   A class for compressing and decompressing GZIP streams.
@@ -81,7 +81,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zlib;
 ///
 /// <seealso cref="DeflateStream" />
 /// <seealso cref="ZlibStream" />
-public class GZipStream : System.IO.Stream
+public class GZipStream : Stream
 {
 	// GZip format
 	// source: http://tools.ietf.org/html/rfc1952
@@ -141,7 +141,7 @@ public class GZipStream : System.IO.Stream
 	///   (<c>Nothing</c> in VB).
 	/// </para>
 	/// </remarks>
-	public String Comment
+	public string Comment
 	{
 		get
 		{
@@ -177,7 +177,7 @@ public class GZipStream : System.IO.Stream
 	///   in VB).
 	/// </para>
 	/// </remarks>
-	public String FileName
+	public string FileName
 	{
 		get { return _FileName; }
 		set
@@ -547,7 +547,7 @@ public class GZipStream : System.IO.Stream
 	/// </summary>
 	virtual public FlushType FlushMode
 	{
-		get { return (_baseStream._flushMode); }
+		get { return _baseStream._flushMode; }
 		set
 		{
 			if (_disposed) throw new ObjectDisposedException("GZipStream");
@@ -584,7 +584,7 @@ public class GZipStream : System.IO.Stream
 			if (_baseStream._workingBuffer != null)
 				throw new ZlibException("The working buffer is already set.");
 			if (value < ZlibConstants.WorkingBufferSizeMin)
-				throw new ZlibException(String.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
+				throw new ZlibException(string.Format("Don't be silly. {0} bytes?? Use a bigger buffer, at least {1}.", value, ZlibConstants.WorkingBufferSizeMin));
 			_baseStream._bufferSize = value;
 		}
 	}
@@ -629,7 +629,7 @@ public class GZipStream : System.IO.Stream
 		{
 			if (!_disposed)
 			{
-				if (disposing && (_baseStream != null))
+				if (disposing && _baseStream != null)
 				{
 					_baseStream.Close();
 					_Crc32 = _baseStream.Crc32;
@@ -699,9 +699,9 @@ public class GZipStream : System.IO.Stream
 	{
 		get
 		{
-			if (_baseStream._streamMode == Ionic.Zlib.ZlibBaseStream.StreamMode.Writer)
+			if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Writer)
 				return _baseStream._z.TotalBytesOut + _headerByteCount;
-			return _baseStream._streamMode == Ionic.Zlib.ZlibBaseStream.StreamMode.Reader
+			return _baseStream._streamMode == ZlibBaseStream.StreamMode.Reader
 				? _baseStream._z.TotalBytesIn + _baseStream._gzipHeaderByteCount
 				: 0;
 		}
@@ -799,7 +799,7 @@ public class GZipStream : System.IO.Stream
 	public override void Write(byte[] buffer, int offset, int count)
 	{
 		if (_disposed) throw new ObjectDisposedException("GZipStream");
-		if (_baseStream._streamMode == Ionic.Zlib.ZlibBaseStream.StreamMode.Undefined)
+		if (_baseStream._streamMode == ZlibBaseStream.StreamMode.Undefined)
 		{
 			//Console.WriteLine("GZipStream: First write");
 			if (_baseStream._wantCompress)
@@ -818,7 +818,7 @@ public class GZipStream : System.IO.Stream
 	#endregion
 
 
-	internal static readonly System.DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+	internal static readonly DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 #if SILVERLIGHT || NETCF
         internal static readonly System.Text.Encoding iso8859dash1 = new Ionic.Encoding.Iso8859Dash1Encoding();
 #else
@@ -828,11 +828,11 @@ public class GZipStream : System.IO.Stream
 
 	private int EmitHeader()
 	{
-		var commentBytes = (Comment == null) ? null : iso8859dash1.GetBytes(Comment);
-		var filenameBytes = (FileName == null) ? null : iso8859dash1.GetBytes(FileName);
+		var commentBytes = Comment == null ? null : iso8859dash1.GetBytes(Comment);
+		var filenameBytes = FileName == null ? null : iso8859dash1.GetBytes(FileName);
 
-		var cbLength = (Comment == null) ? 0 : commentBytes.Length + 1;
-		var fnLength = (FileName == null) ? 0 : filenameBytes.Length + 1;
+		var cbLength = Comment == null ? 0 : commentBytes.Length + 1;
+		var fnLength = FileName == null ? 0 : filenameBytes.Length + 1;
 
 		var bufferLength = 10 + cbLength + fnLength;
 		var header = new byte[bufferLength];
@@ -855,7 +855,7 @@ public class GZipStream : System.IO.Stream
 		// mtime
 		if (!LastModified.HasValue) LastModified = DateTime.Now;
 		var delta = LastModified.Value - _unixEpoch;
-		var timet = (Int32)delta.TotalSeconds;
+		var timet = (int)delta.TotalSeconds;
 		Array.Copy(BitConverter.GetBytes(timet), 0, header, i, 4);
 		i += 4;
 
@@ -896,11 +896,11 @@ public class GZipStream : System.IO.Stream
 	/// </summary>
 	///
 	/// <remarks>
-	///   Uncompress it with <see cref="GZipStream.UncompressString(byte[])"/>.
+	///   Uncompress it with <see cref="UncompressString(byte[])"/>.
 	/// </remarks>
 	///
-	/// <seealso cref="GZipStream.UncompressString(byte[])"/>
-	/// <seealso cref="GZipStream.CompressBuffer(byte[])"/>
+	/// <seealso cref="UncompressString(byte[])"/>
+	/// <seealso cref="CompressBuffer(byte[])"/>
 	///
 	/// <param name="s">
 	///   A string to compress. The string will first be encoded
@@ -908,10 +908,10 @@ public class GZipStream : System.IO.Stream
 	/// </param>
 	///
 	/// <returns>The string in compressed form</returns>
-	public static byte[] CompressString(String s)
+	public static byte[] CompressString(string s)
 	{
 		using var ms = new MemoryStream();
-		System.IO.Stream compressor =
+		Stream compressor =
 			new GZipStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
 		ZlibBaseStream.CompressString(s, compressor);
 		return ms.ToArray();
@@ -923,11 +923,11 @@ public class GZipStream : System.IO.Stream
 	/// </summary>
 	///
 	/// <remarks>
-	///   Uncompress it with <see cref="GZipStream.UncompressBuffer(byte[])"/>.
+	///   Uncompress it with <see cref="UncompressBuffer(byte[])"/>.
 	/// </remarks>
 	///
-	/// <seealso cref="GZipStream.CompressString(string)"/>
-	/// <seealso cref="GZipStream.UncompressBuffer(byte[])"/>
+	/// <seealso cref="CompressString(string)"/>
+	/// <seealso cref="UncompressBuffer(byte[])"/>
 	///
 	/// <param name="b">
 	///   A buffer to compress.
@@ -937,7 +937,7 @@ public class GZipStream : System.IO.Stream
 	public static byte[] CompressBuffer(byte[] b)
 	{
 		using var ms = new MemoryStream();
-		System.IO.Stream compressor =
+		Stream compressor =
 			new GZipStream(ms, CompressionMode.Compress, CompressionLevel.BestCompression);
 
 		ZlibBaseStream.CompressBuffer(b, compressor);
@@ -949,15 +949,15 @@ public class GZipStream : System.IO.Stream
 	///   Uncompress a GZip'ed byte array into a single string.
 	/// </summary>
 	///
-	/// <seealso cref="GZipStream.CompressString(String)"/>
-	/// <seealso cref="GZipStream.UncompressBuffer(byte[])"/>
+	/// <seealso cref="CompressString(string)"/>
+	/// <seealso cref="UncompressBuffer(byte[])"/>
 	///
 	/// <param name="compressed">
 	///   A buffer containing GZIP-compressed data.
 	/// </param>
 	///
 	/// <returns>The uncompressed string</returns>
-	public static String UncompressString(byte[] compressed)
+	public static string UncompressString(byte[] compressed)
 	{
 		using var input = new MemoryStream(compressed);
 		Stream decompressor = new GZipStream(input, CompressionMode.Decompress);
@@ -969,8 +969,8 @@ public class GZipStream : System.IO.Stream
 	///   Uncompress a GZip'ed byte array into a byte array.
 	/// </summary>
 	///
-	/// <seealso cref="GZipStream.CompressBuffer(byte[])"/>
-	/// <seealso cref="GZipStream.UncompressString(byte[])"/>
+	/// <seealso cref="CompressBuffer(byte[])"/>
+	/// <seealso cref="UncompressString(byte[])"/>
 	///
 	/// <param name="compressed">
 	///   A buffer containing data that has been compressed with GZip.
@@ -979,8 +979,8 @@ public class GZipStream : System.IO.Stream
 	/// <returns>The data in uncompressed form</returns>
 	public static byte[] UncompressBuffer(byte[] compressed)
 	{
-		using var input = new System.IO.MemoryStream(compressed);
-		System.IO.Stream decompressor =
+		using var input = new MemoryStream(compressed);
+		Stream decompressor =
 			new GZipStream(input, CompressionMode.Decompress);
 
 		return ZlibBaseStream.UncompressBuffer(compressed, decompressor);

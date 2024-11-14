@@ -36,8 +36,9 @@ using OfficeOpenXml.DataValidation;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Drawing.Vml;
+using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.DotNetZip;
 using OfficeOpenXml.Sparkline;
 using OfficeOpenXml.Style.XmlAccess;
 using OfficeOpenXml.Table;
@@ -2920,7 +2921,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	{
 		//Init Zip
 		stream.CodecBufferSize = 8096;
-		stream.CompressionLevel = (OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel)compressionLevel;
+		stream.CompressionLevel = (Packaging.DotNetZip.Zlib.CompressionLevel)compressionLevel;
 		stream.PutNextEntry(fileName);
 
 

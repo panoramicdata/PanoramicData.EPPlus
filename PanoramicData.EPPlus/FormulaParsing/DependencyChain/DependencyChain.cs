@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace OfficeOpenXml.FormulaParsing;
+namespace OfficeOpenXml.FormulaParsing.DependencyChain;
 
 internal class DependencyChain
 {

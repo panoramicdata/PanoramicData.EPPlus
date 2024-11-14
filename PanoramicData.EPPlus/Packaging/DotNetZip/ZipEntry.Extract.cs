@@ -24,6 +24,8 @@
 // ------------------------------------------------------------------
 
 
+using OfficeOpenXml.Packaging.DotNetZip;
+using OfficeOpenXml.Packaging.DotNetZip.Zlib;
 using System;
 using System.IO;
 
@@ -419,7 +421,7 @@ internal partial class ZipEntry
 	///
 	/// <para>
 	///   The return value is of type <see
-	///   cref="Ionic.Crc.CrcCalculatorStream"/>.  Use it as you would any
+	///   cref="DotNetZip.CrcCalculatorStream"/>.  Use it as you would any
 	///   stream for reading.  When an application calls <see
 	///   cref="Stream.Read(byte[], int, int)"/> on that stream, it will
 	///   receive data from the zip entry that is decrypted and decompressed
@@ -430,7 +432,7 @@ internal partial class ZipEntry
 	///   <c>CrcCalculatorStream</c> adds one additional feature: it keeps a
 	///   CRC32 checksum on the bytes of the stream as it is read.  The CRC
 	///   value is available in the <see
-	///   cref="Ionic.Crc.CrcCalculatorStream.Crc"/> property on the
+	///   cref="CrcCalculatorStream.Crc"/> property on the
 	///   <c>CrcCalculatorStream</c>.  When the read is complete, your
 	///   application
 	///   <em>should</em> check this CRC against the <see cref="ZipEntry.Crc"/>
@@ -522,7 +524,7 @@ internal partial class ZipEntry
 	/// </example>
 	/// <seealso cref="ZipEntry.Extract(System.IO.Stream)"/>
 	/// <returns>The Stream for reading.</returns>
-	internal Ionic.Crc.CrcCalculatorStream OpenReader()
+	internal CrcCalculatorStream OpenReader()
 	{
 		// workitem 10923
 		if (_container.ZipFile == null)
@@ -548,7 +550,7 @@ internal partial class ZipEntry
 	///
 	/// <param name="password">The password to use for decrypting the entry.</param>
 	/// <returns>The Stream for reading.</returns>
-	internal Ionic.Crc.CrcCalculatorStream OpenReader(string password) =>
+	internal CrcCalculatorStream OpenReader(string password) =>
 		// workitem 10923
 		_container.ZipFile == null
 			? throw new InvalidOperationException("Use OpenReader() only with ZipFile.")
@@ -556,7 +558,7 @@ internal partial class ZipEntry
 
 
 
-	internal Ionic.Crc.CrcCalculatorStream InternalOpenReader(string password)
+	internal CrcCalculatorStream InternalOpenReader(string password)
 	{
 		ValidateCompression();
 		ValidateEncryption();
@@ -578,7 +580,7 @@ internal partial class ZipEntry
 
 		ArchiveStream.Seek(FileDataPosition, SeekOrigin.Begin);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+		SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 
 		_inputDecryptorStream = GetExtractDecryptor(input);
 		var input3 = GetExtractDecompressor(_inputDecryptorStream);
@@ -992,7 +994,7 @@ internal partial class ZipEntry
 			// change for workitem 8098
 			input.Seek(FileDataPosition, SeekOrigin.Begin);
 			// workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(input);
+			SharedUtilities.Workaround_Ladybug318918(input);
 
 			var bytes = new byte[BufferSize];
 
@@ -1068,7 +1070,7 @@ internal partial class ZipEntry
 			case (short)CompressionMethod.None:
 				return input2;
 			case (short)CompressionMethod.Deflate:
-				return new Ionic.Zlib.DeflateStream(input2, Ionic.Zlib.CompressionMode.Decompress, true);
+				return new Ionic.Zlib.DeflateStream(input2, CompressionMode.Decompress, true);
 #if BZIP
                 case (short)CompressionMethod.BZip2:
                     return new Ionic.BZip2.BZip2InputStream(input2, true);
@@ -1139,7 +1141,7 @@ internal partial class ZipEntry
 			else
 			{
 				// workitem 6191
-				var AdjustedLastModified = Ionic.Zip.SharedUtilities.AdjustTime_Reverse(LastModified);
+				var AdjustedLastModified = SharedUtilities.AdjustTime_Reverse(LastModified);
 
 				if (isFile)
 					File.SetLastWriteTime(fileOrDirectory, AdjustedLastModified);
@@ -1258,7 +1260,7 @@ not EncryptionAlgorithm.None)
 
 			ArchiveStream.Seek(FileDataPosition - 12, SeekOrigin.Begin);
 			// workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+			SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 			_zipCrypto_forExtract = ZipCrypto.ForRead(password, this);
 		}
 

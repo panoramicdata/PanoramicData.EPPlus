@@ -31,7 +31,7 @@
 using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 /// <summary>
 /// ExcelConditionalFormattingNotEqual
@@ -63,7 +63,7 @@ public class ExcelConditionalFormattingNotEqual
 		priority,
 		worksheet,
 		itemElementNode,
-		(namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 		if (itemElementNode == null) //Set default values and create attributes if needed
 		{

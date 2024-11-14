@@ -8,7 +8,7 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 /// <summary>
 /// This sample shows how to add functions to the FormulaParser of EPPlus.
@@ -58,8 +58,8 @@ class MyFunctionModule : FunctionsModule
 {
 	public MyFunctionModule()
 	{
-		base.Functions.Add("sum.addtwo", new SumAddTwo());
-		base.Functions.Add("seanconneryfy", new SeanConneryfy());
+		Functions.Add("sum.addtwo", new SumAddTwo());
+		Functions.Add("seanconneryfy", new SeanConneryfy());
 	}
 }
 
@@ -78,7 +78,7 @@ class SumAddTwo : ExcelFunction
 
 		// Do the work
 		var result = 0d;
-		numbers.ToList().ForEach(x => result += (x + 2));
+		numbers.ToList().ForEach(x => result += x + 2);
 
 		// return the result
 		return CreateResult(result, DataType.Decimal);

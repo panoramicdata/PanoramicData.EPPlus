@@ -20,7 +20,9 @@
 // ------------------------------------------------------------------
 //
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.Ionic.Zip;
+
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 /// An enum that specifies the source of the ZipEntry. 
@@ -39,8 +41,8 @@ internal enum ZipEntrySource
 	FileSystem,
 
 	/// <summary>
-	/// The entry was instantiated via <see cref="Ionic.Zip.ZipFile.AddEntry(string,string)"/> or
-	/// <see cref="Ionic.Zip.ZipFile.AddEntry(string,System.IO.Stream)"/> .
+	/// The entry was instantiated via <see cref="ZipFile.AddEntry(string,string)"/> or
+	/// <see cref="ZipFile.AddEntry(string,System.IO.Stream)"/> .
 	/// </summary>
 	Stream,
 
@@ -56,7 +58,7 @@ internal enum ZipEntrySource
 
 	/// <summary>
 	/// The content for the ZipEntry will be obtained from the stream dispensed by the <c>OpenDelegate</c>.
-	/// The entry was instantiated via <see cref="Ionic.Zip.ZipFile.AddEntry(string,OpenDelegate,CloseDelegate)"/>.
+	/// The entry was instantiated via <see cref="ZipFile.AddEntry(string,OpenDelegate,CloseDelegate)"/>.
 	/// </summary>
 	JitStream,
 

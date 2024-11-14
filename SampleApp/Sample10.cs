@@ -34,7 +34,7 @@ using OfficeOpenXml;
 using System.Drawing;
 using OfficeOpenXml.Style;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 public static class Sample10
 {

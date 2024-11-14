@@ -28,8 +28,7 @@
  *******************************************************************************
  * Jan Källman		Added		25-Oct-2012
  *******************************************************************************/
-using Ionic.Zip;
-using OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.DotNetZip;
 using OfficeOpenXml.Utils;
 using System;
 using System.Collections.Generic;
@@ -278,7 +277,7 @@ public class ZipPackage : ZipPackageRelationshipBase
 		var enc = Encoding.UTF8;
 		ZipOutputStream os = new(stream, true)
 		{
-			CompressionLevel = (OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel)_compression
+			CompressionLevel = (DotNetZip.Zlib.CompressionLevel)_compression
 		};
 		/**** ContentType****/
 		var entry = os.PutNextEntry("[Content_Types].xml");

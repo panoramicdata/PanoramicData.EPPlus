@@ -33,7 +33,7 @@ using System.Drawing;
 using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 using System.Globalization;
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 /// <summary>
 /// Databar
@@ -73,7 +73,7 @@ public class ExcelConditionalFormattingDataBar
 		  priority,
 		  worksheet,
 		  itemElementNode,
-		  (namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		  namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 		var s = SchemaNodeOrder;
 		Array.Resize(ref s, s.Length + 2);    //Fixes issue 15429. Append node order instead om overwriting it.

@@ -24,7 +24,9 @@
 // Created: Tue, 08 Sep 2009  22:03
 //
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.Ionic.Zip;
+
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 /// This class exposes a set of COM-accessible wrappers for static

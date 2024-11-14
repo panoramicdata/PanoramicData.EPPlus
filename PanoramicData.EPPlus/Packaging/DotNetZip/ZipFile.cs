@@ -38,7 +38,8 @@
 //
 
 
-using OfficeOpenXml.Packaging.Ionic.Zlib;
+using OfficeOpenXml.Packaging.DotNetZip;
+using OfficeOpenXml.Packaging.DotNetZip.Zlib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -396,7 +397,7 @@ IDisposable
 	///   parameter can affect the compression ratio and the speed of
 	///   compression but not the correctness of the compresssion.  For more
 	///   information see <see
-	///   cref="Ionic.Zlib.CompressionStrategy">Ionic.Zlib.CompressionStrategy</see>.
+	///   cref="DotNetZip.Zlib.CompressionStrategy">Ionic.Zlib.CompressionStrategy</see>.
 	/// </remarks>
 	public CompressionStrategy Strategy
 	{
@@ -469,7 +470,7 @@ IDisposable
 	///    alone, and accept the default.
 	///  </para>
 	/// </remarks>
-	public OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel CompressionLevel
+	public DotNetZip.Zlib.CompressionLevel CompressionLevel
 	{
 		get;
 		set;
@@ -2156,7 +2157,7 @@ IDisposable
 	///     using Encryption. This is primarily because encryption tends to slow
 	///     down the entire pipeline. Also, multi-threaded compression gives less
 	///     of an advantage when using lower compression levels, for example <see
-	///     cref="Ionic.Zlib.CompressionLevel.BestSpeed"/>.  You may have to
+	///     cref="DotNetZip.Zlib.CompressionLevel.BestSpeed"/>.  You may have to
 	///     perform some tests to determine the best approach for your situation.
 	///   </para>
 	///
@@ -2411,7 +2412,7 @@ IDisposable
 	///
 	/// </remarks>
 	///
-	/// <exception cref="Ionic.Zip.ZipException">
+	/// <exception cref="DotNetZip.ZipException">
 	/// Thrown if name refers to an existing file that is not a valid zip file.
 	/// </exception>
 	///
@@ -2484,7 +2485,7 @@ IDisposable
 	///
 	/// </remarks>
 	///
-	/// <exception cref="Ionic.Zip.ZipException">
+	/// <exception cref="DotNetZip.ZipException">
 	/// Thrown if name refers to an existing file that is not a valid zip file.
 	/// </exception>
 	///
@@ -2630,7 +2631,7 @@ IDisposable
 	///
 	/// </remarks>
 	///
-	/// <exception cref="Ionic.Zip.ZipException">
+	/// <exception cref="DotNetZip.ZipException">
 	/// Thrown if name refers to an existing file that is not a valid zip file.
 	/// </exception>
 	///
@@ -2722,7 +2723,7 @@ IDisposable
 	///
 	/// </remarks>
 	///
-	/// <exception cref="Ionic.Zip.ZipException">
+	/// <exception cref="DotNetZip.ZipException">
 	/// Thrown if <c>fileName</c> refers to an existing file that is not a valid zip file.
 	/// </exception>
 	///
@@ -2804,7 +2805,7 @@ IDisposable
 		_StatusMessageTextWriter = statusMessageWriter;
 		_contentsChanged = true;
 		AddDirectoryWillTraverseReparsePoints = true;  // workitem 8617
-		CompressionLevel = OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel.Default;
+		CompressionLevel = DotNetZip.Zlib.CompressionLevel.Default;
 #if !NETCF
 		ParallelDeflateThreshold = 512 * 1024;
 #endif
@@ -3560,7 +3561,7 @@ IDisposable
 	internal string _Password;
 	private bool _emitNtfsTimes = true;
 	private bool _emitUnixTimes;
-	private Ionic.Zlib.CompressionStrategy _Strategy = Ionic.Zlib.CompressionStrategy.Default;
+	private CompressionStrategy _Strategy = CompressionStrategy.Default;
 	private Ionic.Zip.CompressionMethod _compressionMethod = Ionic.Zip.CompressionMethod.Deflate;
 	private bool _fileAlreadyExists;
 	private string _temporaryFileName;

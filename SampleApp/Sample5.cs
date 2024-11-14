@@ -34,7 +34,7 @@ using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Drawing;
 using System.Drawing;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 class Sample5
 {
@@ -72,7 +72,7 @@ class Sample5
 			worksheet.Cells["C5:C6"].Style.Numberformat.Format = "#,##0";
 			worksheet.Cells["D5:E6"].Style.Numberformat.Format = "#,##0.00";
 
-			var chart = (worksheet.Drawings.AddChart("PieChart", eChartType.Pie3D) as ExcelPieChart);
+			var chart = worksheet.Drawings.AddChart("PieChart", eChartType.Pie3D) as ExcelPieChart;
 
 			chart.Title.Text = "Total";
 			//From row 1 colum 5 with five pixels offset
@@ -80,7 +80,7 @@ class Sample5
 			chart.SetSize(600, 300);
 
 			ExcelAddress valueAddress = new(2, 5, 6, 5);
-			var ser = (chart.Series.Add(valueAddress.Address, "B2:B6") as ExcelPieChartSerie);
+			var ser = chart.Series.Add(valueAddress.Address, "B2:B6") as ExcelPieChartSerie;
 			chart.DataLabel.ShowCategory = true;
 			chart.DataLabel.ShowPercent = true;
 

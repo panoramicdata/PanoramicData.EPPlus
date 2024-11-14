@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 
-namespace OfficeOpenXml.FormulaParsing;
+namespace OfficeOpenXml.FormulaParsing.DependencyChain;
 
 internal static class DependencyChainFactory
 {
@@ -108,7 +108,7 @@ internal static class DependencyChainFactory
 			var f = new FormulaCell() { SheetID = ws == null ? 0 : ws.SheetID, Row = name.Index, Column = 0, Formula = name.NameFormula };
 			if (!string.IsNullOrEmpty(f.Formula))
 			{
-				f.Tokens = lexer.Tokenize(f.Formula, (ws?.Name)).ToList();
+				f.Tokens = lexer.Tokenize(f.Formula, ws?.Name).ToList();
 				if (ws == null)
 				{
 					name._workbook._formulaTokens.SetValue(name.Index, 0, f.Tokens);
@@ -197,7 +197,7 @@ internal static class DependencyChainFactory
 
 				if (adr.WorkSheet == null && adr.Collide(new ExcelAddressBase(f.Row, f.Column, f.Row, f.Column)) != ExcelAddressBase.eAddressCollition.No && !options.AllowCirculareReferences)
 				{
-					throw (new CircularReferenceException(string.Format("Circular Reference in cell {0}", ExcelAddressBase.GetAddress(f.Row, f.Column))));
+					throw new CircularReferenceException(string.Format("Circular Reference in cell {0}", ExcelAddressBase.GetAddress(f.Row, f.Column)));
 				}
 
 				if (adr._fromRow > 0 && adr._fromCol > 0)
@@ -275,7 +275,7 @@ internal static class DependencyChainFactory
 					}
 					else
 					{
-						var id = ExcelAddressBase.GetCellID(name.LocalSheetId, name.Index, 0);
+						var id = ExcelCellBase.GetCellID(name.LocalSheetId, name.Index, 0);
 
 						if (!depChain.index.ContainsKey(id))
 						{
@@ -302,7 +302,7 @@ internal static class DependencyChainFactory
 								{
 									if (ExcelAddressBase.GetCellID(par.SheetID, par.Row, par.Column) == id && !options.AllowCirculareReferences)
 									{
-										throw (new CircularReferenceException(string.Format("Circular Reference in name {0}", name.Name)));
+										throw new CircularReferenceException(string.Format("Circular Reference in name {0}", name.Name));
 									}
 								}
 							}
@@ -360,7 +360,7 @@ internal static class DependencyChainFactory
 						{
 							if (options.AllowCirculareReferences == false)
 							{
-								throw (new CircularReferenceException(string.Format("Circular Reference in cell {0}!{1}", par.ws.Name, ExcelAddress.GetAddress(f.Row, f.Column))));
+								throw new CircularReferenceException(string.Format("Circular Reference in cell {0}!{1}", par.ws.Name, ExcelAddress.GetAddress(f.Row, f.Column)));
 							}
 							else
 							{

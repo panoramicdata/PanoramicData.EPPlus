@@ -36,7 +36,7 @@ using System.Collections.Generic;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Style.XmlAccess;
 using OfficeOpenXml.Style.Dxf;
-using OfficeOpenXml.ConditionalFormatting;
+using OfficeOpenXml.ConditionalFormatting.Rules;
 namespace OfficeOpenXml;
 
 /// <summary>

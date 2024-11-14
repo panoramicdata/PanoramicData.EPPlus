@@ -23,9 +23,10 @@
 //
 //
 
+using OfficeOpenXml.Packaging.Ionic.Zip;
 using System;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 ///   Delegate in which the application writes the <c>ZipEntry</c> content for the named entry.
@@ -36,7 +37,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zip;
 ///
 /// <remarks>
 ///   When you add an entry and specify a <c>WriteDelegate</c>, via <see
-///   cref="Ionic.Zip.ZipFile.AddEntry(string, WriteDelegate)"/>, the application
+///   cref="ZipFile.AddEntry(string, WriteDelegate)"/>, the application
 ///   code provides the logic that writes the entry data directly into the zip file.
 /// </remarks>
 ///
@@ -77,7 +78,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zip;
 /// End Sub
 /// </code>
 /// </example>
-/// <seealso cref="Ionic.Zip.ZipFile.AddEntry(string, WriteDelegate)"/>
+/// <seealso cref="ZipFile.AddEntry(string, WriteDelegate)"/>
 public delegate void WriteDelegate(string entryName, System.IO.Stream stream);
 
 
@@ -90,12 +91,12 @@ public delegate void WriteDelegate(string entryName, System.IO.Stream stream);
 /// </param>
 ///
 /// <remarks>
-///   When you add an entry via <see cref="Ionic.Zip.ZipFile.AddEntry(string,
+///   When you add an entry via <see cref="ZipFile.AddEntry(string,
 ///   OpenDelegate, CloseDelegate)"/>, the application code provides the logic that
 ///   opens and closes the stream for the given ZipEntry.
 /// </remarks>
 ///
-/// <seealso cref="Ionic.Zip.ZipFile.AddEntry(string, OpenDelegate, CloseDelegate)"/>
+/// <seealso cref="ZipFile.AddEntry(string, OpenDelegate, CloseDelegate)"/>
 public delegate System.IO.Stream OpenDelegate(string entryName);
 
 /// <summary>
@@ -109,12 +110,12 @@ public delegate System.IO.Stream OpenDelegate(string entryName);
 /// <param name="stream">The stream to be closed.</param>
 ///
 /// <remarks>
-///   When you add an entry via <see cref="Ionic.Zip.ZipFile.AddEntry(string,
+///   When you add an entry via <see cref="ZipFile.AddEntry(string,
 ///   OpenDelegate, CloseDelegate)"/>, the application code provides the logic that
 ///   opens and closes the stream for the given ZipEntry.
 /// </remarks>
 ///
-/// <seealso cref="Ionic.Zip.ZipFile.AddEntry(string, OpenDelegate, CloseDelegate)"/>
+/// <seealso cref="ZipFile.AddEntry(string, OpenDelegate, CloseDelegate)"/>
 public delegate void CloseDelegate(string entryName, System.IO.Stream stream);
 
 /// <summary>
@@ -130,8 +131,8 @@ public delegate void CloseDelegate(string entryName, System.IO.Stream stream);
 ///   on any other factor.
 /// </para>
 /// </remarks>
-/// <seealso cref="Ionic.Zip.ZipFile.SetCompression"/>
-public delegate OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel SetCompressionCallback(string localFileName, string fileNameInArchive);
+/// <seealso cref="ZipFile.SetCompression"/>
+public delegate Zlib.CompressionLevel SetCompressionCallback(string localFileName, string fileNameInArchive);
 
 /// <summary>
 ///   In an EventArgs type, indicates which sort of progress event is being
@@ -293,9 +294,9 @@ internal class ZipProgressEventArgs : EventArgs
 	private bool _cancel;
 	private ZipEntry _latestEntry;
 	private ZipProgressEventType _flavor;
-	private String _archiveName;
-	private Int64 _bytesTransferred;
-	private Int64 _totalBytesToTransfer;
+	private string _archiveName;
+	private long _bytesTransferred;
+	private long _totalBytesToTransfer;
 
 
 	internal ZipProgressEventArgs() { }
@@ -346,7 +347,7 @@ internal class ZipProgressEventArgs : EventArgs
 	/// <summary>
 	/// Returns the archive name associated to this event.
 	/// </summary>
-	public String ArchiveName
+	public string ArchiveName
 	{
 		get { return _archiveName; }
 		set { _archiveName = value; }
@@ -356,7 +357,7 @@ internal class ZipProgressEventArgs : EventArgs
 	/// <summary>
 	/// The number of bytes read or written so far for this entry.
 	/// </summary>
-	public Int64 BytesTransferred
+	public long BytesTransferred
 	{
 		get { return _bytesTransferred; }
 		set { _bytesTransferred = value; }
@@ -368,7 +369,7 @@ internal class ZipProgressEventArgs : EventArgs
 	/// Total number of bytes that will be read or written for this entry.
 	/// This number will be -1 if the value cannot be determined.
 	/// </summary>
-	public Int64 TotalBytesToTransfer
+	public long TotalBytesToTransfer
 	{
 		get { return _totalBytesToTransfer; }
 		set { _totalBytesToTransfer = value; }
@@ -414,7 +415,7 @@ internal class ReadProgressEventArgs : ZipProgressEventArgs
 		return x;
 	}
 
-	internal static ReadProgressEventArgs ByteUpdate(string archiveName, ZipEntry entry, Int64 bytesXferred, Int64 totalBytes)
+	internal static ReadProgressEventArgs ByteUpdate(string archiveName, ZipEntry entry, long bytesXferred, long totalBytes)
 	{
 		var x = new ReadProgressEventArgs(archiveName, ZipProgressEventType.Reading_ArchiveBytesRead)
 		{
@@ -485,7 +486,7 @@ internal class SaveProgressEventArgs : ZipProgressEventArgs
 	/// <param name="entriesSaved">Number of entries that have been saved.</param>
 	/// <param name="entry">The entry involved in the event.</param>
 	internal SaveProgressEventArgs(string archiveName, bool before, int entriesTotal, int entriesSaved, ZipEntry entry)
-		: base(archiveName, (before) ? ZipProgressEventType.Saving_BeforeWriteEntry : ZipProgressEventType.Saving_AfterWriteEntry)
+		: base(archiveName, before ? ZipProgressEventType.Saving_BeforeWriteEntry : ZipProgressEventType.Saving_AfterWriteEntry)
 	{
 		EntriesTotal = entriesTotal;
 		CurrentEntry = entry;
@@ -499,7 +500,7 @@ internal class SaveProgressEventArgs : ZipProgressEventArgs
 	{ }
 
 
-	internal static SaveProgressEventArgs ByteUpdate(string archiveName, ZipEntry entry, Int64 bytesXferred, Int64 totalBytes)
+	internal static SaveProgressEventArgs ByteUpdate(string archiveName, ZipEntry entry, long bytesXferred, long totalBytes)
 	{
 		var x = new SaveProgressEventArgs(archiveName, ZipProgressEventType.Saving_EntryBytesRead)
 		{
@@ -548,7 +549,7 @@ internal class ExtractProgressEventArgs : ZipProgressEventArgs
 	/// <param name="entry">The entry involved in the event.</param>
 	/// <param name="extractLocation">The location to which entries are extracted.</param>
 	internal ExtractProgressEventArgs(string archiveName, bool before, int entriesTotal, int entriesExtracted, ZipEntry entry, string extractLocation)
-		: base(archiveName, (before) ? ZipProgressEventType.Extracting_BeforeExtractEntry : ZipProgressEventType.Extracting_AfterExtractEntry)
+		: base(archiveName, before ? ZipProgressEventType.Extracting_BeforeExtractEntry : ZipProgressEventType.Extracting_AfterExtractEntry)
 	{
 		EntriesTotal = entriesTotal;
 		CurrentEntry = entry;
@@ -619,7 +620,7 @@ internal class ExtractProgressEventArgs : ZipProgressEventArgs
 	}
 
 
-	internal static ExtractProgressEventArgs ByteUpdate(string archiveName, ZipEntry entry, Int64 bytesWritten, Int64 totalBytes)
+	internal static ExtractProgressEventArgs ByteUpdate(string archiveName, ZipEntry entry, long bytesWritten, long totalBytes)
 	{
 		var x = new ExtractProgressEventArgs(archiveName, ZipProgressEventType.Extracting_EntryBytesWritten)
 		{
@@ -643,7 +644,7 @@ internal class ExtractProgressEventArgs : ZipProgressEventArgs
 	/// <summary>
 	/// Returns the extraction target location, a filesystem path.
 	/// </summary>
-	public String ExtractLocation => _target;
+	public string ExtractLocation => _target;
 
 }
 
@@ -676,5 +677,5 @@ internal class ZipErrorEventArgs : ZipProgressEventArgs
 	/// <summary>
 	/// Returns the name of the file that caused the exception, if any.
 	/// </summary>
-	public String FileName => CurrentEntry.LocalFileName;
+	public string FileName => CurrentEntry.LocalFileName;
 }

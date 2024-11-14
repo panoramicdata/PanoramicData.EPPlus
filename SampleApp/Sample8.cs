@@ -32,7 +32,8 @@
 using System;
 using OfficeOpenXml;
 using System.Linq;
-namespace EPPlusSamples;
+
+namespace SampleApp;
 
 public static class LinqSample
 {
@@ -50,7 +51,7 @@ public static class LinqSample
 		var sheet = package.Workbook.Worksheets[0];
 
 		//Select all cells in column d between 9990 and 10000
-		var query1 = (from cell in sheet.Cells["d:d"] where cell.Value is double && (double)cell.Value >= 9990 && (double)cell.Value <= 10000 select cell);
+		var query1 = from cell in sheet.Cells["d:d"] where cell.Value is double && (double)cell.Value >= 9990 && (double)cell.Value <= 10000 select cell;
 
 		Console.WriteLine("Print all cells with value between 9990 and 10000 in column D ...");
 		Console.WriteLine();
@@ -67,7 +68,7 @@ public static class LinqSample
 
 		//Select all bold cells
 		Console.WriteLine("Now get all bold cells from the entire sheet...");
-		var query2 = (from cell in sheet.Cells[sheet.Dimension.Address] where cell.Style.Font.Bold select cell);
+		var query2 = from cell in sheet.Cells[sheet.Dimension.Address] where cell.Style.Font.Bold select cell;
 		//If you have a clue where the data is, specify a smaller range in the cells indexer to get better performance (for example "1:1,65536:65536" here)
 		count = 0;
 		foreach (var cell in query2)
@@ -85,11 +86,11 @@ public static class LinqSample
 		}
 
 		//Here we use more than one column in the where clause. We start by searching column D, then use the Offset method to check the value of column C.
-		var query3 = (from cell in sheet.Cells["d:d"]
-					  where cell.Value is double &&
-							(double)cell.Value >= 9500 && (double)cell.Value <= 10000 &&
-							cell.Offset(0, -1).GetValue<DateTime>().Year == DateTime.Today.Year + 1
-					  select cell);
+		var query3 = from cell in sheet.Cells["d:d"]
+					 where cell.Value is double &&
+						   (double)cell.Value >= 9500 && (double)cell.Value <= 10000 &&
+						   cell.Offset(0, -1).GetValue<DateTime>().Year == DateTime.Today.Year + 1
+					 select cell;
 
 		Console.WriteLine();
 		Console.WriteLine("Print all cells with a value between 9500 and 10000 in column D and the year of Column C is {0} ...", DateTime.Today.Year + 1);

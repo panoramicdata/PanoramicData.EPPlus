@@ -34,7 +34,7 @@ using OfficeOpenXml.Utils;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 using OfficeOpenXml.Style.Dxf;
 
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 /// <summary>
 /// 
@@ -321,7 +321,7 @@ public abstract class ExcelConditionalFormattingRule
 		{
 			SetXmlNodeString(
 			  ExcelConditionalFormattingConstants.Paths.StopIfTrueAttribute,
-			  (value == true) ? "1" : string.Empty,
+			  value == true ? "1" : string.Empty,
 			  true);
 		}
 	}
@@ -340,7 +340,7 @@ public abstract class ExcelConditionalFormattingRule
 		{
 			SetXmlNodeString(
 			  ExcelConditionalFormattingConstants.Paths.DxfIdAttribute,
-			  (value == int.MinValue) ? string.Empty : value.ToString(),
+			  value == int.MinValue ? string.Empty : value.ToString(),
 			  true);
 		}
 	}
@@ -357,7 +357,7 @@ public abstract class ExcelConditionalFormattingRule
 	/// <summary>
 	/// StdDev (zero is not allowed and will be converted to 1)
 	/// </summary>
-	public UInt16 StdDev
+	public ushort StdDev
 	{
 		get
 		{
@@ -368,7 +368,7 @@ public abstract class ExcelConditionalFormattingRule
 		{
 			SetXmlNodeString(
 			  ExcelConditionalFormattingConstants.Paths.StdDevAttribute,
-			  (value == 0) ? "1" : value.ToString(),
+			  value == 0 ? "1" : value.ToString(),
 			  true);
 		}
 	}
@@ -376,7 +376,7 @@ public abstract class ExcelConditionalFormattingRule
 	/// <summary>
 	/// Rank (zero is not allowed and will be converted to 1)
 	/// </summary>
-	public UInt16 Rank
+	public ushort Rank
 	{
 		get
 		{
@@ -387,7 +387,7 @@ public abstract class ExcelConditionalFormattingRule
 		{
 			SetXmlNodeString(
 			  ExcelConditionalFormattingConstants.Paths.RankAttribute,
-			  (value == 0) ? "1" : value.ToString(),
+			  value == 0 ? "1" : value.ToString(),
 			  true);
 		}
 	}
@@ -437,7 +437,7 @@ public abstract class ExcelConditionalFormattingRule
 			  ExcelConditionalFormattingConstants.Paths.EqualAverageAttribute);
 
 			// Equal Avarege only if TRUE
-			return (equalAverage == true);
+			return equalAverage == true;
 		}
 		set
 		{
@@ -467,7 +467,7 @@ public abstract class ExcelConditionalFormattingRule
 			  ExcelConditionalFormattingConstants.Paths.BottomAttribute);
 
 			// Bottom if TRUE
-			return (bottom == true);
+			return bottom == true;
 		}
 		set
 		{
@@ -497,7 +497,7 @@ public abstract class ExcelConditionalFormattingRule
 			  ExcelConditionalFormattingConstants.Paths.PercentAttribute);
 
 			// Bottom if TRUE
-			return (percent == true);
+			return percent == true;
 		}
 		set
 		{

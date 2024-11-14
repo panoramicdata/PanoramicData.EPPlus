@@ -25,7 +25,9 @@
 // ------------------------------------------------------------------
 
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.Ionic.Zip;
+
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 /// An enum that provides the various encryption algorithms supported by this

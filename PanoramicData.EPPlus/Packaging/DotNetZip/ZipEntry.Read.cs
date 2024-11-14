@@ -25,6 +25,7 @@
 // ------------------------------------------------------------------
 
 
+using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 using System.IO;
 
@@ -40,7 +41,7 @@ internal partial class ZipEntry
 		var posn = ArchiveStream.Position;
 		ArchiveStream.Seek(_RelativeOffsetOfLocalHeader, SeekOrigin.Begin);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+		SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 
 		var block = new byte[30];
 		ArchiveStream.Read(block, 0, block.Length);
@@ -51,14 +52,14 @@ internal partial class ZipEntry
 		// workitem 8098: ok (relative)
 		ArchiveStream.Seek(filenameLength, SeekOrigin.Current);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+		SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 
 		ProcessExtraField(ArchiveStream, extraFieldLength);
 
 		// workitem 8098: ok (restore)
 		ArchiveStream.Seek(posn, SeekOrigin.Begin);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+		SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 		_readExtraDepth--;
 	}
 
@@ -70,7 +71,7 @@ internal partial class ZipEntry
 		// change for workitem 8098
 		ze._RelativeOffsetOfLocalHeader = ze.ArchiveStream.Position;
 
-		var signature = Ionic.Zip.SharedUtilities.ReadEntrySignature(ze.ArchiveStream);
+		var signature = SharedUtilities.ReadEntrySignature(ze.ArchiveStream);
 		bytesRead += 4;
 
 		// Return false if this is not a local file header signature.
@@ -86,7 +87,7 @@ internal partial class ZipEntry
 
 			ze.ArchiveStream.Seek(-4, SeekOrigin.Current); // unread the signature
 														   // workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ze.ArchiveStream);
+			SharedUtilities.Workaround_Ladybug318918(ze.ArchiveStream);
 			return ZipEntry.IsNotValidZipDirEntrySig(signature) && (signature != ZipConstants.EndOfCentralDirectorySignature)
 				?             throw new BadReadException(String.Format("  Bad signature (0x{0:X8}) at position  0x{1:X8}", signature, ze.ArchiveStream.Position))
 				: false;
@@ -103,7 +104,7 @@ internal partial class ZipEntry
 		ze._CompressionMethod_FromZipFile = ze._CompressionMethod = (Int16)(block[i++] + block[i++] * 256);
 		ze._TimeBlob = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
 		// transform the time data into something usable (a DateTime)
-		ze._LastModified = Ionic.Zip.SharedUtilities.PackedToDateTime(ze._TimeBlob);
+		ze._LastModified = SharedUtilities.PackedToDateTime(ze._TimeBlob);
 		ze._timestamp |= ZipEntryTimestamp.DOS;
 
 		if ((ze._BitField & 0x01) == 0x01)
@@ -190,7 +191,7 @@ internal partial class ZipEntry
 
 				ze._container.ZipFile?.OnReadBytes(ze);
 
-				var d = Ionic.Zip.SharedUtilities.FindSignature(ze.ArchiveStream, ZipConstants.ZipEntryDataDescriptorSignature);
+				var d = SharedUtilities.FindSignature(ze.ArchiveStream, ZipConstants.ZipEntryDataDescriptorSignature);
 				if (d == -1) return false;
 
 				// total size of data read (through all loops of this).
@@ -245,7 +246,7 @@ internal partial class ZipEntry
 					// (12 bytes for the CRC, Comp and Uncomp size.)
 					ze.ArchiveStream.Seek(-12, SeekOrigin.Current);
 					// workitem 10178
-					Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ze.ArchiveStream);
+					SharedUtilities.Workaround_Ladybug318918(ze.ArchiveStream);
 
 					// Adjust the size to account for the false signature read in
 					// FindSignature().
@@ -257,7 +258,7 @@ internal partial class ZipEntry
 			// workitem 8098: ok (restore)
 			ze.ArchiveStream.Seek(posn, SeekOrigin.Begin);
 			// workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ze.ArchiveStream);
+			SharedUtilities.Workaround_Ladybug318918(ze.ArchiveStream);
 		}
 
 		ze._CompressedFileDataSize = ze._CompressedSize;
@@ -368,7 +369,7 @@ internal partial class ZipEntry
 		// seek past the data without reading it. We will read on Extract()
 		s.Seek(entry._CompressedFileDataSize + entry._LengthOfTrailer, SeekOrigin.Current);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(s);
+		SharedUtilities.Workaround_Ladybug318918(s);
 
 		// ReadHeader moves the file pointer to the end of the entry header,
 		// as well as any encryption header.
@@ -396,12 +397,12 @@ internal partial class ZipEntry
 	{
 		// in some cases, the zip file begins with "PK00".  This is a throwback and is rare,
 		// but we handle it anyway. We do not change behavior based on it.
-		var datum = (uint)Ionic.Zip.SharedUtilities.ReadInt(s);
+		var datum = (uint)SharedUtilities.ReadInt(s);
 		if (datum != ZipConstants.PackedToRemovableMedia)
 		{
 			s.Seek(-4, SeekOrigin.Current); // unread the block
 											// workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(s);
+			SharedUtilities.Workaround_Ladybug318918(s);
 		}
 	}
 
@@ -416,13 +417,13 @@ internal partial class ZipEntry
 		//    by the compressed length and the uncompressed length (4 bytes for each
 		//    of those three elements).  Need to check that here.
 		//
-		var datum = (uint)Ionic.Zip.SharedUtilities.ReadInt(s);
+		var datum = (uint)SharedUtilities.ReadInt(s);
 		if (datum == entry._Crc32)
 		{
-			var sz = Ionic.Zip.SharedUtilities.ReadInt(s);
+			var sz = SharedUtilities.ReadInt(s);
 			if (sz == entry._CompressedSize)
 			{
-				sz = Ionic.Zip.SharedUtilities.ReadInt(s);
+				sz = SharedUtilities.ReadInt(s);
 				if (sz == entry._UncompressedSize)
 				{
 					// ignore everything and discard it.
@@ -432,7 +433,7 @@ internal partial class ZipEntry
 					s.Seek(-12, SeekOrigin.Current); // unread the three blocks
 
 					// workitem 10178
-					Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(s);
+					SharedUtilities.Workaround_Ladybug318918(s);
 				}
 			}
 			else
@@ -440,7 +441,7 @@ internal partial class ZipEntry
 				s.Seek(-8, SeekOrigin.Current); // unread the two blocks
 
 				// workitem 10178
-				Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(s);
+				SharedUtilities.Workaround_Ladybug318918(s);
 			}
 		}
 		else
@@ -448,7 +449,7 @@ internal partial class ZipEntry
 			s.Seek(-4, SeekOrigin.Current); // unread the block
 
 			// workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(s);
+			SharedUtilities.Workaround_Ladybug318918(s);
 		}
 	}
 

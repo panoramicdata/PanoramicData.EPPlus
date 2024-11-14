@@ -32,7 +32,8 @@
 using OfficeOpenXml;
 using System.Drawing;
 using OfficeOpenXml.Style;
-namespace EPPlusSamples;
+using OfficeOpenXml.FormulaParsing;
+namespace SampleApp;
 
 class Sample1
 {

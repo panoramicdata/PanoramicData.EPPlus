@@ -31,7 +31,7 @@
 using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 /// <summary>
 /// ExcelConditionalFormattingAverageGroup
@@ -65,7 +65,7 @@ public class ExcelConditionalFormattingAverageGroup
 		priority,
 		worksheet,
 		itemElementNode,
-		(namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 	}
 

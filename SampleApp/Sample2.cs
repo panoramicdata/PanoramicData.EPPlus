@@ -33,7 +33,7 @@ using System;
 using System.IO;
 using OfficeOpenXml;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 /// <summary>
 /// Simply opens an existing file and reads some values and properties

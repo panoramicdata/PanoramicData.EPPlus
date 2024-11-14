@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 public static class Sample16
 {

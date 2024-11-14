@@ -26,13 +26,13 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2011-01-08
  *******************************************************************************/
-using System;
-using System.Text;
 using OfficeOpenXml;
 using OfficeOpenXml.DataValidation;
 using OfficeOpenXml.DataValidation.Contracts;
+using System;
+using System.Text;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 /// <summary>
 /// This sample shows how to use data validation

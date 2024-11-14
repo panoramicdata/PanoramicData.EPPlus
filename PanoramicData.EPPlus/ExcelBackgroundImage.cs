@@ -29,8 +29,8 @@
  * Jan Källman		Added		10-SEP-2009
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
-using EPPlus.Drawing;
 using OfficeOpenXml.Compatibility;
+using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Utils;
 using System;
 using System.Drawing;

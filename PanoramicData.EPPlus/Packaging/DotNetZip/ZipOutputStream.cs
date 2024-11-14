@@ -42,14 +42,14 @@
 // ------------------------------------------------------------------
 //
 
-using Ionic.Zip;
-using OfficeOpenXml.Packaging.Ionic.Zlib;
+using OfficeOpenXml.Packaging.DotNetZip.Zlib;
+using OfficeOpenXml.Packaging.Ionic.Zip;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 ///   Provides a stream metaphor for generating zip files.
@@ -118,7 +118,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zip;
 ///
 /// <para>
 ///   Be aware that the <c>ZipOutputStream</c> class implements the <see
-///   cref="System.IDisposable"/> interface.  In order for
+///   cref="IDisposable"/> interface.  In order for
 ///   <c>ZipOutputStream</c> to produce a valid zip file, you use use it within
 ///   a using clause (<c>Using</c> in VB), or call the <c>Dispose()</c> method
 ///   explicitly.  See the examples for how to employ a using clause.
@@ -149,7 +149,7 @@ internal class ZipOutputStream : Stream
 	/// <para>
 	///   The <see cref="ZipFile"/> class is generally easier to use when creating
 	///   zip files. The ZipOutputStream offers a different metaphor for creating a
-	///   zip file, based on the <see cref="System.IO.Stream"/> class.
+	///   zip file, based on the <see cref="Stream"/> class.
 	/// </para>
 	///
 	/// </remarks>
@@ -239,7 +239,7 @@ internal class ZipOutputStream : Stream
 	/// <remarks>
 	///   The <see cref="ZipFile"/> class is generally easier to use when creating
 	///   zip files. The ZipOutputStream offers a different metaphor for creating a
-	///   zip file, based on the <see cref="System.IO.Stream"/> class.
+	///   zip file, based on the <see cref="Stream"/> class.
 	/// </remarks>
 	///
 	/// <param name="fileName">
@@ -312,7 +312,7 @@ internal class ZipOutputStream : Stream
 	/// End Sub
 	/// </code>
 	/// </example>
-	public ZipOutputStream(String fileName)
+	public ZipOutputStream(string fileName)
 	{
 		Stream stream = File.Open(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
 		_Init(stream, false, fileName);
@@ -346,13 +346,13 @@ internal class ZipOutputStream : Stream
 	{
 		// workitem 9307
 		_outputStream = stream.CanRead ? stream : new CountingStream(stream);
-		CompressionLevel = OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel.Default;
-		CompressionMethod = OfficeOpenXml.Packaging.Ionic.Zip.CompressionMethod.Deflate;
+		CompressionLevel = Zlib.CompressionLevel.Default;
+		CompressionMethod = CompressionMethod.Deflate;
 		_encryption = EncryptionAlgorithm.None;
-		_entriesWritten = new Dictionary<String, ZipEntry>(StringComparer.Ordinal);
+		_entriesWritten = new Dictionary<string, ZipEntry>(StringComparer.Ordinal);
 		_zip64 = Zip64Option.Never;
 		_leaveUnderlyingStreamOpen = leaveOpen;
-		Strategy = Ionic.Zlib.CompressionStrategy.Default;
+		Strategy = CompressionStrategy.Default;
 		_name = name ?? "(stream)";
 #if !NETCF
 		ParallelDeflateThreshold = -1L;
@@ -367,7 +367,7 @@ internal class ZipOutputStream : Stream
 	///   </para>
 	/// </remarks>
 	/// <returns>a string representation of the instance.</returns>
-	public override String ToString() => String.Format("ZipOutputStream::{0}(leaveOpen({1})))", _name, _leaveUnderlyingStreamOpen);
+	public override string ToString() => string.Format("ZipOutputStream::{0}(leaveOpen({1})))", _name, _leaveUnderlyingStreamOpen);
 
 
 	/// <summary>
@@ -418,14 +418,14 @@ internal class ZipOutputStream : Stream
 	/// </para>
 	///
 	/// </remarks>
-	public String Password
+	public string Password
 	{
 		set
 		{
 			if (_disposed)
 			{
 				_exceptionPending = true;
-				throw new System.InvalidOperationException("The stream has been closed.");
+				throw new InvalidOperationException("The stream has been closed.");
 			}
 
 			_password = value;
@@ -473,7 +473,7 @@ internal class ZipOutputStream : Stream
 			if (_disposed)
 			{
 				_exceptionPending = true;
-				throw new System.InvalidOperationException("The stream has been closed.");
+				throw new InvalidOperationException("The stream has been closed.");
 			}
 
 			if (value == EncryptionAlgorithm.Unsupported)
@@ -514,7 +514,7 @@ internal class ZipOutputStream : Stream
 	///   work better on different sorts of data. The strategy parameter can affect
 	///   the compression ratio and the speed of compression but not the correctness
 	///   of the compresssion.  For more information see <see
-	///   cref="Ionic.Zlib.CompressionStrategy "/>.
+	///   cref="CompressionStrategy "/>.
 	/// </remarks>
 	public CompressionStrategy Strategy
 	{
@@ -542,7 +542,7 @@ internal class ZipOutputStream : Stream
 			if (_disposed)
 			{
 				_exceptionPending = true;
-				throw new System.InvalidOperationException("The stream has been closed.");
+				throw new InvalidOperationException("The stream has been closed.");
 			}
 
 			_timestamp = value;
@@ -581,7 +581,7 @@ internal class ZipOutputStream : Stream
 	///    alone, and accept the default.
 	///  </para>
 	/// </remarks>
-	public OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel CompressionLevel
+	public Zlib.CompressionLevel CompressionLevel
 	{
 		get;
 		set;
@@ -643,7 +643,7 @@ internal class ZipOutputStream : Stream
 			if (_disposed)
 			{
 				_exceptionPending = true;
-				throw new System.InvalidOperationException("The stream has been closed.");
+				throw new InvalidOperationException("The stream has been closed.");
 			}
 
 			_comment = value;
@@ -680,7 +680,7 @@ internal class ZipOutputStream : Stream
 			if (_disposed)
 			{
 				_exceptionPending = true;
-				throw new System.InvalidOperationException("The stream has been closed.");
+				throw new InvalidOperationException("The stream has been closed.");
 			}
 
 			_zip64 = value;
@@ -708,7 +708,7 @@ internal class ZipOutputStream : Stream
 	///   Though the zip specification doesn't prohibit zipfiles with duplicate
 	///   entries, Sane zip files have no duplicates, and the DotNetZip library
 	///   cannot create zip files with duplicate entries. If an application attempts
-	///   to call <see cref="PutNextEntry(String)"/> with a name that duplicates one
+	///   to call <see cref="PutNextEntry(string)"/> with a name that duplicates one
 	///   already used within the archive, the library will throw an Exception.
 	///   </para>
 	///   <para>
@@ -853,8 +853,8 @@ internal class ZipOutputStream : Stream
 	{
 		get
 		{
-			return (_alternateEncoding == System.Text.Encoding.UTF8) &&
-				(AlternateEncodingUsage == ZipOption.AsNecessary);
+			return _alternateEncoding == System.Text.Encoding.UTF8 &&
+				AlternateEncodingUsage == ZipOption.AsNecessary;
 		}
 		set
 		{
@@ -866,7 +866,7 @@ internal class ZipOutputStream : Stream
 			}
 			else
 			{
-				_alternateEncoding = Ionic.Zip.ZipOutputStream.DefaultEncoding;
+				_alternateEncoding = DefaultEncoding;
 				_alternateEncodingUsage = ZipOption.Never;
 			}
 		}
@@ -1011,7 +1011,7 @@ internal class ZipOutputStream : Stream
 	/// The default text encoding used in zip archives.  It is numeric 437, also
 	/// known as IBM437.
 	/// </summary>
-	/// <seealso cref="Ionic.Zip.ZipFile.ProvisionalAlternateEncoding"/>
+	/// <seealso cref="ZipFile.ProvisionalAlternateEncoding"/>
 	public static System.Text.Encoding DefaultEncoding =>
 #if Core
                     return System.Text.Encoding.GetEncoding("utf-8");     
@@ -1070,7 +1070,7 @@ internal class ZipOutputStream : Stream
 	///     Encryption. This is primarily because encryption tends to slow down
 	///     the entire pipeline. Also, multi-threaded compression gives less of an
 	///     advantage when using lower compression levels, for example <see
-	///     cref="Ionic.Zlib.CompressionLevel.BestSpeed"/>.  You may have to perform
+	///     cref="Zlib.CompressionLevel.BestSpeed"/>.  You may have to perform
 	///     some tests to determine the best approach for your situation.
 	///   </para>
 	///
@@ -1108,7 +1108,7 @@ internal class ZipOutputStream : Stream
 	///   compression stream allocates multiple buffers to
 	///   facilitate parallel compression.  As each buffer fills up,
 	///   the stream uses <see
-	///   cref="System.Threading.ThreadPool.QueueUserWorkItem(WaitCallback)">
+	///   cref="ThreadPool.QueueUserWorkItem(WaitCallback)">
 	///   ThreadPool.QueueUserWorkItem()</see> to compress those
 	///   buffers in a background threadpool thread. After a buffer
 	///   is compressed, it is re-ordered and written to the output
@@ -1194,7 +1194,7 @@ internal class ZipOutputStream : Stream
 		if (_entriesWritten.ContainsKey(ze1.FileName))
 		{
 			_exceptionPending = true;
-			throw new ArgumentException(String.Format("The entry '{0}' already exists in the zip archive.", ze1.FileName));
+			throw new ArgumentException(string.Format("The entry '{0}' already exists in the zip archive.", ze1.FileName));
 		}
 	}
 
@@ -1237,25 +1237,25 @@ internal class ZipOutputStream : Stream
 		if (_disposed)
 		{
 			_exceptionPending = true;
-			throw new System.InvalidOperationException("The stream has been closed.");
+			throw new InvalidOperationException("The stream has been closed.");
 		}
 
 		if (buffer == null)
 		{
 			_exceptionPending = true;
-			throw new System.ArgumentNullException(nameof(buffer));
+			throw new ArgumentNullException(nameof(buffer));
 		}
 
 		if (_currentEntry == null)
 		{
 			_exceptionPending = true;
-			throw new System.InvalidOperationException("You must call PutNextEntry() before calling Write().");
+			throw new InvalidOperationException("You must call PutNextEntry() before calling Write().");
 		}
 
 		if (_currentEntry.IsDirectory)
 		{
 			_exceptionPending = true;
-			throw new System.InvalidOperationException("You cannot Write() data for an entry that is a directory.");
+			throw new InvalidOperationException("You cannot Write() data for an entry that is a directory.");
 		}
 
 		if (_needToWriteEntryHeader)
@@ -1347,7 +1347,7 @@ internal class ZipOutputStream : Stream
 	///   The ZipEntry created.
 	/// </returns>
 	///
-	public ZipEntry PutNextEntry(String entryName)
+	public ZipEntry PutNextEntry(string entryName)
 	{
 		if (string.IsNullOrEmpty(entryName))
 			throw new ArgumentNullException(nameof(entryName));
@@ -1373,8 +1373,8 @@ internal class ZipOutputStream : Stream
 
 		if (entryName.EndsWith("/")) _currentEntry.MarkAsDirectory();
 
-		_currentEntry.EmitTimesInWindowsFormatWhenSaving = ((_timestamp & ZipEntryTimestamp.Windows) != 0);
-		_currentEntry.EmitTimesInUnixFormatWhenSaving = ((_timestamp & ZipEntryTimestamp.Unix) != 0);
+		_currentEntry.EmitTimesInWindowsFormatWhenSaving = (_timestamp & ZipEntryTimestamp.Windows) != 0;
+		_currentEntry.EmitTimesInUnixFormatWhenSaving = (_timestamp & ZipEntryTimestamp.Unix) != 0;
 		InsureUniqueEntry(_currentEntry);
 		_needToWriteEntryHeader = true;
 
@@ -1398,7 +1398,7 @@ internal class ZipOutputStream : Stream
 		if (_entryCount > 65534 && _zip64 == Zip64Option.Never)
 		{
 			_exceptionPending = true;
-			throw new System.InvalidOperationException("Too many entries. Consider setting ZipOutputStream.EnableZip64.");
+			throw new InvalidOperationException("Too many entries. Consider setting ZipOutputStream.EnableZip64.");
 		}
 
 		// Write out the header.
@@ -1588,7 +1588,7 @@ internal class ZipOutputStream : Stream
 	private CountingStream _outputCounter;
 	private Stream _encryptor;
 	private Stream _deflater;
-	private Crc.CrcCalculatorStream _entryOutputStream;
+	private CrcCalculatorStream _entryOutputStream;
 	private bool _needToWriteEntryHeader;
 	private string _name;
 	private bool _dontIgnoreCase;
@@ -1621,9 +1621,9 @@ internal class ZipContainer
 
 	public ZipContainer(object o)
 	{
-		_zf = (o as ZipFile);
-		_zos = (o as ZipOutputStream);
-		_zis = (o as ZipInputStream);
+		_zf = o as ZipFile;
+		_zos = o as ZipOutputStream;
+		_zis = o as ZipInputStream;
 	}
 
 	public ZipFile ZipFile => _zf;
@@ -1667,7 +1667,7 @@ internal class ZipContainer
 	}
 
 #if !NETCF
-	public Ionic.Zlib.ParallelDeflateOutputStream ParallelDeflater
+	public ParallelDeflateOutputStream ParallelDeflater
 	{
 		get
 		{
@@ -1694,7 +1694,7 @@ internal class ZipContainer
 		}
 	}
 
-	public Ionic.Zlib.CompressionStrategy Strategy => _zf != null ? _zf.Strategy : _zos.Strategy;
+	public CompressionStrategy Strategy => _zf != null ? _zf.Strategy : _zos.Strategy;
 
 	public Zip64Option UseZip64WhenSaving => _zf != null ? _zf.UseZip64WhenSaving : _zos.EnableZip64;
 

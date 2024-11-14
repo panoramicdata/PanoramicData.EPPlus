@@ -25,9 +25,10 @@
 //
 // ------------------------------------------------------------------
 
+using OfficeOpenXml.Packaging.Ionic.Zip;
 using System;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 ///   This class implements the "traditional" or "classic" PKZip encryption,
@@ -93,7 +94,7 @@ internal class ZipCrypto
 		// CRC check
 		// According to the pkzip spec, the final byte in the decrypted header
 		// is the highest-order byte in the CRC. We check it here.
-		if (DecryptedHeader[11] != (byte)((e._Crc32 >> 24) & 0xff))
+		if (DecryptedHeader[11] != (byte)(e._Crc32 >> 24 & 0xff))
 		{
 			// In the case that bit 3 of the general purpose bit flag is set to
 			// indicate the presence of an 'Extended File Header' or a 'data
@@ -125,7 +126,7 @@ internal class ZipCrypto
 			{
 				throw new BadPasswordException("The password did not match.");
 			}
-			else if (DecryptedHeader[11] != (byte)((e._TimeBlob >> 8) & 0xff))
+			else if (DecryptedHeader[11] != (byte)(e._TimeBlob >> 8 & 0xff))
 			{
 				throw new BadPasswordException("The password did not match.");
 			}
@@ -155,8 +156,8 @@ internal class ZipCrypto
 	{
 		get
 		{
-			var t = (UInt16)((UInt16)(_Keys[2] & 0xFFFF) | 2);
-			return (byte)((t * (t ^ 1)) >> 8);
+			var t = (ushort)((ushort)(_Keys[2] & 0xFFFF) | 2);
+			return (byte)(t * (t ^ 1) >> 8);
 		}
 	}
 
@@ -305,10 +306,10 @@ internal class ZipCrypto
 
 	private void UpdateKeys(byte byteValue)
 	{
-		_Keys[0] = (UInt32)crc32.ComputeCrc32((int)_Keys[0], byteValue);
+		_Keys[0] = (uint)crc32.ComputeCrc32((int)_Keys[0], byteValue);
 		_Keys[1] = _Keys[1] + (byte)_Keys[0];
 		_Keys[1] = _Keys[1] * 0x08088405 + 1;
-		_Keys[2] = (UInt32)crc32.ComputeCrc32((int)_Keys[2], (byte)(_Keys[1] >> 24));
+		_Keys[2] = (uint)crc32.ComputeCrc32((int)_Keys[2], (byte)(_Keys[1] >> 24));
 	}
 
 	///// <summary>
@@ -338,8 +339,8 @@ internal class ZipCrypto
 	//}
 
 	// private fields for the crypto stuff:
-	private UInt32[] _Keys = [0x12345678, 0x23456789, 0x34567890];
-	private Ionic.Crc.CRC32 crc32 = new();
+	private uint[] _Keys = [0x12345678, 0x23456789, 0x34567890];
+	private CRC32 crc32 = new();
 
 }
 
@@ -417,10 +418,10 @@ internal class ZipCipherStream : System.IO.Stream
 	}
 
 
-	public override bool CanRead => (_mode == CryptoMode.Decrypt);
+	public override bool CanRead => _mode == CryptoMode.Decrypt;
 	public override bool CanSeek => false;
 
-	public override bool CanWrite => (_mode == CryptoMode.Encrypt);
+	public override bool CanWrite => _mode == CryptoMode.Encrypt;
 
 	public override void Flush()
 	{

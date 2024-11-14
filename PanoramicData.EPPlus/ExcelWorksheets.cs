@@ -40,7 +40,7 @@ using OfficeOpenXml.Drawing.Vml;
 using OfficeOpenXml.Utils;
 using OfficeOpenXml.VBA;
 using OfficeOpenXml.Table.PivotTable;
-using EPPlus.Drawing;
+using OfficeOpenXml.Drawing;
 
 namespace OfficeOpenXml;
 

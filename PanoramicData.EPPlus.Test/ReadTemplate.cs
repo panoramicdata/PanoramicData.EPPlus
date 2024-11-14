@@ -8,6 +8,7 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml.ConditionalFormatting;
 using System.Threading;
 using System.Drawing;
+using OfficeOpenXml.FormulaParsing;
 namespace PanoramicData.EPPlus.Test;
 
 [TestClass]

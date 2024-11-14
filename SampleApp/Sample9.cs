@@ -35,7 +35,8 @@ using System.IO;
 using OfficeOpenXml.Table;
 using OfficeOpenXml.Drawing.Chart;
 using System.Globalization;
-namespace EPPlusSamples;
+using OfficeOpenXml.FormulaParsing;
+namespace SampleApp;
 
 /// <summary>
 /// This sample shows how to load CSV files using the LoadFromText method, how to use tables and

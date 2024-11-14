@@ -28,6 +28,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using OfficeOpenXml.Packaging.DotNetZip;
 
 namespace OfficeOpenXml.Packaging.Ionic.Zip;
 
@@ -675,7 +676,7 @@ internal partial class ZipFile
 		s.Seek(offset64, SeekOrigin.Begin);
 		//zf.SeekFromOrigin(Offset64);
 
-		var datum = (uint)Ionic.Zip.SharedUtilities.ReadInt(s);
+		var datum = (uint)SharedUtilities.ReadInt(s);
 		if (datum != ZipConstants.Zip64EndOfCentralDirectoryRecordSignature)
 			throw new BadReadException(String.Format("  Bad signature (0x{0:X8}) looking for ZIP64 EoCD Record at position 0x{1:X8}", datum, s.Position));
 
@@ -694,7 +695,7 @@ internal partial class ZipFile
 
 	private static uint ReadFirstFourBytes(Stream s)
 	{
-		var datum = (uint)Ionic.Zip.SharedUtilities.ReadInt(s);
+		var datum = (uint)SharedUtilities.ReadInt(s);
 		return datum;
 	}
 
@@ -824,7 +825,7 @@ internal partial class ZipFile
 	private static void ReadCentralDirectoryFooter(ZipFile zf)
 	{
 		var s = zf.ReadStream;
-		var signature = Ionic.Zip.SharedUtilities.ReadSignature(s);
+		var signature = SharedUtilities.ReadSignature(s);
 
 		byte[] block = null;
 		var j = 0;
@@ -867,7 +868,7 @@ internal partial class ZipFile
 			s.Read(block, 0, block.Length);
 			// discard the result
 
-			signature = Ionic.Zip.SharedUtilities.ReadSignature(s);
+			signature = SharedUtilities.ReadSignature(s);
 			if (signature != ZipConstants.Zip64EndOfCentralDirectoryLocatorSignature)
 				throw new ZipException("Inconsistent metadata in the ZIP64 Central Directory.");
 
@@ -875,7 +876,7 @@ internal partial class ZipFile
 			s.Read(block, 0, block.Length);
 			// discard the result
 
-			signature = Ionic.Zip.SharedUtilities.ReadSignature(s);
+			signature = SharedUtilities.ReadSignature(s);
 		}
 
 		// Throw if this is not a signature for "end of central directory record"

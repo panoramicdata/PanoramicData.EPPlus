@@ -33,7 +33,7 @@ using OfficeOpenXml;
 using System.Data;
 using OfficeOpenXml.Table;
 using System.Reflection;
-namespace EPPlusSamples;
+namespace SampleApp;
 
 /// <summary>
 /// This class shows how to load data in a few ways
@@ -66,7 +66,7 @@ public static class Sample13
 		wsDt.Cells[2, 3, dt.Rows.Count + 1, 4].Style.Numberformat.Format = "mm-dd-yy";
 		wsDt.Cells[wsDt.Dimension.Address].AutoFitColumns();
 		//Select Name and Created-time...
-		var collection = (from row in dt.Select() select new { Name = row["Name"], Created_time = (DateTime)row["Created"] });
+		var collection = from row in dt.Select() select new { Name = row["Name"], Created_time = (DateTime)row["Created"] };
 
 		var wsEnum = pck.Workbook.Worksheets.Add("FromAnonymous");
 
@@ -80,14 +80,14 @@ public static class Sample13
 		//Load a list of FileDTO objects from the datatable...
 		var wsList = pck.Workbook.Worksheets.Add("FromList");
 		var list = (from row in dt.Select()
-							  select new FileDTO
-							  {
-								  Name = row["Name"].ToString(),
-								  Size = row["Size"].GetType() == typeof(long) ? (long)row["Size"] : 0,
-								  Created = (DateTime)row["Created"],
-								  LastModified = (DateTime)row["Modified"],
-								  IsDirectory = (row["Size"] == DBNull.Value)
-							  }).ToList<FileDTO>();
+					select new FileDTO
+					{
+						Name = row["Name"].ToString(),
+						Size = row["Size"].GetType() == typeof(long) ? (long)row["Size"] : 0,
+						Created = (DateTime)row["Created"],
+						LastModified = (DateTime)row["Modified"],
+						IsDirectory = row["Size"] == DBNull.Value
+					}).ToList();
 
 		//Load files ordered by size...
 		wsList.Cells["A1"].LoadFromCollection(from file in list
@@ -105,8 +105,8 @@ public static class Sample13
 											  where file.IsDirectory == true
 											  select new
 											  {
-												  Name = file.Name,
-												  Created = file.Created,
+												  file.Name,
+												  file.Created,
 												  Last_modified = file.LastModified
 											  }, //Use an underscore in the property name to get a space in the title.
 											  true, TableStyles.Medium11);

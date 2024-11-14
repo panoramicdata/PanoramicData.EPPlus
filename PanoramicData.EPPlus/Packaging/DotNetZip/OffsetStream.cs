@@ -29,11 +29,11 @@
 using System;
 using System.IO;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
-internal class OffsetStream : System.IO.Stream, System.IDisposable
+internal class OffsetStream : Stream, IDisposable
 {
-	private Int64 _originalPosition;
+	private long _originalPosition;
 	private Stream _innerStream;
 
 	public OffsetStream(Stream s)
@@ -64,7 +64,7 @@ internal class OffsetStream : System.IO.Stream, System.IDisposable
 	}
 
 
-	public override long Seek(long offset, System.IO.SeekOrigin origin) => _innerStream.Seek(_originalPosition + offset, origin) - _originalPosition;
+	public override long Seek(long offset, SeekOrigin origin) => _innerStream.Seek(_originalPosition + offset, origin) - _originalPosition;
 
 
 	public override void SetLength(long value) => throw new NotImplementedException();

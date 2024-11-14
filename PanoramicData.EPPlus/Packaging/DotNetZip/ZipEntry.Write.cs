@@ -26,7 +26,8 @@
 // ------------------------------------------------------------------
 
 
-using OfficeOpenXml.Packaging.Ionic.Zlib;
+using OfficeOpenXml.Packaging.DotNetZip;
+using OfficeOpenXml.Packaging.DotNetZip.Zlib;
 using System;
 using System.IO;
 
@@ -682,7 +683,7 @@ internal partial class ZipEntry
 	{
 		if (_UncompressedSize < 0x10) return false;
 		if (_CompressionMethod == 0x00) return false;
-		if (CompressionLevel == OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel.None) return false;
+		if (CompressionLevel == DotNetZip.Zlib.CompressionLevel.None) return false;
 		if (_CompressedSize < _UncompressedSize) return false;
 
 		if (_Source == ZipEntrySource.Stream && !_sourceStream.CanSeek) return false;
@@ -751,7 +752,7 @@ internal partial class ZipEntry
 			CompressionLevel = SetCompression(LocalFileName, _FileNameInArchive);
 
 		// finally, set CompressionMethod to None if CompressionLevel is None
-		if (CompressionLevel == (short)Ionic.Zlib.CompressionLevel.None &&
+		if (CompressionLevel == (short)DotNetZip.Zlib.CompressionLevel.None &&
 			CompressionMethod == Ionic.Zip.CompressionMethod.Deflate)
 			_CompressionMethod = 0x00;
 
@@ -1039,7 +1040,7 @@ internal partial class ZipEntry
 #endif
 
 		// LastMod
-		_TimeBlob = Ionic.Zip.SharedUtilities.DateTimeToPacked(LastModified);
+		_TimeBlob = SharedUtilities.DateTimeToPacked(LastModified);
 
 		// (i==10) time blob
 		block[i++] = (byte)(_TimeBlob & 0x000000FF);
@@ -1494,14 +1495,14 @@ internal partial class ZipEntry
 									 CountingStream entryCounter,
 									 Stream encryptor,
 									 Stream compressor,
-									 Ionic.Crc.CrcCalculatorStream output)
+									 CrcCalculatorStream output)
 	{
 		if (output == null) return;
 
 		output.Close();
 		output.Dispose();
 		// by calling Close() on the deflate stream, we write the footer bytes, as necessary.
-		if ((compressor as Ionic.Zlib.DeflateStream) != null)
+		if ((compressor as DeflateStream) != null)
 		{
 			compressor.Close();
 			compressor.Dispose();
@@ -1516,7 +1517,7 @@ internal partial class ZipEntry
 #endif
 
 #if !NETCF
-		else if ((compressor as Ionic.Zlib.ParallelDeflateOutputStream) != null)
+		else if ((compressor as ParallelDeflateOutputStream) != null)
 		{
 			compressor.Close();
 			compressor.Dispose();
@@ -1583,7 +1584,7 @@ internal partial class ZipEntry
 					s.Seek(-1 * headerBytesToRetract, SeekOrigin.Current);
 					s.SetLength(s.Position);
 					// workitem 10178
-					Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(s);
+					SharedUtilities.Workaround_Ladybug318918(s);
 
 					// workitem 11131
 					// adjust the count on the CountingStream as necessary
@@ -1896,7 +1897,7 @@ internal partial class ZipEntry
 								   out CountingStream outputCounter,
 								   out Stream encryptor,
 								   out Stream compressor,
-								   out Ionic.Crc.CrcCalculatorStream output)
+								   out CrcCalculatorStream output)
 	{
 		TraceWriteLine("PrepOutputStream: e({0}) comp({1}) crypto({2}) zf({3})",
 					   FileName,
@@ -1937,7 +1938,7 @@ internal partial class ZipEntry
 
 	private Stream MaybeApplyCompression(Stream s, long streamLength)
 	{
-		if (_CompressionMethod == 0x08 && CompressionLevel != Ionic.Zlib.CompressionLevel.None)
+		if (_CompressionMethod == 0x08 && CompressionLevel != DotNetZip.Zlib.CompressionLevel.None)
 		{
 #if !NETCF
 			// ParallelDeflateThreshold == 0    means ALWAYS use parallel deflate
@@ -1986,7 +1987,7 @@ internal partial class ZipEntry
 				return o1;
 			}
 #endif
-			var o = new DeflateStream(s, OfficeOpenXml.Packaging.Ionic.Zlib.CompressionMode.Compress,
+			var o = new DeflateStream(s, CompressionMode.Compress,
 												 CompressionLevel,
 												 true);
 			if (_container.CodecBufferSize > 0)
@@ -2316,7 +2317,7 @@ internal partial class ZipEntry
 				// http://www.info-zip.org/pub/infozip/
 
 				// Also, winzip insists on this!
-				_TimeBlob = Ionic.Zip.SharedUtilities.DateTimeToPacked(LastModified);
+				_TimeBlob = SharedUtilities.DateTimeToPacked(LastModified);
 				encryptionHeader[11] = (byte)((_TimeBlob >> 8) & 0xff);
 			}
 			else

@@ -62,7 +62,7 @@
 
 
 using System;
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 
 sealed class InfTree
@@ -202,7 +202,7 @@ sealed class InfTree
 		while (--i != 0)
 		{
 			// note that i == g from above
-			x[xp] = (j += c[p]);
+			x[xp] = j += c[p];
 			xp++;
 			p++;
 		}
@@ -244,12 +244,12 @@ sealed class InfTree
 					w += l; // previous table always l bits
 							// compute minimum size table less than or equal to l bits
 					z = g - w;
-					z = (z > l) ? l : z; // table size upper limit
+					z = z > l ? l : z; // table size upper limit
 					if ((f = 1 << (j = k - w)) > a + 1)
 					{
 						// try a k-w bit table
 						// too few codes for k-w bit table
-						f -= (a + 1); // deduct codes from patterns left
+						f -= a + 1; // deduct codes from patterns left
 						xp = k;
 						if (j < z)
 						{
@@ -281,8 +281,8 @@ sealed class InfTree
 						x[h] = i; // save pattern for backing up
 						r[0] = (sbyte)j; // bits in this table
 						r[1] = (sbyte)l; // bits to dump before this table
-						j = SharedUtils.URShift(i, (w - l));
-						r[2] = (int)(q - u[h - 1] - j); // offset to this table
+						j = SharedUtils.URShift(i, w - l);
+						r[2] = q - u[h - 1] - j; // offset to this table
 						Array.Copy(r, 0, hp, (u[h - 1] + j) * 3, 3); // connect to last table
 					}
 					else
@@ -309,14 +309,14 @@ sealed class InfTree
 				}
 
 				// fill code-like entries with r
-				f = 1 << (k - w);
+				f = 1 << k - w;
 				for (j = SharedUtils.URShift(i, w); j < z; j += f)
 				{
 					Array.Copy(r, 0, hp, (q + j) * 3, 3);
 				}
 
 				// backwards increment the k-bit code i
-				for (j = 1 << (k - 1); (i & j) != 0; j = SharedUtils.URShift(j, 1))
+				for (j = 1 << k - 1; (i & j) != 0; j = SharedUtils.URShift(j, 1))
 				{
 					i ^= j;
 				}
@@ -384,7 +384,7 @@ sealed class InfTree
 		initWorkArea(288);
 		result = huft_build(c, nl, nd, 0, cpdist, cpdext, td, bd, hp, hn, v);
 
-		if (result != Z_OK || (bd[0] == 0 && nl > 257))
+		if (result != Z_OK || bd[0] == 0 && nl > 257)
 		{
 			if (result == Z_DATA_ERROR)
 			{

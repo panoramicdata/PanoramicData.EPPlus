@@ -33,7 +33,7 @@ using OfficeOpenXml;
 using System.Data.SqlClient;
 using OfficeOpenXml.Table.PivotTable;
 using OfficeOpenXml.Drawing.Chart;
-namespace EPPlusSamples;
+namespace SampleApp;
 
 /// <summary>
 /// This class shows how to use pivottables 

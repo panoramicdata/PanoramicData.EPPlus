@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
-using OfficeOpenXml;
 using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;

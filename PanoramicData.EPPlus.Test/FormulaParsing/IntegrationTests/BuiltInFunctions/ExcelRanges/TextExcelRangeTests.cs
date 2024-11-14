@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
+using OfficeOpenXml.FormulaParsing;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.BuiltInFunctions.ExcelRanges;
 

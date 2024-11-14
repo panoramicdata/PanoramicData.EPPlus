@@ -29,7 +29,6 @@
  * Jan Källman		                Initial Release		        2009-12-22
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
-using EPPlus.Drawing;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Table.PivotTable;
 using OfficeOpenXml.Utils;

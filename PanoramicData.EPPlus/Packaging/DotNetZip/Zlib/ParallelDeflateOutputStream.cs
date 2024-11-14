@@ -28,9 +28,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
+using OfficeOpenXml.Packaging.DotNetZip;
 
 
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 internal class WorkItem
 {
@@ -44,13 +45,13 @@ internal class WorkItem
 	public ZlibCodec compressor;
 
 	public WorkItem(int size,
-					Ionic.Zlib.CompressionLevel compressLevel,
+					CompressionLevel compressLevel,
 					CompressionStrategy strategy,
 					int ix)
 	{
 		buffer = new byte[size];
 		// alloc 5 bytes overhead for every block (margin of safety= 2)
-		var n = size + ((size / 32768) + 1) * 5 * 2;
+		var n = size + (size / 32768 + 1) * 5 * 2;
 		compressed = new byte[n];
 		compressor = new ZlibCodec();
 		compressor.InitializeDeflate(compressLevel, false);
@@ -73,7 +74,7 @@ internal class WorkItem
 /// </para>
 ///
 /// <para>
-///   This class is similar to <see cref="Ionic.Zlib.DeflateStream"/>, except
+///   This class is similar to <see cref="DeflateStream"/>, except
 ///   that this class is for compression only, and this implementation uses an
 ///   approach that employs multiple worker threads to perform the DEFLATE.  On
 ///   a multi-cpu or multi-core computer, the performance of this class can be
@@ -96,17 +97,17 @@ internal class WorkItem
 /// </para>
 ///
 /// </remarks>
-/// <seealso cref="Ionic.Zlib.DeflateStream" />
-public class ParallelDeflateOutputStream : System.IO.Stream
+/// <seealso cref="DeflateStream" />
+public class ParallelDeflateOutputStream : Stream
 {
 
 	private static readonly int IO_BUFFER_SIZE_DEFAULT = 64 * 1024;  // 128k
 	private static readonly int BufferPairsPerCore = 4;
 
-	private System.Collections.Generic.List<WorkItem> _pool;
+	private List<WorkItem> _pool;
 	private bool _leaveOpen;
 	private bool emitting;
-	private System.IO.Stream _outStream;
+	private Stream _outStream;
 	private int _maxBufferPairs;
 	private int _bufferSize = IO_BUFFER_SIZE_DEFAULT;
 	private AutoResetEvent _newlyCompressedBlob;
@@ -120,12 +121,12 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	private int _lastWritten;
 	private int _latestCompressed;
 	private int _Crc32;
-	private Ionic.Crc.CRC32 _runningCrc;
+	private CRC32 _runningCrc;
 	private object _latestLock = new();
-	private System.Collections.Generic.Queue<int> _toWrite;
-	private System.Collections.Generic.Queue<int> _toFill;
-	private Int64 _totalBytesProcessed;
-	private Ionic.Zlib.CompressionLevel _compressLevel;
+	private Queue<int> _toWrite;
+	private Queue<int> _toFill;
+	private long _totalBytesProcessed;
+	private CompressionLevel _compressLevel;
 	private volatile Exception _pendingException;
 	private bool _handlingException;
 	private object _eLock = new();  // protects _pendingException
@@ -165,7 +166,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// </para>
 	///
 	/// <para>
-	///   This class is similar to <see cref="Ionic.Zlib.DeflateStream"/>,
+	///   This class is similar to <see cref="DeflateStream"/>,
 	///   except that this implementation uses an approach that employs
 	///   multiple worker threads to perform the DEFLATE.  On a multi-cpu or
 	///   multi-core computer, the performance of this class can be
@@ -219,7 +220,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// </code>
 	/// </example>
 	/// <param name="stream">The stream to which compressed data will be written.</param>
-	public ParallelDeflateOutputStream(System.IO.Stream stream)
+	public ParallelDeflateOutputStream(Stream stream)
 		: this(stream, CompressionLevel.Default, CompressionStrategy.Default, false)
 	{
 	}
@@ -228,12 +229,12 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	///   Create a ParallelDeflateOutputStream using the specified CompressionLevel.
 	/// </summary>
 	/// <remarks>
-	///   See the <see cref="ParallelDeflateOutputStream(System.IO.Stream)"/>
+	///   See the <see cref="ParallelDeflateOutputStream(Stream)"/>
 	///   constructor for example code.
 	/// </remarks>
 	/// <param name="stream">The stream to which compressed data will be written.</param>
 	/// <param name="level">A tuning knob to trade speed for effectiveness.</param>
-	public ParallelDeflateOutputStream(System.IO.Stream stream, CompressionLevel level)
+	public ParallelDeflateOutputStream(Stream stream, CompressionLevel level)
 		: this(stream, level, CompressionStrategy.Default, false)
 	{
 	}
@@ -243,14 +244,14 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// when the ParallelDeflateOutputStream is closed.
 	/// </summary>
 	/// <remarks>
-	///   See the <see cref="ParallelDeflateOutputStream(System.IO.Stream)"/>
+	///   See the <see cref="ParallelDeflateOutputStream(Stream)"/>
 	///   constructor for example code.
 	/// </remarks>
 	/// <param name="stream">The stream to which compressed data will be written.</param>
 	/// <param name="leaveOpen">
 	///    true if the application would like the stream to remain open after inflation/deflation.
 	/// </param>
-	public ParallelDeflateOutputStream(System.IO.Stream stream, bool leaveOpen)
+	public ParallelDeflateOutputStream(Stream stream, bool leaveOpen)
 		: this(stream, CompressionLevel.Default, CompressionStrategy.Default, leaveOpen)
 	{
 	}
@@ -260,7 +261,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// when the ParallelDeflateOutputStream is closed.
 	/// </summary>
 	/// <remarks>
-	///   See the <see cref="ParallelDeflateOutputStream(System.IO.Stream)"/>
+	///   See the <see cref="ParallelDeflateOutputStream(Stream)"/>
 	///   constructor for example code.
 	/// </remarks>
 	/// <param name="stream">The stream to which compressed data will be written.</param>
@@ -268,7 +269,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// <param name="leaveOpen">
 	///    true if the application would like the stream to remain open after inflation/deflation.
 	/// </param>
-	public ParallelDeflateOutputStream(System.IO.Stream stream, CompressionLevel level, bool leaveOpen)
+	public ParallelDeflateOutputStream(Stream stream, CompressionLevel level, bool leaveOpen)
 		: this(stream, CompressionLevel.Default, CompressionStrategy.Default, leaveOpen)
 	{
 	}
@@ -280,7 +281,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// closed.
 	/// </summary>
 	/// <remarks>
-	///   See the <see cref="ParallelDeflateOutputStream(System.IO.Stream)"/>
+	///   See the <see cref="ParallelDeflateOutputStream(Stream)"/>
 	///   constructor for example code.
 	/// </remarks>
 	/// <param name="stream">The stream to which compressed data will be written.</param>
@@ -292,7 +293,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// <param name="leaveOpen">
 	///    true if the application would like the stream to remain open after inflation/deflation.
 	/// </param>
-	public ParallelDeflateOutputStream(System.IO.Stream stream,
+	public ParallelDeflateOutputStream(Stream stream,
 									   CompressionLevel level,
 									   CompressionStrategy strategy,
 									   bool leaveOpen)
@@ -327,7 +328,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	///   pairs to create.  The implementation of this stream allocates
 	///   multiple buffers to facilitate parallel compression.  As each buffer
 	///   fills up, this stream uses <see
-	///   cref="System.Threading.ThreadPool.QueueUserWorkItem(WaitCallback)">
+	///   cref="ThreadPool.QueueUserWorkItem(WaitCallback)">
 	///   ThreadPool.QueueUserWorkItem()</see>
 	///   to compress those buffers in a background threadpool thread. After a
 	///   buffer is compressed, it is re-ordered and written to the output
@@ -419,7 +420,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	///   memory but may result in less effective compression.  For example,
 	///   using the default buffer size of 128k, the compression delivered is
 	///   within 1% of the compression delivered by the single-threaded <see
-	///   cref="Ionic.Zlib.DeflateStream"/>.  On the other hand, using a
+	///   cref="DeflateStream"/>.  On the other hand, using a
 	///   BufferSize of 8k can result in a compressed data stream that is 5%
 	///   larger than that delivered by the single-threaded
 	///   <c>DeflateStream</c>.  Excessively small buffer sizes can also cause
@@ -470,7 +471,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// <remarks>
 	/// This value is meaningful only after a call to Close().
 	/// </remarks>
-	public Int64 BytesProcessed => _totalBytesProcessed;
+	public long BytesProcessed => _totalBytesProcessed;
 
 
 	private void _InitializePoolOfWorkItems()
@@ -513,7 +514,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	/// </para>
 	///
 	/// <para>
-	///   To decompress data, use the <see cref="Ionic.Zlib.DeflateStream"/> class.
+	///   To decompress data, use the <see cref="DeflateStream"/> class.
 	/// </para>
 	///
 	/// </remarks>
@@ -591,9 +592,9 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 
 			var workitem = _pool[ix];
 
-			var limit = ((workitem.buffer.Length - workitem.inputBytesAvailable) > count)
+			var limit = workitem.buffer.Length - workitem.inputBytesAvailable > count
 				? count
-				: (workitem.buffer.Length - workitem.inputBytesAvailable);
+				: workitem.buffer.Length - workitem.inputBytesAvailable;
 
 			workitem.ordinal = _lastFilled;
 
@@ -886,7 +887,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 		do
 		{
 			var firstSkip = -1;
-			var millisecondsToWait = doAll ? 200 : (mustWait ? -1 : 0);
+			var millisecondsToWait = doAll ? 200 : mustWait ? -1 : 0;
 			var nextToWrite = -1;
 
 			do
@@ -1149,14 +1150,14 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 
 
 
-	private void _DeflateOne(Object wi)
+	private void _DeflateOne(object wi)
 	{
 		// compress one buffer
 		var workitem = (WorkItem)wi;
 		try
 		{
 			var myItem = workitem.index;
-			Ionic.Crc.CRC32 crc = new();
+			CRC32 crc = new();
 
 			// calc CRC on the buffer
 			crc.SlurpBlock(workitem.buffer, 0, workitem.inputBytesAvailable);
@@ -1186,7 +1187,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 
 			_newlyCompressedBlob.Set();
 		}
-		catch (System.Exception exc1)
+		catch (Exception exc1)
 		{
 			lock (_eLock)
 			{
@@ -1226,7 +1227,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	}
 
 
-	[System.Diagnostics.ConditionalAttribute("Trace")]
+	[System.Diagnostics.Conditional("Trace")]
 	private void TraceOutput(TraceBits bits, string format, params object[] varParams)
 	{
 		if ((bits & _DesiredTrace) != 0)
@@ -1350,7 +1351,7 @@ public class ParallelDeflateOutputStream : System.IO.Stream
 	///   THIS METHOD ACTUALLY DID ANYTHING.
 	/// </param>
 	/// <returns>nothing. It always throws.</returns>
-	public override long Seek(long offset, System.IO.SeekOrigin origin) => throw new NotSupportedException();
+	public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
 	/// <summary>
 	/// This method always throws a NotSupportedException.

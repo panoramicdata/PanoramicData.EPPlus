@@ -2,6 +2,7 @@
 using System.Drawing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
+using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.Style;
 
 namespace PanoramicData.EPPlus.Test;

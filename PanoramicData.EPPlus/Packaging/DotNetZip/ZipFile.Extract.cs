@@ -25,6 +25,7 @@
 //
 
 
+using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 using System.IO;
 
@@ -54,7 +55,7 @@ internal partial class ZipFile
 	///   be extracted, the existing file will not be overwritten and an
 	///   exception will be thrown. To change this, set the property, or use the
 	///   <see cref="ZipFile.ExtractAll(string,
-	///   Ionic.Zip.ExtractExistingFileAction)" /> overload that allows you to
+	///   ExtractExistingFileAction)" /> overload that allows you to
 	///   specify an ExtractExistingFileAction parameter.
 	/// </para>
 	///

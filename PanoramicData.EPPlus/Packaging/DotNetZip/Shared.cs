@@ -26,7 +26,7 @@
 using System;
 using System.IO;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 /// Collects general purpose utility methods.
@@ -37,10 +37,10 @@ internal static class SharedUtilities
 	//private SharedUtilities() { }
 
 	// workitem 8423
-	public static Int64 GetFileLength(string fileName)
+	public static long GetFileLength(string fileName)
 	{
 		if (!File.Exists(fileName))
-			throw new System.IO.FileNotFoundException(fileName);
+			throw new FileNotFoundException(fileName);
 
 		var fileLength = 0L;
 		var fs = FileShare.ReadWrite;
@@ -88,10 +88,10 @@ internal static class SharedUtilities
 	public static string NormalizePathForUseInZipFile(string pathName)
 	{
 		// boundary case
-		if (String.IsNullOrEmpty(pathName)) return pathName;
+		if (string.IsNullOrEmpty(pathName)) return pathName;
 
 		// trim volume if necessary
-		if ((pathName.Length >= 2) && ((pathName[1] == ':') && (pathName[2] == '\\')))
+		if (pathName.Length >= 2 && pathName[1] == ':' && pathName[2] == '\\')
 			pathName = pathName[3..];
 
 		// swap slashes
@@ -134,7 +134,7 @@ internal static class SharedUtilities
 	}
 
 
-	internal static int ReadSignature(System.IO.Stream s)
+	internal static int ReadSignature(Stream s)
 	{
 		var x = 0;
 		try { x = _ReadFourBytes(s, "n/a"); }
@@ -144,7 +144,7 @@ internal static class SharedUtilities
 	}
 
 
-	internal static int ReadEntrySignature(System.IO.Stream s)
+	internal static int ReadEntrySignature(Stream s)
 	{
 		// handle the case of ill-formatted zip archives - includes a data descriptor
 		// when none is expected.
@@ -184,9 +184,9 @@ internal static class SharedUtilities
 	}
 
 
-	internal static int ReadInt(System.IO.Stream s) => _ReadFourBytes(s, "Could not read block - no data!  (position 0x{0:X8})");
+	internal static int ReadInt(Stream s) => _ReadFourBytes(s, "Could not read block - no data!  (position 0x{0:X8})");
 
-	private static int _ReadFourBytes(System.IO.Stream s, string message)
+	private static int _ReadFourBytes(Stream s, string message)
 	{
 		var n = 0;
 		var block = new byte[4];
@@ -213,8 +213,8 @@ internal static class SharedUtilities
 #else
 		n = s.Read(block, 0, block.Length);
 #endif
-		if (n != block.Length) throw new BadReadException(String.Format(message, s.Position));
-		var data = unchecked((((block[3] * 256 + block[2]) * 256) + block[1]) * 256 + block[0]);
+		if (n != block.Length) throw new BadReadException(string.Format(message, s.Position));
+		var data = unchecked(((block[3] * 256 + block[2]) * 256 + block[1]) * 256 + block[0]);
 		return data;
 	}
 
@@ -241,7 +241,7 @@ internal static class SharedUtilities
 	/// <param name="stream">The stream to search</param>
 	/// <param name="SignatureToFind">The 4-byte signature to find</param>
 	/// <returns>The number of bytes read</returns>
-	internal static long FindSignature(System.IO.Stream stream, int SignatureToFind)
+	internal static long FindSignature(Stream stream, int SignatureToFind)
 	{
 		var startingPosition = stream.Position;
 
@@ -264,17 +264,17 @@ internal static class SharedUtilities
 					if (batch[i] == targetBytes[3])
 					{
 						var curPosition = stream.Position;
-						stream.Seek(i - n, System.IO.SeekOrigin.Current);
+						stream.Seek(i - n, SeekOrigin.Current);
 						// workitem 10178
 						Workaround_Ladybug318918(stream);
 
 						// workitem 7711
 						var sig = ReadSignature(stream);
 
-						success = (sig == SignatureToFind);
+						success = sig == SignatureToFind;
 						if (!success)
 						{
-							stream.Seek(curPosition, System.IO.SeekOrigin.Begin);
+							stream.Seek(curPosition, SeekOrigin.Begin);
 							// workitem 10178
 							Workaround_Ladybug318918(stream);
 						}
@@ -290,14 +290,14 @@ internal static class SharedUtilities
 
 		if (!success)
 		{
-			stream.Seek(startingPosition, System.IO.SeekOrigin.Begin);
+			stream.Seek(startingPosition, SeekOrigin.Begin);
 			// workitem 10178
 			Workaround_Ladybug318918(stream);
 			return -1;  // or throw?
 		}
 
 		// subtract 4 for the signature.
-		var bytesRead = (stream.Position - startingPosition) - 4;
+		var bytesRead = stream.Position - startingPosition - 4;
 
 		return bytesRead;
 	}
@@ -310,10 +310,10 @@ internal static class SharedUtilities
 		if (time.Kind == DateTimeKind.Utc) return time;
 		var adjusted = time;
 		if (DateTime.Now.IsDaylightSavingTime() && !time.IsDaylightSavingTime())
-			adjusted = time - new System.TimeSpan(1, 0, 0);
+			adjusted = time - new TimeSpan(1, 0, 0);
 
 		else if (!DateTime.Now.IsDaylightSavingTime() && time.IsDaylightSavingTime())
-			adjusted = time + new System.TimeSpan(1, 0, 0);
+			adjusted = time + new TimeSpan(1, 0, 0);
 
 		return adjusted;
 	}
@@ -336,14 +336,14 @@ internal static class SharedUtilities
 #endif
 
 
-	internal static DateTime PackedToDateTime(Int32 packedDateTime)
+	internal static DateTime PackedToDateTime(int packedDateTime)
 	{
 		// workitem 7074 & workitem 7170
 		if (packedDateTime is 0xFFFF or 0)
-			return new System.DateTime(1995, 1, 1, 0, 0, 0, 0);  // return a fixed date when none is supplied.
+			return new DateTime(1995, 1, 1, 0, 0, 0, 0);  // return a fixed date when none is supplied.
 
-		var packedTime = unchecked((Int16)(packedDateTime & 0x0000ffff));
-		var packedDate = unchecked((Int16)((packedDateTime & 0xffff0000) >> 16));
+		var packedTime = unchecked((short)(packedDateTime & 0x0000ffff));
+		var packedDate = unchecked((short)((packedDateTime & 0xffff0000) >> 16));
 
 		var year = 1980 + ((packedDate & 0xFE00) >> 9);
 		var month = (packedDate & 0x01E0) >> 5;
@@ -362,30 +362,30 @@ internal static class SharedUtilities
 
 		if (hour >= 24) { day++; hour = 0; }
 
-		var d = System.DateTime.Now;
+		var d = DateTime.Now;
 		var success = false;
 		try
 		{
-			d = new System.DateTime(year, month, day, hour, minute, second, 0);
+			d = new DateTime(year, month, day, hour, minute, second, 0);
 			success = true;
 		}
-		catch (System.ArgumentOutOfRangeException)
+		catch (ArgumentOutOfRangeException)
 		{
 			if (year == 1980 && (month == 0 || day == 0))
 			{
 				try
 				{
-					d = new System.DateTime(1980, 1, 1, hour, minute, second, 0);
+					d = new DateTime(1980, 1, 1, hour, minute, second, 0);
 					success = true;
 				}
-				catch (System.ArgumentOutOfRangeException)
+				catch (ArgumentOutOfRangeException)
 				{
 					try
 					{
-						d = new System.DateTime(1980, 1, 1, 0, 0, 0, 0);
+						d = new DateTime(1980, 1, 1, 0, 0, 0, 0);
 						success = true;
 					}
-					catch (System.ArgumentOutOfRangeException) { }
+					catch (ArgumentOutOfRangeException) { }
 
 				}
 			}
@@ -406,17 +406,17 @@ internal static class SharedUtilities
 					while (minute > 59) minute--;
 					while (second < 0) second++;
 					while (second > 59) second--;
-					d = new System.DateTime(year, month, day, hour, minute, second, 0);
+					d = new DateTime(year, month, day, hour, minute, second, 0);
 					success = true;
 				}
-				catch (System.ArgumentOutOfRangeException) { }
+				catch (ArgumentOutOfRangeException) { }
 			}
 		}
 
 		if (!success)
 		{
-			var msg = String.Format("y({0}) m({1}) d({2}) h({3}) m({4}) s({5})", year, month, day, hour, minute, second);
-			throw new ZipException(String.Format("Bad date/time format in the zip file. ({0})", msg));
+			var msg = string.Format("y({0}) m({1}) d({2}) h({3}) m({4}) s({5})", year, month, day, hour, minute, second);
+			throw new ZipException(string.Format("Bad date/time format in the zip file. ({0})", msg));
 
 		}
 		// workitem 6191
@@ -427,7 +427,7 @@ internal static class SharedUtilities
 
 
 	internal
-	 static Int32 DateTimeToPacked(DateTime time)
+	 static int DateTimeToPacked(DateTime time)
 	{
 		// The time is passed in here only for purposes of writing LastModified to the
 		// zip archive. It should always be LocalTime, but we convert anyway.  And,
@@ -438,10 +438,10 @@ internal static class SharedUtilities
 		//time = AdjustTime_Forward(time);
 
 		// see http://www.vsft.com/hal/dostime.htm for the format
-		var packedDate = (UInt16)((time.Day & 0x0000001F) | ((time.Month << 5) & 0x000001E0) | (((time.Year - 1980) << 9) & 0x0000FE00));
-		var packedTime = (UInt16)((time.Second / 2 & 0x0000001F) | ((time.Minute << 5) & 0x000007E0) | ((time.Hour << 11) & 0x0000F800));
+		var packedDate = (ushort)(time.Day & 0x0000001F | time.Month << 5 & 0x000001E0 | time.Year - 1980 << 9 & 0x0000FE00);
+		var packedTime = (ushort)(time.Second / 2 & 0x0000001F | time.Minute << 5 & 0x000007E0 | time.Hour << 11 & 0x0000F800);
 
-		var result = (Int32)(((UInt32)(packedDate << 16)) | packedTime);
+		var result = (int)((uint)(packedDate << 16) | packedTime);
 		return result;
 	}
 
@@ -525,7 +525,7 @@ internal static class SharedUtilities
 	/// This could be gracefully handled with an extension attribute, but
 	/// This assembly is built for .NET 2.0, so I cannot use them.
 	/// </remarks>
-	internal static int ReadWithRetry(System.IO.Stream s, byte[] buffer, int offset, int count, string FileName)
+	internal static int ReadWithRetry(Stream s, byte[] buffer, int offset, int count, string FileName)
 	{
 		var n = 0;
 		var done = false;
@@ -599,7 +599,7 @@ internal static class SharedUtilities
 	// generates the JIT-compile time exception.
 	//
 #endif
-	private static uint _HRForException(System.Exception ex1) => unchecked((uint)System.Runtime.InteropServices.Marshal.GetHRForException(ex1));
+	private static uint _HRForException(Exception ex1) => unchecked((uint)System.Runtime.InteropServices.Marshal.GetHRForException(ex1));
 
 }
 
@@ -643,19 +643,19 @@ internal static class SharedUtilities
 ///     <c>Position</c>, it will then do the right thing with the offsets.
 ///   </para>
 /// </remarks>
-internal class CountingStream : System.IO.Stream
+internal class CountingStream : Stream
 {
 	// workitem 12374: this class is now public
-	private System.IO.Stream _s;
-	private Int64 _bytesWritten;
-	private Int64 _bytesRead;
-	private Int64 _initialOffset;
+	private Stream _s;
+	private long _bytesWritten;
+	private long _bytesRead;
+	private long _initialOffset;
 
 	/// <summary>
 	/// The constructor.
 	/// </summary>
 	/// <param name="stream">The underlying stream</param>
-	public CountingStream(System.IO.Stream stream)
+	public CountingStream(Stream stream)
 		: base()
 	{
 		_s = stream;
@@ -677,12 +677,12 @@ internal class CountingStream : System.IO.Stream
 	/// <summary>
 	///   The count of bytes written out to the stream.
 	/// </summary>
-	public Int64 BytesWritten => _bytesWritten;
+	public long BytesWritten => _bytesWritten;
 
 	/// <summary>
 	///   the count of bytes that have been read from the stream.
 	/// </summary>
-	public Int64 BytesRead => _bytesRead;
+	public long BytesRead => _bytesRead;
 
 	/// <summary>
 	///    Adjust the byte count on the stream.
@@ -699,7 +699,7 @@ internal class CountingStream : System.IO.Stream
 	///     as happens in some cases when saving Zip files.
 	///   </para>
 	/// </remarks>
-	public void Adjust(Int64 delta)
+	public void Adjust(long delta)
 	{
 		_bytesWritten -= delta;
 		if (_bytesWritten < 0)

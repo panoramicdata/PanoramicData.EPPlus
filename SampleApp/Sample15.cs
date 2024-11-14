@@ -34,7 +34,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Text;
-namespace EPPlusSamples;
+namespace SampleApp;
 
 class Sample15
 {
@@ -167,7 +167,7 @@ class Sample15
 
 		//Ships are displayed with a black background
 		var shipsaddress = string.Join(",", ships);
-		ws.Cells[shipsaddress].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+		ws.Cells[shipsaddress].Style.Fill.PatternType = ExcelFillStyle.Solid;
 		ws.Cells[shipsaddress].Style.Fill.BackgroundColor.SetColor(Color.Black);
 
 		var m2 = pck.Workbook.VbaProject.Modules.AddModule("ComputerPlay");

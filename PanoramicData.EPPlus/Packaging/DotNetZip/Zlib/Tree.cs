@@ -60,11 +60,74 @@
 //
 // -----------------------------------------------------------------------
 
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+
+// Tree.cs
+// ------------------------------------------------------------------
+//
+// Copyright (c) 2009 Dino Chiesa and Microsoft Corporation.  
+// All rights reserved.
+//
+// This code module is part of DotNetZip, a zipfile class library.
+//
+// ------------------------------------------------------------------
+//
+// This code is licensed under the Microsoft Public License. 
+// See the file License.txt for the license details.
+// More info on: http://dotnetzip.codeplex.com
+//
+// ------------------------------------------------------------------
+//
+// last saved (in emacs): 
+// Time-stamp: <2009-October-28 13:29:50>
+//
+// ------------------------------------------------------------------
+//
+// This module defines classes for zlib compression and
+// decompression. This code is derived from the jzlib implementation of
+// zlib. In keeping with the license for jzlib, the copyright to that
+// code is below.
+//
+// ------------------------------------------------------------------
+// 
+// Copyright (c) 2000,2001,2002,2003 ymnk, JCraft,Inc. All rights reserved.
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// 1. Redistributions of source code must retain the above copyright notice,
+// this list of conditions and the following disclaimer.
+// 
+// 2. Redistributions in binary form must reproduce the above copyright 
+// notice, this list of conditions and the following disclaimer in 
+// the documentation and/or other materials provided with the distribution.
+// 
+// 3. The names of the authors may not be used to endorse or promote products
+// derived from this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+// INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JCRAFT,
+// INC. OR ANY CONTRIBUTORS TO THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT,
+// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+// OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+// LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+// NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+// EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// 
+// -----------------------------------------------------------------------
+//
+// This program is based on zlib-1.1.3; credit to authors
+// Jean-loup Gailly(jloup@gzip.org) and Mark Adler(madler@alumni.caltech.edu)
+// and contributors of zlib.
+//
+// -----------------------------------------------------------------------
+
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 sealed class Tree
 {
-	private static readonly int HEAP_SIZE = (2 * InternalConstants.L_CODES + 1);
+	private static readonly int HEAP_SIZE = 2 * InternalConstants.L_CODES + 1;
 
 	// extra bits for each length code
 	internal static readonly int[] ExtraLengthBits =
@@ -172,7 +235,7 @@ sealed class Tree
 	/// <remarks> 
 	/// No side effects. _dist_code[256] and _dist_code[257] are never used.
 	/// </remarks>
-	internal static int DistanceCode(int dist) => (dist < 256)
+	internal static int DistanceCode(int dist) => dist < 256
 			? _dist_code[dist]
 			: _dist_code[256 + SharedUtils.URShift(dist, 7)];
 
@@ -263,7 +326,7 @@ sealed class Tree
 					continue;
 				if (tree[m * 2 + 1] != bits)
 				{
-					s.opt_len = (int)(s.opt_len + ((long)bits - (long)tree[m * 2 + 1]) * (long)tree[m * 2]);
+					s.opt_len = (int)(s.opt_len + (bits - (long)tree[m * 2 + 1]) * tree[m * 2]);
 					tree[m * 2 + 1] = (short)bits;
 				}
 
@@ -312,7 +375,7 @@ sealed class Tree
 		// two codes of non zero frequency.
 		while (s.heap_len < 2)
 		{
-			node = s.heap[++s.heap_len] = (max_code < 2 ? ++max_code : 0);
+			node = s.heap[++s.heap_len] = max_code < 2 ? ++max_code : 0;
 			tree[node * 2] = 1;
 			s.depth[node] = 0;
 			s.opt_len--;
@@ -384,7 +447,7 @@ sealed class Tree
 		for (bits = 1; bits <= InternalConstants.MAX_BITS; bits++)
 			unchecked
 			{
-				next_code[bits] = code = (short)((code + bl_count[bits - 1]) << 1);
+				next_code[bits] = code = (short)(code + bl_count[bits - 1] << 1);
 			}
 
 		// Check that the bit counts in bl_count are consistent. The last code
@@ -399,7 +462,7 @@ sealed class Tree
 			if (len == 0)
 				continue;
 			// Now reverse the bits
-			tree[n * 2] = unchecked((short)(bi_reverse(next_code[len]++, len)));
+			tree[n * 2] = unchecked((short)bi_reverse(next_code[len]++, len));
 		}
 	}
 

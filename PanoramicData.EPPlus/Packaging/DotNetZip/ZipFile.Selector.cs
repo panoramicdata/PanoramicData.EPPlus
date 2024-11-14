@@ -37,6 +37,7 @@ using System.IO;
 using System.Collections.Generic;
 using OfficeOpenXml.Packaging.Ionic.Zip;
 using System.Globalization;
+using OfficeOpenXml.Packaging.DotNetZip;
 
 namespace OfficeOpenXml.Packaging.Ionic.Zip
 {

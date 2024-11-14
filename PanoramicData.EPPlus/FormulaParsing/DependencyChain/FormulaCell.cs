@@ -25,7 +25,7 @@
 using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
-namespace OfficeOpenXml.FormulaParsing;
+namespace OfficeOpenXml.FormulaParsing.DependencyChain.DependencyChain;
 
 internal class FormulaCell
 {

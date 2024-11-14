@@ -32,7 +32,7 @@ using System;
 using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 public class ExcelConditionalFormattingThreeIconSet : ExcelConditionalFormattingIconSetBase<eExcelconditionalFormatting3IconsSetType>
 {
@@ -48,7 +48,7 @@ public class ExcelConditionalFormattingThreeIconSet : ExcelConditionalFormatting
 		  priority,
 		  worksheet,
 		  itemElementNode,
-		  (namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		  namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 	}
 }
@@ -90,7 +90,7 @@ public class ExcelConditionalFormattingIconSetBase<T>
 		  priority,
 		  worksheet,
 		  itemElementNode,
-		  (namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		  namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 		if (itemElementNode != null && itemElementNode.HasChildNodes)
 		{

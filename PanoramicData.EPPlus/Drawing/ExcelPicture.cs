@@ -31,7 +31,6 @@
  *******************************************************************************/
 using OfficeOpenXml;
 using OfficeOpenXml.Compatibility;
-using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Utils;
 using System;
 using System.Drawing;
@@ -41,7 +40,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-namespace EPPlus.Drawing;
+namespace OfficeOpenXml.Drawing;
 
 /// <summary>
 /// An image object
@@ -133,7 +132,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		if (!drawings._hashes.TryGetValue(ii.Hash, out var value))
 		{
 			Part = ii.Part;
-			RelPic = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, ii.Uri), OfficeOpenXml.Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
+			RelPic = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, ii.Uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 			relID = RelPic.Id;
 			_drawings._hashes.Add(ii.Hash, relID);
 			AddNewPicture(img, relID);
@@ -210,7 +209,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		}
 
 		//Set the Image and save it to the package.
-		RelPic = _drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(_drawings.UriDrawing, UriPic), OfficeOpenXml.Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
+		RelPic = _drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(_drawings.UriDrawing, UriPic), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 
 		//AddNewPicture(img, picRelation.Id);
 		_drawings._hashes.Add(ii.Hash, RelPic.Id);
@@ -236,7 +235,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		}
 		else
 		{
-			HypRel = _drawings.Part.CreateRelationship(Hyperlink, OfficeOpenXml.Packaging.TargetMode.External, ExcelPackage.schemaHyperlink);
+			HypRel = _drawings.Part.CreateRelationship(Hyperlink, Packaging.TargetMode.External, ExcelPackage.schemaHyperlink);
 			xml.AppendFormat("<xdr:cNvPr id=\"{0}\" descr=\"\">", _id);
 			if (HypRel != null)
 			{
@@ -336,9 +335,9 @@ public sealed class ExcelPicture : ExcelDrawing
 		}
 	}
 	internal Uri UriPic { get; set; }
-	internal OfficeOpenXml.Packaging.ZipPackageRelationship RelPic { get; set; }
-	internal OfficeOpenXml.Packaging.ZipPackageRelationship HypRel { get; set; }
-	internal OfficeOpenXml.Packaging.ZipPackagePart Part;
+	internal Packaging.ZipPackageRelationship RelPic { get; set; }
+	internal Packaging.ZipPackageRelationship HypRel { get; set; }
+	internal Packaging.ZipPackagePart Part;
 
 	internal new string Id => Name;
 

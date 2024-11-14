@@ -31,7 +31,7 @@
 using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 /// <summary>
 /// ExcelConditionalFormattingThreeColorScale
@@ -82,7 +82,7 @@ public class ExcelConditionalFormattingThreeColorScale
 		priority,
 		worksheet,
 		itemElementNode,
-		(namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 		if (itemElementNode == null)
 		{

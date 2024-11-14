@@ -38,7 +38,8 @@ using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
-namespace EPPlusSamples;
+using OfficeOpenXml.FormulaParsing;
+namespace SampleApp;
 
 /// <summary>
 /// Sample 6 - Reads the filesystem and makes a report.
@@ -55,7 +56,7 @@ class Sample6
 
 		//Default compare Size
 		public int CompareTo(StatItem other) => Size < other.Size ? -1 :
-						(Size > other.Size ? 1 : 0);
+						Size > other.Size ? 1 : 0;
 
 		#endregion
 	}
@@ -221,8 +222,8 @@ class Sample6
 			r.Merge = true;
 			r.Style.Font.SetFromFont(new Font("Arial", 22, FontStyle.Regular));
 			r.Style.Font.Color.SetColor(Color.White);
-			r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
-			r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+			r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
+			r.Style.Fill.PatternType = ExcelFillStyle.Solid;
 			r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
 		}
 
@@ -246,7 +247,7 @@ class Sample6
 		//Set top left corner to row 1 column 2
 		pieChart.SetPosition(1, 0, 2, 0);
 		pieChart.SetSize(400, 400);
-		pieChart.Series.Add(ExcelRange.GetAddress(3, 2, row - 1, 2), ExcelRange.GetAddress(3, 1, row - 1, 1));
+		pieChart.Series.Add(ExcelCellBase.GetAddress(3, 2, row - 1, 2), ExcelCellBase.GetAddress(3, 1, row - 1, 1));
 
 		pieChart.Title.Text = "Extension Size";
 		//Set datalabels and remove the legend
@@ -264,7 +265,7 @@ class Sample6
 		//Set position to row 1 column 7 and 16 pixels offset
 		doughtnutChart.SetPosition(1, 0, 8, 16);
 		doughtnutChart.SetSize(400, 400);
-		doughtnutChart.Series.Add(ExcelRange.GetAddress(16, 2, row - 1, 2), ExcelRange.GetAddress(16, 1, row - 1, 1));
+		doughtnutChart.Series.Add(ExcelCellBase.GetAddress(16, 2, row - 1, 2), ExcelCellBase.GetAddress(16, 1, row - 1, 1));
 
 		doughtnutChart.Title.Text = "Extension Count";
 		doughtnutChart.DataLabel.ShowPercent = true;
@@ -280,7 +281,7 @@ class Sample6
 
 		barChart.SetPosition(22, 0, 2, 0);
 		barChart.SetSize(800, 398);
-		barChart.Series.Add(ExcelRange.GetAddress(30, 2, row - 1, 2), ExcelRange.GetAddress(30, 1, row - 1, 1));
+		barChart.Series.Add(ExcelCellBase.GetAddress(30, 2, row - 1, 2), ExcelCellBase.GetAddress(30, 1, row - 1, 1));
 		//barChart.Series[0].Header = "Size";
 		barChart.Title.Text = "Top File size";
 
@@ -319,8 +320,8 @@ class Sample6
 				r.Merge = true;
 				r.Style.Font.SetFromFont(new Font("Arial", 16, FontStyle.Italic));
 				r.Style.Font.Color.SetColor(Color.White);
-				r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
-				r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+				r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
+				r.Style.Fill.PatternType = ExcelFillStyle.Solid;
 				r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
 			}
 
@@ -416,8 +417,8 @@ class Sample6
 			//Add the icon as a picture
 			if (icon != null)
 			{
-				var pic = ws.Drawings.AddPicture("pic" + (row).ToString(), icon);
-				pic.SetPosition((int)20 * (row - 1) + 2, 0);
+				var pic = ws.Drawings.AddPicture("pic" + row.ToString(), icon);
+				pic.SetPosition(20 * (row - 1) + 2, 0);
 			}
 		}
 
@@ -450,8 +451,8 @@ class Sample6
 				ws.Row(row).Height = height;
 				if (fileIcon != null)
 				{
-					var pic = ws.Drawings.AddPicture("pic" + (row).ToString(), fileIcon);
-					pic.SetPosition((int)20 * (row - 1) + 2, 0);
+					var pic = ws.Drawings.AddPicture("pic" + row.ToString(), fileIcon);
+					pic.SetPosition(20 * (row - 1) + 2, 0);
 				}
 			}
 
@@ -522,7 +523,7 @@ class Sample6
 	{
 		if (File.Exists(FileName))
 		{
-			var bmp = System.Drawing.Icon.ExtractAssociatedIcon(FileName).ToBitmap();
+			var bmp = Icon.ExtractAssociatedIcon(FileName).ToBitmap();
 			return new Bitmap(bmp, new Size(16, 16));
 		}
 		else

@@ -32,7 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security;
-using OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.DotNetZip;
 
 namespace OfficeOpenXml.Packaging;
 

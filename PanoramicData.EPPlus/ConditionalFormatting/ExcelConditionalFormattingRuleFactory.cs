@@ -30,6 +30,7 @@
  *******************************************************************************/
 using System;
 using System.Xml;
+using OfficeOpenXml.ConditionalFormatting.Rules;
 using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.ConditionalFormatting;

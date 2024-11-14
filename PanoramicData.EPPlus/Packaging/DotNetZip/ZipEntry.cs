@@ -26,6 +26,7 @@
 // ------------------------------------------------------------------
 
 
+using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 using System.IO;
 using Interop = System.Runtime.InteropServices;
@@ -54,7 +55,7 @@ internal partial class ZipEntry
 	public ZipEntry()
 	{
 		_CompressionMethod = (Int16)CompressionMethod.Deflate;
-		_CompressionLevel = Ionic.Zlib.CompressionLevel.Default;
+		_CompressionLevel = DotNetZip.Zlib.CompressionLevel.Default;
 		_Encryption = EncryptionAlgorithm.None;
 		_Source = ZipEntrySource.None;
 		AlternateEncoding = System.Text.Encoding.GetEncoding("UTF-8");
@@ -211,7 +212,7 @@ internal partial class ZipEntry
 			_LastModified = (value.Kind == DateTimeKind.Unspecified)
 				? DateTime.SpecifyKind(value, DateTimeKind.Local)
 				: value.ToLocalTime();
-			_Mtime = Ionic.Zip.SharedUtilities.AdjustTime_Reverse(_LastModified).ToUniversalTime();
+			_Mtime = SharedUtilities.AdjustTime_Reverse(_LastModified).ToUniversalTime();
 			_metadataChanged = true;
 		}
 	}
@@ -1353,9 +1354,9 @@ internal partial class ZipEntry
 			_CompressionMethod = (Int16)value;
 
 			if (_CompressionMethod == (Int16)Ionic.Zip.CompressionMethod.None)
-				_CompressionLevel = Ionic.Zlib.CompressionLevel.None;
-			else if (CompressionLevel == Ionic.Zlib.CompressionLevel.None)
-				_CompressionLevel = Ionic.Zlib.CompressionLevel.Default;
+				_CompressionLevel = DotNetZip.Zlib.CompressionLevel.None;
+			else if (CompressionLevel == DotNetZip.Zlib.CompressionLevel.None)
+				_CompressionLevel = DotNetZip.Zlib.CompressionLevel.Default;
 
 			_container.ZipFile?.NotifyEntryChanged();
 			_restreamRequiredOnSave = true;
@@ -1405,7 +1406,7 @@ internal partial class ZipEntry
 	/// </remarks>
 	///
 	/// <seealso cref="CompressionMethod"/>
-	public OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel CompressionLevel
+	public DotNetZip.Zlib.CompressionLevel CompressionLevel
 	{
 		get
 		{
@@ -1417,15 +1418,15 @@ internal partial class ZipEntry
 				not ((short)CompressionMethod.None))
 				return; // no effect
 
-			if (value == OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel.Default &&
+			if (value == DotNetZip.Zlib.CompressionLevel.Default &&
 				_CompressionMethod == (short)CompressionMethod.Deflate) return; // nothing to do
 			_CompressionLevel = value;
 
-			if (value == OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel.None &&
+			if (value == DotNetZip.Zlib.CompressionLevel.None &&
 				_CompressionMethod == (short)CompressionMethod.None)
 				return; // nothing more to do
 
-			if (_CompressionLevel == OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel.None)
+			if (_CompressionLevel == DotNetZip.Zlib.CompressionLevel.None)
 				_CompressionMethod = (short)OfficeOpenXml.Packaging.Ionic.Zip.CompressionMethod.None;
 			else
 				_CompressionMethod = (short)OfficeOpenXml.Packaging.Ionic.Zip.CompressionMethod.Deflate;
@@ -2492,7 +2493,7 @@ internal partial class ZipEntry
 			ArchiveStream.Seek(_RelativeOffsetOfLocalHeader, SeekOrigin.Begin);
 
 			// workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+			SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 		}
 		catch (System.IO.IOException exc1)
 		{
@@ -2517,7 +2518,7 @@ internal partial class ZipEntry
 
 		ArchiveStream.Seek(filenameLength + extraFieldLength, SeekOrigin.Current);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+		SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 
 		_LengthOfHeader = 30 + extraFieldLength + filenameLength +
 			GetLengthOfCryptoHeaderBytes(_Encryption_FromZipFile);
@@ -2532,7 +2533,7 @@ internal partial class ZipEntry
 		// workitem 8098: ok (restore)
 		ArchiveStream.Seek(origPosition, SeekOrigin.Begin);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
+		SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 	}
 
 
@@ -2608,7 +2609,7 @@ internal partial class ZipEntry
 	internal Int16 _BitField;
 	internal Int16 _CompressionMethod;
 	private Int16 _CompressionMethod_FromZipFile;
-	private Ionic.Zlib.CompressionLevel _CompressionLevel;
+	private DotNetZip.Zlib.CompressionLevel _CompressionLevel;
 	internal string _Comment;
 	private bool _IsDirectory;
 	private byte[] _CommentBytes;

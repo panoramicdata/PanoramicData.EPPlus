@@ -27,9 +27,9 @@
 using System;
 using System.IO;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
-internal class ZipSegmentedStream : System.IO.Stream
+internal class ZipSegmentedStream : Stream
 {
 	enum RwMode
 	{
@@ -49,7 +49,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 	private uint _currentDiskNumber;
 	private uint _maxDiskNumber;
 	private int _maxSegmentSize;
-	private System.IO.Stream _innerStream;
+	private Stream _innerStream;
 
 	// **Note regarding exceptions:
 	//
@@ -135,7 +135,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 			throw new ArgumentOutOfRangeException(nameof(diskNumber));
 
 		var fname =
-			String.Format("{0}.z{1:D2}",
+			string.Format("{0}.z{1:D2}",
 							 Path.Combine(Path.GetDirectoryName(name),
 										  Path.GetFileNameWithoutExtension(name)),
 							 diskNumber + 1);
@@ -161,7 +161,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 	}
 
 
-	public UInt32 CurrentSegment
+	public uint CurrentSegment
 	{
 		get
 		{
@@ -185,7 +185,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 	///     started.
 	///   </para>
 	/// </remarks>
-	public String CurrentName
+	public string CurrentName
 	{
 		get
 		{
@@ -196,7 +196,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 	}
 
 
-	public String CurrentTempName => _currentTempName;
+	public string CurrentTempName => _currentTempName;
 
 	private string _NameForSegment(uint diskNumber)
 	{
@@ -206,7 +206,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 			throw new OverflowException("The number of zip segments would exceed 99.");
 		}
 
-		return String.Format("{0}.z{1:D2}",
+		return string.Format("{0}.z{1:D2}",
 							 Path.Combine(Path.GetDirectoryName(_baseName),
 										  Path.GetFileNameWithoutExtension(_baseName)),
 							 diskNumber + 1);
@@ -217,7 +217,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 	// a block of the given length.
 	// This isn't exactly true. It could roll over beyond
 	// this number.
-	public UInt32 ComputeSegment(int length)
+	public uint ComputeSegment(int length)
 	{
 		if (_innerStream.Position + length > _maxSegmentSize)
 			// the block will go AT LEAST into the next segment
@@ -228,7 +228,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 	}
 
 
-	public override String ToString() => String.Format("{0}[{1}][{2}], pos=0x{3:X})",
+	public override string ToString() => string.Format("{0}[{1}][{2}], pos=0x{3:X})",
 							 "ZipSegmentedStream", CurrentName,
 							 rwMode.ToString(),
 							 Position);
@@ -271,7 +271,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 			if (_innerStream.Position != _innerStream.Length)
 			{
 				_exceptionPending = true;
-				throw new ZipException(String.Format("Read error in file {0}", CurrentName));
+				throw new ZipException(string.Format("Read error in file {0}", CurrentName));
 
 			}
 
@@ -379,7 +379,7 @@ internal class ZipSegmentedStream : System.IO.Stream
 		{
 			var x = _innerStream.Seek(offset, SeekOrigin.Begin);
 			// workitem 10178
-			Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(_innerStream);
+			SharedUtilities.Workaround_Ladybug318918(_innerStream);
 			return x;
 		}
 
@@ -431,24 +431,24 @@ internal class ZipSegmentedStream : System.IO.Stream
 		var r = _innerStream.Seek(offset, SeekOrigin.Begin);
 
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(_innerStream);
+		SharedUtilities.Workaround_Ladybug318918(_innerStream);
 
 		return r;
 	}
 
 
 
-	public override bool CanRead => (rwMode == RwMode.ReadOnly &&
-					(_innerStream != null) &&
-					_innerStream.CanRead);
+	public override bool CanRead => rwMode == RwMode.ReadOnly &&
+					_innerStream != null &&
+					_innerStream.CanRead;
 
 
-	public override bool CanSeek => (_innerStream != null) &&
+	public override bool CanSeek => _innerStream != null &&
 					_innerStream.CanSeek;
 
 
-	public override bool CanWrite => (rwMode == RwMode.Write) &&
-					(_innerStream != null) &&
+	public override bool CanWrite => rwMode == RwMode.Write &&
+					_innerStream != null &&
 					_innerStream.CanWrite;
 
 	public override void Flush() => _innerStream.Flush();
@@ -461,11 +461,11 @@ internal class ZipSegmentedStream : System.IO.Stream
 		set { _innerStream.Position = value; }
 	}
 
-	public override long Seek(long offset, System.IO.SeekOrigin origin)
+	public override long Seek(long offset, SeekOrigin origin)
 	{
 		var x = _innerStream.Seek(offset, origin);
 		// workitem 10178
-		Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(_innerStream);
+		SharedUtilities.Workaround_Ladybug318918(_innerStream);
 		return x;
 	}
 

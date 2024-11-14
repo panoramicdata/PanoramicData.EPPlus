@@ -36,7 +36,7 @@ using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Style;
 using System.Drawing;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 class Sample4
 {
@@ -110,19 +110,19 @@ class Sample4
 			}
 
 			//Set the series for the chart. The series must exist in the template or the program will crash.
-			var chart = ((ExcelChart)ws.Drawings["SampleChart"]);
+			var chart = (ExcelChart)ws.Drawings["SampleChart"];
 			chart.Title.Text = "Exchange rate %";
 			chart.Series[0].Header = "USD/JPY";
-			chart.Series[0].XSeries = "'" + ws.Name + "'!" + ExcelRange.GetAddress(startRow + 1, 1, row - 1, 1);
-			chart.Series[0].Series = "'" + ws.Name + "'!" + ExcelRange.GetAddress(startRow + 1, 5, row - 1, 5);
+			chart.Series[0].XSeries = "'" + ws.Name + "'!" + ExcelCellBase.GetAddress(startRow + 1, 1, row - 1, 1);
+			chart.Series[0].Series = "'" + ws.Name + "'!" + ExcelCellBase.GetAddress(startRow + 1, 5, row - 1, 5);
 
 			chart.Series[1].Header = "USD/EUR";
-			chart.Series[1].XSeries = "'" + ws.Name + "'!" + ExcelRange.GetAddress(startRow + 1, 1, row - 1, 1);
-			chart.Series[1].Series = "'" + ws.Name + "'!" + ExcelRange.GetAddress(startRow + 1, 6, row - 1, 6);
+			chart.Series[1].XSeries = "'" + ws.Name + "'!" + ExcelCellBase.GetAddress(startRow + 1, 1, row - 1, 1);
+			chart.Series[1].Series = "'" + ws.Name + "'!" + ExcelCellBase.GetAddress(startRow + 1, 6, row - 1, 6);
 
 			chart.Series[2].Header = "USD/GBP";
-			chart.Series[2].XSeries = "'" + ws.Name + "'!" + ExcelRange.GetAddress(startRow + 1, 1, row - 1, 1);
-			chart.Series[2].Series = "'" + ws.Name + "'!" + ExcelRange.GetAddress(startRow + 1, 7, row - 1, 7);
+			chart.Series[2].XSeries = "'" + ws.Name + "'!" + ExcelCellBase.GetAddress(startRow + 1, 1, row - 1, 1);
+			chart.Series[2].Series = "'" + ws.Name + "'!" + ExcelCellBase.GetAddress(startRow + 1, 7, row - 1, 7);
 		}
 
 		//Get the documet as a byte array from the stream and save it to disk.  (This is useful in a webapplication) ... 

@@ -2,7 +2,8 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
-namespace EPPlusSamples;
+
+namespace SampleApp;
 
 class Sample7
 {

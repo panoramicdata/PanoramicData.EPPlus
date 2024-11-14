@@ -32,7 +32,7 @@
 using System;
 using System.IO;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 class Sample_Main
 {

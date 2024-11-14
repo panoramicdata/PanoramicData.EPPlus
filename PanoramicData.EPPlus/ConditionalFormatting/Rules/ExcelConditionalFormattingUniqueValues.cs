@@ -31,7 +31,7 @@
 using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 
-namespace OfficeOpenXml.ConditionalFormatting;
+namespace OfficeOpenXml.ConditionalFormatting.Rules;
 
 /// <summary>
 /// ExcelConditionalFormattingUniqueValues
@@ -63,7 +63,7 @@ public class ExcelConditionalFormattingUniqueValues
 		priority,
 		worksheet,
 		itemElementNode,
-		(namespaceManager == null) ? worksheet.NameSpaceManager : namespaceManager)
+		namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
 	{
 	}
 

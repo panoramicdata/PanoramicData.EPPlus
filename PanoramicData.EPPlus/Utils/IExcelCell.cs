@@ -29,9 +29,10 @@
  * Jan Källman		                Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Style;
 using System;
 
-namespace OfficeOpenXml.Style;
+namespace OfficeOpenXml.Utils;
 
 internal interface IExcelCell
 {

@@ -30,6 +30,7 @@
  *******************************************************************************/
 using System;
 using System.IO;
+using OfficeOpenXml.Packaging.DotNetZip;
 using OfficeOpenXml.Packaging.Ionic.Zip;
 
 namespace OfficeOpenXml.Packaging;
@@ -136,7 +137,7 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 				return;
 			}
 
-			os.CompressionLevel = (OfficeOpenXml.Packaging.Ionic.Zlib.CompressionLevel)CompressionLevel;
+			os.CompressionLevel = (DotNetZip.Zlib.CompressionLevel)CompressionLevel;
 			os.PutNextEntry(Uri.OriginalString);
 			os.Write(b, 0, b.Length);
 		}

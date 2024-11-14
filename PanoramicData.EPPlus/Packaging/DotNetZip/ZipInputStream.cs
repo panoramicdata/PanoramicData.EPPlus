@@ -29,12 +29,11 @@
 // ------------------------------------------------------------------
 //
 
-using OfficeOpenXml.Packaging.Ionic.Crc;
 using OfficeOpenXml.Packaging.Ionic.Zip;
 using System;
 using System.IO;
 
-namespace Ionic.Zip;
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 ///   Provides a stream metaphor for reading zip files.
@@ -113,7 +112,7 @@ internal class ZipInputStream : Stream
 	///   While the <see cref="ZipFile"/> class is generally easier
 	///   to use, this class provides an alternative to those
 	///   applications that want to read from a zipfile directly,
-	///   using a <see cref="System.IO.Stream"/>.
+	///   using a <see cref="Stream"/>.
 	/// </para>
 	///
 	/// <para>
@@ -246,7 +245,7 @@ internal class ZipInputStream : Stream
 	///   While the <see cref="ZipFile"/> class is generally easier
 	///   to use, this class provides an alternative to those
 	///   applications that want to read from a zipfile directly,
-	///   using a <see cref="System.IO.Stream"/>.
+	///   using a <see cref="Stream"/>.
 	/// </para>
 	///
 	/// </remarks>
@@ -306,7 +305,7 @@ internal class ZipInputStream : Stream
 	/// End Sub
 	/// </code>
 	/// </example>
-	public ZipInputStream(String fileName)
+	public ZipInputStream(string fileName)
 	{
 		Stream stream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
 		_Init(stream, false, fileName);
@@ -357,7 +356,7 @@ internal class ZipInputStream : Stream
 	///   </para>
 	/// </remarks>
 	/// <returns>a string representation of the instance.</returns>
-	public override String ToString() => String.Format("ZipInputStream::{0}(leaveOpen({1})))", _name, _leaveUnderlyingStreamOpen);
+	public override string ToString() => string.Format("ZipInputStream::{0}(leaveOpen({1})))", _name, _leaveUnderlyingStreamOpen);
 
 
 	/// <summary>
@@ -495,14 +494,14 @@ internal class ZipInputStream : Stream
 	///
 	/// </code>
 	/// </example>
-	public String Password
+	public string Password
 	{
 		set
 		{
 			if (_closed)
 			{
 				_exceptionPending = true;
-				throw new System.InvalidOperationException("The stream has been closed.");
+				throw new InvalidOperationException("The stream has been closed.");
 			}
 
 			_Password = value;
@@ -551,7 +550,7 @@ internal class ZipInputStream : Stream
 		if (_closed)
 		{
 			_exceptionPending = true;
-			throw new System.InvalidOperationException("The stream has been closed.");
+			throw new InvalidOperationException("The stream has been closed.");
 		}
 
 		if (_needSetup)
@@ -559,7 +558,7 @@ internal class ZipInputStream : Stream
 
 		if (_LeftToRead == 0) return 0;
 
-		var len = (_LeftToRead > count) ? count : (int)_LeftToRead;
+		var len = _LeftToRead > count ? count : (int)_LeftToRead;
 		var n = _crcStream.Read(buffer, offset, len);
 
 		_LeftToRead -= n;
@@ -794,9 +793,9 @@ internal class ZipInputStream : Stream
 	private bool _needSetup;
 	private ZipContainer _container;
 	private CrcCalculatorStream _crcStream;
-	private Int64 _LeftToRead;
-	internal String _Password;
-	private Int64 _endOfEntry;
+	private long _LeftToRead;
+	internal string _Password;
+	private long _endOfEntry;
 	private string _name;
 
 	private bool _leaveUnderlyingStreamOpen;

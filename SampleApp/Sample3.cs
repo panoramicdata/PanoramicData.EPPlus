@@ -52,7 +52,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using OfficeOpenXml.Style;
 
-namespace EPPlusSamples;
+namespace SampleApp;
 
 class Sample3
 {
@@ -86,8 +86,8 @@ class Sample3
 					r.Merge = true;
 					r.Style.Font.SetFromFont(new Font("Britannic Bold", 22, FontStyle.Italic));
 					r.Style.Font.Color.SetColor(Color.White);
-					r.Style.HorizontalAlignment = OfficeOpenXml.Style.ExcelHorizontalAlignment.CenterContinuous;
-					r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+					r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
+					r.Style.Fill.PatternType = ExcelFillStyle.Solid;
 					r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(23, 55, 93));
 				}
 

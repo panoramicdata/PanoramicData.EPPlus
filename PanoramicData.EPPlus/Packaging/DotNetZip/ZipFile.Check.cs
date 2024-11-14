@@ -27,6 +27,7 @@
 //
 
 
+using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 using System.IO;
 
@@ -287,7 +288,7 @@ internal partial class ZipFile
 
 			success = true;
 		}
-		catch (Ionic.Zip.BadPasswordException) { }
+		catch (BadPasswordException) { }
 
 		return success;
 	}

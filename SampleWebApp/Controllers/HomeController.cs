@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SampleWebApp.Core.Controllers;
+namespace SampleWebApp.Controllers;
 
 public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 {

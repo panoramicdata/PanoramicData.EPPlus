@@ -63,7 +63,7 @@
 
 
 using System;
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 sealed class InflateBlocks
 {
@@ -110,12 +110,12 @@ sealed class InflateBlocks
 	internal int end;                                 // one byte after sliding window
 	internal int readAt;                              // window read pointer
 	internal int writeAt;                             // window write pointer
-	internal System.Object checkfn;                   // check function
+	internal object checkfn;                   // check function
 	internal uint check;                              // check on output
 
 	internal InfTree inftree = new();
 
-	internal InflateBlocks(ZlibCodec codec, System.Object checkfn, int w)
+	internal InflateBlocks(ZlibCodec codec, object checkfn, int w)
 	{
 		_codec = codec;
 		hufts = new int[MANY * 3];
@@ -158,7 +158,7 @@ sealed class InflateBlocks
 		k = bitk;
 
 		q = writeAt;
-		m = (int)(q < readAt ? readAt - q - 1 : end - q);
+		m = q < readAt ? readAt - q - 1 : end - q;
 
 
 		// process input based on current state
@@ -168,7 +168,7 @@ sealed class InflateBlocks
 			{
 				case InflateBlockMode.TYPE:
 
-					while (k < (3))
+					while (k < 3)
 					{
 						if (n != 0)
 						{
@@ -189,13 +189,13 @@ sealed class InflateBlocks
 						k += 8;
 					}
 
-					t = (int)(b & 7);
+					t = b & 7;
 					last = t & 1;
 
 					switch ((uint)t >> 1)
 					{
 						case 0:  // stored
-							b >>= 3; k -= (3);
+							b >>= 3; k -= 3;
 							t = k & 7; // go to byte boundary
 							b >>= t; k -= t;
 							mode = InflateBlockMode.LENS; // get length of stored block
@@ -234,7 +234,7 @@ sealed class InflateBlocks
 
 				case InflateBlockMode.LENS:
 
-					while (k < (32))
+					while (k < 32)
 					{
 						if (n != 0)
 						{
@@ -256,7 +256,7 @@ sealed class InflateBlocks
 						k += 8;
 					}
 
-					if ((((~b) >> 16) & 0xffff) != (b & 0xffff))
+					if ((~b >> 16 & 0xffff) != (b & 0xffff))
 					{
 						mode = InflateBlockMode.BAD;
 						_codec.Message = "invalid stored block lengths";
@@ -270,9 +270,9 @@ sealed class InflateBlocks
 						return Flush(r);
 					}
 
-					left = (b & 0xffff);
+					left = b & 0xffff;
 					b = k = 0; // dump bits
-					mode = left != 0 ? InflateBlockMode.STORED : (last != 0 ? InflateBlockMode.DRY : InflateBlockMode.TYPE);
+					mode = left != 0 ? InflateBlockMode.STORED : last != 0 ? InflateBlockMode.DRY : InflateBlockMode.TYPE;
 					break;
 
 				case InflateBlockMode.STORED:
@@ -290,17 +290,17 @@ sealed class InflateBlocks
 					{
 						if (q == end && readAt != 0)
 						{
-							q = 0; m = (int)(q < readAt ? readAt - q - 1 : end - q);
+							q = 0; m = q < readAt ? readAt - q - 1 : end - q;
 						}
 
 						if (m == 0)
 						{
 							writeAt = q;
 							r = Flush(r);
-							q = writeAt; m = (int)(q < readAt ? readAt - q - 1 : end - q);
+							q = writeAt; m = q < readAt ? readAt - q - 1 : end - q;
 							if (q == end && readAt != 0)
 							{
-								q = 0; m = (int)(q < readAt ? readAt - q - 1 : end - q);
+								q = 0; m = q < readAt ? readAt - q - 1 : end - q;
 							}
 
 							if (m == 0)
@@ -332,7 +332,7 @@ sealed class InflateBlocks
 
 				case InflateBlockMode.TABLE:
 
-					while (k < (14))
+					while (k < 14)
 					{
 						if (n != 0)
 						{
@@ -353,8 +353,8 @@ sealed class InflateBlocks
 						k += 8;
 					}
 
-					table = t = (b & 0x3fff);
-					if ((t & 0x1f) > 29 || ((t >> 5) & 0x1f) > 29)
+					table = t = b & 0x3fff;
+					if ((t & 0x1f) > 29 || (t >> 5 & 0x1f) > 29)
 					{
 						mode = InflateBlockMode.BAD;
 						_codec.Message = "too many length or distance symbols";
@@ -368,7 +368,7 @@ sealed class InflateBlocks
 						return Flush(r);
 					}
 
-					t = 258 + (t & 0x1f) + ((t >> 5) & 0x1f);
+					t = 258 + (t & 0x1f) + (t >> 5 & 0x1f);
 					if (blens == null || blens.Length < t)
 					{
 						blens = new int[t];
@@ -393,7 +393,7 @@ sealed class InflateBlocks
 				case InflateBlockMode.BTREE:
 					while (index < 4 + (table >> 10))
 					{
-						while (k < (3))
+						while (k < 3)
 						{
 							if (n != 0)
 							{
@@ -451,7 +451,7 @@ sealed class InflateBlocks
 					while (true)
 					{
 						t = table;
-						if (!(index < 258 + (t & 0x1f) + ((t >> 5) & 0x1f)))
+						if (!(index < 258 + (t & 0x1f) + (t >> 5 & 0x1f)))
 						{
 							break;
 						}
@@ -495,7 +495,7 @@ sealed class InflateBlocks
 							i = c == 18 ? 7 : c - 14;
 							j = c == 18 ? 11 : 3;
 
-							while (k < (t + i))
+							while (k < t + i)
 							{
 								if (n != 0)
 								{
@@ -518,13 +518,13 @@ sealed class InflateBlocks
 
 							b >>= t; k -= t;
 
-							j += (b & InternalInflateConstants.InflateMask[i]);
+							j += b & InternalInflateConstants.InflateMask[i];
 
 							b >>= i; k -= i;
 
 							i = index;
 							t = table;
-							if (i + j > 258 + (t & 0x1f) + ((t >> 5) & 0x1f) || (c == 16 && i < 1))
+							if (i + j > 258 + (t & 0x1f) + (t >> 5 & 0x1f) || c == 16 && i < 1)
 							{
 								blens = null;
 								mode = InflateBlockMode.BAD;
@@ -539,7 +539,7 @@ sealed class InflateBlocks
 								return Flush(r);
 							}
 
-							c = (c == 16) ? blens[i - 1] : 0;
+							c = c == 16 ? blens[i - 1] : 0;
 							do
 							{
 								blens[i++] = c;
@@ -557,7 +557,7 @@ sealed class InflateBlocks
 						var td = new int[1];
 
 						t = table;
-						t = inftree.inflate_trees_dynamic(257 + (t & 0x1f), 1 + ((t >> 5) & 0x1f), blens, bl, bd, tl, td, hufts, _codec);
+						t = inftree.inflate_trees_dynamic(257 + (t & 0x1f), 1 + (t >> 5 & 0x1f), blens, bl, bd, tl, td, hufts, _codec);
 
 						if (t != ZlibConstants.Z_OK)
 						{
@@ -602,7 +602,7 @@ sealed class InflateBlocks
 					b = bitb;
 					k = bitk;
 					q = writeAt;
-					m = (int)(q < readAt ? readAt - q - 1 : end - q);
+					m = q < readAt ? readAt - q - 1 : end - q;
 
 					if (last == 0)
 					{
@@ -616,7 +616,7 @@ sealed class InflateBlocks
 				case InflateBlockMode.DRY:
 					writeAt = q;
 					r = Flush(r);
-					q = writeAt; m = (int)(q < readAt ? readAt - q - 1 : end - q);
+					q = writeAt; m = q < readAt ? readAt - q - 1 : end - q;
 					if (readAt != writeAt)
 					{
 						bitb = b; bitk = k;
@@ -692,7 +692,7 @@ sealed class InflateBlocks
 			if (pass == 0)
 			{
 				// compute number of bytes to copy as far as end of window
-				nBytes = (int)((readAt <= writeAt ? writeAt : end) - readAt);
+				nBytes = (readAt <= writeAt ? writeAt : end) - readAt;
 			}
 			else
 			{
@@ -855,7 +855,7 @@ sealed class InflateCodes
 
 						if (r != ZlibConstants.Z_OK)
 						{
-							mode = (r == ZlibConstants.Z_STREAM_END) ? WASH : BADCODE;
+							mode = r == ZlibConstants.Z_STREAM_END ? WASH : BADCODE;
 							break;
 						}
 					}
@@ -891,8 +891,8 @@ sealed class InflateCodes
 
 					tindex = (tree_index + (b & InternalInflateConstants.InflateMask[j])) * 3;
 
-					b >>= (tree[tindex + 1]);
-					k -= (tree[tindex + 1]);
+					b >>= tree[tindex + 1];
+					k -= tree[tindex + 1];
 
 					e = tree[tindex];
 
@@ -959,7 +959,7 @@ sealed class InflateCodes
 						k += 8;
 					}
 
-					len += (b & InternalInflateConstants.InflateMask[j]);
+					len += b & InternalInflateConstants.InflateMask[j];
 
 					b >>= j;
 					k -= j;
@@ -994,7 +994,7 @@ sealed class InflateCodes
 					b >>= tree[tindex + 1];
 					k -= tree[tindex + 1];
 
-					e = (tree[tindex]);
+					e = tree[tindex];
 					if ((e & 0x10) != 0)
 					{
 						// distance
@@ -1041,7 +1041,7 @@ sealed class InflateCodes
 						k += 8;
 					}
 
-					dist += (b & InternalInflateConstants.InflateMask[j]);
+					dist += b & InternalInflateConstants.InflateMask[j];
 
 					b >>= j;
 					k -= j;
@@ -1222,7 +1222,7 @@ sealed class InflateCodes
 		{
 			// assume called with m >= 258 && n >= 10
 			// get literal/length code
-			while (k < (20))
+			while (k < 20)
 			{
 				// max bits for literal/length code
 				n--;
@@ -1235,7 +1235,7 @@ sealed class InflateCodes
 			tp_index_t_3 = (tp_index + t) * 3;
 			if ((e = tp[tp_index_t_3]) == 0)
 			{
-				b >>= (tp[tp_index_t_3 + 1]); k -= (tp[tp_index_t_3 + 1]);
+				b >>= tp[tp_index_t_3 + 1]; k -= tp[tp_index_t_3 + 1];
 
 				s.window[q++] = (byte)tp[tp_index_t_3 + 2];
 				m--;
@@ -1245,12 +1245,12 @@ sealed class InflateCodes
 			do
 			{
 
-				b >>= (tp[tp_index_t_3 + 1]); k -= (tp[tp_index_t_3 + 1]);
+				b >>= tp[tp_index_t_3 + 1]; k -= tp[tp_index_t_3 + 1];
 
 				if ((e & 16) != 0)
 				{
 					e &= 15;
-					c = tp[tp_index_t_3 + 2] + ((int)b & InternalInflateConstants.InflateMask[e]);
+					c = tp[tp_index_t_3 + 2] + (b & InternalInflateConstants.InflateMask[e]);
 
 					b >>= e; k -= e;
 
@@ -1271,7 +1271,7 @@ sealed class InflateCodes
 					do
 					{
 
-						b >>= (tp[tp_index_t_3 + 1]); k -= (tp[tp_index_t_3 + 1]);
+						b >>= tp[tp_index_t_3 + 1]; k -= tp[tp_index_t_3 + 1];
 
 						if ((e & 16) != 0)
 						{
@@ -1321,7 +1321,7 @@ sealed class InflateCodes
 								{
 									// if source crosses,
 									c -= e; // wrapped copy
-									if (q - r > 0 && e > (q - r))
+									if (q - r > 0 && e > q - r)
 									{
 										do
 										{
@@ -1340,7 +1340,7 @@ sealed class InflateCodes
 							}
 
 							// copy all or what's left
-							if (q - r > 0 && c > (q - r))
+							if (q - r > 0 && c > q - r)
 							{
 								do
 								{
@@ -1359,7 +1359,7 @@ sealed class InflateCodes
 						else if ((e & 64) == 0)
 						{
 							t += tp[tp_index_t_3 + 2];
-							t += (b & InternalInflateConstants.InflateMask[e]);
+							t += b & InternalInflateConstants.InflateMask[e];
 							tp_index_t_3 = (tp_index + t) * 3;
 							e = tp[tp_index_t_3];
 						}
@@ -1367,7 +1367,7 @@ sealed class InflateCodes
 						{
 							z.Message = "invalid distance code";
 
-							c = z.AvailableBytesIn - n; c = (k >> 3) < c ? k >> 3 : c; n += c; p -= c; k -= (c << 3);
+							c = z.AvailableBytesIn - n; c = k >> 3 < c ? k >> 3 : c; n += c; p -= c; k -= c << 3;
 
 							s.bitb = b; s.bitk = k;
 							z.AvailableBytesIn = n; z.TotalBytesIn += p - z.NextIn; z.NextIn = p;
@@ -1383,11 +1383,11 @@ sealed class InflateCodes
 				if ((e & 64) == 0)
 				{
 					t += tp[tp_index_t_3 + 2];
-					t += (b & InternalInflateConstants.InflateMask[e]);
+					t += b & InternalInflateConstants.InflateMask[e];
 					tp_index_t_3 = (tp_index + t) * 3;
 					if ((e = tp[tp_index_t_3]) == 0)
 					{
-						b >>= (tp[tp_index_t_3 + 1]); k -= (tp[tp_index_t_3 + 1]);
+						b >>= tp[tp_index_t_3 + 1]; k -= tp[tp_index_t_3 + 1];
 						s.window[q++] = (byte)tp[tp_index_t_3 + 2];
 						m--;
 						break;
@@ -1395,7 +1395,7 @@ sealed class InflateCodes
 				}
 				else if ((e & 32) != 0)
 				{
-					c = z.AvailableBytesIn - n; c = (k >> 3) < c ? k >> 3 : c; n += c; p -= c; k -= (c << 3);
+					c = z.AvailableBytesIn - n; c = k >> 3 < c ? k >> 3 : c; n += c; p -= c; k -= c << 3;
 
 					s.bitb = b; s.bitk = k;
 					z.AvailableBytesIn = n; z.TotalBytesIn += p - z.NextIn; z.NextIn = p;
@@ -1407,7 +1407,7 @@ sealed class InflateCodes
 				{
 					z.Message = "invalid literal/length code";
 
-					c = z.AvailableBytesIn - n; c = (k >> 3) < c ? k >> 3 : c; n += c; p -= c; k -= (c << 3);
+					c = z.AvailableBytesIn - n; c = k >> 3 < c ? k >> 3 : c; n += c; p -= c; k -= c << 3;
 
 					s.bitb = b; s.bitk = k;
 					z.AvailableBytesIn = n; z.TotalBytesIn += p - z.NextIn; z.NextIn = p;
@@ -1421,7 +1421,7 @@ sealed class InflateCodes
 		while (m >= 258 && n >= 10);
 
 		// not enough input or output--restore pointers and return
-		c = z.AvailableBytesIn - n; c = (k >> 3) < c ? k >> 3 : c; n += c; p -= c; k -= (c << 3);
+		c = z.AvailableBytesIn - n; c = k >> 3 < c ? k >> 3 : c; n += c; p -= c; k -= c << 3;
 
 		s.bitb = b; s.bitk = k;
 		z.AvailableBytesIn = n; z.TotalBytesIn += p - z.NextIn; z.NextIn = p;
@@ -1567,7 +1567,7 @@ internal sealed class InflateManager
 					if (((method = _codec.InputBuffer[_codec.NextIn++]) & 0xf) != Z_DEFLATED)
 					{
 						mode = InflateManagerMode.BAD;
-						_codec.Message = String.Format("unknown compression method (0x{0:X2})", method);
+						_codec.Message = string.Format("unknown compression method (0x{0:X2})", method);
 						marker = 5; // can't try inflateSync
 						break;
 					}
@@ -1575,7 +1575,7 @@ internal sealed class InflateManager
 					if ((method >> 4) + 8 > wbits)
 					{
 						mode = InflateManagerMode.BAD;
-						_codec.Message = String.Format("invalid window size ({0})", (method >> 4) + 8);
+						_codec.Message = string.Format("invalid window size ({0})", (method >> 4) + 8);
 						marker = 5; // can't try inflateSync
 						break;
 					}
@@ -1589,9 +1589,9 @@ internal sealed class InflateManager
 					r = f;
 					_codec.AvailableBytesIn--;
 					_codec.TotalBytesIn++;
-					b = (_codec.InputBuffer[_codec.NextIn++]) & 0xff;
+					b = _codec.InputBuffer[_codec.NextIn++] & 0xff;
 
-					if ((((method << 8) + b) % 31) != 0)
+					if (((method << 8) + b) % 31 != 0)
 					{
 						mode = InflateManagerMode.BAD;
 						_codec.Message = "incorrect header check";
@@ -1599,7 +1599,7 @@ internal sealed class InflateManager
 						break;
 					}
 
-					mode = ((b & PRESET_DICT) == 0)
+					mode = (b & PRESET_DICT) == 0
 						? InflateManagerMode.BLOCKS
 						: InflateManagerMode.DICT4;
 					break;
@@ -1609,7 +1609,7 @@ internal sealed class InflateManager
 					r = f;
 					_codec.AvailableBytesIn--;
 					_codec.TotalBytesIn++;
-					expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xff000000);
+					expectedCheck = (uint)(_codec.InputBuffer[_codec.NextIn++] << 24 & 0xff000000);
 					mode = InflateManagerMode.DICT3;
 					break;
 
@@ -1618,7 +1618,7 @@ internal sealed class InflateManager
 					r = f;
 					_codec.AvailableBytesIn--;
 					_codec.TotalBytesIn++;
-					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0x00ff0000);
+					expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] << 16 & 0x00ff0000);
 					mode = InflateManagerMode.DICT2;
 					break;
 
@@ -1628,7 +1628,7 @@ internal sealed class InflateManager
 					r = f;
 					_codec.AvailableBytesIn--;
 					_codec.TotalBytesIn++;
-					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0x0000ff00);
+					expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] << 8 & 0x0000ff00);
 					mode = InflateManagerMode.DICT1;
 					break;
 
@@ -1680,7 +1680,7 @@ internal sealed class InflateManager
 					r = f;
 					_codec.AvailableBytesIn--;
 					_codec.TotalBytesIn++;
-					expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xff000000);
+					expectedCheck = (uint)(_codec.InputBuffer[_codec.NextIn++] << 24 & 0xff000000);
 					mode = InflateManagerMode.CHECK3;
 					break;
 
@@ -1688,7 +1688,7 @@ internal sealed class InflateManager
 					if (_codec.AvailableBytesIn == 0) return r;
 					r = f;
 					_codec.AvailableBytesIn--; _codec.TotalBytesIn++;
-					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0x00ff0000);
+					expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] << 16 & 0x00ff0000);
 					mode = InflateManagerMode.CHECK2;
 					break;
 
@@ -1697,7 +1697,7 @@ internal sealed class InflateManager
 					r = f;
 					_codec.AvailableBytesIn--;
 					_codec.TotalBytesIn++;
-					expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0x0000ff00);
+					expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] << 8 & 0x0000ff00);
 					mode = InflateManagerMode.CHECK1;
 					break;
 
@@ -1721,7 +1721,7 @@ internal sealed class InflateManager
 					return ZlibConstants.Z_STREAM_END;
 
 				case InflateManagerMode.BAD:
-					throw new ZlibException(String.Format("Bad state ({0})", _codec.Message));
+					throw new ZlibException(string.Format("Bad state ({0})", _codec.Message));
 
 				default:
 					throw new ZlibException("Stream error.");
@@ -1746,7 +1746,7 @@ internal sealed class InflateManager
 
 		_codec._Adler32 = Adler.Adler32(0, null, 0, 0);
 
-		if (length >= (1 << wbits))
+		if (length >= 1 << wbits)
 		{
 			length = (1 << wbits) - 1;
 			index = dictionary.Length - length;

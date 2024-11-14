@@ -25,6 +25,7 @@
 //
 
 
+using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -113,7 +114,7 @@ internal partial class ZipFile
 	///
 	/// <seealso cref="Ionic.Zip.ZipFile.AddEntry(String, System.IO.Stream)"/>
 	///
-	/// <exception cref="Ionic.Zip.BadStateException">
+	/// <exception cref="DotNetZip.BadStateException">
 	///   Thrown if you haven't specified a location or stream for saving the zip,
 	///   either in the constructor or by setting the Name property, or if you try
 	///   to save a regular zip archive to a filename with a .exe extension.

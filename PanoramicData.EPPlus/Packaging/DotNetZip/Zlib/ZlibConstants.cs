@@ -60,7 +60,7 @@
 //
 // -----------------------------------------------------------------------
 
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 /// <summary>
 /// A bunch of constants used in the Zlib interface.

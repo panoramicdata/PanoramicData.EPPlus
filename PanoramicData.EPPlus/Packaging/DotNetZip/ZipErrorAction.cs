@@ -26,7 +26,9 @@
 // ------------------------------------------------------------------
 
 
-namespace OfficeOpenXml.Packaging.Ionic.Zip;
+using OfficeOpenXml.Packaging.Ionic.Zip;
+
+namespace OfficeOpenXml.Packaging.DotNetZip;
 
 /// <summary>
 /// An enum providing the options when an error occurs during opening or reading

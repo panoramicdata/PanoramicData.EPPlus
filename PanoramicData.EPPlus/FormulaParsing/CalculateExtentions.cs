@@ -33,15 +33,15 @@ using System.Threading;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System;
 using System.Collections.Generic;
-using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.Exceptions;
+using OfficeOpenXml.FormulaParsing.DependencyChain;
 
-namespace OfficeOpenXml;
+namespace OfficeOpenXml.FormulaParsing;
 
 public static class CalculationExtension
 {
 
-	public static void Calculate(this ExcelWorkbook workbook) => Calculate(workbook, new ExcelCalculationOption() { AllowCirculareReferences = false });
+	public static void Calculate(this ExcelWorkbook workbook) => workbook.Calculate(new ExcelCalculationOption() { AllowCirculareReferences = false });
 	public static void Calculate(this ExcelWorkbook workbook, ExcelCalculationOption options)
 	{
 		Init(workbook);
@@ -76,7 +76,7 @@ public static class CalculationExtension
 
 		//workbook._isCalculated = true;
 	}
-	public static void Calculate(this ExcelWorksheet worksheet) => Calculate(worksheet, new ExcelCalculationOption());
+	public static void Calculate(this ExcelWorksheet worksheet) => worksheet.Calculate(new ExcelCalculationOption());
 	public static void Calculate(this ExcelWorksheet worksheet, ExcelCalculationOption options)
 	{
 		Init(worksheet.Workbook);
@@ -92,7 +92,7 @@ public static class CalculationExtension
 
 		CalcChain(worksheet.Workbook, parser, dc);
 	}
-	public static void Calculate(this ExcelRangeBase range) => Calculate(range, new ExcelCalculationOption());
+	public static void Calculate(this ExcelRangeBase range) => range.Calculate(new ExcelCalculationOption());
 	public static void Calculate(this ExcelRangeBase range, ExcelCalculationOption options)
 	{
 		Init(range._workbook);
@@ -101,7 +101,7 @@ public static class CalculationExtension
 		var dc = DependencyChainFactory.Create(range, options);
 		CalcChain(range._workbook, parser, dc);
 	}
-	public static object Calculate(this ExcelWorksheet worksheet, string Formula) => Calculate(worksheet, Formula, new ExcelCalculationOption());
+	public static object Calculate(this ExcelWorksheet worksheet, string Formula) => worksheet.Calculate(Formula, new ExcelCalculationOption());
 	public static object Calculate(this ExcelWorksheet worksheet, string Formula, ExcelCalculationOption options)
 	{
 		try
@@ -145,7 +145,7 @@ public static class CalculationExtension
 			}
 			catch (FormatException fe)
 			{
-				throw (fe);
+				throw fe;
 			}
 			catch (Exception e)
 			{

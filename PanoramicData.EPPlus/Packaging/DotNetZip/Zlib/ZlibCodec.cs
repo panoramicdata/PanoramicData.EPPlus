@@ -66,7 +66,7 @@
 
 using System;
 
-namespace OfficeOpenXml.Packaging.Ionic.Zlib;
+namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
 
 /// <summary>
 /// Encoder and Decoder for ZLIB and DEFLATE (IETF RFC1950 and RFC1951).
@@ -136,7 +136,7 @@ sealed public class ZlibCodec
 	/// <summary>
 	/// used for diagnostics, when something goes wrong!
 	/// </summary>
-	public System.String Message;
+	public string Message;
 
 	internal DeflateManager dstate;
 	internal InflateManager istate;
@@ -636,10 +636,10 @@ sealed public class ZlibCodec
 
 		if (dstate.pending.Length <= dstate.nextPending ||
 			OutputBuffer.Length <= NextOut ||
-			dstate.pending.Length < (dstate.nextPending + len) ||
-			OutputBuffer.Length < (NextOut + len))
+			dstate.pending.Length < dstate.nextPending + len ||
+			OutputBuffer.Length < NextOut + len)
 		{
-			throw new ZlibException(String.Format("Invalid State. (pending.Length={0}, pendingCount={1})",
+			throw new ZlibException(string.Format("Invalid State. (pending.Length={0}, pendingCount={1})",
 				dstate.pending.Length, dstate.pendingCount));
 		}
 
