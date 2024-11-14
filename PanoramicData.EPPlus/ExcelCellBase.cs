@@ -354,7 +354,7 @@ public abstract class ExcelCellBase
 		}
 
 		int num;
-		if (value[0] == '[' && value[value.Length - 1] == ']') //Offset?                
+		if (value[0] == '[' && value[^1] == ']') //Offset?                
 		{
 			fixedAddr = false;
 			return int.TryParse(value[1..^1], NumberStyles.Any, CultureInfo.InvariantCulture, out num) ? OffsetValue + num : int.MinValue;

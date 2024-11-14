@@ -77,8 +77,8 @@ public class ExcelConditionalFormattingDataBar
 	{
 		var s = SchemaNodeOrder;
 		Array.Resize(ref s, s.Length + 2);    //Fixes issue 15429. Append node order instead om overwriting it.
-		s[s.Length - 2] = "cfvo";
-		s[s.Length - 1] = "color";
+		s[^2] = "cfvo";
+		s[^1] = "color";
 		SchemaNodeOrder = s;
 
 		//Create the <dataBar> node inside the <cfRule> node

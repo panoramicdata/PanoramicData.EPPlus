@@ -786,7 +786,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 												_worksheet.AutoFilterAddress._fromCol,
 												_worksheet.AutoFilterAddress._fromRow,
 												_worksheet.AutoFilterAddress._toCol));
-			afAddr[afAddr.Count - 1]._ws = WorkSheet;
+			afAddr[^1]._ws = WorkSheet;
 		}
 
 		foreach (var tbl in _worksheet.Tables)
@@ -797,7 +797,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 																		tbl.AutoFilterAddress._fromCol,
 																		tbl.AutoFilterAddress._fromRow,
 																		tbl.AutoFilterAddress._toCol));
-				afAddr[afAddr.Count - 1]._ws = WorkSheet;
+				afAddr[^1]._ws = WorkSheet;
 			}
 		}
 
@@ -2857,7 +2857,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		while (e.Next())
 		{
-			if (l.Count == 0 || l[l.Count - 1].Row != e.Row)
+			if (l.Count == 0 || l[^1].Row != e.Row)
 			{
 				item = new SortItem<ExcelCoreValue>() { Row = e.Row, Items = new ExcelCoreValue[cols] };
 				l.Add(item);

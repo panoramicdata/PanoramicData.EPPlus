@@ -151,7 +151,7 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 		var node = _node.SelectNodes("c:ser", _ns);
 		if (node.Count > 0)
 		{
-			_node.InsertAfter(ser, node[node.Count - 1]);
+			_node.InsertAfter(ser, node[^1]);
 		}
 		else
 		{

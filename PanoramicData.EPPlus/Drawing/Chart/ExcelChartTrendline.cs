@@ -70,7 +70,7 @@ public class ExcelChartTrendlineCollection : IEnumerable<ExcelChartTrendline>
 		XmlNode insertAfter;
 		if (_list.Count > 0)
 		{
-			insertAfter = _list[_list.Count - 1].TopNode;
+			insertAfter = _list[^1].TopNode;
 		}
 		else
 		{

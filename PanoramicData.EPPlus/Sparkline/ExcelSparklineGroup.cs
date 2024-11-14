@@ -152,12 +152,12 @@ public class ExcelSparklineGroup : XmlHelper
 					fromCol = firstAddress._fromCol;
 				}
 
-				var lastAddress = Sparklines[Sparklines.Count - 1].GetRangeAddress(_ws.Names);
+				var lastAddress = Sparklines[^1].GetRangeAddress(_ws.Names);
 				if (lastAddress.Addresses?.Count > 0)
 				{
 					//ExcelNamedRange usually has multiple RangeAddress.
-					toRow = lastAddress.Addresses[lastAddress.Addresses.Count - 1]._toRow;
-					toCol = lastAddress.Addresses[lastAddress.Addresses.Count - 1]._toCol;
+					toRow = lastAddress.Addresses[^1]._toRow;
+					toCol = lastAddress.Addresses[^1]._toCol;
 				}
 				else
 				{
@@ -174,7 +174,7 @@ public class ExcelSparklineGroup : XmlHelper
 	/// </summary>
 	public ExcelRangeBase LocationRange => Sparklines.Count == 0
 				? null
-				: (ExcelRangeBase)_ws.Cells[Sparklines[0].Cell.Row, Sparklines[0].Cell.Column, Sparklines[Sparklines.Count - 1].Cell.Row, Sparklines[Sparklines.Count - 1].Cell.Column];
+				: (ExcelRangeBase)_ws.Cells[Sparklines[0].Cell.Row, Sparklines[0].Cell.Column, Sparklines[^1].Cell.Row, Sparklines[^1].Cell.Column];
 	/// <summary>
 	/// The Sparklines for the sparklinegroup
 	/// </summary>

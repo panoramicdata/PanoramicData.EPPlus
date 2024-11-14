@@ -2376,7 +2376,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 						}
 						else
 						{
-							newFormulas[newFormulas.Count - 1].Address = ExcelCellBase.GetAddress(newFormulas[newFormulas.Count - 1].StartRow, newFormulas[newFormulas.Count - 1].StartCol, row - 1, col);
+							newFormulas[^1].Address = ExcelCellBase.GetAddress(newFormulas[^1].StartRow, newFormulas[^1].StartCol, row - 1, col);
 						}
 
 						var refFormula = new Formulas(SourceCodeTokenizer.Default)
@@ -2435,7 +2435,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		if (newFormulas.Count > newFormulasCount)
 		{
-			newFormulas[newFormulas.Count - 1].Address = ExcelCellBase.GetAddress(newFormulas[newFormulas.Count - 1].StartRow, newFormulas[newFormulas.Count - 1].StartCol, toRow, toCol);
+			newFormulas[^1].Address = ExcelCellBase.GetAddress(newFormulas[^1].StartRow, newFormulas[^1].StartCol, toRow, toCol);
 		}
 	}
 	#endregion
