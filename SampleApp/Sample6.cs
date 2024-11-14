@@ -29,21 +29,21 @@
  *******************************************************************************
  * Jan Källman		Added		25-JAN-2010
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Drawing;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
+using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Table;
-using OfficeOpenXml.FormulaParsing;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 namespace SampleApp;
 
 /// <summary>
 /// Sample 6 - Reads the filesystem and makes a report.
-/// </summary>                  
+/// </summary>
 class Sample6
 {
 	public class StatItem : IComparable<StatItem>
