@@ -38,7 +38,7 @@ public class Find : ExcelFunction
 		var search = ArgToString(functionArguments, 0);
 		var searchIn = ArgToString(functionArguments, 1);
 		var startIndex = 0;
-		if (functionArguments.Count() > 2)
+		if (functionArguments.Length > 2)
 		{
 			startIndex = ArgToInt(functionArguments, 2);
 		}

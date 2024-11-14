@@ -266,7 +266,7 @@ public class ExpressionGraphBuilderTests
 		var tokenizer = new SourceCodeTokenizer(ctx.Configuration.FunctionRepository, ctx.NameValueProvider);
 		var tokens = tokenizer.Tokenize(formula).ToList();
 		var expression = _graphBuilder.Build(tokens);
-		Assert.AreEqual(11, tokens.Count());
+		Assert.AreEqual(11, tokens.Count);
 		Assert.AreEqual("+", tokens[1].Value);
 		Assert.AreEqual("-", tokens[3].Value);
 		Assert.AreEqual("-", tokens[5].Value);

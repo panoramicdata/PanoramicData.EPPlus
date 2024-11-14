@@ -45,7 +45,7 @@ public class ParsingScopes
 	public virtual ParsingScope NewScope(RangeAddress address)
 	{
 		ParsingScope scope;
-		if (_scopes.Count() > 0)
+		if (_scopes.Count > 0)
 		{
 			scope = new ParsingScope(this, _scopes.Peek(), address);
 		}
@@ -62,7 +62,7 @@ public class ParsingScopes
 	/// <summary>
 	/// The current parsing scope.
 	/// </summary>
-	public virtual ParsingScope Current => _scopes.Count() > 0 ? _scopes.Peek() : null;
+	public virtual ParsingScope Current => _scopes.Count > 0 ? _scopes.Peek() : null;
 
 	/// <summary>
 	/// Removes the current scope, setting the calling scope to current.
@@ -71,7 +71,7 @@ public class ParsingScopes
 	public virtual void KillScope(ParsingScope parsingScope)
 	{
 		_scopes.Pop();
-		if (_scopes.Count() == 0)
+		if (_scopes.Count == 0)
 		{
 			_lifetimeEventHandler.ParsingCompleted();
 		}

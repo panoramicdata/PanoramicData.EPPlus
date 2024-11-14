@@ -28,7 +28,7 @@ public class Yearfrac : ExcelFunction
 		var date2 = System.DateTime.FromOADate(date2Num);
 
 		var basis = 0;
-		if (functionArguments.Count() > 2)
+		if (functionArguments.Length > 2)
 		{
 			basis = ArgToInt(functionArguments, 2);
 			ThrowExcelErrorValueExceptionIf(() => basis is < 0 or > 4, eErrorType.Num);
