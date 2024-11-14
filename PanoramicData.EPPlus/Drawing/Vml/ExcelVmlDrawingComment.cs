@@ -30,9 +30,9 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
-using System.Xml;
-using System.Globalization;
 using System.Drawing;
+using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.Drawing.Vml;
 
@@ -165,7 +165,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 		}
 		set
 		{
-			var color = "#" + value.ToArgb().ToString("X").Substring(2, 6);
+			var color = string.Concat("#", value.ToArgb().ToString("X").AsSpan(2, 6));
 			SetXmlNodeString(BACKGROUNDCOLOR_PATH, color);
 			//SetXmlNode(BACKGROUNDCOLOR2_PATH, color);
 		}
@@ -240,7 +240,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 		}
 		set
 		{
-			var color = "#" + value.ToArgb().ToString("X").Substring(2, 6);
+			var color = string.Concat("#", value.ToArgb().ToString("X").AsSpan(2, 6));
 			SetXmlNodeString(LINECOLOR_PATH, color);
 		}
 	}
