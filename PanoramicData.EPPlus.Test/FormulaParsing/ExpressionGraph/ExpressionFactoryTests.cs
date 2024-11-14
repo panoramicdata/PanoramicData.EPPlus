@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FakeItEasy;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+﻿using FakeItEasy;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
@@ -9,7 +9,7 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 [TestClass]
 public class ExpressionFactoryTests
 {
-	private IExpressionFactory _factory;
+	private ExpressionFactory _factory;
 	private ParsingContext _parsingContext;
 
 	[TestInitialize]
