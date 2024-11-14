@@ -22,42 +22,40 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-02-01
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+
+public class AverageIfs : MultipleRangeCriteriasFunction
 {
-    public class AverageIfs : MultipleRangeCriteriasFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
-            ValidateArguments(functionArguments, 3);
-            var sumRange = ArgsToDoubleEnumerable(true, new List<FunctionArgument> { functionArguments[0] }, context).ToList();
-            var argRanges = new List<ExcelDataProvider.IRangeInfo>();
-            var criterias = new List<string>();
-            for (var ix = 1; ix < 31; ix += 2)
-            {
-                if (functionArguments.Length <= ix) break;
-                var rangeInfo = functionArguments[ix].ValueAsRangeInfo;
-                argRanges.Add(rangeInfo);
-                var value = functionArguments[ix + 1].Value != null ? functionArguments[ix + 1].Value.ToString() : null;
-                criterias.Add(value);
-            }
-            IEnumerable<int> matchIndexes = GetMatchIndexes(argRanges[0], criterias[0]);
-            var enumerable = matchIndexes as IList<int> ?? matchIndexes.ToList();
-            for (var ix = 1; ix < argRanges.Count && enumerable.Any(); ix++)
-            {
-                var indexes = GetMatchIndexes(argRanges[ix], criterias[ix]);
-                matchIndexes = enumerable.Intersect(indexes);
-            }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
+		ValidateArguments(functionArguments, 3);
+		var sumRange = ArgsToDoubleEnumerable(true, new List<FunctionArgument> { functionArguments[0] }, context).ToList();
+		var argRanges = new List<ExcelDataProvider.IRangeInfo>();
+		var criterias = new List<string>();
+		for (var ix = 1; ix < 31; ix += 2)
+		{
+			if (functionArguments.Length <= ix) break;
+			var rangeInfo = functionArguments[ix].ValueAsRangeInfo;
+			argRanges.Add(rangeInfo);
+			var value = functionArguments[ix + 1].Value?.ToString();
+			criterias.Add(value);
+		}
 
-            var result = matchIndexes.Average(index => sumRange[index]);
+		IEnumerable<int> matchIndexes = GetMatchIndexes(argRanges[0], criterias[0]);
+		var enumerable = matchIndexes as IList<int> ?? matchIndexes.ToList();
+		for (var ix = 1; ix < argRanges.Count && enumerable.Any(); ix++)
+		{
+			var indexes = GetMatchIndexes(argRanges[ix], criterias[ix]);
+			matchIndexes = enumerable.Intersect(indexes);
+		}
 
-            return CreateResult(result, DataType.Decimal);
-        }
-    }
+		var result = matchIndexes.Average(index => sumRange[index]);
+
+		return CreateResult(result, DataType.Decimal);
+	}
 }

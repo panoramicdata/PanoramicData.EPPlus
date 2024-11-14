@@ -22,34 +22,26 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-26
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
+
+public class CompileResultValidators
 {
-    public class CompileResultValidators
-    {
-        private readonly Dictionary<DataType, CompileResultValidator> _validators = new Dictionary<DataType, CompileResultValidator>(); 
+	private readonly Dictionary<DataType, CompileResultValidator> _validators = [];
 
-        private CompileResultValidator CreateOrGet(DataType dataType)
-        {
-            if (_validators.ContainsKey(dataType))
-            {
-                return _validators[dataType];
-            }
-            if (dataType == DataType.Decimal)
-            {
-                return _validators[DataType.Decimal] = new DecimalCompileResultValidator();
-            }
-            return CompileResultValidator.Empty;
-        }
+	private CompileResultValidator CreateOrGet(DataType dataType)
+	{
+		if (_validators.ContainsKey(dataType))
+		{
+			return _validators[dataType];
+		}
 
-        public CompileResultValidator GetValidator(DataType dataType)
-        {
-            return CreateOrGet(dataType);
-        }
-    }
+		return dataType == DataType.Decimal
+			? (_validators[DataType.Decimal] = new DecimalCompileResultValidator())
+			: CompileResultValidator.Empty;
+	}
+
+	public CompileResultValidator GetValidator(DataType dataType) => CreateOrGet(dataType);
 }

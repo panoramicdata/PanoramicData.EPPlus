@@ -25,38 +25,37 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using MathObj = System.Math;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+
+public class Stdev : HiddenValuesHandlingFunction
 {
-    public class Stdev : HiddenValuesHandlingFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var values = ArgsToDoubleEnumerable(arguments, context, false).Select(x => (double)x);
-            return CreateResult(StandardDeviation(values), DataType.Decimal);
-        }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var values = ArgsToDoubleEnumerable(arguments, context, false).Select(x => (double)x);
+		return CreateResult(StandardDeviation(values), DataType.Decimal);
+	}
 
-        private double StandardDeviation(IEnumerable<double> values)
-        {
-            double ret = 0;
-            if (values.Any())
-            {
-                var nValues = values.Count();
-                if(nValues == 1) throw new ExcelErrorValueException(eErrorType.Div0);
-                //Compute the Average       
-                double avg = values.Average();
-                //Perform the Sum of (value-avg)_2_2       
-                double sum = values.Sum(d => MathObj.Pow(d - avg, 2));
-                //Put it all together       
-                ret = MathObj.Sqrt(Divide(sum, (values.Count() - 1)));
-            }
-            return ret;
-        } 
+	private double StandardDeviation(IEnumerable<double> values)
+	{
+		double ret = 0;
+		if (values.Any())
+		{
+			var nValues = values.Count();
+			if (nValues == 1) throw new ExcelErrorValueException(eErrorType.Div0);
+			//Compute the Average       
+			var avg = values.Average();
+			//Perform the Sum of (value-avg)_2_2       
+			var sum = values.Sum(d => MathObj.Pow(d - avg, 2));
+			//Put it all together       
+			ret = MathObj.Sqrt(Divide(sum, (values.Count() - 1)));
+		}
 
-    }
+		return ret;
+	}
+
 }

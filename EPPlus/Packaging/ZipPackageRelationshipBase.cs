@@ -29,102 +29,89 @@
  * Jan Källman		Added		25-Oct-2012
  *******************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Ionic.Zip;
-using System.IO;
 using System.Xml;
-using OfficeOpenXml.Packaging.Ionic.Zlib;
-namespace OfficeOpenXml.Packaging
-{
-    public abstract class ZipPackageRelationshipBase
-    {
-        protected ZipPackageRelationshipCollection _rels = new ZipPackageRelationshipCollection();
-        protected internal 
-        int maxRId = 1;
-        internal void DeleteRelationship(string id)
-        {
-            _rels.Remove(id);
-            UpdateMaxRId(id, ref maxRId);
-        }
-        protected void UpdateMaxRId(string id, ref int maxRId)
-        {
-            if (id.StartsWith("rId"))
-            {
-                int num;
-                if (int.TryParse(id.Substring(3), out num))
-                {
-                    if (num == maxRId - 1)
-                    {
-                        maxRId--;
-                    }
-                }
-            }
-        }
-        internal virtual ZipPackageRelationship CreateRelationship(Uri targetUri, TargetMode targetMode, string relationshipType)
-        {
-            var rel = new ZipPackageRelationship();
-            rel.TargetUri = targetUri;
-            rel.TargetMode = targetMode;
-            rel.RelationshipType = relationshipType;
-            rel.Id = "rId" + (maxRId++).ToString();
-            _rels.Add(rel);
-            return rel;
-        }
-        internal bool RelationshipExists(string id)
-        {
-            return _rels.ContainsKey(id);
-        }
-        internal ZipPackageRelationshipCollection GetRelationshipsByType(string schema)
-        {
-            return _rels.GetRelationshipsByType(schema);
-        }
-        internal ZipPackageRelationshipCollection GetRelationships()
-        {
-            return _rels;
-        }
-        internal ZipPackageRelationship GetRelationship(string id)
-        {
-            return _rels[id];
-        }
-        internal void ReadRelation(string xml, string source)
-        {
-            var doc = new XmlDocument();
-            XmlHelper.LoadXmlSafe(doc, xml, Encoding.UTF8);
+namespace OfficeOpenXml.Packaging;
 
-            foreach (XmlElement c in doc.DocumentElement.ChildNodes)
-            {
-                var rel = new ZipPackageRelationship();
-                rel.Id = c.GetAttribute("Id");
-                rel.RelationshipType = c.GetAttribute("Type");
-                rel.TargetMode = c.GetAttribute("TargetMode").Equals("external",StringComparison.OrdinalIgnoreCase) ? TargetMode.External : TargetMode.Internal;
-                try
-                {
-                    rel.TargetUri = new Uri(c.GetAttribute("Target"), UriKind.RelativeOrAbsolute);
-                }
-                catch
-                {
-                    //The URI is not a valid URI. Encode it to make i valid.
-                    rel.TargetUri = new Uri(Uri.EscapeUriString("Invalid:URI "+c.GetAttribute("Target")), UriKind.RelativeOrAbsolute);
-                }
-                if (!string.IsNullOrEmpty(source))
-                {
-                    rel.SourceUri = new Uri(source, UriKind.Relative);
-                }
-                if (rel.Id.StartsWith("rid", StringComparison.OrdinalIgnoreCase))
-                {
-                    int id;
-                    if (int.TryParse(rel.Id.Substring(3), out id))
-                    {
-                        if (id >= maxRId && id < int.MaxValue - 10000) //Not likly to have this high id's but make sure we have space to avoid overflow.
-                        {
-                            maxRId = id + 1;
-                        }
-                    }
-                }
-                _rels.Add(rel);
-            }
-        }
-    }
+public abstract class ZipPackageRelationshipBase
+{
+	protected ZipPackageRelationshipCollection _rels = [];
+	protected internal
+	int maxRId = 1;
+	internal void DeleteRelationship(string id)
+	{
+		_rels.Remove(id);
+		UpdateMaxRId(id, ref maxRId);
+	}
+	protected void UpdateMaxRId(string id, ref int maxRId)
+	{
+		if (id.StartsWith("rId"))
+		{
+			if (int.TryParse(id[3..], out var num))
+			{
+				if (num == maxRId - 1)
+				{
+					maxRId--;
+				}
+			}
+		}
+	}
+	internal virtual ZipPackageRelationship CreateRelationship(Uri targetUri, TargetMode targetMode, string relationshipType)
+	{
+		var rel = new ZipPackageRelationship
+		{
+			TargetUri = targetUri,
+			TargetMode = targetMode,
+			RelationshipType = relationshipType,
+			Id = "rId" + (maxRId++).ToString()
+		};
+		_rels.Add(rel);
+		return rel;
+	}
+	internal bool RelationshipExists(string id) => _rels.ContainsKey(id);
+	internal ZipPackageRelationshipCollection GetRelationshipsByType(string schema) => _rels.GetRelationshipsByType(schema);
+	internal ZipPackageRelationshipCollection GetRelationships() => _rels;
+	internal ZipPackageRelationship GetRelationship(string id) => _rels[id];
+	internal void ReadRelation(string xml, string source)
+	{
+		var doc = new XmlDocument();
+		XmlHelper.LoadXmlSafe(doc, xml, Encoding.UTF8);
+
+		foreach (XmlElement c in doc.DocumentElement.ChildNodes)
+		{
+			var rel = new ZipPackageRelationship
+			{
+				Id = c.GetAttribute("Id"),
+				RelationshipType = c.GetAttribute("Type"),
+				TargetMode = c.GetAttribute("TargetMode").Equals("external", StringComparison.OrdinalIgnoreCase) ? TargetMode.External : TargetMode.Internal
+			};
+			try
+			{
+				rel.TargetUri = new Uri(c.GetAttribute("Target"), UriKind.RelativeOrAbsolute);
+			}
+			catch
+			{
+				//The URI is not a valid URI. Encode it to make i valid.
+				rel.TargetUri = new Uri(Uri.EscapeUriString("Invalid:URI " + c.GetAttribute("Target")), UriKind.RelativeOrAbsolute);
+			}
+
+			if (!string.IsNullOrEmpty(source))
+			{
+				rel.SourceUri = new Uri(source, UriKind.Relative);
+			}
+
+			if (rel.Id.StartsWith("rid", StringComparison.OrdinalIgnoreCase))
+			{
+				if (int.TryParse(rel.Id[3..], out var id))
+				{
+					if (id >= maxRId && id < int.MaxValue - 10000) //Not likly to have this high id's but make sure we have space to avoid overflow.
+					{
+						maxRId = id + 1;
+					}
+				}
+			}
+
+			_rels.Add(rel);
+		}
+	}
 }

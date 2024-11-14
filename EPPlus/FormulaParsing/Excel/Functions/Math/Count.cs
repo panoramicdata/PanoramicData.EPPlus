@@ -24,94 +24,83 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+
+public class Count : HiddenValuesHandlingFunction
 {
-    public class Count : HiddenValuesHandlingFunction
-    {
-        private enum ItemContext
-        {
-            InRange,
-            InArray,
-            SingleArg
-        }
+	private enum ItemContext
+	{
+		InRange,
+		InArray,
+		SingleArg
+	}
 
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var nItems = 0d;
-            Calculate(arguments, ref nItems, context, ItemContext.SingleArg);
-            return CreateResult(nItems, DataType.Integer);
-        }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var nItems = 0d;
+		Calculate(arguments, ref nItems, context, ItemContext.SingleArg);
+		return CreateResult(nItems, DataType.Integer);
+	}
 
-        private void Calculate(IEnumerable<FunctionArgument> items, ref double nItems, ParsingContext context, ItemContext itemContext)
-        {
-            foreach (var item in items)
-            {
-                var cs = item.Value as ExcelDataProvider.IRangeInfo;
-                if (cs != null)
-                {
-                    foreach (var c in cs)
-                    {
-                        _CheckForAndHandleExcelError(c, context);
-                        if (ShouldIgnore(c, context) == false && ShouldCount(c.Value, ItemContext.InRange))
-                        {
-                            nItems++;
-                        }
-                    }
-                }
-                else
-                {
-                    var value = item.Value as IEnumerable<FunctionArgument>;
-                    if (value != null)
-                    {
-                        Calculate(value, ref nItems, context, ItemContext.InArray);
-                    }
-                    else
-                    {
-                        _CheckForAndHandleExcelError(item, context);
-                        if (ShouldIgnore(item) == false && ShouldCount(item.Value, itemContext))
-                        {
-                            nItems++;
-                        }
-                    }
-                }
-            }
-        }
+	private void Calculate(IEnumerable<FunctionArgument> items, ref double nItems, ParsingContext context, ItemContext itemContext)
+	{
+		foreach (var item in items)
+		{
+			var cs = item.Value as ExcelDataProvider.IRangeInfo;
+			if (cs != null)
+			{
+				foreach (var c in cs)
+				{
+					_CheckForAndHandleExcelError(c, context);
+					if (ShouldIgnore(c, context) == false && ShouldCount(c.Value, ItemContext.InRange))
+					{
+						nItems++;
+					}
+				}
+			}
+			else
+			{
+				var value = item.Value as IEnumerable<FunctionArgument>;
+				if (value != null)
+				{
+					Calculate(value, ref nItems, context, ItemContext.InArray);
+				}
+				else
+				{
+					_CheckForAndHandleExcelError(item, context);
+					if (ShouldIgnore(item) == false && ShouldCount(item.Value, itemContext))
+					{
+						nItems++;
+					}
+				}
+			}
+		}
+	}
 
-        private void _CheckForAndHandleExcelError(FunctionArgument arg, ParsingContext context)
-        {
-            //if (context.Scopes.Current.IsSubtotal)
-            //{
-            //    CheckForAndHandleExcelError(arg);
-            //}
-        }
+	private void _CheckForAndHandleExcelError(FunctionArgument arg, ParsingContext context)
+	{
+		//if (context.Scopes.Current.IsSubtotal)
+		//{
+		//    CheckForAndHandleExcelError(arg);
+		//}
+	}
 
-        private void _CheckForAndHandleExcelError(ExcelDataProvider.ICellInfo cell, ParsingContext context)
-        {
-            //if (context.Scopes.Current.IsSubtotal)
-            //{
-            //    CheckForAndHandleExcelError(cell);
-            //}
-        }
+	private void _CheckForAndHandleExcelError(ExcelDataProvider.ICellInfo cell, ParsingContext context)
+	{
+		//if (context.Scopes.Current.IsSubtotal)
+		//{
+		//    CheckForAndHandleExcelError(cell);
+		//}
+	}
 
-        private bool ShouldCount(object value, ItemContext context)
-        {
-            switch (context)
-            {
-                case ItemContext.SingleArg:
-                    return IsNumeric(value) || IsNumericString(value);
-                case ItemContext.InRange:
-                    return IsNumeric(value);
-                case ItemContext.InArray:
-                    return IsNumeric(value) || IsNumericString(value);
-                default:
-                    throw new ArgumentException("Unknown ItemContext:" + context.ToString());
-            }
-        }
-    }
+	private bool ShouldCount(object value, ItemContext context) => context switch
+	{
+		ItemContext.SingleArg => IsNumeric(value) || IsNumericString(value),
+		ItemContext.InRange => IsNumeric(value),
+		ItemContext.InArray => IsNumeric(value) || IsNumericString(value),
+		_ => throw new ArgumentException("Unknown ItemContext:" + context.ToString()),
+	};
 }

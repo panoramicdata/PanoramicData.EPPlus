@@ -23,28 +23,17 @@
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
+
+public class ArgumentParserFactory
 {
-    public class ArgumentParserFactory
-    {
-        public virtual ArgumentParser CreateArgumentParser(DataType dataType)
-        {
-            switch (dataType)
-            {
-                case DataType.Integer:
-                    return new IntArgumentParser();
-                case DataType.Boolean:
-                    return new BoolArgumentParser();
-                case DataType.Decimal:
-                    return new DoubleArgumentParser();
-                default:
-                    throw new InvalidOperationException("non supported argument parser type " + dataType.ToString());
-            }
-        }
-    }
+	public virtual ArgumentParser CreateArgumentParser(DataType dataType) => dataType switch
+	{
+		DataType.Integer => new IntArgumentParser(),
+		DataType.Boolean => new BoolArgumentParser(),
+		DataType.Decimal => new DoubleArgumentParser(),
+		_ => throw new InvalidOperationException("non supported argument parser type " + dataType.ToString()),
+	};
 }

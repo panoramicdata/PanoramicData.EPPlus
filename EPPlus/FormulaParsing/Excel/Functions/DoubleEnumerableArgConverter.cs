@@ -24,69 +24,60 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.Utils;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions
-{
-    public class DoubleEnumerableArgConverter : CollectionFlattener<ExcelDoubleCellValue>
-    {
-        public virtual IEnumerable<ExcelDoubleCellValue> ConvertArgs(bool ignoreHidden, bool ignoreErrors, IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            return base.FuncArgsToFlatEnumerable(arguments, (arg, argList) =>
-                {
-                    if (arg.IsExcelRange)
-                    {
-                        foreach (var cell in arg.ValueAsRangeInfo)
-                        {
-                            if(!ignoreErrors && cell.IsExcelError) throw new ExcelErrorValueException(ExcelErrorValue.Parse(cell.Value.ToString()));
-                            if (!CellStateHelper.ShouldIgnore(ignoreHidden, cell, context) && ConvertUtil.IsNumeric(cell.Value))
-                            {
-                                var val = new ExcelDoubleCellValue(cell.ValueDouble, cell.Row);
-                                argList.Add(val);
-                            }       
-                        }
-                    }
-                    else
-                    {
-                        if(!ignoreErrors && arg.ValueIsExcelError) throw new ExcelErrorValueException(arg.ValueAsExcelErrorValue);
-                        if (ConvertUtil.IsNumeric(arg.Value) && !CellStateHelper.ShouldIgnore(ignoreHidden, arg, context))
-                        {
-                            var val = new ExcelDoubleCellValue(ConvertUtil.GetValueDouble(arg.Value));
-                            argList.Add(val);
-                        }
-                    }
-                });
-        }
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
-        public virtual IEnumerable<ExcelDoubleCellValue> ConvertArgsIncludingOtherTypes(IEnumerable<FunctionArgument> arguments)
-        {
-            return base.FuncArgsToFlatEnumerable(arguments, (arg, argList) =>
-            {
-                //var cellInfo = arg.Value as EpplusExcelDataProvider.CellInfo;
-                //var value = cellInfo != null ? cellInfo.Value : arg.Value;
-                if (arg.Value is ExcelDataProvider.IRangeInfo)
-                {
-                    foreach (var cell in (ExcelDataProvider.IRangeInfo)arg.Value)
-                    {
-                        var val = new ExcelDoubleCellValue(cell.ValueDoubleLogical, cell.Row);
-                        argList.Add(val);
-                    }
-                }
-                else
-                {
-                    if (arg.Value is double || arg.Value is int || arg.Value is bool)
-                    {
-                        argList.Add(Convert.ToDouble(arg.Value));
-                    }
-                    else if (arg.Value is string)
-                    {
-                        argList.Add(0d);
-                    }
-                }
-            });
-        }
-    }
+public class DoubleEnumerableArgConverter : CollectionFlattener<ExcelDoubleCellValue>
+{
+	public virtual IEnumerable<ExcelDoubleCellValue> ConvertArgs(bool ignoreHidden, bool ignoreErrors, IEnumerable<FunctionArgument> arguments, ParsingContext context) => base.FuncArgsToFlatEnumerable(arguments, (arg, argList) =>
+																																													{
+																																														if (arg.IsExcelRange)
+																																														{
+																																															foreach (var cell in arg.ValueAsRangeInfo)
+																																															{
+																																																if (!ignoreErrors && cell.IsExcelError) throw new ExcelErrorValueException(ExcelErrorValue.Parse(cell.Value.ToString()));
+																																																if (!CellStateHelper.ShouldIgnore(ignoreHidden, cell, context) && ConvertUtil.IsNumeric(cell.Value))
+																																																{
+																																																	var val = new ExcelDoubleCellValue(cell.ValueDouble, cell.Row);
+																																																	argList.Add(val);
+																																																}
+																																															}
+																																														}
+																																														else
+																																														{
+																																															if (!ignoreErrors && arg.ValueIsExcelError) throw new ExcelErrorValueException(arg.ValueAsExcelErrorValue);
+																																															if (ConvertUtil.IsNumeric(arg.Value) && !CellStateHelper.ShouldIgnore(ignoreHidden, arg, context))
+																																															{
+																																																var val = new ExcelDoubleCellValue(ConvertUtil.GetValueDouble(arg.Value));
+																																																argList.Add(val);
+																																															}
+																																														}
+																																													});
+
+	public virtual IEnumerable<ExcelDoubleCellValue> ConvertArgsIncludingOtherTypes(IEnumerable<FunctionArgument> arguments) => base.FuncArgsToFlatEnumerable(arguments, (arg, argList) =>
+																																	 {
+																																		 //var cellInfo = arg.Value as EpplusExcelDataProvider.CellInfo;
+																																		 //var value = cellInfo != null ? cellInfo.Value : arg.Value;
+																																		 if (arg.Value is ExcelDataProvider.IRangeInfo)
+																																		 {
+																																			 foreach (var cell in (ExcelDataProvider.IRangeInfo)arg.Value)
+																																			 {
+																																				 var val = new ExcelDoubleCellValue(cell.ValueDoubleLogical, cell.Row);
+																																				 argList.Add(val);
+																																			 }
+																																		 }
+																																		 else
+																																		 {
+																																			 if (arg.Value is double or int or bool)
+																																			 {
+																																				 argList.Add(Convert.ToDouble(arg.Value));
+																																			 }
+																																			 else if (arg.Value is string)
+																																			 {
+																																				 argList.Add(0d);
+																																			 }
+																																		 }
+																																	 });
 }

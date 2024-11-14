@@ -22,21 +22,18 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+
+public class Min : HiddenValuesHandlingFunction
 {
-    public class Min : HiddenValuesHandlingFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var values = ArgsToDoubleEnumerable(IgnoreHiddenValues, false, arguments, context);
-            return CreateResult(values.Min(), DataType.Decimal);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var values = ArgsToDoubleEnumerable(IgnoreHiddenValues, false, arguments, context);
+		return CreateResult(values.Min(), DataType.Decimal);
+	}
 }

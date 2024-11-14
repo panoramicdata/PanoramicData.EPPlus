@@ -28,25 +28,20 @@
  * ******************************************************************************
  * Jan Källman		    Added       		        2017-11-02
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Text;
-using OfficeOpenXml;
+namespace OfficeOpenXml.Compatibility;
 
-namespace OfficeOpenXml.Compatibility
+/// <summary>
+/// Settings to stay compatible with older versions of EPPlus
+/// </summary>
+public class CompatibilitySettings
 {
-    /// <summary>
-    /// Settings to stay compatible with older versions of EPPlus
-    /// </summary>
-    public class CompatibilitySettings
-    {
-        private ExcelPackage excelPackage;
+	private ExcelPackage excelPackage;
 
 
-        internal CompatibilitySettings(ExcelPackage excelPackage)
-        {
-            this.excelPackage = excelPackage;
-        }
+	internal CompatibilitySettings(ExcelPackage excelPackage)
+	{
+		this.excelPackage = excelPackage;
+	}
 #if Core
         /// <summary>
         /// If the worksheets collection of the ExcelWorkbook class is 1 based.
@@ -64,33 +59,32 @@ namespace OfficeOpenXml.Compatibility
         /// </code>
         /// </summary>
 #else
-        /// <summary>
-        /// If the worksheets collection of the ExcelWorkbook class is 1 based.
-        /// This property can be set from app.config file.
-        /// <code>
-        ///   <appSettings>
-        ///    <!--Set worksheets collection to start from zero.Default is 1, for backward compatibility reasons -->  
-        ///    <add key = "EPPlus:ExcelPackage.Compatibility.IsWorksheets1Based" value="false" />
-        ///   </appSettings>
-        /// </code>
-        /// </summary>
+	/// <summary>
+	/// If the worksheets collection of the ExcelWorkbook class is 1 based.
+	/// This property can be set from app.config file.
+	/// <code>
+	///   <appSettings>
+	///    <!--Set worksheets collection to start from zero.Default is 1, for backward compatibility reasons -->  
+	///    <add key = "EPPlus:ExcelPackage.Compatibility.IsWorksheets1Based" value="false" />
+	///   </appSettings>
+	/// </code>
+	/// </summary>
 #endif
 
-        public bool IsWorksheets1Based
-        {
-            get
-            {
-                return excelPackage._worksheetAdd==1;
-            }
-            set
-            {
-                excelPackage._worksheetAdd = value ? 1 : 0;
-                if(excelPackage._workbook!=null && excelPackage._workbook._worksheets!=null)
-                {
-                    excelPackage.Workbook.Worksheets.ReindexWorksheetDictionary();
+	public bool IsWorksheets1Based
+	{
+		get
+		{
+			return excelPackage._worksheetAdd == 1;
+		}
+		set
+		{
+			excelPackage._worksheetAdd = value ? 1 : 0;
+			if (excelPackage._workbook != null && excelPackage._workbook._worksheets != null)
+			{
+				excelPackage.Workbook.Worksheets.ReindexWorksheetDictionary();
 
-                }
-            }
-        }
-    }
+			}
+		}
+	}
 }

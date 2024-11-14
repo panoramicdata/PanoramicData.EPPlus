@@ -26,267 +26,263 @@
  * ******************************************************************************
  * Jan Källman                      Added       		        2012-05-01
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using OfficeOpenXml;
-using System.Security.Cryptography.X509Certificates;
-using System.Drawing;
-using OfficeOpenXml.Style;
+using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
-namespace EPPlusSamples
+using OfficeOpenXml.Style;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Text;
+namespace EPPlusSamples;
+
+class Sample15
 {
-    class Sample15
-    {
-        public static void VBASample()
-        {
-            //Create a macro-enabled workbook from scratch.
-            VBASample1();
-            
-            //Open Sample 1 and add code to change the chart to a bubble chart.
-            VBASample2();
+	public static void VBASample()
+	{
+		//Create a macro-enabled workbook from scratch.
+		VBASample1();
 
-            //Simple battleships game from scratch.
-            VBASample3();
-        }
-        private static void VBASample1()
-        {
-            ExcelPackage pck = new ExcelPackage();
+		//Open Sample 1 and add code to change the chart to a bubble chart.
+		VBASample2();
 
-            //Add a worksheet.
-            var ws=pck.Workbook.Worksheets.Add("VBA Sample");
-            ws.Drawings.AddShape("VBASampleRect", eShapeStyle.RoundRect);
-            
-            //Create a vba project             
-            pck.Workbook.CreateVBAProject();
+		//Simple battleships game from scratch.
+		VBASample3();
+	}
+	private static void VBASample1()
+	{
+		ExcelPackage pck = new();
 
-            //Now add some code to update the text of the shape...
-            var sb = new StringBuilder();
+		//Add a worksheet.
+		var ws = pck.Workbook.Worksheets.Add("VBA Sample");
+		ws.Drawings.AddShape("VBASampleRect", eShapeStyle.RoundRect);
 
-            sb.AppendLine("Private Sub Workbook_Open()");
-            sb.AppendLine("    [VBA Sample].Shapes(\"VBASampleRect\").TextEffect.Text = \"This text is set from VBA!\"");
-            sb.AppendLine("End Sub");
-            pck.Workbook.CodeModule.Code = sb.ToString();
+		//Create a vba project             
+		pck.Workbook.CreateVBAProject();
 
-            //And Save as xlsm
-            FileInfo fi = Utils.GetFileInfo("sample15-1.xlsm");
-            pck.SaveAs(fi);
-        }
-        private static void VBASample2()
-        {
-            FileInfo sample1File = Utils.GetFileInfo("sample1.xlsx",false);
-            //Open Sample 1 again
-            ExcelPackage pck = new ExcelPackage(sample1File);
-            var p = new ExcelPackage();
-            //Create a vba project             
-            pck.Workbook.CreateVBAProject();
+		//Now add some code to update the text of the shape...
+		var sb = new StringBuilder();
 
-            //Now add some code that creates a bubble chart...
-            var sb = new StringBuilder();
+		sb.AppendLine("Private Sub Workbook_Open()");
+		sb.AppendLine("    [VBA Sample].Shapes(\"VBASampleRect\").TextEffect.Text = \"This text is set from VBA!\"");
+		sb.AppendLine("End Sub");
+		pck.Workbook.CodeModule.Code = sb.ToString();
 
-            sb.AppendLine("Public Sub CreateBubbleChart()");
-            sb.AppendLine("Dim co As ChartObject");
-            sb.AppendLine("Set co = Inventory.ChartObjects.Add(10, 100, 400, 200)");
-            sb.AppendLine("co.Chart.SetSourceData Source:=Range(\"'Inventory'!$B$1:$E$5\")");
-            sb.AppendLine("co.Chart.ChartType = xlBubble3DEffect         'Add a bubblechart");
-            sb.AppendLine("End Sub");
+		//And Save as xlsm
+		var fi = Utils.GetFileInfo("sample15-1.xlsm");
+		pck.SaveAs(fi);
+	}
+	private static void VBASample2()
+	{
+		var sample1File = Utils.GetFileInfo("sample1.xlsx", false);
+		//Open Sample 1 again
+		ExcelPackage pck = new(sample1File);
+		var p = new ExcelPackage();
+		//Create a vba project             
+		pck.Workbook.CreateVBAProject();
 
-            //Create a new module and set the code
-            var module = pck.Workbook.VbaProject.Modules.AddModule("EPPlusGeneratedCode");
-            module.Code = sb.ToString();
+		//Now add some code that creates a bubble chart...
+		var sb = new StringBuilder();
 
-            //Call the newly created sub from the workbook open event
-            pck.Workbook.CodeModule.Code = "Private Sub Workbook_Open()\r\nCreateBubbleChart\r\nEnd Sub";
+		sb.AppendLine("Public Sub CreateBubbleChart()");
+		sb.AppendLine("Dim co As ChartObject");
+		sb.AppendLine("Set co = Inventory.ChartObjects.Add(10, 100, 400, 200)");
+		sb.AppendLine("co.Chart.SetSourceData Source:=Range(\"'Inventory'!$B$1:$E$5\")");
+		sb.AppendLine("co.Chart.ChartType = xlBubble3DEffect         'Add a bubblechart");
+		sb.AppendLine("End Sub");
 
-            //Optionally, Sign the code with your company certificate.
-            //X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            //store.Open(OpenFlags.ReadOnly);
-            //pck.Workbook.VbaProject.Signature.Certificate = store.Certificates[0];
+		//Create a new module and set the code
+		var module = pck.Workbook.VbaProject.Modules.AddModule("EPPlusGeneratedCode");
+		module.Code = sb.ToString();
 
-            //And Save as xlsm
-            FileInfo fi =Utils.GetFileInfo("sample15-2.xlsm");
-            pck.SaveAs(fi);
-        }
-        private static void VBASample3()
-        {
-            //Now, lets do something a little bit more fun.
-            //We are going to create a simple battleships game from scratch.
+		//Call the newly created sub from the workbook open event
+		pck.Workbook.CodeModule.Code = "Private Sub Workbook_Open()\r\nCreateBubbleChart\r\nEnd Sub";
 
-            ExcelPackage pck = new ExcelPackage();
+		//Optionally, Sign the code with your company certificate.
+		//X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+		//store.Open(OpenFlags.ReadOnly);
+		//pck.Workbook.VbaProject.Signature.Certificate = store.Certificates[0];
 
-            //Add a worksheet.
-            var ws = pck.Workbook.Worksheets.Add("Battleship");
+		//And Save as xlsm
+		var fi = Utils.GetFileInfo("sample15-2.xlsm");
+		pck.SaveAs(fi);
+	}
+	private static void VBASample3()
+	{
+		//Now, lets do something a little bit more fun.
+		//We are going to create a simple battleships game from scratch.
 
-            ws.View.ShowGridLines = false;
-            ws.View.ShowHeaders = false;
+		ExcelPackage pck = new();
 
-            ws.DefaultColWidth = 3;
-            ws.DefaultRowHeight = 15;
+		//Add a worksheet.
+		var ws = pck.Workbook.Worksheets.Add("Battleship");
 
-            int gridSize=10;
+		ws.View.ShowGridLines = false;
+		ws.View.ShowHeaders = false;
 
-            //Create the boards
-            var board1 = ws.Cells[2, 2, 2 + gridSize - 1, 2 + gridSize - 1];
-            var board2 = ws.Cells[2, 4+gridSize-1, 2 + gridSize-1, 4 + (gridSize-1)*2];
-            CreateBoard(board1);
-            CreateBoard(board2);
-            ws.Select("B2");
-            ws.Protection.IsProtected = true;
-            ws.Protection.AllowSelectLockedCells = true;
+		ws.DefaultColWidth = 3;
+		ws.DefaultRowHeight = 15;
 
-            //Create the VBA Project
-            pck.Workbook.CreateVBAProject();
-            //Password protect your code
-            pck.Workbook.VbaProject.Protection.SetPassword("EPPlus");
+		var gridSize = 10;
 
-            var codeDir = new DirectoryInfo(AppContext.BaseDirectory + "VBA-Code");
+		//Create the boards
+		var board1 = ws.Cells[2, 2, 2 + gridSize - 1, 2 + gridSize - 1];
+		var board2 = ws.Cells[2, 4 + gridSize - 1, 2 + gridSize - 1, 4 + (gridSize - 1) * 2];
+		CreateBoard(board1);
+		CreateBoard(board2);
+		ws.Select("B2");
+		ws.Protection.IsProtected = true;
+		ws.Protection.AllowSelectLockedCells = true;
 
-            //Add all the code from the textfiles in the Vba-Code sub-folder.
-            pck.Workbook.CodeModule.Code = GetCodeModule(codeDir, "ThisWorkbook.txt");
+		//Create the VBA Project
+		pck.Workbook.CreateVBAProject();
+		//Password protect your code
+		pck.Workbook.VbaProject.Protection.SetPassword("EPPlus");
 
-            //Add the sheet code
-            ws.CodeModule.Code = GetCodeModule(codeDir, "BattleshipSheet.txt");
-            var m1=pck.Workbook.VbaProject.Modules.AddModule("Code");
-            string code = GetCodeModule(codeDir, "CodeModule.txt");
+		var codeDir = new DirectoryInfo(AppContext.BaseDirectory + "VBA-Code");
 
-            //Insert your ships on the right board. you can changes these, but don't cheat ;)
-            var ships = new string[]{
-                "N3:N7",
-                "P2:S2",
-                "V9:V11",
-                "O10:Q10",
-                "R11:S11"};
-            
-            //Note: For security reasons you should never mix external data and code(to avoid code injections!), especially not on a webserver. 
-            //If you deside to do that anyway, be very careful with the validation of the data.
-            //Be extra carefull if you sign the code.
-            //Read more here http://en.wikipedia.org/wiki/Code_injection
+		//Add all the code from the textfiles in the Vba-Code sub-folder.
+		pck.Workbook.CodeModule.Code = GetCodeModule(codeDir, "ThisWorkbook.txt");
 
-            code = string.Format(code, ships[0],ships[1],ships[2],ships[3],ships[4], board1.Address, board2.Address);  //Ships are injected into the constants in the module
-            m1.Code = code;
+		//Add the sheet code
+		ws.CodeModule.Code = GetCodeModule(codeDir, "BattleshipSheet.txt");
+		var m1 = pck.Workbook.VbaProject.Modules.AddModule("Code");
+		var code = GetCodeModule(codeDir, "CodeModule.txt");
 
-            //Ships are displayed with a black background
-            string shipsaddress = string.Join(",", ships);
-            ws.Cells[shipsaddress].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-            ws.Cells[shipsaddress].Style.Fill.BackgroundColor.SetColor(Color.Black);
+		//Insert your ships on the right board. you can changes these, but don't cheat ;)
+		var ships = new string[]{
+			"N3:N7",
+			"P2:S2",
+			"V9:V11",
+			"O10:Q10",
+			"R11:S11"};
 
-            var m2 = pck.Workbook.VbaProject.Modules.AddModule("ComputerPlay");
-            m2.Code = GetCodeModule(codeDir, "ComputerPlayModule.txt"); 
-            var c1 = pck.Workbook.VbaProject.Modules.AddClass("Ship",false);
-            c1.Code = GetCodeModule(codeDir, "ShipClass.txt"); 
+		//Note: For security reasons you should never mix external data and code(to avoid code injections!), especially not on a webserver. 
+		//If you decide to do that anyway, be very careful with the validation of the data.
+		//Be extra careful if you sign the code.
+		//Read more here http://en.wikipedia.org/wiki/Code_injection
 
-            //Add the info text shape.
-            var tb = ws.Drawings.AddShape("txtInfo", eShapeStyle.Rect);
-            tb.SetPosition(1, 0, 27, 0);
-            tb.Fill.Color = Color.LightSlateGray;
-            var rt1 = tb.RichText.Add("Battleships");
-            rt1.Bold = true;
-            tb.RichText.Add("\r\nDouble-click on the left board to make your move. Find and sink all ships to win!");
+		code = string.Format(code, ships[0], ships[1], ships[2], ships[3], ships[4], board1.Address, board2.Address);  //Ships are injected into the constants in the module
+		m1.Code = code;
 
-            //Set the headers.
-            ws.SetValue("B1", "Computer Grid");
-            ws.SetValue("M1", "Your Grid");
-            ws.Row(1).Style.Font.Size = 18;
+		//Ships are displayed with a black background
+		var shipsaddress = string.Join(",", ships);
+		ws.Cells[shipsaddress].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+		ws.Cells[shipsaddress].Style.Fill.BackgroundColor.SetColor(Color.Black);
 
-            AddChart(ws.Cells["B13"], "chtHitPercent", "Player");
-            AddChart(ws.Cells["M13"], "chtComputerHitPercent", "Computer");
+		var m2 = pck.Workbook.VbaProject.Modules.AddModule("ComputerPlay");
+		m2.Code = GetCodeModule(codeDir, "ComputerPlayModule.txt");
+		var c1 = pck.Workbook.VbaProject.Modules.AddClass("Ship", false);
+		c1.Code = GetCodeModule(codeDir, "ShipClass.txt");
 
-            ws.Names.Add("LogStart", ws.Cells["B24"]);
-            ws.Cells["B24:X224"].Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
-            ws.Cells["B25:X224"].Style.Font.Name = "Consolas";
-            ws.SetValue("B24", "Log");
-            ws.Cells["B24"].Style.Font.Bold = true;
-            ws.Cells["B24:X24"].Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
-            var cf=ws.Cells["B25:B224"].ConditionalFormatting.AddContainsText();
-            cf.Text = "hit";
-            cf.Style.Font.Color.Color = Color.Red;
+		//Add the info text shape.
+		var tb = ws.Drawings.AddShape("txtInfo", eShapeStyle.Rect);
+		tb.SetPosition(1, 0, 27, 0);
+		tb.Fill.Color = Color.LightSlateGray;
+		var rt1 = tb.RichText.Add("Battleships");
+		rt1.Bold = true;
+		tb.RichText.Add("\r\nDouble-click on the left board to make your move. Find and sink all ships to win!");
 
-            //If you have a valid certificate for code signing you can use this code to set it.
-            ///*** Try to find a cert valid for signing... ***/
-            //X509Store store = new X509Store(StoreLocation.CurrentUser);
-            //store.Open(OpenFlags.ReadOnly);   
-            //foreach (var cert in store.Certificates)
-            //{
-            //    if (cert.HasPrivateKey && cert.NotBefore <= DateTime.Today && cert.NotAfter >= DateTime.Today)
-            //    {
-            //        pck.Workbook.VbaProject.Signature.Certificate = cert;
-            //        break;
-            //    }
-            //}
+		//Set the headers.
+		ws.SetValue("B1", "Computer Grid");
+		ws.SetValue("M1", "Your Grid");
+		ws.Row(1).Style.Font.Size = 18;
 
-            var fi = Utils.GetFileInfo(@"sample15-3.xlsm");
-            pck.SaveAs(fi);
-        }
+		AddChart(ws.Cells["B13"], "chtHitPercent", "Player");
+		AddChart(ws.Cells["M13"], "chtComputerHitPercent", "Computer");
 
-        private static string GetCodeModule(DirectoryInfo codeDir, string fileName)
-        {
-            return File.ReadAllText(Utils.GetFileInfo(codeDir, fileName, false).FullName);
-        }
+		ws.Names.Add("LogStart", ws.Cells["B24"]);
+		ws.Cells["B24:X224"].Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
+		ws.Cells["B25:X224"].Style.Font.Name = "Consolas";
+		ws.SetValue("B24", "Log");
+		ws.Cells["B24"].Style.Font.Bold = true;
+		ws.Cells["B24:X24"].Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
+		var cf = ws.Cells["B25:B224"].ConditionalFormatting.AddContainsText();
+		cf.Text = "hit";
+		cf.Style.Font.Color.Color = Color.Red;
 
-        private static void AddChart(ExcelRange rng,string name, string prefix)
-        {
-            var chrt = (ExcelPieChart)rng.Worksheet.Drawings.AddChart(name, eChartType.Pie);
-            chrt.SetPosition(rng.Start.Row-1, 0, rng.Start.Column-1, 0);
-            chrt.To.Row = rng.Start.Row+9;
-            chrt.To.Column = rng.Start.Column + 9;
-            chrt.Style = eChartStyle.Style18;
-            chrt.DataLabel.ShowPercent = true;
+		//If you have a valid certificate for code signing you can use this code to set it.
+		///*** Try to find a cert valid for signing... ***/
+		//X509Store store = new X509Store(StoreLocation.CurrentUser);
+		//store.Open(OpenFlags.ReadOnly);   
+		//foreach (var cert in store.Certificates)
+		//{
+		//    if (cert.HasPrivateKey && cert.NotBefore <= DateTime.Today && cert.NotAfter >= DateTime.Today)
+		//    {
+		//        pck.Workbook.VbaProject.Signature.Certificate = cert;
+		//        break;
+		//    }
+		//}
 
-            var serie = chrt.Series.Add(rng.Offset(2, 2, 1, 2), rng.Offset(1, 2, 1, 2));
-            serie.Header = "Hits";
-            
-            chrt.Title.Text = "Hit ratio";
-            
-            var n1 = rng.Worksheet.Names.Add(prefix + "Misses", rng.Offset(2, 2));
-            n1.Value = 0;
-            var n2 = rng.Worksheet.Names.Add(prefix + "Hits", rng.Offset(2, 3));
-            n2.Value = 0;
-            rng.Offset(1, 2).Value = "Misses";
-            rng.Offset(1, 3).Value = "Hits";            
-        }
+		var fi = Utils.GetFileInfo(@"sample15-3.xlsm");
+		pck.SaveAs(fi);
+	}
 
-        private static void CreateBoard(ExcelRange rng)
-        {
-            //Create a gradiant background with one dark and one light blue color
-            rng.Style.Fill.Gradient.Color1.SetColor(Color.FromArgb(0x80, 0x80, 0XFF));
-            rng.Style.Fill.Gradient.Color2.SetColor(Color.FromArgb(0x20, 0x20, 0XFF));
-            rng.Style.Fill.Gradient.Type = ExcelFillGradientType.None;
-            for (int col = 0; col <= rng.End.Column - rng.Start.Column; col++)
-            {
-                for (int row = 0; row <= rng.End.Row - rng.Start.Row; row++)
-                {
-                    if (col % 4 == 0)
-                    {
-                        rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 45;
-                    }
-                    if (col % 4 == 1)
-                    {
-                        rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 70;
-                    }
-                    if (col % 4 == 2)
-                    {
-                        rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 110;
-                    }
-                    else
-                    {
-                        rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 135;
-                    }
-                }
-            }
-            //Set the inner cell border to thin, light gray
-            rng.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            rng.Style.Border.Top.Color.SetColor(Color.Gray);
-            rng.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            rng.Style.Border.Right.Color.SetColor(Color.Gray);
-            rng.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            rng.Style.Border.Left.Color.SetColor(Color.Gray);
-            rng.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            rng.Style.Border.Bottom.Color.SetColor(Color.Gray);
+	private static string GetCodeModule(DirectoryInfo codeDir, string fileName) => File.ReadAllText(Utils.GetFileInfo(codeDir, fileName, false).FullName);
 
-            //Solid black border around the board.
-            rng.Style.Border.BorderAround(ExcelBorderStyle.Medium, Color.Black);
-        }
-    }
+	private static void AddChart(ExcelRange rng, string name, string prefix)
+	{
+		var chrt = (ExcelPieChart)rng.Worksheet.Drawings.AddChart(name, eChartType.Pie);
+		chrt.SetPosition(rng.Start.Row - 1, 0, rng.Start.Column - 1, 0);
+		chrt.To.Row = rng.Start.Row + 9;
+		chrt.To.Column = rng.Start.Column + 9;
+		chrt.Style = eChartStyle.Style18;
+		chrt.DataLabel.ShowPercent = true;
+
+		var serie = chrt.Series.Add(rng.Offset(2, 2, 1, 2), rng.Offset(1, 2, 1, 2));
+		serie.Header = "Hits";
+
+		chrt.Title.Text = "Hit ratio";
+
+		var n1 = rng.Worksheet.Names.Add(prefix + "Misses", rng.Offset(2, 2));
+		n1.Value = 0;
+		var n2 = rng.Worksheet.Names.Add(prefix + "Hits", rng.Offset(2, 3));
+		n2.Value = 0;
+		rng.Offset(1, 2).Value = "Misses";
+		rng.Offset(1, 3).Value = "Hits";
+	}
+
+	private static void CreateBoard(ExcelRange rng)
+	{
+		//Create a gradiant background with one dark and one light blue color
+		rng.Style.Fill.Gradient.Color1.SetColor(Color.FromArgb(0x80, 0x80, 0XFF));
+		rng.Style.Fill.Gradient.Color2.SetColor(Color.FromArgb(0x20, 0x20, 0XFF));
+		rng.Style.Fill.Gradient.Type = ExcelFillGradientType.None;
+		for (var col = 0; col <= rng.End.Column - rng.Start.Column; col++)
+		{
+			for (var row = 0; row <= rng.End.Row - rng.Start.Row; row++)
+			{
+				if (col % 4 == 0)
+				{
+					rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 45;
+				}
+
+				if (col % 4 == 1)
+				{
+					rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 70;
+				}
+
+				if (col % 4 == 2)
+				{
+					rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 110;
+				}
+				else
+				{
+					rng.Offset(row, col, 1, 1).Style.Fill.Gradient.Degree = 135;
+				}
+			}
+		}
+		//Set the inner cell border to thin, light gray
+		rng.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+		rng.Style.Border.Top.Color.SetColor(Color.Gray);
+		rng.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+		rng.Style.Border.Right.Color.SetColor(Color.Gray);
+		rng.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+		rng.Style.Border.Left.Color.SetColor(Color.Gray);
+		rng.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+		rng.Style.Border.Bottom.Color.SetColor(Color.Gray);
+
+		//Solid black border around the board.
+		rng.Style.Border.BorderAround(ExcelBorderStyle.Medium, Color.Black);
+	}
 }

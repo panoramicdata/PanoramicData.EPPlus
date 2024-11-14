@@ -22,23 +22,19 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime
-{
-    public class Day : DateParsingFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var dateObj = GetFirstValue(arguments);
-            var date = ParseDate(arguments, dateObj);
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
-            return CreateResult(date.Day, DataType.Integer);
-        }
-    }
+public class Day : DateParsingFunction
+{
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var dateObj = GetFirstValue(arguments);
+		var date = ParseDate(arguments, dateObj);
+
+		return CreateResult(date.Day, DataType.Integer);
+	}
 }

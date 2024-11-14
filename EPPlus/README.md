@@ -1,9 +1,21 @@
-# Continuous Version of EPPlus Free Edition 4.5.3.3
-# EPPlus Free Edition
-# Continuous Version of EPPlus Free Edition 4.5.3.3
+# Continuous Version of EPPlus Free Edition by Panoramic Data
+# Panoramic Data's EPPlus Free Edition
 # LGPL License continue
 		
-# Note: 4.5.3.3 is the last official version of EPPlus under the LGPL License, now it has been archived.
+## Official Announcement: This is a fork of EPPlus under the LGPL License
+
+### Overview
+
+This is a fork of EPPlusFree, a project that while useful, was not under active maintenance.
+
+### Changes in this fork
+
+For maintenance reasons, only .NET 9 and later will be supported.  No, we won't add .NET Standard support.
+If you wish to also fork the project so that it runs on .NET 7 or Silverlight, be our guest!
+
+The codebase has been completely overhauled to use the latest C# features and to be more readable and maintainable.
+
+The version number reflects the supported .NET version.
 
 ## Official Announcement: This is the last version of EPPlus under the LGPL License
 EPPlus will from version 5 be licensed under the [Polyform Noncommercial 1.0.0]( https://polyformproject.org/licenses/noncommercial/1.0.0/) license.  

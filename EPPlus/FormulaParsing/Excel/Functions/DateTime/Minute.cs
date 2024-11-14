@@ -22,31 +22,29 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
+
+public class Minute : ExcelFunction
 {
-    public class Minute : ExcelFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var dateObj = arguments.ElementAt(0).Value;
-            System.DateTime date = System.DateTime.MinValue;
-            if (dateObj is string)
-            {
-                date = System.DateTime.Parse(dateObj.ToString());
-            }
-            else
-            {
-                var d = ArgToDecimal(arguments, 0);
-                date = System.DateTime.FromOADate(d);
-            }
-            return CreateResult(date.Minute, DataType.Integer);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var dateObj = arguments.ElementAt(0).Value;
+		var date = System.DateTime.MinValue;
+		if (dateObj is string)
+		{
+			date = System.DateTime.Parse(dateObj.ToString());
+		}
+		else
+		{
+			var d = ArgToDecimal(arguments, 0);
+			date = System.DateTime.FromOADate(d);
+		}
+
+		return CreateResult(date.Minute, DataType.Integer);
+	}
 }

@@ -22,36 +22,35 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Text
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+
+public class Proper : ExcelFunction
 {
-    public class Proper : ExcelFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var text = ArgToString(arguments, 0).ToLower(CultureInfo.InvariantCulture);
-            var sb = new StringBuilder();
-            var previousChar = '.';
-            foreach (var ch in text)
-            {
-                if (!char.IsLetter(previousChar))
-                {
-                    sb.Append(Utils.ConvertUtil._invariantTextInfo.ToUpper(ch.ToString()));
-                }
-                else
-                {
-                    sb.Append(ch);
-                }
-                previousChar = ch;
-            }
-            return CreateResult(sb.ToString(), DataType.String);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var text = ArgToString(arguments, 0).ToLower(CultureInfo.InvariantCulture);
+		var sb = new StringBuilder();
+		var previousChar = '.';
+		foreach (var ch in text)
+		{
+			if (!char.IsLetter(previousChar))
+			{
+				sb.Append(Utils.ConvertUtil._invariantTextInfo.ToUpper(ch.ToString()));
+			}
+			else
+			{
+				sb.Append(ch);
+			}
+
+			previousChar = ch;
+		}
+
+		return CreateResult(sb.ToString(), DataType.String);
+	}
 }

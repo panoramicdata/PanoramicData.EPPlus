@@ -16,15 +16,9 @@
  *******************************************************************************
  * Mats Alm Added		                2016-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.FormulaParsing;
 
-namespace OfficeOpenXml.FormulaParsing
+public interface IParsingLifetimeEventHandler
 {
-    public interface IParsingLifetimeEventHandler
-    {
-        void ParsingCompleted();
-    }
+	void ParsingCompleted();
 }

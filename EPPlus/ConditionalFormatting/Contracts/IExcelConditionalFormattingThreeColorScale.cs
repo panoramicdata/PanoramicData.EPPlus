@@ -28,26 +28,18 @@
  * ******************************************************************************
  * Eyal Seagull    Conditional Formatting Adaption    2012-04-03
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.ConditionalFormatting.Contracts;
 
-using OfficeOpenXml.ConditionalFormatting;
-
-namespace OfficeOpenXml.ConditionalFormatting.Contracts
+/// <summary>
+/// IExcelConditionalFormattingThreeColorScale
+/// </summary>
+public interface IExcelConditionalFormattingThreeColorScale
+: IExcelConditionalFormattingTwoColorScale
 {
+	#region Public Properties
 	/// <summary>
-	/// IExcelConditionalFormattingThreeColorScale
+	/// Three Color Scale Middle Value
 	/// </summary>
-	public interface IExcelConditionalFormattingThreeColorScale
-    : IExcelConditionalFormattingTwoColorScale
-	{
-		#region Public Properties
-		/// <summary>
-		/// Three Color Scale Middle Value
-		/// </summary>
-		ExcelConditionalFormattingColorScaleValue MiddleValue { get; set; }
-		#endregion Public Properties
-	}
+	ExcelConditionalFormattingColorScaleValue MiddleValue { get; set; }
+	#endregion Public Properties
 }

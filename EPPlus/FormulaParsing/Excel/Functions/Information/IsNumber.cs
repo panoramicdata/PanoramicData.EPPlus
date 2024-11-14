@@ -1,5 +1,4 @@
-﻿using System;
-/* Copyright (C) 2011  Jan Källman
+﻿/* Copyright (C) 2011  Jan Källman
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,19 +23,16 @@
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Information
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
+
+public class IsNumber : ExcelFunction
 {
-    public class IsNumber : ExcelFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var arg = GetFirstValue(arguments);
-            return CreateResult(IsNumeric(arg), DataType.Boolean);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var arg = GetFirstValue(arguments);
+		return CreateResult(IsNumeric(arg), DataType.Boolean);
+	}
 }

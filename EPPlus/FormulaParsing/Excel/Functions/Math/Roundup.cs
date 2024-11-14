@@ -22,25 +22,21 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2014-01-06
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+
+public class Roundup : ExcelFunction
 {
-    public class Roundup : ExcelFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 2);
-            var number = ArgToDecimal(arguments, 0);
-            var nDigits = ArgToInt(arguments, 1);
-            double result = (number >= 0) 
-                ? System.Math.Ceiling(number * System.Math.Pow(10, nDigits)) / System.Math.Pow(10, nDigits)
-                : System.Math.Floor(number * System.Math.Pow(10, nDigits)) / System.Math.Pow(10, nDigits);
-            return CreateResult(result, DataType.Decimal);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 2);
+		var number = ArgToDecimal(arguments, 0);
+		var nDigits = ArgToInt(arguments, 1);
+		var result = (number >= 0)
+			? System.Math.Ceiling(number * System.Math.Pow(10, nDigits)) / System.Math.Pow(10, nDigits)
+			: System.Math.Floor(number * System.Math.Pow(10, nDigits)) / System.Math.Pow(10, nDigits);
+		return CreateResult(result, DataType.Decimal);
+	}
 }

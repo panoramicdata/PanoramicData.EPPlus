@@ -30,23 +30,14 @@
  * Jan Källman		    License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.Utils;
 
-namespace OfficeOpenXml.Utils
+/// <summary>
+/// Utility for validation
+/// </summary>
+public static class Require
 {
-    /// <summary>
-    /// Utility for validation
-    /// </summary>
-    public static class Require
-    {
-        public static IArgument<T> Argument<T>(T argument)
-        {
-            return new Argument<T>(argument);
-        }
+	public static IArgument<T> Argument<T>(T argument) => new Argument<T>(argument);
 
 
-    }
 }

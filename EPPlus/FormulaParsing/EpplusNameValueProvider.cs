@@ -16,46 +16,34 @@
  *******************************************************************************
  * Mats Alm Added		                2016-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OfficeOpenXml.FormulaParsing;
+namespace OfficeOpenXml.FormulaParsing;
 
-namespace OfficeOpenXml.FormulaParsing
+public class EpplusNameValueProvider : INameValueProvider
 {
-    public class EpplusNameValueProvider : INameValueProvider
-    {
-        private ExcelDataProvider _excelDataProvider;
-        private ExcelNamedRangeCollection _values;
+	private ExcelDataProvider _excelDataProvider;
+	private ExcelNamedRangeCollection _values;
 
-        public EpplusNameValueProvider(ExcelDataProvider excelDataProvider)
-        {
-            _excelDataProvider = excelDataProvider;
-            _values = _excelDataProvider.GetWorkbookNameValues();
-        }
+	public EpplusNameValueProvider(ExcelDataProvider excelDataProvider)
+	{
+		_excelDataProvider = excelDataProvider;
+		_values = _excelDataProvider.GetWorkbookNameValues();
+	}
 
-        public virtual bool IsNamedValue(string key, string ws)
-        {
-            if(ws!=null)
-            {
-                var wsNames = _excelDataProvider.GetWorksheetNames(ws);
-                if(wsNames!=null && wsNames.ContainsKey(key))
-                {
-                    return true;
-                }
-            }
-            return _values != null && _values.ContainsKey(key);
-        }
+	public virtual bool IsNamedValue(string key, string ws)
+	{
+		if (ws != null)
+		{
+			var wsNames = _excelDataProvider.GetWorksheetNames(ws);
+			if (wsNames != null && wsNames.ContainsKey(key))
+			{
+				return true;
+			}
+		}
 
-        public virtual object GetNamedValue(string key)
-        {
-            return _values[key];
-        }
+		return _values != null && _values.ContainsKey(key);
+	}
 
-        public virtual void Reload()
-        {
-            _values = _excelDataProvider.GetWorkbookNameValues();
-        }
-    }
+	public virtual object GetNamedValue(string key) => _values[key];
+
+	public virtual void Reload() => _values = _excelDataProvider.GetWorkbookNameValues();
 }

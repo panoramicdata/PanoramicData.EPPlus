@@ -29,25 +29,19 @@
  * Mats Alm   		                Added       		        2011-01-01
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.DataValidation;
 
-namespace OfficeOpenXml.DataValidation
+/// <summary>
+/// Operator for comparison between Formula and Formula2 in a validation.
+/// </summary>
+public enum ExcelDataValidationOperator
 {
-    /// <summary>
-    /// Operator for comparison between Formula and Formula2 in a validation.
-    /// </summary>
-    public enum ExcelDataValidationOperator
-    {
-        between = 0,
-        equal = 2,
-        greaterThan = 6,
-        greaterThanOrEqual = 7,
-        lessThan = 4,
-        lessThanOrEqual = 5,
-        notBetween = 1,
-        notEqual= 3
-    }
+	between = 0,
+	equal = 2,
+	greaterThan = 6,
+	greaterThanOrEqual = 7,
+	lessThan = 4,
+	lessThanOrEqual = 5,
+	notBetween = 1,
+	notEqual = 3
 }

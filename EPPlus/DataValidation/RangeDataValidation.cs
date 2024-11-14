@@ -29,66 +29,37 @@
  * Mats Alm   		                Added       		        2011-03-23
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.Utils;
 using OfficeOpenXml.DataValidation.Contracts;
 
-namespace OfficeOpenXml.DataValidation
+namespace OfficeOpenXml.DataValidation;
+
+internal class RangeDataValidation : IRangeDataValidation
 {
-    internal class RangeDataValidation : IRangeDataValidation
-    {
-        public RangeDataValidation(ExcelWorksheet worksheet, string address)
-        {
-            Require.Argument(worksheet).IsNotNull("worksheet");
-            Require.Argument(address).IsNotNullOrEmpty("address");
-            _worksheet = worksheet;
-            _address = address;
-        }
+	public RangeDataValidation(ExcelWorksheet worksheet, string address)
+	{
+		Require.Argument(worksheet).IsNotNull("worksheet");
+		Require.Argument(address).IsNotNullOrEmpty("address");
+		_worksheet = worksheet;
+		_address = address;
+	}
 
-        ExcelWorksheet _worksheet;
-        string _address;
+	ExcelWorksheet _worksheet;
+	string _address;
 
-        public IExcelDataValidationAny AddAnyDataValidation()
-        {
-            return _worksheet.DataValidations.AddAnyValidation(_address);
-        }
+	public IExcelDataValidationAny AddAnyDataValidation() => _worksheet.DataValidations.AddAnyValidation(_address);
 
-        public IExcelDataValidationInt AddIntegerDataValidation()
-        {
-            return _worksheet.DataValidations.AddIntegerValidation(_address);
-        }
+	public IExcelDataValidationInt AddIntegerDataValidation() => _worksheet.DataValidations.AddIntegerValidation(_address);
 
-        public IExcelDataValidationDecimal AddDecimalDataValidation()
-        {
-            return _worksheet.DataValidations.AddDecimalValidation(_address);
-        }
+	public IExcelDataValidationDecimal AddDecimalDataValidation() => _worksheet.DataValidations.AddDecimalValidation(_address);
 
-        public IExcelDataValidationDateTime AddDateTimeDataValidation()
-        {
-            return _worksheet.DataValidations.AddDateTimeValidation(_address);
-        }
+	public IExcelDataValidationDateTime AddDateTimeDataValidation() => _worksheet.DataValidations.AddDateTimeValidation(_address);
 
-        public IExcelDataValidationList AddListDataValidation()
-        {
-            return _worksheet.DataValidations.AddListValidation(_address);
-        }
+	public IExcelDataValidationList AddListDataValidation() => _worksheet.DataValidations.AddListValidation(_address);
 
-        public IExcelDataValidationInt AddTextLengthDataValidation()
-        {
-            return _worksheet.DataValidations.AddTextLengthValidation(_address);
-        }
+	public IExcelDataValidationInt AddTextLengthDataValidation() => _worksheet.DataValidations.AddTextLengthValidation(_address);
 
-        public IExcelDataValidationTime AddTimeDataValidation()
-        {
-            return _worksheet.DataValidations.AddTimeValidation(_address);
-        }
+	public IExcelDataValidationTime AddTimeDataValidation() => _worksheet.DataValidations.AddTimeValidation(_address);
 
-        public IExcelDataValidationCustom AddCustomDataValidation()
-        {
-            return _worksheet.DataValidations.AddCustomValidation(_address);
-        }
-    }
+	public IExcelDataValidationCustom AddCustomDataValidation() => _worksheet.DataValidations.AddCustomValidation(_address);
 }

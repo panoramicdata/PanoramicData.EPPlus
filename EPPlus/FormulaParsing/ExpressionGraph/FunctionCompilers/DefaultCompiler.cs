@@ -28,42 +28,39 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.Excel;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 
-namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers
+namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
+
+public class DefaultCompiler : FunctionCompiler
 {
-    public class DefaultCompiler : FunctionCompiler
-    {
-        public DefaultCompiler(ExcelFunction function, ParsingContext context)
-            : base(function, context)
-        {
+	public DefaultCompiler(ExcelFunction function, ParsingContext context)
+		: base(function, context)
+	{
 
-        }
+	}
 
-        public override CompileResult Compile(IEnumerable<Expression> children)
-        {
-            var args = new List<FunctionArgument>();
-            Function.BeforeInvoke(Context);
-            foreach (var child in children)
-            {
-                var compileResult = child.Compile();
-                if (compileResult.IsResultOfSubtotal)
-                {
-                    var arg = new FunctionArgument(compileResult.Result, compileResult.DataType);
-                    arg.SetExcelStateFlag(ExcelCellState.IsResultOfSubtotal);
-                    args.Add(arg);
-                }
-                else
-                {
-                    BuildFunctionArguments(compileResult, args);     
-                }
-            }
-            return Function.Execute(args, Context);
-        }
-    }
+	public override CompileResult Compile(IEnumerable<Expression> children)
+	{
+		var args = new List<FunctionArgument>();
+		Function.BeforeInvoke(Context);
+		foreach (var child in children)
+		{
+			var compileResult = child.Compile();
+			if (compileResult.IsResultOfSubtotal)
+			{
+				var arg = new FunctionArgument(compileResult.Result, compileResult.DataType);
+				arg.SetExcelStateFlag(ExcelCellState.IsResultOfSubtotal);
+				args.Add(arg);
+			}
+			else
+			{
+				BuildFunctionArguments(compileResult, args);
+			}
+		}
+
+		return Function.Execute(args, Context);
+	}
 }

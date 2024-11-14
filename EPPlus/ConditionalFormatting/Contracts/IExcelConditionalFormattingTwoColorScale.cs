@@ -28,31 +28,23 @@
  * ******************************************************************************
  * Eyal Seagull    Conditional Formatting Adaption    2012-04-03
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.ConditionalFormatting.Contracts;
 
-using OfficeOpenXml.ConditionalFormatting;
-
-namespace OfficeOpenXml.ConditionalFormatting.Contracts
+/// <summary>
+/// IExcelConditionalFormattingTwoColorScale
+/// </summary>
+public interface IExcelConditionalFormattingTwoColorScale
+	: IExcelConditionalFormattingColorScaleGroup
 {
+	#region Public Properties
 	/// <summary>
-	/// IExcelConditionalFormattingTwoColorScale
+	/// Two Color Scale Low Value
 	/// </summary>
-	public interface IExcelConditionalFormattingTwoColorScale
-		: IExcelConditionalFormattingColorScaleGroup
-	{
-		#region Public Properties
-    /// <summary>
-    /// Two Color Scale Low Value
-    /// </summary>
-    ExcelConditionalFormattingColorScaleValue LowValue { get; set; }
+	ExcelConditionalFormattingColorScaleValue LowValue { get; set; }
 
-    /// <summary>
-    /// Two Color Scale High Value
-    /// </summary>
-    ExcelConditionalFormattingColorScaleValue HighValue { get; set; }
-    #endregion Public Properties
-	}
+	/// <summary>
+	/// Two Color Scale High Value
+	/// </summary>
+	ExcelConditionalFormattingColorScaleValue HighValue { get; set; }
+	#endregion Public Properties
 }

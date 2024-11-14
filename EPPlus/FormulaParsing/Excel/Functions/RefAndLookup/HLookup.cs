@@ -22,24 +22,19 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using OfficeOpenXml.FormulaParsing.Exceptions;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
+
+public class HLookup : LookupFunction
 {
-    public class HLookup : LookupFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 3);
-            var lookupArgs = new LookupArguments(arguments, context);
-            ThrowExcelErrorValueExceptionIf(() => lookupArgs.LookupIndex < 1, eErrorType.Value);
-            var navigator = LookupNavigatorFactory.Create(LookupDirection.Horizontal, lookupArgs, context);
-            return Lookup(navigator, lookupArgs);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 3);
+		var lookupArgs = new LookupArguments(arguments, context);
+		ThrowExcelErrorValueExceptionIf(() => lookupArgs.LookupIndex < 1, eErrorType.Value);
+		var navigator = LookupNavigatorFactory.Create(LookupDirection.Horizontal, lookupArgs, context);
+		return Lookup(navigator, lookupArgs);
+	}
 }

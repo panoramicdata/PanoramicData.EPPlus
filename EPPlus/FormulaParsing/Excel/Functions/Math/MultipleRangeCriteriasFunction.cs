@@ -22,66 +22,63 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-01-15
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using OfficeOpenXml.Utils;
 using Require = OfficeOpenXml.FormulaParsing.Utilities.Require;
 
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+
+public abstract class MultipleRangeCriteriasFunction : ExcelFunction
 {
-    public abstract class MultipleRangeCriteriasFunction : ExcelFunction
-    {
 
-        private readonly ExpressionEvaluator _expressionEvaluator;
+	private readonly ExpressionEvaluator _expressionEvaluator;
 
-        protected MultipleRangeCriteriasFunction()
-            :this(new ExpressionEvaluator())
-        {
-            
-        }
+	protected MultipleRangeCriteriasFunction()
+		: this(new ExpressionEvaluator())
+	{
 
-        protected MultipleRangeCriteriasFunction(ExpressionEvaluator evaluator)
-        {
-            Require.That(evaluator).Named("evaluator").IsNotNull();
-            _expressionEvaluator = evaluator;
-        }
+	}
 
-        protected bool Evaluate(object obj, string expression)
-        {
-            double? candidate = default(double?);
-            if (IsNumeric(obj))
-            {
-                candidate = ConvertUtil.GetValueDouble(obj);
-            }
-            if (candidate.HasValue)
-            {
-                return _expressionEvaluator.Evaluate(candidate.Value, expression);
-            }
-            return _expressionEvaluator.Evaluate(obj, expression);
-        }
+	protected MultipleRangeCriteriasFunction(ExpressionEvaluator evaluator)
+	{
+		Require.That(evaluator).Named("evaluator").IsNotNull();
+		_expressionEvaluator = evaluator;
+	}
 
-        protected List<int> GetMatchIndexes(ExcelDataProvider.IRangeInfo rangeInfo, string searched)
-        {
-            var result = new List<int>();
-            var internalIndex = 0;
-            for (var row = rangeInfo.Address._fromRow; row <= rangeInfo.Address._toRow; row++)
-            {
-                for (var col = rangeInfo.Address._fromCol; col <= rangeInfo.Address._toCol; col++)
-                {
-                    var candidate = rangeInfo.GetValue(row, col);
-                    if (searched != null && Evaluate(candidate, searched))
-                    {
-                        result.Add(internalIndex);
-                    }
-                    internalIndex++;
-                }
-            }
-            return result;
-        }
-    }
+	protected bool Evaluate(object obj, string expression)
+	{
+		var candidate = default(double?);
+		if (IsNumeric(obj))
+		{
+			candidate = ConvertUtil.GetValueDouble(obj);
+		}
+
+		return candidate.HasValue
+			? _expressionEvaluator.Evaluate(candidate.Value, expression)
+			: _expressionEvaluator.Evaluate(obj, expression);
+	}
+
+	protected List<int> GetMatchIndexes(ExcelDataProvider.IRangeInfo rangeInfo, string searched)
+	{
+		var result = new List<int>();
+		var internalIndex = 0;
+		for (var row = rangeInfo.Address._fromRow; row <= rangeInfo.Address._toRow; row++)
+		{
+			for (var col = rangeInfo.Address._fromCol; col <= rangeInfo.Address._toCol; col++)
+			{
+				var candidate = rangeInfo.GetValue(row, col);
+				if (searched != null && Evaluate(candidate, searched))
+				{
+					result.Add(internalIndex);
+				}
+
+				internalIndex++;
+			}
+		}
+
+		return result;
+	}
 }

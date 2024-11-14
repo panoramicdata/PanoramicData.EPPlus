@@ -29,17 +29,13 @@
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace OfficeOpenXml.FormulaParsing.Excel
+namespace OfficeOpenXml.FormulaParsing.Excel;
+
+[Flags]
+public enum ExcelCellState
 {
-    [Flags]
-    public enum ExcelCellState
-    {
-        HiddenCell = 1,
-        ContainsError = 2,
-        IsResultOfSubtotal = 4
-    }
+	HiddenCell = 1,
+	ContainsError = 2,
+	IsResultOfSubtotal = 4
 }

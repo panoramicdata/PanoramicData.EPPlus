@@ -1,13 +1,10 @@
-﻿using System.Globalization;
-using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EPPlusTest.FormulaParsing.ExpressionGraph
+namespace EPPlusTest.FormulaParsing.ExpressionGraph;
+
+[TestClass]
+public class CompileResultFactoryTests
 {
-    [TestClass]
-    public class CompileResultFactoryTests
-    {
 #if (!Core)
         [TestMethod]
         public void CalculateUsingEuropeanDates()
@@ -25,5 +22,4 @@ namespace EPPlusTest.FormulaParsing.ExpressionGraph
             Assert.AreEqual(41654, eNumeric);
         }
 #endif
-    }
 }

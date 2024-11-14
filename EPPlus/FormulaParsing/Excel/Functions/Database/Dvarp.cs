@@ -22,35 +22,31 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-19
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
+
+public class Dvarp : DatabaseFunction
 {
-    public class Dvarp : DatabaseFunction
-    {
-         public Dvarp()
-            : this(new RowMatcher())
-        {
+	public Dvarp()
+	   : this(new RowMatcher())
+	{
 
-        }
+	}
 
-         public Dvarp(RowMatcher rowMatcher)
-            : base(rowMatcher)
-        {
+	public Dvarp(RowMatcher rowMatcher)
+	   : base(rowMatcher)
+	{
 
-        }
+	}
 
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 3);
-            var values = GetMatchingValues(arguments, context);
-            if (!values.Any()) return CreateResult(0d, DataType.Integer);
-            return CreateResult(VarMethods.VarP(values), DataType.Integer);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 3);
+		var values = GetMatchingValues(arguments, context);
+		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(VarMethods.VarP(values), DataType.Integer);
+	}
 }

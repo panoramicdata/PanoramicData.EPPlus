@@ -28,44 +28,41 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 
-namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers
-{
-    public class ErrorHandlingFunctionCompiler : FunctionCompiler
-    {
-        public ErrorHandlingFunctionCompiler(ExcelFunction function, ParsingContext context)
-            : base(function, context)
-        {
+namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
-        }
-        public override CompileResult Compile(IEnumerable<Expression> children)
-        {
-            var args = new List<FunctionArgument>();
-            Function.BeforeInvoke(Context);
-            foreach (var child in children)
-            {
-                try
-                {
-                    var arg = child.Compile();
-                    BuildFunctionArguments(arg != null ? arg : null, args);
-                }
-                catch (ExcelErrorValueException efe)
-                {
-                    return ((ErrorHandlingFunction)Function).HandleError(efe.ErrorValue.ToString());
-                }
-                catch// (Exception e)
-                {
-                    return ((ErrorHandlingFunction)Function).HandleError(ExcelErrorValue.Values.Value);
-                }
-                
-            }
-            return Function.Execute(args, Context);
-        }
-    }
+public class ErrorHandlingFunctionCompiler : FunctionCompiler
+{
+	public ErrorHandlingFunctionCompiler(ExcelFunction function, ParsingContext context)
+		: base(function, context)
+	{
+
+	}
+	public override CompileResult Compile(IEnumerable<Expression> children)
+	{
+		var args = new List<FunctionArgument>();
+		Function.BeforeInvoke(Context);
+		foreach (var child in children)
+		{
+			try
+			{
+				var arg = child.Compile();
+				BuildFunctionArguments(arg != null ? arg : null, args);
+			}
+			catch (ExcelErrorValueException efe)
+			{
+				return ((ErrorHandlingFunction)Function).HandleError(efe.ErrorValue.ToString());
+			}
+			catch// (Exception e)
+			{
+				return ((ErrorHandlingFunction)Function).HandleError(ExcelErrorValue.Values.Value);
+			}
+
+		}
+
+		return Function.Execute(args, Context);
+	}
 }

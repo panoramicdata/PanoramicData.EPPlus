@@ -22,22 +22,17 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using System.Globalization;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Numeric
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Numeric;
+
+public class CInt : ExcelFunction
 {
-    public class CInt : ExcelFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var num = ArgToDecimal(arguments, 0);
-            return CreateResult((int)System.Math.Floor(num), DataType.Integer);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var num = ArgToDecimal(arguments, 0);
+		return CreateResult((int)System.Math.Floor(num), DataType.Integer);
+	}
 }

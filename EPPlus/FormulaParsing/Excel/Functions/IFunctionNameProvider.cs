@@ -22,15 +22,9 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions
+public interface IFunctionNameProvider
 {
-    public interface IFunctionNameProvider
-    {
-        bool IsFunctionName(string name);
-    }
+	bool IsFunctionName(string name);
 }

@@ -22,32 +22,31 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Text
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+
+public class Concatenate : ExcelFunction
 {
-    public class Concatenate : ExcelFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            if (arguments == null)
-            {
-                return CreateResult(string.Empty, DataType.String);
-            }
-            var sb = new StringBuilder();
-            foreach (var arg in arguments)
-            {
-                var v = arg.ValueFirst;
-                if (v != null)
-                {
-                    sb.Append(v);
-                }
-            }
-            return CreateResult(sb.ToString(), DataType.String);
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		if (arguments == null)
+		{
+			return CreateResult(string.Empty, DataType.String);
+		}
+
+		var sb = new StringBuilder();
+		foreach (var arg in arguments)
+		{
+			var v = arg.ValueFirst;
+			if (v != null)
+			{
+				sb.Append(v);
+			}
+		}
+
+		return CreateResult(sb.ToString(), DataType.String);
+	}
 }

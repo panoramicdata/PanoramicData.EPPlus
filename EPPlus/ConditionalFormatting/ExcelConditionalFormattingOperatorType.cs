@@ -29,117 +29,58 @@
  * Eyal Seagull    Conditional Formatting Adaption    2012-04-17
  *******************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
 
-namespace OfficeOpenXml.ConditionalFormatting
+namespace OfficeOpenXml.ConditionalFormatting;
+
+/// <summary>
+/// Functions related to the <see cref="ExcelConditionalFormattingOperatorType"/>
+/// </summary>
+internal static class ExcelConditionalFormattingOperatorType
 {
 	/// <summary>
-  /// Functions related to the <see cref="ExcelConditionalFormattingOperatorType"/>
+	/// 
 	/// </summary>
-  internal static class ExcelConditionalFormattingOperatorType
-	{
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="type"></param>
-		/// <returns></returns>
-		internal static string GetAttributeByType(
-			eExcelConditionalFormattingOperatorType type)
+	/// <param name="type"></param>
+	/// <returns></returns>
+	internal static string GetAttributeByType(
+		eExcelConditionalFormattingOperatorType type) => type switch
 		{
-			switch (type)
-			{
-        case eExcelConditionalFormattingOperatorType.BeginsWith:
-          return ExcelConditionalFormattingConstants.Operators.BeginsWith;
+			eExcelConditionalFormattingOperatorType.BeginsWith => ExcelConditionalFormattingConstants.Operators.BeginsWith,
+			eExcelConditionalFormattingOperatorType.Between => ExcelConditionalFormattingConstants.Operators.Between,
+			eExcelConditionalFormattingOperatorType.ContainsText => ExcelConditionalFormattingConstants.Operators.ContainsText,
+			eExcelConditionalFormattingOperatorType.EndsWith => ExcelConditionalFormattingConstants.Operators.EndsWith,
+			eExcelConditionalFormattingOperatorType.Equal => ExcelConditionalFormattingConstants.Operators.Equal,
+			eExcelConditionalFormattingOperatorType.GreaterThan => ExcelConditionalFormattingConstants.Operators.GreaterThan,
+			eExcelConditionalFormattingOperatorType.GreaterThanOrEqual => ExcelConditionalFormattingConstants.Operators.GreaterThanOrEqual,
+			eExcelConditionalFormattingOperatorType.LessThan => ExcelConditionalFormattingConstants.Operators.LessThan,
+			eExcelConditionalFormattingOperatorType.LessThanOrEqual => ExcelConditionalFormattingConstants.Operators.LessThanOrEqual,
+			eExcelConditionalFormattingOperatorType.NotBetween => ExcelConditionalFormattingConstants.Operators.NotBetween,
+			eExcelConditionalFormattingOperatorType.NotContains => ExcelConditionalFormattingConstants.Operators.NotContains,
+			eExcelConditionalFormattingOperatorType.NotEqual => ExcelConditionalFormattingConstants.Operators.NotEqual,
+			_ => string.Empty,
+		};
 
-        case eExcelConditionalFormattingOperatorType.Between:
-          return ExcelConditionalFormattingConstants.Operators.Between;
-
-        case eExcelConditionalFormattingOperatorType.ContainsText:
-          return ExcelConditionalFormattingConstants.Operators.ContainsText;
-
-        case eExcelConditionalFormattingOperatorType.EndsWith:
-          return ExcelConditionalFormattingConstants.Operators.EndsWith;
-
-        case eExcelConditionalFormattingOperatorType.Equal:
-          return ExcelConditionalFormattingConstants.Operators.Equal;
-
-        case eExcelConditionalFormattingOperatorType.GreaterThan:
-          return ExcelConditionalFormattingConstants.Operators.GreaterThan;
-
-        case eExcelConditionalFormattingOperatorType.GreaterThanOrEqual:
-          return ExcelConditionalFormattingConstants.Operators.GreaterThanOrEqual;
-
-        case eExcelConditionalFormattingOperatorType.LessThan:
-          return ExcelConditionalFormattingConstants.Operators.LessThan;
-
-        case eExcelConditionalFormattingOperatorType.LessThanOrEqual:
-          return ExcelConditionalFormattingConstants.Operators.LessThanOrEqual;
-
-        case eExcelConditionalFormattingOperatorType.NotBetween:
-          return ExcelConditionalFormattingConstants.Operators.NotBetween;
-
-        case eExcelConditionalFormattingOperatorType.NotContains:
-          return ExcelConditionalFormattingConstants.Operators.NotContains;
-
-        case eExcelConditionalFormattingOperatorType.NotEqual:
-          return ExcelConditionalFormattingConstants.Operators.NotEqual;
-			}
-
-			return string.Empty;
-		}
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// param name="attribute"
-    /// <returns></returns>
-    internal static eExcelConditionalFormattingOperatorType GetTypeByAttribute(
-      string attribute)
-    {
-      switch (attribute)
-      {
-        case ExcelConditionalFormattingConstants.Operators.BeginsWith:
-          return eExcelConditionalFormattingOperatorType.BeginsWith;
-
-        case ExcelConditionalFormattingConstants.Operators.Between:
-          return eExcelConditionalFormattingOperatorType.Between;
-
-        case ExcelConditionalFormattingConstants.Operators.ContainsText:
-          return eExcelConditionalFormattingOperatorType.ContainsText;
-
-        case ExcelConditionalFormattingConstants.Operators.EndsWith:
-          return eExcelConditionalFormattingOperatorType.EndsWith;
-
-        case ExcelConditionalFormattingConstants.Operators.Equal:
-          return eExcelConditionalFormattingOperatorType.Equal;
-
-        case ExcelConditionalFormattingConstants.Operators.GreaterThan:
-          return eExcelConditionalFormattingOperatorType.GreaterThan;
-
-        case ExcelConditionalFormattingConstants.Operators.GreaterThanOrEqual:
-          return eExcelConditionalFormattingOperatorType.GreaterThanOrEqual;
-
-        case ExcelConditionalFormattingConstants.Operators.LessThan:
-          return eExcelConditionalFormattingOperatorType.LessThan;
-
-        case ExcelConditionalFormattingConstants.Operators.LessThanOrEqual:
-          return eExcelConditionalFormattingOperatorType.LessThanOrEqual;
-
-        case ExcelConditionalFormattingConstants.Operators.NotBetween:
-          return eExcelConditionalFormattingOperatorType.NotBetween;
-
-        case ExcelConditionalFormattingConstants.Operators.NotContains:
-          return eExcelConditionalFormattingOperatorType.NotContains;
-
-        case ExcelConditionalFormattingConstants.Operators.NotEqual:
-          return eExcelConditionalFormattingOperatorType.NotEqual;
-      }
-
-      throw new Exception(
-        ExcelConditionalFormattingConstants.Errors.UnexistentOperatorTypeAttribute);
-    }
-  }
+	/// <summary>
+	/// 
+	/// </summary>
+	/// param name="attribute"
+	/// <returns></returns>
+	internal static eExcelConditionalFormattingOperatorType GetTypeByAttribute(
+	  string attribute) => attribute switch
+	  {
+		  ExcelConditionalFormattingConstants.Operators.BeginsWith => eExcelConditionalFormattingOperatorType.BeginsWith,
+		  ExcelConditionalFormattingConstants.Operators.Between => eExcelConditionalFormattingOperatorType.Between,
+		  ExcelConditionalFormattingConstants.Operators.ContainsText => eExcelConditionalFormattingOperatorType.ContainsText,
+		  ExcelConditionalFormattingConstants.Operators.EndsWith => eExcelConditionalFormattingOperatorType.EndsWith,
+		  ExcelConditionalFormattingConstants.Operators.Equal => eExcelConditionalFormattingOperatorType.Equal,
+		  ExcelConditionalFormattingConstants.Operators.GreaterThan => eExcelConditionalFormattingOperatorType.GreaterThan,
+		  ExcelConditionalFormattingConstants.Operators.GreaterThanOrEqual => eExcelConditionalFormattingOperatorType.GreaterThanOrEqual,
+		  ExcelConditionalFormattingConstants.Operators.LessThan => eExcelConditionalFormattingOperatorType.LessThan,
+		  ExcelConditionalFormattingConstants.Operators.LessThanOrEqual => eExcelConditionalFormattingOperatorType.LessThanOrEqual,
+		  ExcelConditionalFormattingConstants.Operators.NotBetween => eExcelConditionalFormattingOperatorType.NotBetween,
+		  ExcelConditionalFormattingConstants.Operators.NotContains => eExcelConditionalFormattingOperatorType.NotContains,
+		  ExcelConditionalFormattingConstants.Operators.NotEqual => eExcelConditionalFormattingOperatorType.NotEqual,
+		  _ => throw new Exception(
+					ExcelConditionalFormattingConstants.Errors.UnexistentOperatorTypeAttribute),
+	  };
 }

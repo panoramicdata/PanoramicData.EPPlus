@@ -52,286 +52,250 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections;
-using OfficeOpenXml.Drawing.Vml;namespace OfficeOpenXml
+namespace OfficeOpenXml;
+
+/// <summary>
+/// This is the store for all Rows, Columns and Cells.
+/// It is a Dictionary implementation that allows you to change the Key (the RowID, ColumnID or CellID )
+/// </summary>
+internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 {
-    /// <summary>
-    /// This is the store for all Rows, Columns and Cells.
-    /// It is a Dictionary implementation that allows you to change the Key (the RowID, ColumnID or CellID )
-    /// </summary>
-    internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
-    {
-        private class IndexItem
-        {
-            internal IndexItem(ulong cellId)
-            {
-                RangeID = cellId;
-            }
-            internal IndexItem(ulong cellId, int listPointer)
-	        {
-                RangeID = cellId;
-                ListPointer=listPointer;
-	        }
-            internal ulong RangeID;
-            internal int ListPointer;
-        }
-        /// <summary>
-        /// Compares an IndexItem
-        /// </summary>
-        internal class Compare : IComparer<IndexItem>
-        {
-            #region IComparer<IndexItem> Members
-            int IComparer<IndexItem>.Compare(IndexItem x, IndexItem y)
-            {
-                return x.RangeID < y.RangeID ? -1 : x.RangeID > y.RangeID ? 1 : 0;
-            }
+	private class IndexItem
+	{
+		internal IndexItem(ulong cellId)
+		{
+			RangeID = cellId;
+		}
+		internal IndexItem(ulong cellId, int listPointer)
+		{
+			RangeID = cellId;
+			ListPointer = listPointer;
+		}
+		internal ulong RangeID;
+		internal int ListPointer;
+	}
+	/// <summary>
+	/// Compares an IndexItem
+	/// </summary>
+	internal class Compare : IComparer<IndexItem>
+	{
+		#region IComparer<IndexItem> Members
+		int IComparer<IndexItem>.Compare(IndexItem x, IndexItem y) => x.RangeID < y.RangeID ? -1 : x.RangeID > y.RangeID ? 1 : 0;
 
-            #endregion
-        }
-        IndexItem[] _cellIndex;
-        List<IRangeID> _cells;
-        static readonly Compare _comparer=new Compare(); 
-        /// <summary>
-        /// Creates a new collection
-        /// </summary>
-        /// <param name="cells">The Cells. This list must be sorted</param>
-        internal RangeCollection(List<IRangeID> cells)
-        {   
-            _cells = cells;
-            InitSize(_cells);
-            for (int i = 0; i < _cells.Count; i++)
-            {
-                _cellIndex[i] = new IndexItem(cells[i].RangeID, i);
-            }
-        }
-        ~RangeCollection()
-        {
-            _cells = null;
-            _cellIndex = null;
-        }
-        /// <summary>
-        /// Return the item with the RangeID
-        /// </summary>
-        /// <param name="RangeID"></param>
-        /// <returns></returns>
-        internal IRangeID this[ulong RangeID]
-        {
-            get
-            {
-                return _cells[_cellIndex[IndexOf(RangeID)].ListPointer];
-            }
-        }
-        /// <summary>
-        /// Return specified index from the sorted list
-        /// </summary>
-        /// <param name="Index"></param>
-        /// <returns></returns>
-        internal IRangeID this[int Index]
-        {
-            get
-            {
-                return _cells[_cellIndex[Index].ListPointer];
-            }
-        }
-        internal int Count
-        {
-            get
-            {
-                return _cells.Count;
-            }
-        }
-        internal void Add(IRangeID cell)
-        {
-            var ix = IndexOf(cell.RangeID);
-            if (ix >= 0)
-            {
-                throw (new Exception("Item already exists"));
-            }
-            Insert(~ix, cell);
-        }
-        internal void Delete(ulong key)
-        {
-            var ix = IndexOf(key);
-            if (ix < 0)
-            {
-                throw (new Exception("Key does not exists"));
-            }
-            int listPointer = _cellIndex[ix].ListPointer;
-            Array.Copy(_cellIndex, ix + 1, _cellIndex, ix, _cells.Count - ix - 1);
-            _cells.RemoveAt(listPointer);
+		#endregion
+	}
+	IndexItem[] _cellIndex;
+	List<IRangeID> _cells;
+	static readonly Compare _comparer = new();
+	/// <summary>
+	/// Creates a new collection
+	/// </summary>
+	/// <param name="cells">The Cells. This list must be sorted</param>
+	internal RangeCollection(List<IRangeID> cells)
+	{
+		_cells = cells;
+		InitSize(_cells);
+		for (var i = 0; i < _cells.Count; i++)
+		{
+			_cellIndex[i] = new IndexItem(cells[i].RangeID, i);
+		}
+	}
+	~RangeCollection()
+	{
+		_cells = null;
+		_cellIndex = null;
+	}
+	/// <summary>
+	/// Return the item with the RangeID
+	/// </summary>
+	/// <param name="RangeID"></param>
+	/// <returns></returns>
+	internal IRangeID this[ulong RangeID]
+	{
+		get
+		{
+			return _cells[_cellIndex[IndexOf(RangeID)].ListPointer];
+		}
+	}
+	/// <summary>
+	/// Return specified index from the sorted list
+	/// </summary>
+	/// <param name="Index"></param>
+	/// <returns></returns>
+	internal IRangeID this[int Index]
+	{
+		get
+		{
+			return _cells[_cellIndex[Index].ListPointer];
+		}
+	}
+	internal int Count => _cells.Count;
+	internal void Add(IRangeID cell)
+	{
+		var ix = IndexOf(cell.RangeID);
+		if (ix >= 0)
+		{
+			throw (new Exception("Item already exists"));
+		}
 
-            //Item is removed subtract one from all items with greater ListPointer
-            for (int i = 0; i < _cells.Count; i++)
-            {
-                if (_cellIndex[i].ListPointer >= listPointer)
-                {
-                    _cellIndex[i].ListPointer--;
-                }
+		Insert(~ix, cell);
+	}
+	internal void Delete(ulong key)
+	{
+		var ix = IndexOf(key);
+		if (ix < 0)
+		{
+			throw (new Exception("Key does not exists"));
+		}
 
-            }
-        }
-        internal int IndexOf(ulong key)
-        {
-            return Array.BinarySearch<IndexItem>(_cellIndex, 0, _cells.Count, new IndexItem(key), _comparer);
-        }
-        internal bool ContainsKey(ulong key)
-        {
-            return IndexOf(key) < 0 ? false : true;
-        }
-        int _size { get; set; }
-        #region "RangeID manipulation methods"
-        /// <summary>
-        /// Insert a number of rows in the collecion but dont update the cell only the index
-        /// </summary>
-        /// <param name="rowID"></param>
-        /// <param name="rows"></param>
-        /// <returns>Index of first rangeItem</returns>
-        internal int InsertRowsUpdateIndex(ulong rowID, int rows)
-        {
-            int index = IndexOf(rowID);
-            if (index < 0) index = ~index; //No match found invert to get start cell
-            ulong rowAdd = (((ulong)rows) << 29);
-            for (int i = index; i < _cells.Count; i++)
-            {
-                _cellIndex[i].RangeID += rowAdd;
-            }
-            return index;
-        }
-        /// <summary>
-        /// Insert a number of rows in the collecion
-        /// </summary>
-        /// <param name="rowID"></param>
-        /// <param name="rows"></param>
-        /// <returns>Index of first rangeItem</returns>
-        internal int InsertRows(ulong rowID, int rows)
-        {
-            int index = IndexOf(rowID);
-            if (index < 0) index = ~index; //No match found invert to get start cell
-            ulong rowAdd=(((ulong)rows) << 29);
-            for (int i = index; i < _cells.Count; i++)
-            {
-                _cellIndex[i].RangeID += rowAdd;
-                _cells[_cellIndex[i].ListPointer].RangeID += rowAdd;
-            }
-            return index;
-        }
-        /// <summary>
-        /// Delete rows from the collecion
-        /// </summary>
-        /// <param name="rowID"></param>
-        /// <param name="rows"></param>
-        /// <param name="updateCells">Update range id's on cells</param>
-        internal int DeleteRows(ulong rowID, int rows, bool updateCells)
-        {
-            ulong rowAdd = (((ulong)rows) << 29);
-            var index = IndexOf(rowID);
-            if (index < 0) index = ~index; //No match found invert to get start cell
+		var listPointer = _cellIndex[ix].ListPointer;
+		Array.Copy(_cellIndex, ix + 1, _cellIndex, ix, _cells.Count - ix - 1);
+		_cells.RemoveAt(listPointer);
 
-            if (index >= _cells.Count || _cellIndex[index] == null) return -1;   //No row above this row
-            while (index < _cells.Count && _cellIndex[index].RangeID < rowID + rowAdd)
-            {
-                Delete(_cellIndex[index].RangeID);
-            }
+		//Item is removed subtract one from all items with greater ListPointer
+		for (var i = 0; i < _cells.Count; i++)
+		{
+			if (_cellIndex[i].ListPointer >= listPointer)
+			{
+				_cellIndex[i].ListPointer--;
+			}
 
-            int updIndex = IndexOf(rowID + rowAdd);
-            if (updIndex < 0) updIndex = ~updIndex; //No match found invert to get start cell
+		}
+	}
+	internal int IndexOf(ulong key) => Array.BinarySearch<IndexItem>(_cellIndex, 0, _cells.Count, new IndexItem(key), _comparer);
+	internal bool ContainsKey(ulong key) => IndexOf(key) >= 0;
+	int _size { get; set; }
+	#region "RangeID manipulation methods"
+	/// <summary>
+	/// Insert a number of rows in the collecion but dont update the cell only the index
+	/// </summary>
+	/// <param name="rowID"></param>
+	/// <param name="rows"></param>
+	/// <returns>Index of first rangeItem</returns>
+	internal int InsertRowsUpdateIndex(ulong rowID, int rows)
+	{
+		var index = IndexOf(rowID);
+		if (index < 0) index = ~index; //No match found invert to get start cell
+		var rowAdd = (((ulong)rows) << 29);
+		for (var i = index; i < _cells.Count; i++)
+		{
+			_cellIndex[i].RangeID += rowAdd;
+		}
 
-            for (int i = updIndex; i < _cells.Count; i++)
-            {
-                _cellIndex[i].RangeID -= rowAdd;                        //Change the index
-                if (updateCells) _cells[_cellIndex[i].ListPointer].RangeID -= rowAdd;    //Change the cell/row or column object
-            }
-            return index;
-        }
-        internal void InsertColumn(ulong ColumnID, int columns)
-        {
-            throw (new Exception("Working on it..."));
-        }
-        internal void DeleteColumn(ulong ColumnID,int columns)
-        {
-            throw (new Exception("Working on it..."));
-        }
-        #endregion
-        #region "Private Methods"
-        /// <summary>
-        /// Init the size starting from 128 items. Double the size until the list fits.
-        /// </summary>
-        /// <param name="_cells"></param>
-        private void InitSize(List<IRangeID> _cells)
-        {
-            _size = 128;
-            while (_cells.Count > _size) _size <<= 1;
-            _cellIndex = new IndexItem[_size];
-        }
-        /// <summary>
-        /// Check the size and double the size if out of bound
-        /// </summary>
-        private void CheckSize()
-        {
-            if (_cells.Count >= _size)
-            {
-                _size <<= 1;
-                Array.Resize(ref _cellIndex, _size);
-            }
-        }
-        private void Insert(int ix, IRangeID cell)
-        {
-            CheckSize();
-            Array.Copy(_cellIndex, ix, _cellIndex, ix + 1, _cells.Count - ix);
-            _cellIndex[ix] = new IndexItem(cell.RangeID, _cells.Count);
-            _cells.Add(cell);
-        }
-        #endregion
+		return index;
+	}
+	/// <summary>
+	/// Insert a number of rows in the collecion
+	/// </summary>
+	/// <param name="rowID"></param>
+	/// <param name="rows"></param>
+	/// <returns>Index of first rangeItem</returns>
+	internal int InsertRows(ulong rowID, int rows)
+	{
+		var index = IndexOf(rowID);
+		if (index < 0) index = ~index; //No match found invert to get start cell
+		var rowAdd = (((ulong)rows) << 29);
+		for (var i = index; i < _cells.Count; i++)
+		{
+			_cellIndex[i].RangeID += rowAdd;
+			_cells[_cellIndex[i].ListPointer].RangeID += rowAdd;
+		}
 
-        #region IEnumerator<IRangeID> Members
+		return index;
+	}
+	/// <summary>
+	/// Delete rows from the collecion
+	/// </summary>
+	/// <param name="rowID"></param>
+	/// <param name="rows"></param>
+	/// <param name="updateCells">Update range id's on cells</param>
+	internal int DeleteRows(ulong rowID, int rows, bool updateCells)
+	{
+		var rowAdd = (((ulong)rows) << 29);
+		var index = IndexOf(rowID);
+		if (index < 0) index = ~index; //No match found invert to get start cell
 
-        IRangeID IEnumerator<IRangeID>.Current
-        {
-            get { throw new NotImplementedException(); }
-        }
+		if (index >= _cells.Count || _cellIndex[index] == null) return -1;   //No row above this row
+		while (index < _cells.Count && _cellIndex[index].RangeID < rowID + rowAdd)
+		{
+			Delete(_cellIndex[index].RangeID);
+		}
 
-        #endregion
+		var updIndex = IndexOf(rowID + rowAdd);
+		if (updIndex < 0) updIndex = ~updIndex; //No match found invert to get start cell
 
-        #region IDisposable for the enumerator Members
+		for (var i = updIndex; i < _cells.Count; i++)
+		{
+			_cellIndex[i].RangeID -= rowAdd;                        //Change the index
+			if (updateCells) _cells[_cellIndex[i].ListPointer].RangeID -= rowAdd;    //Change the cell/row or column object
+		}
 
-        void IDisposable.Dispose()
-        {
-            _ix = -1;
-        }
+		return index;
+	}
+	internal void InsertColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
+	internal void DeleteColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
+	#endregion
+	#region "Private Methods"
+	/// <summary>
+	/// Init the size starting from 128 items. Double the size until the list fits.
+	/// </summary>
+	/// <param name="_cells"></param>
+	private void InitSize(List<IRangeID> _cells)
+	{
+		_size = 128;
+		while (_cells.Count > _size) _size <<= 1;
+		_cellIndex = new IndexItem[_size];
+	}
+	/// <summary>
+	/// Check the size and double the size if out of bound
+	/// </summary>
+	private void CheckSize()
+	{
+		if (_cells.Count >= _size)
+		{
+			_size <<= 1;
+			Array.Resize(ref _cellIndex, _size);
+		}
+	}
+	private void Insert(int ix, IRangeID cell)
+	{
+		CheckSize();
+		Array.Copy(_cellIndex, ix, _cellIndex, ix + 1, _cells.Count - ix);
+		_cellIndex[ix] = new IndexItem(cell.RangeID, _cells.Count);
+		_cells.Add(cell);
+	}
+	#endregion
 
-        #endregion
+	#region IEnumerator<IRangeID> Members
 
-        #region IEnumerator Members
-        int _ix = -1;
-        object IEnumerator.Current
-        {
-            get 
-            {
-                return _cells[_cellIndex[_ix].ListPointer];
-            }
-        }
+	IRangeID IEnumerator<IRangeID>.Current => throw new NotImplementedException();
 
-        bool IEnumerator.MoveNext()
-        {
-           _ix++;
-           return _ix < _cells.Count;
-        }
+	#endregion
 
-        void IEnumerator.Reset()
-        {
-            _ix = -1;
-        }
+	#region IDisposable for the enumerator Members
 
-        #endregion
+	void IDisposable.Dispose() => _ix = -1;
 
-        #region IEnumerable Members
+	#endregion
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.MemberwiseClone() as IEnumerator;
-        }
+	#region IEnumerator Members
+	int _ix = -1;
+	object IEnumerator.Current => _cells[_cellIndex[_ix].ListPointer];
 
-        #endregion
-    }
+	bool IEnumerator.MoveNext()
+	{
+		_ix++;
+		return _ix < _cells.Count;
+	}
+
+	void IEnumerator.Reset() => _ix = -1;
+
+	#endregion
+
+	#region IEnumerable Members
+
+	IEnumerator IEnumerable.GetEnumerator() => MemberwiseClone() as IEnumerator;
+
+	#endregion
 }

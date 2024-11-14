@@ -29,44 +29,31 @@
  * Mats Alm   		                Added       		        2011-01-08
  * Jan Källman		    License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.DataValidation.Formulas.Contracts;
 using System.Xml;
 
-namespace OfficeOpenXml.DataValidation.Formulas
+namespace OfficeOpenXml.DataValidation.Formulas;
+
+/// <summary>
+/// 
+/// </summary>
+internal class ExcelDataValidationFormulaCustom : ExcelDataValidationFormula, IExcelDataValidationFormula
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    internal class ExcelDataValidationFormulaCustom : ExcelDataValidationFormula, IExcelDataValidationFormula
-    {
-        public ExcelDataValidationFormulaCustom(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
-            : base(namespaceManager, topNode, formulaPath)
-        {
-            var value = GetXmlNodeString(formulaPath);
-            if (!string.IsNullOrEmpty(value))
-            {
-                ExcelFormula = value;
-            }
-            State = FormulaState.Formula;
-        }
+	public ExcelDataValidationFormulaCustom(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
+		: base(namespaceManager, topNode, formulaPath)
+	{
+		var value = GetXmlNodeString(formulaPath);
+		if (!string.IsNullOrEmpty(value))
+		{
+			ExcelFormula = value;
+		}
 
-        internal override string GetXmlValue()
-        {
-            return ExcelFormula;
-        }
+		State = FormulaState.Formula;
+	}
 
-        protected override string GetValueAsString()
-        {
-            return ExcelFormula;
-        }
+	internal override string GetXmlValue() => ExcelFormula;
 
-        internal override void ResetValue()
-        {
-            ExcelFormula = null;
-        }
-    }
+	protected override string GetValueAsString() => ExcelFormula;
+
+	internal override void ResetValue() => ExcelFormula = null;
 }

@@ -31,224 +31,204 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
-namespace OfficeOpenXml.Table
+namespace OfficeOpenXml.Table;
+
+/// <summary>
+/// A collection of table objects
+/// </summary>
+public class ExcelTableCollection : IEnumerable<ExcelTable>
 {
-    /// <summary>
-    /// A collection of table objects
-    /// </summary>
-    public class ExcelTableCollection : IEnumerable<ExcelTable>
-    {
-        List<ExcelTable> _tables = new List<ExcelTable>();
-        internal Dictionary<string, int> _tableNames = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        ExcelWorksheet _ws;        
-        internal ExcelTableCollection(ExcelWorksheet ws)
-        {
-            var pck = ws._package.Package;
-            _ws = ws;
-            foreach(XmlElement node in ws.WorksheetXml.SelectNodes("//d:tableParts/d:tablePart", ws.NameSpaceManager))
-            {
-                var rel = ws.Part.GetRelationship(node.GetAttribute("id",ExcelPackage.schemaRelationships));
-                var tbl = new ExcelTable(rel, ws);
-                _tableNames.Add(tbl.Name, _tables.Count);
-                _tables.Add(tbl);
-            }
-        }
-        private ExcelTable Add(ExcelTable tbl)
-        {
-            _tables.Add(tbl);
-            _tableNames.Add(tbl.Name, _tables.Count - 1);
-            if (tbl.Id >= _ws.Workbook._nextTableID)
-            {
-                _ws.Workbook._nextTableID = tbl.Id + 1;
-            }
-            return tbl;
-        }
+	List<ExcelTable> _tables = [];
+	internal Dictionary<string, int> _tableNames = new(StringComparer.OrdinalIgnoreCase);
+	ExcelWorksheet _ws;
+	internal ExcelTableCollection(ExcelWorksheet ws)
+	{
+		var pck = ws._package.Package;
+		_ws = ws;
+		foreach (XmlElement node in ws.WorksheetXml.SelectNodes("//d:tableParts/d:tablePart", ws.NameSpaceManager))
+		{
+			var rel = ws.Part.GetRelationship(node.GetAttribute("id", ExcelPackage.schemaRelationships));
+			var tbl = new ExcelTable(rel, ws);
+			_tableNames.Add(tbl.Name, _tables.Count);
+			_tables.Add(tbl);
+		}
+	}
+	private ExcelTable Add(ExcelTable tbl)
+	{
+		_tables.Add(tbl);
+		_tableNames.Add(tbl.Name, _tables.Count - 1);
+		if (tbl.Id >= _ws.Workbook._nextTableID)
+		{
+			_ws.Workbook._nextTableID = tbl.Id + 1;
+		}
 
-        /// <summary>
-        /// Create a table on the supplied range
-        /// </summary>
-        /// <param name="Range">The range address including header and total row</param>
-        /// <param name="Name">The name of the table. Must be unique </param>
-        /// <returns>The table object</returns>
-        public ExcelTable Add(ExcelAddressBase Range, string Name)
-        {
-            if (Range.WorkSheet != null && Range.WorkSheet != _ws.Name)
-            {
-                throw new ArgumentException("Range does not belong to a worksheet", "Range");
-            }
+		return tbl;
+	}
 
-            if (string.IsNullOrEmpty(Name))
-            {
-                Name = GetNewTableName();
-            }
-            else
-            {
-                if (_ws.Workbook.ExistsTableName(Name))
-                {
-                    throw (new ArgumentException("Tablename is not unique"));
-                }
-            }
+	/// <summary>
+	/// Create a table on the supplied range
+	/// </summary>
+	/// <param name="Range">The range address including header and total row</param>
+	/// <param name="Name">The name of the table. Must be unique </param>
+	/// <returns>The table object</returns>
+	public ExcelTable Add(ExcelAddressBase Range, string Name)
+	{
+		if (Range.WorkSheet != null && Range.WorkSheet != _ws.Name)
+		{
+			throw new ArgumentException("Range does not belong to a worksheet", nameof(Range));
+		}
 
-            ValidateTableName(Name);
+		if (string.IsNullOrEmpty(Name))
+		{
+			Name = GetNewTableName();
+		}
+		else
+		{
+			if (_ws.Workbook.ExistsTableName(Name))
+			{
+				throw (new ArgumentException("Tablename is not unique"));
+			}
+		}
 
-            foreach (var t in _tables)
-            {
-                if (t.Address.Collide(Range) != ExcelAddressBase.eAddressCollition.No)
-                {
-                    throw (new ArgumentException(string.Format("Table range collides with table {0}", t.Name)));
-                }
-            }
-            return Add(new ExcelTable(_ws, Range, Name, _ws.Workbook._nextTableID));
-        }
+		ValidateTableName(Name);
 
-        private void ValidateTableName(string Name)
-        {
-            if (string.IsNullOrEmpty(Name))
-            {
-                throw new ArgumentException("Tablename is null or empty");
-            }
+		foreach (var t in _tables)
+		{
+			if (t.Address.Collide(Range) != ExcelAddressBase.eAddressCollition.No)
+			{
+				throw (new ArgumentException(string.Format("Table range collides with table {0}", t.Name)));
+			}
+		}
 
-            char firstLetterOfName = Name[0];
-            if (Char.IsLetter(firstLetterOfName) == false && firstLetterOfName != '_' && firstLetterOfName != '\\')
-            {
-                throw new ArgumentException("Tablename start with invalid character");
-            }
+		return Add(new ExcelTable(_ws, Range, Name, _ws.Workbook._nextTableID));
+	}
 
-            if (Name.Contains(" "))
-            {
-                throw new ArgumentException("Tablename has spaces");
-            }
-            if (!ExcelAddressUtil.IsValidName(Name))
-            {
-                throw (new ArgumentException("Tablename is not valid"));
-            }
-        }
+	private void ValidateTableName(string Name)
+	{
+		if (string.IsNullOrEmpty(Name))
+		{
+			throw new ArgumentException("Tablename is null or empty");
+		}
 
-        public void Delete(int Index, bool ClearRange = false)
-        {
-            Delete(this[Index], ClearRange);
-        }
+		var firstLetterOfName = Name[0];
+		if (Char.IsLetter(firstLetterOfName) == false && firstLetterOfName != '_' && firstLetterOfName != '\\')
+		{
+			throw new ArgumentException("Tablename start with invalid character");
+		}
 
-        public void Delete(string Name, bool ClearRange = false)
-        {
-            if (this[Name] == null)
-            {
-                throw new ArgumentOutOfRangeException(string.Format("Cannot delete non-existant table {0} in sheet {1}.", Name, _ws.Name));
-            }
-            Delete(this[Name], ClearRange);
-        }
+		if (Name.Contains(" "))
+		{
+			throw new ArgumentException("Tablename has spaces");
+		}
+
+		if (!ExcelAddressUtil.IsValidName(Name))
+		{
+			throw (new ArgumentException("Tablename is not valid"));
+		}
+	}
+
+	public void Delete(int Index, bool ClearRange = false) => Delete(this[Index], ClearRange);
+
+	public void Delete(string Name, bool ClearRange = false)
+	{
+		if (this[Name] == null)
+		{
+			throw new ArgumentOutOfRangeException(string.Format("Cannot delete non-existant table {0} in sheet {1}.", Name, _ws.Name));
+		}
+
+		Delete(this[Name], ClearRange);
+	}
 
 
-        public void Delete(ExcelTable Table, bool ClearRange = false)
-        {
-            if (!this._tables.Contains(Table))
-            {
-                throw new ArgumentOutOfRangeException("Table", String.Format("Table {0} does not exist in this collection", Table.Name));
-            }
-            lock (this)
-            {
-                var range = _ws.Cells[Table.Address.Address];
-                _tableNames.Remove(Table.Name);
-                _tables.Remove(Table);
-                foreach (var sheet in Table.WorkSheet.Workbook.Worksheets)
-                {
-                    foreach (var table in sheet.Tables)
-                    {
-                        if (table.Id > Table.Id) table.Id--;
-                    }
-                    Table.WorkSheet.Workbook._nextTableID--;
-                }
-                if (ClearRange)
-                {
-                    range.Clear();
-                }
-            }
+	public void Delete(ExcelTable Table, bool ClearRange = false)
+	{
+		if (!_tables.Contains(Table))
+		{
+			throw new ArgumentOutOfRangeException(nameof(Table), String.Format("Table {0} does not exist in this collection", Table.Name));
+		}
 
-        }
+		lock (this)
+		{
+			var range = _ws.Cells[Table.Address.Address];
+			_tableNames.Remove(Table.Name);
+			_tables.Remove(Table);
+			foreach (var sheet in Table.WorkSheet.Workbook.Worksheets)
+			{
+				foreach (var table in sheet.Tables)
+				{
+					if (table.Id > Table.Id) table.Id--;
+				}
 
-        internal string GetNewTableName()
-        {
-            string name = "Table1";
-            int i = 2;
-            while (_ws.Workbook.ExistsTableName(name))
-            {
-                name = string.Format("Table{0}", i++);
-            }
-            return name;
-        }
-        /// <summary>
-        /// Number of items in the collection
-        /// </summary>
-        public int Count
-        {
-            get
-            {
-                return _tables.Count;
-            }
-        }
-        /// <summary>
-        /// Get the table object from a range.
-        /// </summary>
-        /// <param name="Range">The range</param>
-        /// <returns>The table. Null if no range matches</returns>
-        public ExcelTable GetFromRange(ExcelRangeBase Range)
-        {
-            foreach (var tbl in Range.Worksheet.Tables)
-            {
-                if (tbl.Address._address == Range._address)
-                {
-                    return tbl;
-                }
-            }
-            return null;
-        }
-        /// <summary>
-        /// The table Index. Base 0.
-        /// </summary>
-        /// <param name="Index"></param>
-        /// <returns></returns>
-        public ExcelTable this[int Index]
-        {
-            get
-            {
-                if (Index < 0 || Index >= _tables.Count)
-                {
-                    throw (new ArgumentOutOfRangeException("Table index out of range"));
-                }
-                return _tables[Index];
-            }
-        }
-        /// <summary>
-        /// Indexer
-        /// </summary>
-        /// <param name="Name">The name of the table</param>
-        /// <returns>The table. Null if the table name is not found in the collection</returns>
-        public ExcelTable this[string Name]
-        {
-            get
-            {
-                if (_tableNames.ContainsKey(Name))
-                {
-                    return _tables[_tableNames[Name]];
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-        public IEnumerator<ExcelTable> GetEnumerator()
-        {
-            return _tables.GetEnumerator();
-        }
+				Table.WorkSheet.Workbook._nextTableID--;
+			}
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return _tables.GetEnumerator();
-        }
-    }
+			if (ClearRange)
+			{
+				range.Clear();
+			}
+		}
+
+	}
+
+	internal string GetNewTableName()
+	{
+		var name = "Table1";
+		var i = 2;
+		while (_ws.Workbook.ExistsTableName(name))
+		{
+			name = string.Format("Table{0}", i++);
+		}
+
+		return name;
+	}
+	/// <summary>
+	/// Number of items in the collection
+	/// </summary>
+	public int Count => _tables.Count;
+	/// <summary>
+	/// Get the table object from a range.
+	/// </summary>
+	/// <param name="Range">The range</param>
+	/// <returns>The table. Null if no range matches</returns>
+	public ExcelTable GetFromRange(ExcelRangeBase Range)
+	{
+		foreach (var tbl in Range.Worksheet.Tables)
+		{
+			if (tbl.Address._address == Range._address)
+			{
+				return tbl;
+			}
+		}
+
+		return null;
+	}
+	/// <summary>
+	/// The table Index. Base 0.
+	/// </summary>
+	/// <param name="Index"></param>
+	/// <returns></returns>
+	public ExcelTable this[int Index]
+	{
+		get
+		{
+			return Index < 0 || Index >= _tables.Count ? throw (new ArgumentOutOfRangeException("Table index out of range")) : _tables[Index];
+		}
+	}
+	/// <summary>
+	/// Indexer
+	/// </summary>
+	/// <param name="Name">The name of the table</param>
+	/// <returns>The table. Null if the table name is not found in the collection</returns>
+	public ExcelTable this[string Name]
+	{
+		get
+		{
+			return _tableNames.ContainsKey(Name) ? _tables[_tableNames[Name]] : null;
+		}
+	}
+	public IEnumerator<ExcelTable> GetEnumerator() => _tables.GetEnumerator();
+
+	System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => _tables.GetEnumerator();
 }

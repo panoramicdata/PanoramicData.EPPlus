@@ -30,102 +30,87 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Xml;
 
-namespace OfficeOpenXml.Drawing.Chart
+namespace OfficeOpenXml.Drawing.Chart;
+
+/// <summary>
+/// A charts plot area
+/// </summary>
+public sealed class ExcelChartPlotArea : XmlHelper
 {
-    /// <summary>
-    /// A charts plot area
-    /// </summary>
-    public sealed class ExcelChartPlotArea :  XmlHelper
-    {
-        ExcelChart _firstChart;
-        internal ExcelChartPlotArea(XmlNamespaceManager ns, XmlNode node, ExcelChart firstChart)
-           : base(ns,node)
-       {
-           _firstChart = firstChart;
-            if (TopNode.SelectSingleNode("c:dTable", NameSpaceManager) != null)
-            {
-                _dataTable = new ExcelChartDataTable(NameSpaceManager, TopNode);
-            }
-        }
+	ExcelChart _firstChart;
+	internal ExcelChartPlotArea(XmlNamespaceManager ns, XmlNode node, ExcelChart firstChart)
+	   : base(ns, node)
+	{
+		_firstChart = firstChart;
+		if (TopNode.SelectSingleNode("c:dTable", NameSpaceManager) != null)
+		{
+			_dataTable = new ExcelChartDataTable(NameSpaceManager, TopNode);
+		}
+	}
 
-        ExcelChartCollection _chartTypes;
-        public ExcelChartCollection ChartTypes
-        {
-            get
-            {
-                if (_chartTypes == null)
-                {
-                    _chartTypes = new ExcelChartCollection(_firstChart); 
-                }
-                return _chartTypes;
-            }
-        }
-        #region Data table
-        /// <summary>
-        /// Creates a data table in the plotarea
-        /// The datatable can also be accessed via the DataTable propery
-        /// <see cref="DataTable"/>
-        /// </summary>
-        public ExcelChartDataTable CreateDataTable()
-        {
-            if(_dataTable!=null)
-            {
-                throw (new InvalidOperationException("Data table already exists"));
-            }
+	ExcelChartCollection _chartTypes;
+	public ExcelChartCollection ChartTypes
+	{
+		get
+		{
+			_chartTypes ??= new ExcelChartCollection(_firstChart);
 
-            _dataTable = new ExcelChartDataTable(NameSpaceManager, TopNode);
-            return _dataTable;
-        }
-        /// <summary>
-        /// Remove the data table if it's created in the plotarea
-        /// </summary>
-        public void RemoveDataTable()
-        {
-            DeleteAllNode("c:dTable");
-            _dataTable = null;
-        }
-        ExcelChartDataTable _dataTable = null;
-        /// <summary>
-        /// The data table object.
-        /// Use the CreateDataTable method to create a datatable if it does not exist.
-        /// <see cref="CreateDataTable"/>
-        /// <see cref="RemoveDataTable"/>
-        /// </summary>
-        public ExcelChartDataTable DataTable
-        {
-            get
-            {
-                return _dataTable;
-            }
-        }
-        #endregion
-        ExcelDrawingFill _fill = null;
-        public ExcelDrawingFill Fill
-        {
-            get
-            {
-                if (_fill == null)
-                {
-                    _fill = new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-                }
-                return _fill;
-            }
-        }
-        ExcelDrawingBorder _border = null;
-        public ExcelDrawingBorder Border
-        {
-            get
-            {
-                if (_border == null)
-                {
-                    _border = new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-                }
-                return _border;
-            }
-        }
-    }
+			return _chartTypes;
+		}
+	}
+	#region Data table
+	/// <summary>
+	/// Creates a data table in the plotarea
+	/// The datatable can also be accessed via the DataTable propery
+	/// <see cref="DataTable"/>
+	/// </summary>
+	public ExcelChartDataTable CreateDataTable()
+	{
+		if (_dataTable != null)
+		{
+			throw (new InvalidOperationException("Data table already exists"));
+		}
+
+		_dataTable = new ExcelChartDataTable(NameSpaceManager, TopNode);
+		return _dataTable;
+	}
+	/// <summary>
+	/// Remove the data table if it's created in the plotarea
+	/// </summary>
+	public void RemoveDataTable()
+	{
+		DeleteAllNode("c:dTable");
+		_dataTable = null;
+	}
+	ExcelChartDataTable _dataTable = null;
+	/// <summary>
+	/// The data table object.
+	/// Use the CreateDataTable method to create a datatable if it does not exist.
+	/// <see cref="CreateDataTable"/>
+	/// <see cref="RemoveDataTable"/>
+	/// </summary>
+	public ExcelChartDataTable DataTable => _dataTable;
+	#endregion
+	ExcelDrawingFill _fill = null;
+	public ExcelDrawingFill Fill
+	{
+		get
+		{
+			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
+
+			return _fill;
+		}
+	}
+	ExcelDrawingBorder _border = null;
+	public ExcelDrawingBorder Border
+	{
+		get
+		{
+			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
+
+			return _border;
+		}
+	}
 }

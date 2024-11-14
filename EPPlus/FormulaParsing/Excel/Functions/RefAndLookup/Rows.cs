@@ -25,35 +25,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using System.Text.RegularExpressions;
-using OfficeOpenXml.FormulaParsing.Utilities;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
+
+public class Rows : LookupFunction
 {
-    public class Rows : LookupFunction
-    {
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 1);
-            var r=arguments.ElementAt(0).ValueAsRangeInfo;
-            if (r != null)
-            {
-                return CreateResult(r.Address._toRow - r.Address._fromRow + 1, DataType.Integer);
-            }
-            else
-            {
-                var range = ArgToAddress(arguments, 0, context);
-                if (ExcelAddressUtil.IsValidAddress(range))
-                {
-                    var factory = new RangeAddressFactory(context.ExcelDataProvider);
-                    var address = factory.Create(range);
-                    return CreateResult(address.ToRow - address.FromRow + 1, DataType.Integer);
-                }
-            }
-            throw new ArgumentException("Invalid range supplied");
-        }
-    }
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 1);
+		var r = arguments.ElementAt(0).ValueAsRangeInfo;
+		if (r != null)
+		{
+			return CreateResult(r.Address._toRow - r.Address._fromRow + 1, DataType.Integer);
+		}
+		else
+		{
+			var range = ArgToAddress(arguments, 0, context);
+			if (ExcelAddressUtil.IsValidAddress(range))
+			{
+				var factory = new RangeAddressFactory(context.ExcelDataProvider);
+				var address = factory.Create(range);
+				return CreateResult(address.ToRow - address.FromRow + 1, DataType.Integer);
+			}
+		}
+
+		throw new ArgumentException("Invalid range supplied");
+	}
 }

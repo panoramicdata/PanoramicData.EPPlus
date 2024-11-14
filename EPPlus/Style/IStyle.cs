@@ -29,16 +29,11 @@
  * Jan Källman		                Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Text;
-using OfficeOpenXml.Style;
-namespace OfficeOpenXml.Style
+namespace OfficeOpenXml.Style;
+
+internal interface IStyle
 {
-    internal interface IStyle
-    {
-        void SetNewStyleID(string value);
-        ulong Id {get;}
-        ExcelStyle ExcelStyle{get;}
-    }
+	void SetNewStyleID(string value);
+	ulong Id { get; }
+	ExcelStyle ExcelStyle { get; }
 }

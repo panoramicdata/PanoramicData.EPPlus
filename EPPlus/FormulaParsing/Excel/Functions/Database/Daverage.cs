@@ -22,33 +22,29 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-19
  *******************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
-namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database
+namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
+
+public class Daverage : DatabaseFunction
 {
-    public class Daverage : DatabaseFunction
-    {
-         public Daverage()
-            : this(new RowMatcher())
-        {
+	public Daverage()
+	   : this(new RowMatcher())
+	{
 
-        }
+	}
 
-         public Daverage(RowMatcher rowMatcher)
-            : base(rowMatcher)
-        {
+	public Daverage(RowMatcher rowMatcher)
+	   : base(rowMatcher)
+	{
 
-        }
-        public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-        {
-            ValidateArguments(arguments, 3);
-            var values = GetMatchingValues(arguments, context);
-            if (!values.Any()) return CreateResult(0d, DataType.Integer);
-            return CreateResult(values.Average(), DataType.Integer);
-        }
-    }
+	}
+	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		ValidateArguments(arguments, 3);
+		var values = GetMatchingValues(arguments, context);
+		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(values.Average(), DataType.Integer);
+	}
 }

@@ -28,23 +28,15 @@
  * ******************************************************************************
  * Eyal Seagull    Conditional Formatting Adaption    2012-04-03
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.ConditionalFormatting.Contracts;
 
-using OfficeOpenXml.ConditionalFormatting;
-
-namespace OfficeOpenXml.ConditionalFormatting.Contracts
+/// <summary>
+/// IExcelConditionalFormattingBetween
+/// </summary>
+public interface IExcelConditionalFormattingBetween
+  : IExcelConditionalFormattingRule,
+  IExcelConditionalFormattingWithFormula2
 {
-  /// <summary>
-  /// IExcelConditionalFormattingBetween
-  /// </summary>
-  public interface IExcelConditionalFormattingBetween
-    : IExcelConditionalFormattingRule,
-    IExcelConditionalFormattingWithFormula2
-  {
-    #region Public Properties
-    #endregion Public Properties
-  }
+	#region Public Properties
+	#endregion Public Properties
 }

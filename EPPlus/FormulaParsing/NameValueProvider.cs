@@ -16,38 +16,23 @@
  *******************************************************************************
  * Mats Alm Added		                2016-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.FormulaParsing;
 
-namespace OfficeOpenXml.FormulaParsing
+public class NameValueProvider : INameValueProvider
 {
-    public class NameValueProvider : INameValueProvider
-    {
-        private NameValueProvider()
-        {
+	private NameValueProvider()
+	{
 
-        }
+	}
 
-        public static INameValueProvider Empty
-        {
-            get { return new NameValueProvider(); }
-        }
+	public static INameValueProvider Empty => new NameValueProvider();
 
-        public bool IsNamedValue(string key, string worksheet)
-        {
-            return false;
-        }
+	public bool IsNamedValue(string key, string worksheet) => false;
 
-        public object GetNamedValue(string key)
-        {
-            return null;
-        }
+	public object GetNamedValue(string key) => null;
 
-        public void Reload()
-        {
-            
-        }
-    }
+	public void Reload()
+	{
+
+	}
 }

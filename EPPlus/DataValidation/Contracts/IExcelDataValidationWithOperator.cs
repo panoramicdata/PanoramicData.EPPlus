@@ -29,21 +29,15 @@
  * Mats Alm   		                Added       		        2011-01-08
  * Jan Källman		    License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+namespace OfficeOpenXml.DataValidation.Contracts;
 
-namespace OfficeOpenXml.DataValidation.Contracts
+/// <summary>
+/// Represents a validation with an operator
+/// </summary>
+public interface IExcelDataValidationWithOperator
 {
-    /// <summary>
-    /// Represents a validation with an operator
-    /// </summary>
-    public interface IExcelDataValidationWithOperator
-    {
-        /// <summary>
-        /// Operator type
-        /// </summary>
-        ExcelDataValidationOperator Operator { get; set; }
-    }
+	/// <summary>
+	/// Operator type
+	/// </summary>
+	ExcelDataValidationOperator Operator { get; set; }
 }

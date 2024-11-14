@@ -30,45 +30,37 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 using OfficeOpenXml.FormulaParsing.Utilities;
 
-namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers
-{
-    public class FunctionCompilerFactory
-    {
-        private readonly Dictionary<Type, FunctionCompiler> _specialCompilers = new Dictionary<Type, FunctionCompiler>();
-        private readonly ParsingContext _context;
-        public FunctionCompilerFactory(FunctionRepository repository, ParsingContext context)
-        {
-            Require.That(context).Named("context").IsNotNull();
-            _context = context;
-            _specialCompilers.Add(typeof(If), new IfFunctionCompiler(repository.GetFunction("if"), context));
-            _specialCompilers.Add(typeof(IfError), new IfErrorFunctionCompiler(repository.GetFunction("iferror"), context));
-            _specialCompilers.Add(typeof(IfNa), new IfNaFunctionCompiler(repository.GetFunction("ifna"), context));
-            foreach (var key in repository.CustomCompilers.Keys)
-            {
-              _specialCompilers.Add(key, repository.CustomCompilers[key]);
-            }
-        }
+namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
-        private FunctionCompiler GetCompilerByType(ExcelFunction function)
-        {
-            var funcType = function.GetType();
-            if (_specialCompilers.ContainsKey(funcType))
-            {
-                return _specialCompilers[funcType];
-            }
-            return new DefaultCompiler(function, _context);
-        }
-        public virtual FunctionCompiler Create(ExcelFunction function)
-        {
-            if (function.IsLookupFuction) return new LookupFunctionCompiler(function, _context);
-            if (function.IsErrorHandlingFunction) return new ErrorHandlingFunctionCompiler(function, _context);
-            return GetCompilerByType(function);
-        }
-    }
+public class FunctionCompilerFactory
+{
+	private readonly Dictionary<Type, FunctionCompiler> _specialCompilers = [];
+	private readonly ParsingContext _context;
+	public FunctionCompilerFactory(FunctionRepository repository, ParsingContext context)
+	{
+		Require.That(context).Named("context").IsNotNull();
+		_context = context;
+		_specialCompilers.Add(typeof(If), new IfFunctionCompiler(repository.GetFunction("if"), context));
+		_specialCompilers.Add(typeof(IfError), new IfErrorFunctionCompiler(repository.GetFunction("iferror"), context));
+		_specialCompilers.Add(typeof(IfNa), new IfNaFunctionCompiler(repository.GetFunction("ifna"), context));
+		foreach (var key in repository.CustomCompilers.Keys)
+		{
+			_specialCompilers.Add(key, repository.CustomCompilers[key]);
+		}
+	}
+
+	private FunctionCompiler GetCompilerByType(ExcelFunction function)
+	{
+		var funcType = function.GetType();
+		return _specialCompilers.ContainsKey(funcType) ? _specialCompilers[funcType] : new DefaultCompiler(function, _context);
+	}
+	public virtual FunctionCompiler Create(ExcelFunction function)
+	{
+		if (function.IsLookupFuction) return new LookupFunctionCompiler(function, _context);
+		return function.IsErrorHandlingFunction ? new ErrorHandlingFunctionCompiler(function, _context) : GetCompilerByType(function);
+	}
 }
