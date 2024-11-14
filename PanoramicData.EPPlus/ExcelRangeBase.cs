@@ -2708,7 +2708,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 	#endregion
 	#region "Enumerator"
-	CellsStoreEnumerator<ExcelCoreValue> cellEnum;
+	CellsStoreEnumerator<ExcelCoreValue> _cellEnum;
 	public IEnumerator<ExcelRangeBase> GetEnumerator()
 	{
 		Reset();
@@ -2724,19 +2724,19 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <summary>
 	/// The current range when enumerating
 	/// </summary>
-	public ExcelRangeBase Current => new(_worksheet, ExcelAddressBase.GetAddress(cellEnum.Row, cellEnum.Column));
+	public ExcelRangeBase Current => new(_worksheet, ExcelAddressBase.GetAddress(_cellEnum.Row, _cellEnum.Column));
 
 	/// <summary>
 	/// The current range when enumerating
 	/// </summary>
-	object IEnumerator.Current => ((object)(new ExcelRangeBase(_worksheet, ExcelAddressBase.GetAddress(cellEnum.Row, cellEnum.Column))));
+	object IEnumerator.Current => ((object)(new ExcelRangeBase(_worksheet, ExcelAddressBase.GetAddress(_cellEnum.Row, _cellEnum.Column))));
 
 	//public object FormatedText { get; private set; }
 
 	int _enumAddressIx = -1;
 	public bool MoveNext()
 	{
-		if (cellEnum.Next())
+		if (_cellEnum.Next())
 		{
 			return true;
 		}
@@ -2745,7 +2745,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			_enumAddressIx++;
 			if (_enumAddressIx < _addresses.Count)
 			{
-				cellEnum = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values,
+				_cellEnum = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values,
 					_addresses[_enumAddressIx]._fromRow,
 					_addresses[_enumAddressIx]._fromCol,
 					_addresses[_enumAddressIx]._toRow,
@@ -2764,7 +2764,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	public void Reset()
 	{
 		_enumAddressIx = -1;
-		cellEnum = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, _fromRow, _fromCol, _toRow, _toCol);
+		_cellEnum = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, _fromRow, _fromCol, _toRow, _toCol);
 	}
 	#endregion
 	private struct SortItem<T>

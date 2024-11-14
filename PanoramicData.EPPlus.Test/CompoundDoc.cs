@@ -22,7 +22,7 @@ public class CompoundDoc
 		//
 	}
 
-	private TestContext testContextInstance;
+	private TestContext _testContextInstance;
 
 	/// <summary>
 	///Gets or sets the test context which provides
@@ -32,11 +32,11 @@ public class CompoundDoc
 	{
 		get
 		{
-			return testContextInstance;
+			return _testContextInstance;
 		}
 		set
 		{
-			testContextInstance = value;
+			_testContextInstance = value;
 		}
 	}
 

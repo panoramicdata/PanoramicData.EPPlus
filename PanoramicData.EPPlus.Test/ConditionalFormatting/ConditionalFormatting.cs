@@ -12,7 +12,7 @@ namespace PanoramicData.EPPlus.Test.ConditionalFormatting;
 [TestClass]
 public class ConditionalFormatting
 {
-	private TestContext testContextInstance;
+	private TestContext _testContextInstance;
 	private static ExcelPackage _pck;
 
 	/// <summary>
@@ -23,11 +23,11 @@ public class ConditionalFormatting
 	{
 		get
 		{
-			return testContextInstance;
+			return _testContextInstance;
 		}
 		set
 		{
-			testContextInstance = value;
+			_testContextInstance = value;
 		}
 	}
 
