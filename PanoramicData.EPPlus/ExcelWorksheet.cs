@@ -2553,9 +2553,8 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			foreach (var val in csec)
 			{
 				var column = val._value;
-				if (column is ExcelColumn)
+				if (column is ExcelColumn c)
 				{
-					var c = (ExcelColumn)column;
 					if (c._columnMin >= columnFrom)
 					{
 						c._columnMin -= columns;
@@ -2906,9 +2905,8 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				foreach (ExcelDrawing d in Drawings)
 				{
 					d.AdjustPositionAndSize();
-					if (d is ExcelChart)
+					if (d is ExcelChart c)
 					{
-						var c = (ExcelChart)d;
 						c.ChartXml.Save(c.Part.GetStream(FileMode.Create, FileAccess.Write));
 					}
 				}
@@ -3471,8 +3469,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		//foreach (ExcelColumn col in _columns)
 		while (cse.Next())
 		{
-			var col = cse.Value._value as ExcelColumn;
-			if (col != null && col.PageBreak)
+			if (cse.Value._value is ExcelColumn col && col.PageBreak)
 			{
 				breaks.AppendFormat("<brk id=\"{0}\" max=\"16383\" man=\"1\"/>", cse.Column);
 				count++;
@@ -3493,8 +3490,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		//foreach(ExcelRow row in _rows)            
 		while (cse.Next())
 		{
-			var row = cse.Value._value as RowInternal;
-			if (row != null && row.PageBreak)
+			if (cse.Value._value is RowInternal row && row.PageBreak)
 			{
 				breaks.AppendFormat("<brk id=\"{0}\" max=\"1048575\" man=\"1\"/>", cse.Row);
 				count++;
@@ -3607,9 +3603,8 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 				var v = val._value;
 				var formula = _formulas.GetValue(cse.Row, cse.Column);
-				if (formula is int)
+				if (formula is int sfId)
 				{
-					var sfId = (int)formula;
 					var f = _sharedFormulas[(int)sfId];
 					if (f.Address.IndexOf(':') > 0)
 					{
@@ -3662,8 +3657,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					else if (v != null)
 					{
 						// Fix for issue 15460
-						var enumerableResult = v as System.Collections.IEnumerable;
-						if (enumerableResult != null && !(v is string))
+						if (v is System.Collections.IEnumerable enumerableResult && !(v is string))
 						{
 							var enumerator = enumerableResult.GetEnumerator();
 							if (enumerator.MoveNext() && enumerator.Current != null)
@@ -3891,8 +3885,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		if (prevRow != -1) cache.Append("</row>");
 		//ulong rowID = ExcelRow.GetRowID(SheetID, row);
 		cache.AppendFormat("<row r=\"{0}\"", row);
-		var currRow = GetValueInner(row, 0) as RowInternal;
-		if (currRow != null)
+		if (GetValueInner(row, 0) is RowInternal currRow)
 		{
 
 			// if hidden, add hidden attribute and preserve ht/customHeight (Excel compatible)
@@ -3945,8 +3938,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		if (prevRow != -1) sw.Write("</row>");
 		//ulong rowID = ExcelRow.GetRowID(SheetID, row);
 		sw.Write("<row r=\"{0}\"", row);
-		var currRow = GetValueInner(row, 0) as RowInternal;
-		if (currRow != null)
+		if (GetValueInner(row, 0) is RowInternal currRow)
 		{
 
 			// if hidden, add hidden attribute and preserve ht/customHeight (Excel compatible)

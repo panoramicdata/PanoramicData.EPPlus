@@ -350,8 +350,7 @@ public sealed class ExcelStyles : XmlHelper
 					{
 						s = cse.Value._styleId;
 						if (s == 0) continue;
-						var c = ws.GetValueInner(cse.Row, cse.Column) as ExcelColumn;
-						if (c != null && c.ColumnMax < ExcelPackage.MaxColumns)
+						if (ws.GetValueInner(cse.Row, cse.Column) is ExcelColumn c && c.ColumnMax < ExcelPackage.MaxColumns)
 						{
 							for (var col = c.ColumnMin; col < c.ColumnMax; col++)
 							{

@@ -41,8 +41,7 @@ public class CountA : HiddenValuesHandlingFunction
 	{
 		foreach (var item in items)
 		{
-			var cs = item.Value as ExcelDataProvider.IRangeInfo;
-			if (cs != null)
+			if (item.Value is ExcelDataProvider.IRangeInfo cs)
 			{
 				foreach (var c in cs)
 				{

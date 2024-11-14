@@ -207,10 +207,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		}
 		else
 		{
-			if (value is object[,] && valueMethod == Set_Value)
+			if (value is object[,] v && valueMethod == Set_Value)
 			{
 				// only simple set value is supported for bulk copy
-				_worksheet.SetRangeValueInner(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column, (object[,])value);
+				_worksheet.SetRangeValueInner(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column, v);
 			}
 			else
 			{
@@ -249,7 +249,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	private static void Set_Formula(ExcelRangeBase range, object value, int row, int col)
 	{
 		var f = range._worksheet._formulas.GetValue(row, col);
-		if (f is int && (int)f >= 0) range.SplitFormulas(range._worksheet.Cells[row, col]);
+		if (f is int v && v >= 0) range.SplitFormulas(range._worksheet.Cells[row, col]);
 
 		var formula = (value == null ? string.Empty : value.ToString());
 		if (formula == string.Empty)
@@ -308,20 +308,20 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	}
 	private static void Set_HyperLink(ExcelRangeBase range, object value, int row, int col)
 	{
-		if (value is Uri)
+		if (value is Uri uri)
 		{
-			range._worksheet._hyperLinks.SetValue(row, col, (Uri)value);
+			range._worksheet._hyperLinks.SetValue(row, col, uri);
 
-			if (value is ExcelHyperLink)
+			if (value is ExcelHyperLink link)
 			{
-				range._worksheet.SetValueInner(row, col, ((ExcelHyperLink)value).Display);
+				range._worksheet.SetValueInner(row, col, link.Display);
 			}
 			else
 			{
 				var v = range._worksheet.GetValueInner(row, col);
 				if (v == null || v.ToString() == "")
 				{
-					range._worksheet.SetValueInner(row, col, ((Uri)value).OriginalString);
+					range._worksheet.SetValueInner(row, col, uri.OriginalString);
 				}
 			}
 		}
@@ -971,27 +971,27 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				return GetDateText(date, format, nf);
 			}
 		}
-		else if (v is DateTime)
+		else if (v is DateTime time)
 		{
 			if (nf.DataType == ExcelNumberFormatXml.eFormatType.DateTime)
 			{
-				return GetDateText((DateTime)v, format, nf);
+				return GetDateText(time, format, nf);
 			}
 			else
 			{
-				var d = ((DateTime)v).ToOADate();
+				var d = time.ToOADate();
 				return string.IsNullOrEmpty(nf.FractionFormat) ? d.ToString(format, nf.Culture) : nf.FormatFraction(d);
 			}
 		}
-		else if (v is TimeSpan)
+		else if (v is TimeSpan span)
 		{
 			if (nf.DataType == ExcelNumberFormatXml.eFormatType.DateTime)
 			{
-				return GetDateText(new DateTime(((TimeSpan)v).Ticks), format, nf);
+				return GetDateText(new DateTime(span.Ticks), format, nf);
 			}
 			else
 			{
-				var d = new DateTime(0).Add((TimeSpan)v).ToOADate();
+				var d = new DateTime(0).Add(span).ToOADate();
 				return string.IsNullOrEmpty(nf.FractionFormat) ? d.ToString(format, nf.Culture) : nf.FormatFraction(d);
 			}
 		}
@@ -1471,7 +1471,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			for (var row = address._fromRow; row <= address._toRow; row++)
 			{
 				var f = _worksheet._formulas.GetValue(row, col);
-				if (f is int && (int)f >= 0)
+				if (f is int v && v >= 0)
 				{
 					SplitFormulas(address);
 					return;
@@ -1488,9 +1488,8 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			for (var row = address._fromRow; row <= address._toRow; row++)
 			{
 				var f = _worksheet._formulas.GetValue(row, col);
-				if (f is int)
+				if (f is int id)
 				{
-					var id = (int)f;
 					if (id >= 0 && !formulas.Contains(id))
 					{
 						if (_worksheet._sharedFormulas[id].IsArray &&
@@ -1949,18 +1948,14 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			foreach (var t in Members)
 			{
-				var descriptionAttribute = t.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
 				var header = string.Empty;
-				if (descriptionAttribute != null)
+				if (t.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() is DescriptionAttribute descriptionAttribute)
 				{
 					header = descriptionAttribute.Description;
 				}
 				else
 				{
-					var displayNameAttribute =
-						t.GetCustomAttributes(typeof(DisplayNameAttribute), false).FirstOrDefault() as
-						DisplayNameAttribute;
-					if (displayNameAttribute != null)
+					if (t.GetCustomAttributes(typeof(DisplayNameAttribute), false).FirstOrDefault() is DisplayNameAttribute displayNameAttribute)
 					{
 						header = displayNameAttribute.DisplayName;
 					}
@@ -1997,17 +1992,17 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 						col++;
 						continue; //Check if the property exists if and inherited class is used
 					}
-					else if (t is PropertyInfo)
+					else if (t is PropertyInfo info)
 					{
-						values[row, col++] = ((PropertyInfo)t).GetValue(item, null);
+						values[row, col++] = info.GetValue(item, null);
 					}
-					else if (t is FieldInfo)
+					else if (t is FieldInfo info1)
 					{
-						values[row, col++] = ((FieldInfo)t).GetValue(item);
+						values[row, col++] = info1.GetValue(item);
 					}
-					else if (t is MethodInfo)
+					else if (t is MethodInfo info2)
 					{
-						values[row, col++] = ((MethodInfo)t).Invoke(item, null);
+						values[row, col++] = info2.Invoke(item, null);
 					}
 				}
 			}
@@ -2911,9 +2906,8 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				if (formulas.TryGetValue(addr, out var value2))
 				{
 					_worksheet._formulas.SetValue(row, col, value2);
-					if (formulas[addr] is int)
+					if (formulas[addr] is int sfIx)
 					{
-						var sfIx = (int)formulas[addr];
 						var startAddr = new ExcelAddress(Worksheet._sharedFormulas[sfIx].Address);
 						var f = Worksheet._sharedFormulas[sfIx];
 						if (startAddr._fromRow > row)

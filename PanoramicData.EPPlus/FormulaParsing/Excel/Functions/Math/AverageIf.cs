@@ -65,10 +65,9 @@ public class AverageIf : HiddenValuesHandlingFunction
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
 		ValidateArguments(arguments, 2);
-		var args = arguments.ElementAt(0).Value as ExcelDataProvider.IRangeInfo;
 		var criteria = arguments.ElementAt(1).ValueFirst != null ? ArgToString(arguments, 1) : null;
 		var retVal = 0d;
-		if (args == null)
+		if (arguments.ElementAt(0).Value is not ExcelDataProvider.IRangeInfo args)
 		{
 			var val = arguments.ElementAt(0).Value;
 			if (criteria != null && Evaluate(val, criteria))

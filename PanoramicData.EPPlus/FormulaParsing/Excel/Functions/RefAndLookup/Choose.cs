@@ -41,8 +41,7 @@ public class Choose : ExcelFunction
 			items.Add(arguments.ElementAt(x).ValueFirst);
 		}
 
-		var chooseIndeces = arguments.ElementAt(0).ValueFirst as IEnumerable<FunctionArgument>;
-		if (chooseIndeces != null && chooseIndeces.Count() > 1)
+		if (arguments.ElementAt(0).ValueFirst is IEnumerable<FunctionArgument> chooseIndeces && chooseIndeces.Count() > 1)
 		{
 			IntArgumentParser intParser = new();
 			var values = chooseIndeces.Select(chosenIndex => items[(int)intParser.Parse(chosenIndex.ValueFirst)]).ToArray();

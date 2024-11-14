@@ -63,9 +63,8 @@ public class ValueMatcher
 
 	private static object CheckGetRange(object v)
 	{
-		if (v is ExcelDataProvider.IRangeInfo)
+		if (v is ExcelDataProvider.IRangeInfo r)
 		{
-			var r = ((ExcelDataProvider.IRangeInfo)v);
 			if (r.GetNCells() > 1)
 			{
 				v = ExcelErrorValue.Create(eErrorType.NA);
@@ -73,9 +72,8 @@ public class ValueMatcher
 
 			v = r.GetOffset(0, 0);
 		}
-		else if (v is ExcelDataProvider.INameInfo)
+		else if (v is ExcelDataProvider.INameInfo n)
 		{
-			var n = ((ExcelDataProvider.INameInfo)v);
 			v = CheckGetRange(n);
 		}
 

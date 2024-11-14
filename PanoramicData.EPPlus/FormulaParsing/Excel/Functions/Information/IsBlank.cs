@@ -40,9 +40,8 @@ public class IsBlank : ExcelFunction
 		var result = true;
 		foreach (var arg in arguments)
 		{
-			if (arg.Value is ExcelDataProvider.IRangeInfo)
+			if (arg.Value is ExcelDataProvider.IRangeInfo r)
 			{
-				var r = (ExcelDataProvider.IRangeInfo)arg.Value;
 				if (r.GetValue(r.Address._fromRow, r.Address._fromCol) != null)
 				{
 					result = false;

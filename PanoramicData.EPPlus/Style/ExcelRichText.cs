@@ -85,14 +85,12 @@ public class ExcelRichText : XmlHelper
 	{
 		get
 		{
-			var elem = TopNode.SelectSingleNode(TEXT_PATH, NameSpaceManager) as XmlElement;
-			return elem != null && elem.GetAttribute("xml:space") == "preserve";
+			return TopNode.SelectSingleNode(TEXT_PATH, NameSpaceManager) is XmlElement elem && elem.GetAttribute("xml:space") == "preserve";
 		}
 		set
 		{
 			_collection.ConvertRichtext();
-			var elem = TopNode.SelectSingleNode(TEXT_PATH, NameSpaceManager) as XmlElement;
-			if (elem != null)
+			if (TopNode.SelectSingleNode(TEXT_PATH, NameSpaceManager) is XmlElement elem)
 			{
 				if (value)
 				{

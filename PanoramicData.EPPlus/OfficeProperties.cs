@@ -431,8 +431,7 @@ public sealed class OfficeProperties : XmlHelper
 	public object GetCustomPropertyValue(string propertyName)
 	{
 		var searchString = string.Format("ctp:Properties/ctp:property[@name='{0}']", propertyName);
-		var node = CustomPropertiesXml.SelectSingleNode(searchString, NameSpaceManager) as XmlElement;
-		if (node != null)
+		if (CustomPropertiesXml.SelectSingleNode(searchString, NameSpaceManager) is XmlElement node)
 		{
 			var value = node.LastChild.InnerText;
 			switch (node.LastChild.LocalName)
@@ -475,8 +474,7 @@ public sealed class OfficeProperties : XmlHelper
 		var allProps = CustomPropertiesXml.SelectSingleNode(@"ctp:Properties", NameSpaceManager);
 
 		var prop = string.Format("ctp:Properties/ctp:property[@name='{0}']", propertyName);
-		var node = CustomPropertiesXml.SelectSingleNode(prop, NameSpaceManager) as XmlElement;
-		if (node == null)
+		if (CustomPropertiesXml.SelectSingleNode(prop, NameSpaceManager) is not XmlElement node)
 		{
 			int pid;
 			var MaxNode = CustomPropertiesXml.SelectSingleNode("ctp:Properties/ctp:property[not(@pid <= preceding-sibling::ctp:property/@pid) and not(@pid <= following-sibling::ctp:property/@pid)]", NameSpaceManager);

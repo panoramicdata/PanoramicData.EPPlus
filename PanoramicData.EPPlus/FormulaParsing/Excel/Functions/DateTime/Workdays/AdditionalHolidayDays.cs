@@ -19,8 +19,7 @@ public class AdditionalHolidayDays
 
 	private void Initialize()
 	{
-		var holidays = _holidayArg.Value as IEnumerable<FunctionArgument>;
-		if (holidays != null)
+		if (_holidayArg.Value is IEnumerable<FunctionArgument> holidays)
 		{
 			foreach (var holidayDate in from arg in holidays where ConvertUtil.IsNumeric(arg.Value) select ConvertUtil.GetValueDouble(arg.Value) into dateSerial select System.DateTime.FromOADate(dateSerial))
 			{
@@ -28,8 +27,7 @@ public class AdditionalHolidayDays
 			}
 		}
 
-		var range = _holidayArg.Value as ExcelDataProvider.IRangeInfo;
-		if (range != null)
+		if (_holidayArg.Value is ExcelDataProvider.IRangeInfo range)
 		{
 			foreach (var holidayDate in from cell in range where ConvertUtil.IsNumeric(cell.Value) select ConvertUtil.GetValueDouble(cell.Value) into dateSerial select System.DateTime.FromOADate(dateSerial))
 			{

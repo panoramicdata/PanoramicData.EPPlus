@@ -240,10 +240,10 @@ public sealed class ExcelPicture : ExcelDrawing
 			xml.AppendFormat("<xdr:cNvPr id=\"{0}\" descr=\"\">", _id);
 			if (HypRel != null)
 			{
-				if (Hyperlink is ExcelHyperLink)
+				if (Hyperlink is ExcelHyperLink link)
 				{
 					xml.AppendFormat("<a:hlinkClick xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" r:id=\"{0}\" tooltip=\"{1}\"/>",
-					  HypRel.Id, ((ExcelHyperLink)Hyperlink).ToolTip);
+					  HypRel.Id, link.ToolTip);
 				}
 				else
 				{

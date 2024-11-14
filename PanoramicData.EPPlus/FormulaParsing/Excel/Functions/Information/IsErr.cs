@@ -12,11 +12,9 @@ public class IsErr : ErrorHandlingFunction
 		if ((bool)result.Result)
 		{
 			var arg = GetFirstValue(arguments);
-			if (arg is ExcelDataProvider.IRangeInfo)
+			if (arg is ExcelDataProvider.IRangeInfo r)
 			{
-				var r = (ExcelDataProvider.IRangeInfo)arg;
-				var e = r.GetValue(r.Address._fromRow, r.Address._fromCol) as ExcelErrorValue;
-				if (e != null && e.Type == eErrorType.NA)
+				if (r.GetValue(r.Address._fromRow, r.Address._fromCol) is ExcelErrorValue e && e.Type == eErrorType.NA)
 				{
 					return CreateResult(false, DataType.Boolean);
 				}

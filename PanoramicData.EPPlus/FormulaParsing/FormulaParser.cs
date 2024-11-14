@@ -115,8 +115,7 @@ public class FormulaParser : IDisposable
 		{
 			var compileResult = _compiler.Compile(graph.Expressions);
 			// quick solution for the fact that an excelrange can be returned.
-			var rangeInfo = compileResult.Result as ExcelDataProvider.IRangeInfo;
-			if (rangeInfo == null)
+			if (compileResult.Result is not ExcelDataProvider.IRangeInfo rangeInfo)
 			{
 				return compileResult.Result ?? 0d;
 			}

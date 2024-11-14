@@ -1043,8 +1043,7 @@ internal partial class ZipEntry
 		}
 		finally
 		{
-			var zss = input as ZipSegmentedStream;
-			if (zss != null)
+			if (input is ZipSegmentedStream zss)
 			{
 #if NETCF
                     zss.Close();

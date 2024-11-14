@@ -58,9 +58,8 @@ public class NamedValueExpression : AtomicExpression
 			return null;
 		}
 
-		if (name.Value is ExcelDataProvider.IRangeInfo)
+		if (name.Value is ExcelDataProvider.IRangeInfo range)
 		{
-			var range = (ExcelDataProvider.IRangeInfo)name.Value;
 			if (range.IsMulti)
 			{
 				return new CompileResult(name.Value, DataType.Enumerable);

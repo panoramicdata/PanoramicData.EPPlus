@@ -181,8 +181,7 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		{
 			get
 			{
-				var row = _ws.GetValueInner(_values.Row, 0) as RowInternal;
-				return row != null && (row.Hidden || row.Height == 0);
+				return _ws.GetValueInner(_values.Row, 0) is RowInternal row && (row.Hidden || row.Height == 0);
 			}
 		}
 

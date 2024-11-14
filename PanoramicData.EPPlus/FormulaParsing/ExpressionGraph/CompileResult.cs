@@ -80,8 +80,7 @@ public class CompileResult
 	{
 		get
 		{
-			var r = Result as ExcelDataProvider.IRangeInfo;
-			return r == null ? Result : r.GetValue(r.Address._fromRow, r.Address._fromCol);
+			return Result is not ExcelDataProvider.IRangeInfo r ? Result : r.GetValue(r.Address._fromRow, r.Address._fromCol);
 		}
 	}
 

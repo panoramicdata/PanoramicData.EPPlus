@@ -631,8 +631,7 @@ internal static class ZipOutput
 		// that data into the directory, and finally, write the directory to the
 		// output stream.
 
-		var output = s as CountingStream;
-		var Finish = (output != null) ? output.ComputedPosition : s.Position;  // BytesWritten
+		var Finish = (s is CountingStream output) ? output.ComputedPosition : s.Position;  // BytesWritten
 		var Start = Finish - aLength;
 
 		// need to know which segment the EOCD record starts in

@@ -1076,8 +1076,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				XmlDocument xmlExtRef = new();
 				LoadXmlSafe(xmlExtRef, part.GetStream());
 
-				var book = xmlExtRef.SelectSingleNode("//d:externalBook", NameSpaceManager) as XmlElement;
-				if (book != null)
+				if (xmlExtRef.SelectSingleNode("//d:externalBook", NameSpaceManager) is XmlElement book)
 				{
 					var rId_ExtRef = book.GetAttribute("r:id");
 					var rel_extRef = part.GetRelationship(rId_ExtRef);

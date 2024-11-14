@@ -31,8 +31,7 @@ public class HolidayWeekdays
 													 IEnumerable<FunctionArgument> arguments)
 	{
 		if (arguments.Count() == 2) return resultDate;
-		var holidays = arguments.ElementAt(2).Value as IEnumerable<FunctionArgument>;
-		if (holidays != null)
+		if (arguments.ElementAt(2).Value is IEnumerable<FunctionArgument> holidays)
 		{
 			foreach (var arg in holidays)
 			{
@@ -49,8 +48,7 @@ public class HolidayWeekdays
 		}
 		else
 		{
-			var range = arguments.ElementAt(2).Value as ExcelDataProvider.IRangeInfo;
-			if (range != null)
+			if (arguments.ElementAt(2).Value is ExcelDataProvider.IRangeInfo range)
 			{
 				foreach (var cell in range)
 				{

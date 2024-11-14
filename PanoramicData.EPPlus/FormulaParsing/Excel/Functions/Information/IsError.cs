@@ -40,9 +40,8 @@ public class IsError : ErrorHandlingFunction
 
 		foreach (var argument in arguments)
 		{
-			if (argument.Value is ExcelDataProvider.IRangeInfo)
+			if (argument.Value is ExcelDataProvider.IRangeInfo r)
 			{
-				var r = (ExcelDataProvider.IRangeInfo)argument.Value;
 				if (ExcelErrorValue.Values.IsErrorValue(r.GetValue(r.Address._fromRow, r.Address._fromCol)))
 				{
 					return CreateResult(true, DataType.Boolean);

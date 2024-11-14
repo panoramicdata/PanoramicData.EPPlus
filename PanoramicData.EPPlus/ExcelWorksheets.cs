@@ -534,8 +534,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			var styleID = 0;
 			if (row == 0) //Column
 			{
-				var c = Copy.GetValueInner(row, col) as ExcelColumn;
-				if (c != null)
+				if (Copy.GetValueInner(row, col) is ExcelColumn c)
 				{
 					var clone = c.Clone(added, c.ColumnMin);
 					clone.StyleID = c.StyleID;

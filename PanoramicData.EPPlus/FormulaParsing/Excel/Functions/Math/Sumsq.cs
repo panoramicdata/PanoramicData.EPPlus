@@ -38,8 +38,7 @@ public class Sumsq : HiddenValuesHandlingFunction
 		}
 		else
 		{
-			var cs = arg.Value as ExcelDataProvider.IRangeInfo;
-			if (cs != null)
+			if (arg.Value is ExcelDataProvider.IRangeInfo cs)
 			{
 				foreach (var c in cs)
 				{

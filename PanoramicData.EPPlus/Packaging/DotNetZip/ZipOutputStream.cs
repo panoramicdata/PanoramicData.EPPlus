@@ -1486,8 +1486,7 @@ internal class ZipOutputStream : Stream
 																				 Comment,
 																				 new ZipContainer(this));
 				Stream wrappedStream = null;
-				var cs = _outputStream as CountingStream;
-				if (cs != null)
+				if (_outputStream is CountingStream cs)
 				{
 					wrappedStream = cs.WrappedStream;
 					cs.Dispose();

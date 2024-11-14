@@ -848,13 +848,13 @@ public sealed class ExcelPackage : IDisposable
 
 				_package.Save(_stream);
 				_package.Close();
-				if (Stream is MemoryStream)
+				if (Stream is MemoryStream stream)
 				{
 					var fi = new FileStream(File.FullName, FileMode.Create);
 					//EncryptPackage
 					if (Encryption.IsEncrypted)
 					{
-						var file = ((MemoryStream)Stream).ToArray();
+						var file = stream.ToArray();
 						EncryptedPackageHandler eph = new();
 						var ms = eph.EncryptPackage(file, Encryption);
 
@@ -862,7 +862,7 @@ public sealed class ExcelPackage : IDisposable
 					}
 					else
 					{
-						fi.Write(((MemoryStream)Stream).ToArray(), 0, (int)Stream.Length);
+						fi.Write(stream.ToArray(), 0, (int)Stream.Length);
 					}
 
 					fi.Close();

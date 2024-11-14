@@ -49,8 +49,7 @@ public class Count : HiddenValuesHandlingFunction
 	{
 		foreach (var item in items)
 		{
-			var cs = item.Value as ExcelDataProvider.IRangeInfo;
-			if (cs != null)
+			if (item.Value is ExcelDataProvider.IRangeInfo cs)
 			{
 				foreach (var c in cs)
 				{
@@ -63,8 +62,7 @@ public class Count : HiddenValuesHandlingFunction
 			}
 			else
 			{
-				var value = item.Value as IEnumerable<FunctionArgument>;
-				if (value != null)
+				if (item.Value is IEnumerable<FunctionArgument> value)
 				{
 					Calculate(value, ref nItems, context, ItemContext.InArray);
 				}

@@ -798,7 +798,6 @@ internal partial class ZipEntry
 		// the header, and also we have to compute the offset later, to handle the
 		// case of split archives.
 
-		var counter = s as CountingStream;
 
 		// workitem 8098: ok (output)
 		// This may change later, for split archives
@@ -808,7 +807,7 @@ internal partial class ZipEntry
 		// zip archive (and maybe decrypted, and maybe decompressed) and then
 		// written to another zip archive, with different settings for
 		// compression method, compression level, or encryption algorithm.
-		_future_ROLH = (counter != null)
+		_future_ROLH = (s is CountingStream counter)
 			? counter.ComputedPosition
 			: s.Position;
 
@@ -1790,8 +1789,7 @@ internal partial class ZipEntry
 			 (_Source == ZipEntrySource.ZipOutputStream && s.CanSeek))
 		{
 			// seek back and rewrite the entry header
-			var zss = s as ZipSegmentedStream;
-			if (zss != null && _diskNumber != zss.CurrentSegment)
+			if (s is ZipSegmentedStream zss && _diskNumber != zss.CurrentSegment)
 			{
 				// In this case the entry header is in a different file,
 				// which has already been closed. Need to re-open it.
@@ -2536,8 +2534,7 @@ internal partial class ZipEntry
 		// remember the offset, within the output stream, of this particular entry header.
 		// This may have changed if any of the other entries changed (eg, if a different
 		// entry was removed or added.)
-		var counter = outstream as CountingStream;
-		_RelativeOffsetOfLocalHeader = (counter != null)
+		_RelativeOffsetOfLocalHeader = (outstream is CountingStream counter)
 			? counter.ComputedPosition
 			: outstream.Position;  // BytesWritten
 

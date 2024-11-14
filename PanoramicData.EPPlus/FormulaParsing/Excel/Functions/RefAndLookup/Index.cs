@@ -12,9 +12,8 @@ public class Index : ExcelFunction
 	{
 		ValidateArguments(arguments, 2);
 		var arg1 = arguments.ElementAt(0);
-		var args = arg1.Value as IEnumerable<FunctionArgument>;
 		var crf = new CompileResultFactory();
-		if (args != null)
+		if (arg1.Value is IEnumerable<FunctionArgument> args)
 		{
 			var index = ArgToInt(arguments, 1);
 			if (index > args.Count())

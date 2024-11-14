@@ -48,8 +48,7 @@ public class LookupArguments
 		_argumentParsers = argumentParsers;
 		SearchedValue = arguments.ElementAt(0).Value;
 		var arg1 = arguments.ElementAt(1).Value;
-		var dataArray = arg1 as IEnumerable<FunctionArgument>;
-		if (dataArray != null)
+		if (arg1 is IEnumerable<FunctionArgument> dataArray)
 		{
 			DataArray = dataArray;
 			ArgumentDataType = LookupArgumentDataType.DataArray;
@@ -57,8 +56,7 @@ public class LookupArguments
 		else
 		{
 			//if (arg1 is ExcelDataProvider.INameInfo) arg1 = ((ExcelDataProvider.INameInfo) arg1).Value;
-			var rangeInfo = arg1 as ExcelDataProvider.IRangeInfo;
-			if (rangeInfo != null)
+			if (arg1 is ExcelDataProvider.IRangeInfo rangeInfo)
 			{
 				RangeAddress = string.IsNullOrEmpty(rangeInfo.Address.WorkSheet) ? rangeInfo.Address.Address : "'" + rangeInfo.Address.WorkSheet + "'!" + rangeInfo.Address.Address;
 				RangeInfo = rangeInfo;

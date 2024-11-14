@@ -444,8 +444,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	private decimal GetColumnWidth(int col)
 	{
 		var ws = _drawings.Worksheet;
-		var column = ws.GetValueInner(0, col) as ExcelColumn;
-		return column == null ? (decimal)ws.DefaultColWidth : (decimal)ws.Column(col).VisualWidth;
+		return ws.GetValueInner(0, col) is not ExcelColumn column ? (decimal)ws.DefaultColWidth : (decimal)ws.Column(col).VisualWidth;
 	}
 	private double GetRowHeight(int row)
 	{

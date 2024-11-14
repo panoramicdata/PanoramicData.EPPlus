@@ -514,8 +514,8 @@ internal class EncryptedPackageHandler
 		var encryptedData = new byte[data.Length - 8];
 		Array.Copy(data, 8, encryptedData, 0, encryptedData.Length);
 
-		return encryptionInfo is EncryptionInfoBinary
-			? DecryptBinary((EncryptionInfoBinary)encryptionInfo, password, size, encryptedData)
+		return encryptionInfo is EncryptionInfoBinary binary
+			? DecryptBinary(binary, password, size, encryptedData)
 			: DecryptAgile((EncryptionInfoAgile)encryptionInfo, password, size, encryptedData, data);
 	}
 

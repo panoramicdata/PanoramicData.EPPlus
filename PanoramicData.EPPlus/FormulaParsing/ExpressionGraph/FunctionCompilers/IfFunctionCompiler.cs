@@ -68,9 +68,8 @@ public class IfFunctionCompiler : FunctionCompiler
 			v = ((ExcelDataProvider.INameInfo)v).Value;
 		}
 
-		if (v is ExcelDataProvider.IRangeInfo)
+		if (v is ExcelDataProvider.IRangeInfo r)
 		{
-			var r = ((ExcelDataProvider.IRangeInfo)v);
 			if (r.GetNCells() > 1)
 			{
 				throw (new ArgumentException("Logical can't be more than one cell"));

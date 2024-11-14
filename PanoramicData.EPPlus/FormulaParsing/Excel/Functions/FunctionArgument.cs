@@ -71,8 +71,7 @@ public class FunctionArgument
 				Value = ((ExcelDataProvider.INameInfo)Value).Value;
 			}
 
-			var v = Value as ExcelDataProvider.IRangeInfo;
-			return v == null ? Value : v.GetValue(v.Address._fromRow, v.Address._fromCol);
+			return Value is not ExcelDataProvider.IRangeInfo v ? Value : v.GetValue(v.Address._fromRow, v.Address._fromCol);
 		}
 	}
 
