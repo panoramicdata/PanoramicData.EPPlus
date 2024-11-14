@@ -1,25 +1,19 @@
-﻿using System;
-using System.Data;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
+using System;
+using System.Data;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SampleWebApp.Core.Controllers;
 
-public class HomeController : Controller
+public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 {
 	private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-	private readonly IHostingEnvironment _hostingEnvironment;
-
-	public HomeController(IHostingEnvironment hostingEnvironment)
-	{
-		_hostingEnvironment = hostingEnvironment;
-	}
 
 	/// <summary>
 	/// /Home/FileReport
@@ -31,7 +25,7 @@ public class HomeController : Controller
 
 		using (var package = createExcelPackage())
 		{
-			package.SaveAs(new FileInfo(Path.Combine(_hostingEnvironment.WebRootPath, reportsFolder, fileDownloadName)));
+			package.SaveAs(new FileInfo(Path.Combine(hostingEnvironment.WebRootPath, reportsFolder, fileDownloadName)));
 		}
 
 		return File($"~/{reportsFolder}/{fileDownloadName}", XlsxContentType, fileDownloadName);
@@ -60,7 +54,7 @@ public class HomeController : Controller
 	{
 		var fileDownloadName = "report.xlsx";
 		var reportsFolder = "reports";
-		var fileInfo = new FileInfo(Path.Combine(_hostingEnvironment.WebRootPath, reportsFolder, fileDownloadName));
+		var fileInfo = new FileInfo(Path.Combine(hostingEnvironment.WebRootPath, reportsFolder, fileDownloadName));
 		if (!fileInfo.Exists)
 		{
 			using var package = createExcelPackage();
@@ -198,7 +192,7 @@ public class HomeController : Controller
 		worksheet.Cells[1, 1, 4, 4].AutoFitColumns();
 
 		worksheet.HeaderFooter.OddFooter.InsertPicture(
-			new FileInfo(Path.Combine(_hostingEnvironment.WebRootPath, "images", "captcha.jpg")),
+			new FileInfo(Path.Combine(hostingEnvironment.WebRootPath, "images", "captcha.jpg")),
 			PictureAlignment.Right);
 
 		return package;
