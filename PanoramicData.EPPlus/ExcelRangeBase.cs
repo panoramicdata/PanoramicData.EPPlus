@@ -80,7 +80,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		internal int? StyleID { get; set; }
 		internal Uri HyperLink { get; set; }
 		internal ExcelComment Comment { get; set; }
-		internal Byte Flag { get; set; }
+		internal byte Flag { get; set; }
 	}
 	#region Constructors
 	internal ExcelRangeBase(ExcelWorksheet xlWorksheet)
