@@ -472,7 +472,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		set
 		{
 			if (value == _name) return;
-			value = _package.Workbook.Worksheets.ValidateFixSheetName(value);
+			value = ExcelWorksheets.ValidateFixSheetName(value);
 			foreach (var ws in Workbook.Worksheets)
 			{
 				if (ws.PositionID != PositionID && ws.Name.Equals(value, StringComparison.OrdinalIgnoreCase))

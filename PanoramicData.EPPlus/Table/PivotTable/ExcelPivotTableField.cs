@@ -731,7 +731,7 @@ public class ExcelPivotTableField : XmlHelper
 		return group;
 	}
 
-	private int AddNumericGroupItems(ExcelPivotTableFieldNumericGroup group, double start, double end, double interval)
+	private static int AddNumericGroupItems(ExcelPivotTableFieldNumericGroup group, double start, double end, double interval)
 	{
 		if (interval < 0)
 		{
@@ -871,7 +871,7 @@ public class ExcelPivotTableField : XmlHelper
 		return items;
 	}
 
-	private void AddTimeSerie(int count, XmlElement groupItems)
+	private static void AddTimeSerie(int count, XmlElement groupItems)
 	{
 		for (var i = 0; i < count; i++)
 		{

@@ -53,9 +53,9 @@ public abstract class TimeBaseFunction : ExcelFunction
 
 	protected static double SecondsInADay => 24 * 60 * 60;
 
-	protected double GetTimeSerialNumber(double seconds) => seconds / SecondsInADay;
+	protected static double GetTimeSerialNumber(double seconds) => seconds / SecondsInADay;
 
-	protected double GetSeconds(double serialNumber) => serialNumber * SecondsInADay;
+	protected static double GetSeconds(double serialNumber) => serialNumber * SecondsInADay;
 
 	protected double GetHour(double serialNumber)
 	{

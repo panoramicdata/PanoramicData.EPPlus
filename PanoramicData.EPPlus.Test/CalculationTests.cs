@@ -286,7 +286,7 @@ public class CalculationTests
 
 
 
-	public void TestAllWorkbooks()
+	public static void TestAllWorkbooks()
 	{
 		StringBuilder sb = new();
 		//Add sheets to test in this directory or change it to your testpath.

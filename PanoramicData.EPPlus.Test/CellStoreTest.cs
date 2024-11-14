@@ -141,7 +141,7 @@ public class CellStoreTest : TestBase
 			ws.SetValue(i + 2, 1, i + 2);
 		}
 	}
-	private void LoadData(ExcelWorksheet ws) => LoadData(ws, 1000);
+	private static void LoadData(ExcelWorksheet ws) => LoadData(ws, 1000);
 	private static void LoadData(ExcelWorksheet ws, int rows, int cols = 1, bool isNumeric = false)
 	{
 		for (var r = 0; r < rows; r++)

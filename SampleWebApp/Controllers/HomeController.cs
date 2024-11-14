@@ -107,7 +107,7 @@ public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 		return File(package.GetAsByteArray(), XlsxContentType, "report.xlsx");
 	}
 
-	private string readExcelPackage(FileInfo fileInfo, string worksheetName)
+	private static string readExcelPackage(FileInfo fileInfo, string worksheetName)
 	{
 		using var package = new ExcelPackage(fileInfo);
 		return readExcelPackageToString(package, package.Workbook.Worksheets[worksheetName]);

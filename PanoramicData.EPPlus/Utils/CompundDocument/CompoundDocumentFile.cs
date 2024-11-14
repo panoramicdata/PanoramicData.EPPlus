@@ -494,7 +494,7 @@ internal class CompoundDocumentFile : IDisposable
 		}
 	}
 
-	private int SetSiblings(int listAdd, List<CompoundDocumentItem> children, int fromPos, int toPos, int currSibl)
+	private static int SetSiblings(int listAdd, List<CompoundDocumentItem> children, int fromPos, int toPos, int currSibl)
 	{
 		int pos, div;
 		pos = GetPos(fromPos, toPos);
@@ -931,7 +931,7 @@ internal class CompoundDocumentFile : IDisposable
 		}
 	}
 
-	private int WriteStream(BinaryWriter bw, List<int> fat, byte[] stream, int FATSectorSize)
+	private static int WriteStream(BinaryWriter bw, List<int> fat, byte[] stream, int FATSectorSize)
 	{
 		var rest = FATSectorSize - (stream.Length % FATSectorSize);
 		bw.Write(stream);

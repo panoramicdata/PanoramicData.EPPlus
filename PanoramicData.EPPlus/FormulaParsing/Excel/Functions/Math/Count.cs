@@ -94,7 +94,7 @@ public class Count : HiddenValuesHandlingFunction
 		//}
 	}
 
-	private bool ShouldCount(object value, ItemContext context) => context switch
+	private static bool ShouldCount(object value, ItemContext context) => context switch
 	{
 		ItemContext.SingleArg => IsNumeric(value) || IsNumericString(value),
 		ItemContext.InRange => IsNumeric(value),

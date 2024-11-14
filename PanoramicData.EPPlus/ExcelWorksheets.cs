@@ -793,7 +793,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		} while (_pck.Package.PartExists(uriWorksheet));
 	}
 
-	internal string ValidateFixSheetName(string Name)
+	internal static string ValidateFixSheetName(string Name)
 	{
 		//remove invalid characters
 		if (ValidateName(Name))

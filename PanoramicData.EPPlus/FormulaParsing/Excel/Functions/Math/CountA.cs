@@ -68,7 +68,7 @@ public class CountA : HiddenValuesHandlingFunction
 		}
 	}
 
-	private void _CheckForAndHandleExcelError(FunctionArgument arg, ParsingContext context)
+	private static void _CheckForAndHandleExcelError(FunctionArgument arg, ParsingContext context)
 	{
 		if (context.Scopes.Current.IsSubtotal)
 		{
@@ -76,7 +76,7 @@ public class CountA : HiddenValuesHandlingFunction
 		}
 	}
 
-	private void _CheckForAndHandleExcelError(ExcelDataProvider.ICellInfo cell, ParsingContext context)
+	private static void _CheckForAndHandleExcelError(ExcelDataProvider.ICellInfo cell, ParsingContext context)
 	{
 		if (context.Scopes.Current.IsSubtotal)
 		{

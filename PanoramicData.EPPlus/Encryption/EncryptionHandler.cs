@@ -301,7 +301,7 @@ internal class EncryptedPackageHandler
 		return ret;
 	}
 	#region "Dataspaces Stream methods"
-	private void CreateDataSpaces(CompoundDocument doc)
+	private static void CreateDataSpaces(CompoundDocument doc)
 	{
 		var ds = new CompoundDocument.StoragePart();
 		doc.Storage.SubStorage.Add("\x06" + "DataSpaces", ds);
@@ -720,7 +720,7 @@ internal class EncryptedPackageHandler
 		return true;
 	}
 
-	private byte[] DecryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyData encr, byte[] key, byte[] encryptedData, long size, byte[] iv)
+	private static byte[] DecryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyData encr, byte[] key, byte[] encryptedData, long size, byte[] iv)
 	{
 		var decryptKey = GetEncryptionAlgorithm(encr);
 		decryptKey.BlockSize = encr.BlockSize << 3;
@@ -756,7 +756,7 @@ internal class EncryptedPackageHandler
 		_ => throw (new NotSupportedException(string.Format("Unsupported Cipher Algorithm: {0}", encr.CipherAlgorithm.ToString()))),
 	};
 
-	private void EncryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyEncryptor encr, byte[] key, byte[] data, long pos, long size, byte[] iv, MemoryStream ms)
+	private static void EncryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyEncryptor encr, byte[] key, byte[] data, long pos, long size, byte[] iv, MemoryStream ms)
 	{
 		var encryptKey = GetEncryptionAlgorithm(encr);
 		encryptKey.BlockSize = encr.BlockSize << 3;
@@ -886,7 +886,7 @@ internal class EncryptedPackageHandler
 		var hashFinal = hashProvider.ComputeHash(tempHash);
 		return hashFinal;
 	}
-	private byte[] GetPasswordHash(HashAlgorithm hashProvider, byte[] salt, string password, int spinCount, int hashSize)
+	private static byte[] GetPasswordHash(HashAlgorithm hashProvider, byte[] salt, string password, int spinCount, int hashSize)
 	{
 		byte[] hash = null;
 		var tempHash = new byte[4 + hashSize];    //Iterator + prev. hash

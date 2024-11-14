@@ -84,7 +84,7 @@ public class Average : HiddenValuesHandlingFunction
 		CheckForAndHandleExcelError(arg);
 	}
 
-	private double? GetNumericValue(object obj, bool isInArray)
+	private static double? GetNumericValue(object obj, bool isInArray)
 	{
 		if (IsNumeric(obj) && !(obj is bool))
 		{

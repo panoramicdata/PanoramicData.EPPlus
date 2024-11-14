@@ -83,7 +83,7 @@ public class ConvertUtilTest
 	}
 	// This is just illustration of the bug in old implementation
 	//[TestMethod]
-	public void TextToIntInOldImplementation()
+	public static void TextToIntInOldImplementation()
 	{
 		var result = GetTypedValue<int>("204");
 

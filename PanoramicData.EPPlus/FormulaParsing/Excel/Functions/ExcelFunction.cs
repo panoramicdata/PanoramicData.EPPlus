@@ -104,7 +104,7 @@ public abstract class ExcelFunction
 	/// <param name="arguments"></param>
 	/// <param name="minLength"></param>
 	/// <param name="errorTypeToThrow">The <see cref="eErrorType"/> of the <see cref="ExcelErrorValueException"/> that will be thrown if <paramref name="minLength"/> is not met.</param>
-	protected void ValidateArguments(IEnumerable<FunctionArgument> arguments, int minLength,
+	protected static void ValidateArguments(IEnumerable<FunctionArgument> arguments, int minLength,
 									 eErrorType errorTypeToThrow)
 	{
 		Require.That(arguments).Named("arguments").IsNotNull();
@@ -161,7 +161,7 @@ public abstract class ExcelFunction
 				return true;
 			}, "Expecting at least {0} arguments", minLength.ToString());
 	}
-	protected string ArgToAddress(IEnumerable<FunctionArgument> arguments, int index) => arguments.ElementAt(index).IsExcelRange ? arguments.ElementAt(index).ValueAsRangeInfo.Address.FullAddress : ArgToString(arguments, index);
+	protected static string ArgToAddress(IEnumerable<FunctionArgument> arguments, int index) => arguments.ElementAt(index).IsExcelRange ? arguments.ElementAt(index).ValueAsRangeInfo.Address.FullAddress : ArgToString(arguments, index);
 
 	protected string ArgToAddress(IEnumerable<FunctionArgument> arguments, int index, ParsingContext context)
 	{
@@ -252,7 +252,7 @@ public abstract class ExcelFunction
 	/// <param name="condition"></param>
 	/// <param name="message"></param>
 	/// <param name="formats">Formats to the message string.</param>
-	protected void ThrowArgumentExceptionIf(Func<bool> condition, string message, params object[] formats)
+	protected static void ThrowArgumentExceptionIf(Func<bool> condition, string message, params object[] formats)
 	{
 		message = string.Format(message, formats);
 		ThrowArgumentExceptionIf(condition, message);

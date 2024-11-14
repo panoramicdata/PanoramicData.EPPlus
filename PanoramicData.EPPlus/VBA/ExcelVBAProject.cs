@@ -313,7 +313,7 @@ public class ExcelVbaProject
 	/// </summary>
 	/// <param name="value">Byte hex string</param>
 	/// <returns>The decrypted value</returns>
-	private byte[] Decrypt(string value)
+	private static byte[] Decrypt(string value)
 	{
 		var enc = GetByte(value);
 		var dec = new byte[(value.Length - 1)];

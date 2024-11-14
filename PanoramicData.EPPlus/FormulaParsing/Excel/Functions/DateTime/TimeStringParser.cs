@@ -70,7 +70,7 @@ public class TimeStringParser
 		return System.DateTime.TryParse(input, out var dateTime) ? GetSerialNumber(dateTime.Hour, dateTime.Minute, dateTime.Second) : -1;
 	}
 
-	private double Parse12HourTimeString(string input)
+	private static double Parse12HourTimeString(string input)
 	{
 		var dayPart = string.Empty;
 		dayPart = input.Substring(input.Length - 2, 2);
@@ -80,7 +80,7 @@ public class TimeStringParser
 		return GetSerialNumber(hour, minute, second);
 	}
 
-	private double Parse24HourTimeString(string input)
+	private static double Parse24HourTimeString(string input)
 	{
 		GetValuesFromString(input, out var hour, out var minute, out var second);
 		ValidateValues(hour, minute, second);

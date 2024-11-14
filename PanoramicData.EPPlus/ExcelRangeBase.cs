@@ -2167,7 +2167,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		return _worksheet.Cells[_fromRow, _fromCol, _fromRow + row - 1, _fromCol + maxCol];
 	}
 
-	private string[] GetLines(string text, ExcelTextFormat Format)
+	private static string[] GetLines(string text, ExcelTextFormat Format)
 	{
 		if (Format.EOL == null || Format.EOL.Length == 0) return [text];
 		var eol = Format.EOL;

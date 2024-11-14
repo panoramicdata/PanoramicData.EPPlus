@@ -295,7 +295,7 @@ internal class CRC32
 		return sum;
 	}
 
-	private void gf2_matrix_square(uint[] square, uint[] mat)
+	private static void gf2_matrix_square(uint[] square, uint[] mat)
 	{
 		for (var i = 0; i < 32; i++)
 			square[i] = gf2_matrix_times(mat, mat[i]);

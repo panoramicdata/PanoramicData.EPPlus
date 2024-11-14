@@ -93,7 +93,7 @@ public class SumProduct : ExcelFunction
 		return CreateResult(result, DataType.Decimal);
 	}
 
-	private void AddValue(object convertVal, List<double> currentResult)
+	private static void AddValue(object convertVal, List<double> currentResult)
 	{
 		if (IsNumeric(convertVal))
 		{

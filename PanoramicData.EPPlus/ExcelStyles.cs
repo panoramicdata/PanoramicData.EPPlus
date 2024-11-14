@@ -915,7 +915,7 @@ public sealed class ExcelStyles : XmlHelper
 		}
 	}
 	#region XmlHelpFunctions
-	private int GetXmlNodeInt(XmlNode node) => int.TryParse(GetXmlNode(node), out var i) ? i : 0;
+	private static int GetXmlNodeInt(XmlNode node) => int.TryParse(GetXmlNode(node), out var i) ? i : 0;
 	private static string GetXmlNode(XmlNode node)
 	{
 		if (node == null)
