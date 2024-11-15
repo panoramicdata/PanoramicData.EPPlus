@@ -729,9 +729,11 @@ public abstract class XmlHelper
 	}
 	internal static void LoadXmlSafe(XmlDocument xmlDoc, Stream stream)
 	{
-		XmlReaderSettings settings = new();
-		// Disable entity parsing (to avoid XML bombs, External Entity Attacks etc.).
-		settings.DtdProcessing = DtdProcessing.Prohibit;
+		XmlReaderSettings settings = new()
+		{
+			// Disable entity parsing (to avoid XML bombs, External Entity Attacks etc.).
+			DtdProcessing = DtdProcessing.Prohibit
+		};
 		var reader = XmlReader.Create(stream, settings);
 		xmlDoc.Load(reader);
 	}

@@ -431,11 +431,13 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 
 			_mac = new HMACSHA1(_params.MacIv);
 
-			_aesCipher = new RijndaelManaged();
-			_aesCipher.BlockSize = 128;
-			_aesCipher.KeySize = keySizeInBits;  // 128, 192, 256
-			_aesCipher.Mode = CipherMode.ECB;
-			_aesCipher.Padding = PaddingMode.None;
+			_aesCipher = new RijndaelManaged
+			{
+				BlockSize = 128,
+				KeySize = keySizeInBits,  // 128, 192, 256
+				Mode = CipherMode.ECB,
+				Padding = PaddingMode.None
+			};
 
 			var iv = new byte[BLOCK_SIZE_IN_BYTES]; // all zeroes
 
