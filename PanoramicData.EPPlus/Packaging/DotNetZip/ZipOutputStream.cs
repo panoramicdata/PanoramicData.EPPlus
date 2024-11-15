@@ -1371,7 +1371,7 @@ internal class ZipOutputStream : Stream
 		_currentEntry.AlternateEncoding = AlternateEncoding;
 		_currentEntry.AlternateEncodingUsage = AlternateEncodingUsage;
 
-		if (entryName.EndsWith("/")) _currentEntry.MarkAsDirectory();
+		if (entryName.EndsWith('/')) _currentEntry.MarkAsDirectory();
 
 		_currentEntry.EmitTimesInWindowsFormatWhenSaving = (_timestamp & ZipEntryTimestamp.Windows) != 0;
 		_currentEntry.EmitTimesInUnixFormatWhenSaving = (_timestamp & ZipEntryTimestamp.Unix) != 0;

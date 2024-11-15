@@ -2367,7 +2367,7 @@ internal partial class ZipEntry
 		WriteHeader(outstream, 0);
 		StoreRelativeOffset();
 
-		if (!FileName.EndsWith("/"))
+		if (!FileName.EndsWith('/'))
 		{
 			// Not a directory; there is file data.
 			// Seek to the beginning of the entry data in the input stream.

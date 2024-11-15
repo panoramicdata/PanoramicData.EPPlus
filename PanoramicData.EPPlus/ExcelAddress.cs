@@ -320,7 +320,7 @@ public class ExcelAddressBase : ExcelCellBase
 		int pos;
 		if (address[0] == '[')
 		{
-			pos = address.IndexOf("]");
+			pos = address.IndexOf(']');
 			_wb = address[1..pos];
 			_ws = address[(pos + 1)..];
 		}
@@ -330,13 +330,13 @@ public class ExcelAddressBase : ExcelCellBase
 			_ws = address;
 		}
 
-		if (_ws.StartsWith("'"))
+		if (_ws.StartsWith('\''))
 		{
-			pos = _ws.IndexOf("'", 1);
+			pos = _ws.IndexOf('\'', 1);
 			while (pos > 0 && pos + 1 < _ws.Length && _ws[pos + 1] == '\'')
 			{
 				_ws = _ws[..pos] + _ws[(pos + 1)..];
-				pos = _ws.IndexOf("'", pos + 1);
+				pos = _ws.IndexOf('\'', pos + 1);
 			}
 
 			if (pos > 0)
@@ -347,7 +347,7 @@ public class ExcelAddressBase : ExcelCellBase
 			}
 		}
 
-		pos = _ws.IndexOf("!");
+		pos = _ws.IndexOf('!');
 
 		if (pos == 0)
 		{
@@ -616,7 +616,7 @@ public class ExcelAddressBase : ExcelCellBase
 			Table.Name = first;
 			foreach (var s in bracketParts)
 			{
-				if (s.IndexOf("[") < 0)
+				if (s.IndexOf('[') < 0)
 				{
 					switch (s.ToLower(CultureInfo.InvariantCulture))
 					{
@@ -884,7 +884,7 @@ public class ExcelAddressBase : ExcelCellBase
 
 	private static bool IsR1C1(string address)
 	{
-		if (address.StartsWith("!"))
+		if (address.StartsWith('!'))
 		{
 			address = address[1..];
 		}
@@ -998,8 +998,8 @@ public class ExcelAddressBase : ExcelCellBase
 				{
 					if (text.Length > 0 && text[0] == '[')
 					{
-						wb = text[1..text.IndexOf("]")];
-						ws = text[(text.IndexOf("]") + 1)..];
+						wb = text[1..text.IndexOf(']')];
+						ws = text[(text.IndexOf(']') + 1)..];
 					}
 					else
 					{
@@ -1170,16 +1170,16 @@ public class ExcelAddressBase : ExcelCellBase
 			strIx = address.IndexOf("''");
 		}
 
-		endIx = address.IndexOf("'");
+		endIx = address.IndexOf('\'');
 		return address[ix..endIx].Replace("''", "'");
 	}
 
 	internal bool IsValidRowCol() => !(_fromRow > _toRow ||
-			   _fromCol > _toCol ||
-			   _fromRow < 1 ||
-			   _fromCol < 1 ||
-			   _toRow > ExcelPackage.MaxRows ||
-			   _toCol > ExcelPackage.MaxColumns);
+		_fromCol > _toCol ||
+		_fromRow < 1 ||
+		_fromCol < 1 ||
+		_toRow > ExcelPackage.MaxRows ||
+		_toCol > ExcelPackage.MaxColumns);
 }
 /// <summary>
 /// Range address with the address property readonly
@@ -1274,7 +1274,7 @@ public class ExcelFormulaAddress : ExcelAddressBase
 
 	private void SetFixed()
 	{
-		if (Address.IndexOf("[") >= 0) return;
+		if (Address.IndexOf('[') >= 0) return;
 		var address = FirstAddress;
 		if (_fromRow == _toRow && _fromCol == _toCol)
 		{

@@ -96,7 +96,7 @@ internal static class SharedUtilities
 		pathName = pathName.Replace('\\', '/');
 
 		// trim all leading slashes
-		while (pathName.StartsWith("/")) pathName = pathName[1..];
+		while (pathName.StartsWith('/')) pathName = pathName[1..];
 
 		return SimplifyFwdSlashPath(pathName);
 	}

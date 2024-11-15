@@ -149,7 +149,7 @@ internal partial class ZipEntry
 		ze._FileNameInArchive = ze.AlternateEncoding.GetString(block, 0, block.Length);
 
 		// workitem 6898
-		if (ze._FileNameInArchive.EndsWith("/")) ze.MarkAsDirectory();
+		if (ze._FileNameInArchive.EndsWith('/')) ze.MarkAsDirectory();
 
 		bytesRead += ze.ProcessExtraField(ze.ArchiveStream, extraFieldLength);
 
@@ -157,7 +157,7 @@ internal partial class ZipEntry
 
 		// workitem 6607 - don't read for directories
 		// actually get the compressed size and CRC if necessary
-		if (!ze._FileNameInArchive.EndsWith("/") && (ze._BitField & 0x0008) == 0x0008)
+		if (!ze._FileNameInArchive.EndsWith('/') && (ze._BitField & 0x0008) == 0x0008)
 		{
 			// This descriptor exists only if bit 3 of the general
 			// purpose bit flag is set (see below).  It is byte aligned

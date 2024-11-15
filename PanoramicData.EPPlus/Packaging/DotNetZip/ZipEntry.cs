@@ -2331,7 +2331,7 @@ internal partial class ZipEntry
 	{
 		_IsDirectory = true;
 		// workitem 6279
-		if (!_FileNameInArchive.EndsWith("/"))
+		if (!_FileNameInArchive.EndsWith('/'))
 			_FileNameInArchive += "/";
 	}
 

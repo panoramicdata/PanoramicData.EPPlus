@@ -945,7 +945,7 @@ internal partial class FileSelector
 		s = NormalizeCriteriaExpression(s);
 
 		// no spaces in the criteria is shorthand for filename glob
-		if (s.IndexOf(" ") == -1)
+		if (s.IndexOf(' ') == -1)
 			s = "name = " + s;
 
 		// split the expression into tokens
@@ -1099,7 +1099,7 @@ internal partial class FileSelector
 
 						// handle single-quoted filespecs (used to include
 						// spaces in filename patterns)
-						if (m.StartsWith("'") && m.EndsWith("'"))
+						if (m.StartsWith('\'') && m.EndsWith('\''))
 						{
 							// trim off leading and trailing single quotes and
 							// revert the control characters to spaces.

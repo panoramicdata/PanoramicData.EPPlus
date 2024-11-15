@@ -1279,7 +1279,7 @@ internal partial class ZipEntry
 			if (f.IndexOf(':') == 1)
 				f = f[2..];
 
-			if (f.StartsWith("/"))
+			if (f.StartsWith('/'))
 				f = f[1..];
 
 			// String.Contains is not available on .NET CF 2.0
@@ -1294,7 +1294,7 @@ internal partial class ZipEntry
 			outFileName = outFileName.Replace("/", "\\");
 
 			// check if it is a directory
-			if ((IsDirectory) || (FileName.EndsWith("/")))
+			if ((IsDirectory) || (FileName.EndsWith('/')))
 			{
 				if (!Directory.Exists(outFileName))
 				{
@@ -1317,7 +1317,7 @@ internal partial class ZipEntry
 		if (outstream != null)
 		{
 			outFileName = null;
-			if ((IsDirectory) || (FileName.EndsWith("/")))
+			if ((IsDirectory) || (FileName.EndsWith('/')))
 			{
 				// extract a directory to streamwriter?  nothing to do!
 				return true;  // true == all done!  caller can return

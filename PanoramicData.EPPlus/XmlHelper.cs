@@ -95,7 +95,7 @@ public abstract class XmlHelper
 	{
 		var node = TopNode;
 		XmlNode prependNode = null;
-		if (path.StartsWith("/")) path = path[1..];
+		if (path.StartsWith('/')) path = path[1..];
 		var subPaths = path.Split('/');
 		for (var i = 0; i < subPaths.Length; i++)
 		{
@@ -129,7 +129,7 @@ public abstract class XmlHelper
 					nodeName = nameSplit[0];
 				}
 
-				if (subPath.StartsWith("@"))
+				if (subPath.StartsWith('@'))
 				{
 					var addedAtt = node.OwnerDocument.CreateAttribute(subPath[1..], nameSpaceURI);  //nameSpaceURI
 					node.Attributes.Append(addedAtt);
@@ -505,7 +505,7 @@ public abstract class XmlHelper
 	}
 	private int GetNodePos(string nodeName)
 	{
-		var ix = nodeName.IndexOf(":");
+		var ix = nodeName.IndexOf(':');
 		if (ix > 0)
 		{
 			nodeName = nodeName[(ix + 1)..];

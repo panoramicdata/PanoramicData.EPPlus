@@ -811,7 +811,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			throw new ArgumentException("The worksheet can not have an empty name");
 		}
 
-		if (Name.StartsWith("'") || Name.EndsWith("'"))
+		if (Name.StartsWith('\'') || Name.EndsWith('\''))
 		{
 			throw new ArgumentException("The worksheet name can not start or end with an apostrophe.");
 		}

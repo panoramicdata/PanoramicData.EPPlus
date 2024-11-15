@@ -113,8 +113,7 @@ partial class ZipEntry
 	// workitem 10330
 	private class CopyHelper
 	{
-		private static readonly System.Text.RegularExpressions.Regex re =
-			new(" \\(copy (\\d+)\\)$");
+		private static readonly System.Text.RegularExpressions.Regex re = new(" \\(copy (\\d+)\\)$");
 
 		private static int callCount = 0;
 
@@ -125,7 +124,7 @@ partial class ZipEntry
 				throw new OverflowException("overflow while creating filename");
 
 			var n = 1;
-			var r = f.LastIndexOf(".");
+			var r = f.LastIndexOf('.');
 
 			if (r == -1)
 			{
@@ -133,13 +132,13 @@ partial class ZipEntry
 				var m = re.Match(f);
 				if (m.Success)
 				{
-					n = Int32.Parse(m.Groups[1].Value) + 1;
-					var copy = String.Format(" (copy {0})", n);
+					n = int.Parse(m.Groups[1].Value) + 1;
+					var copy = string.Format(" (copy {0})", n);
 					f = f[..m.Index] + copy;
 				}
 				else
 				{
-					var copy = String.Format(" (copy {0})", n);
+					var copy = string.Format(" (copy {0})", n);
 					f = f + copy;
 				}
 			}
@@ -280,7 +279,7 @@ partial class ZipEntry
 		if (zde.AttributesIndicateDirectory)
 			zde.MarkAsDirectory();  // may append a slash to filename if nec.
 									// workitem 6898
-		else if (zde._FileNameInArchive.EndsWith("/")) zde.MarkAsDirectory();
+		else if (zde._FileNameInArchive.EndsWith('/')) zde.MarkAsDirectory();
 
 		zde._CompressedFileDataSize = zde._CompressedSize;
 		if ((zde._BitField & 0x01) == 0x01)
