@@ -66,9 +66,9 @@ public class FunctionArgument
 	{
 		get
 		{
-			if (Value is ExcelDataProvider.INameInfo)
+			if (Value is ExcelDataProvider.INameInfo info)
 			{
-				Value = ((ExcelDataProvider.INameInfo)Value).Value;
+				Value = info.Value;
 			}
 
 			return Value is not ExcelDataProvider.IRangeInfo v ? Value : v.GetValue(v.Address._fromRow, v.Address._fromCol);

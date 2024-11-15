@@ -151,9 +151,9 @@ internal static class DependencyChainFactory
 			if (!depChain.index.ContainsKey(id))
 			{
 				var f = new FormulaCell() { SheetID = ws.SheetID, Row = fs.Row, Column = fs.Column };
-				if (fs.Value is int)
+				if (fs.Value is int v)
 				{
-					f.Formula = ws._sharedFormulas[(int)fs.Value].GetFormula(fs.Row, fs.Column, ws.Name);
+					f.Formula = ws._sharedFormulas[v].GetFormula(fs.Row, fs.Column, ws.Name);
 				}
 				else
 				{

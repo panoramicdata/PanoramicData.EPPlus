@@ -1977,9 +1977,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			foreach (var val in csec)
 			{
 				var col = val._value;
-				if (col is ExcelColumn)
+				if (col is ExcelColumn column)
 				{
-					lst.Add((ExcelColumn)col);
+					lst.Add(column);
 				}
 			}
 
@@ -3752,7 +3752,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 						if (!(addr._fromRow == row && addr._fromCol == col))
 						{
 							var fIx = _formulas.GetValue(row, col);
-							if (fIx is int && (int)fIx == f.Index)
+							if (fIx is int v1 && v1 == f.Index)
 							{
 								_formulas.SetValue(row, col, f.GetFormula(row, col, Name));
 							}
@@ -3834,7 +3834,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		{
 			return " t=\"b\"";
 		}
-		else if ((v is double && double.IsInfinity((double)v)) || v is ExcelErrorValue)
+		else if ((v is double v1 && double.IsInfinity(v1)) || v is ExcelErrorValue)
 		{
 			return " t=\"e\"";
 		}
@@ -3851,9 +3851,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		string s;
 		try
 		{
-			if (v is DateTime)
+			if (v is DateTime time)
 			{
-				var sdv = ((DateTime)v).ToOADate();
+				var sdv = time.ToOADate();
 
 				if (Workbook.Date1904)
 				{
@@ -3862,17 +3862,17 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 				s = sdv.ToString(CultureInfo.InvariantCulture);
 			}
-			else if (v is TimeSpan)
+			else if (v is TimeSpan span)
 			{
-				s = DateTime.FromOADate(0).Add(((TimeSpan)v)).ToOADate().ToString(CultureInfo.InvariantCulture);
+				s = DateTime.FromOADate(0).Add(span).ToOADate().ToString(CultureInfo.InvariantCulture);
 			}
 			else if (TypeCompat.IsPrimitive(v) || v is double || v is decimal)
 			{
-				if (v is double && double.IsNaN((double)v))
+				if (v is double v1 && double.IsNaN(v1))
 				{
 					s = "";
 				}
-				else if (v is double && double.IsInfinity((double)v))
+				else if (v is double v2 && double.IsInfinity(v2))
 				{
 					s = "#NUM!";
 				}
@@ -4035,9 +4035,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			{
 				string id;
 				Uri hyp;
-				if (uri is ExcelHyperLink)
+				if (uri is ExcelHyperLink link)
 				{
-					hyp = ((ExcelHyperLink)uri).OriginalUri;
+					hyp = link.OriginalUri;
 				}
 				else
 				{
@@ -4308,11 +4308,11 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		var offset = Workbook.Date1904 ? -ExcelWorkbook.date1904Offset : ExcelWorkbook.date1904Offset;
 		while (cse.MoveNext())
 		{
-			if (cse.Value._value is DateTime)
+			if (cse.Value._value is DateTime time)
 			{
 				try
 				{
-					var sdv = ((DateTime)cse.Value._value).ToOADate();
+					var sdv = time.ToOADate();
 					sdv += offset;
 
 					//cse.Value._value = DateTime.FromOADate(sdv);
@@ -4327,9 +4327,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	internal string GetFormula(int row, int col)
 	{
 		var v = _formulas.GetValue(row, col);
-		if (v is int)
+		if (v is int v1)
 		{
-			return _sharedFormulas[(int)v].GetFormula(row, col, Name);
+			return _sharedFormulas[v1].GetFormula(row, col, Name);
 		}
 		else
 		{
@@ -4339,9 +4339,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	internal string GetFormulaR1C1(int row, int col)
 	{
 		var v = _formulas.GetValue(row, col);
-		if (v is int)
+		if (v is int v1)
 		{
-			var sf = _sharedFormulas[(int)v];
+			var sf = _sharedFormulas[v1];
 			return ExcelCellBase.TranslateToR1C1(sf.Formula, sf.StartRow, sf.StartCol);
 		}
 		else
