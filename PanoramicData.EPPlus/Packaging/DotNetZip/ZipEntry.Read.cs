@@ -573,23 +573,23 @@ internal partial class ZipEntry
 
 	private int ProcessExtraFieldWinZipAes(byte[] buffer, int j, Int16 dataSize, long posn)
 	{
-		if (this._CompressionMethod == 0x0063)
+		if (_CompressionMethod == 0x0063)
 		{
-			if ((this._BitField & 0x01) != 0x01)
+			if ((_BitField & 0x01) != 0x01)
 				throw new BadReadException(String.Format("  Inconsistent metadata at position 0x{0:X16}", posn));
 
-			this._sourceIsEncrypted = true;
+			_sourceIsEncrypted = true;
 
 			//this._aesCrypto = new WinZipAesCrypto(this);
 			// see spec at http://www.winzip.com/aes_info.htm
 			if (dataSize != 7)
 				throw new BadReadException(String.Format("  Inconsistent size (0x{0:X4}) in WinZip AES field at position 0x{1:X16}", dataSize, posn));
 
-			this._WinZipAesMethod = BitConverter.ToInt16(buffer, j);
+			_WinZipAesMethod = BitConverter.ToInt16(buffer, j);
 			j += 2;
-			if (this._WinZipAesMethod != 0x01 && this._WinZipAesMethod != 0x02)
+			if (_WinZipAesMethod != 0x01 && _WinZipAesMethod != 0x02)
 				throw new BadReadException(String.Format("  Unexpected vendor version number (0x{0:X4}) for WinZip AES metadata at position 0x{1:X16}",
-					this._WinZipAesMethod, posn));
+					_WinZipAesMethod, posn));
 
 			Int16 vendorId = BitConverter.ToInt16(buffer, j);
 			j += 2;
@@ -600,15 +600,15 @@ internal partial class ZipEntry
 			if (keystrength < 0)
 				throw new BadReadException(String.Format("Invalid key strength ({0})", keystrength));
 
-			_Encryption_FromZipFile = this._Encryption = (keystrength == 128)
+			_Encryption_FromZipFile = _Encryption = (keystrength == 128)
 				? DotNetZip.EncryptionAlgorithm.WinZipAes128
 				: DotNetZip.EncryptionAlgorithm.WinZipAes256;
 
 			j++;
 
 			// set the actual compression method
-			this._CompressionMethod_FromZipFile =
-			this._CompressionMethod = BitConverter.ToInt16(buffer, j);
+			_CompressionMethod_FromZipFile =
+			_CompressionMethod = BitConverter.ToInt16(buffer, j);
 			j += 2; // for the next segment of the extra field
 		}
 		return j;
