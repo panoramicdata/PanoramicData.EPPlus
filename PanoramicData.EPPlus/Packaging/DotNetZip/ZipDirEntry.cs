@@ -308,8 +308,8 @@ partial class ZipEntry
 			// the "encryption header" of 12 bytes precedes the file data
 			zde._CompressedFileDataSize -= 12;
 		}
-		else if (zde.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-					zde.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		else if (zde.Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+					DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			zde._CompressedFileDataSize = zde.CompressedSize -
 				(GetLengthOfCryptoHeaderBytes(zde.Encryption) + 10);

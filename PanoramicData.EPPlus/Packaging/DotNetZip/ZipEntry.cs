@@ -2527,8 +2527,8 @@ internal partial class ZipEntry
 		//if ((_BitField & 0x01) != 0x01) return 0;
 		if (a == DotNetZip.EncryptionAlgorithm.None) return 0;
 
-		if (a == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-			a == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		if (a is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+			DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			var KeyStrengthInBits = GetKeyStrengthInBits(a);
 			var sizeOfSaltAndPv = ((KeyStrengthInBits / 8 / 2) + 2);

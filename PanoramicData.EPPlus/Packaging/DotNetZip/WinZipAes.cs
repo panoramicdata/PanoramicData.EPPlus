@@ -425,7 +425,7 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 				throw new BadPasswordException("Supply a password to use AES encryption.");
 
 			var keySizeInBits = _params.KeyBytes.Length * 8;
-			if (keySizeInBits != 256 && keySizeInBits != 128 && keySizeInBits != 192)
+			if (keySizeInBits is not 256 and not 128 and not 192)
 				throw new ArgumentOutOfRangeException("keysize",
 													  "size of key must be 128, 192, or 256");
 

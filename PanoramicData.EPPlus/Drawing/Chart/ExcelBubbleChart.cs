@@ -49,7 +49,7 @@ public sealed class ExcelBubbleChart : ExcelChart
 		}
 		set
 		{
-			if (value < 0 && value > 300)
+			if (value is < 0 and > 300)
 			{
 				throw (new ArgumentOutOfRangeException("Bubblescale out of range. 0-300 allowed"));
 			}

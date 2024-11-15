@@ -92,8 +92,8 @@ internal partial class ZipEntry
 		bytes[i++] = (byte)(_CompressionMethod & 0x00FF);
 		bytes[i++] = (byte)((_CompressionMethod & 0xFF00) >> 8);
 
-		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-		Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+		DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			i -= 2;
 			bytes[i++] = 0x63;
@@ -365,8 +365,8 @@ internal partial class ZipEntry
 		}
 
 
-		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+			DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			block = new byte[4 + 7];
 			var i = 0;
@@ -1016,7 +1016,7 @@ internal partial class ZipEntry
 			SetZip64Flags();
 		}
 
-		else if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 || Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		else if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			i -= 2;
 			block[i++] = 0x63;
@@ -1536,8 +1536,8 @@ internal partial class ZipEntry
 				var headerBytesToRetract = 0;
 				if (Encryption == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 					headerBytesToRetract = 12;
-				else if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-						 Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+				else if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+						 DotNetZip.EncryptionAlgorithm.WinZipAes256)
 				{
 					headerBytesToRetract = _aesCrypto_forWrite._Salt.Length + _aesCrypto_forWrite.GeneratedPV.Length;
 				}
@@ -1571,8 +1571,8 @@ internal partial class ZipEntry
 				_EntryHeader[j++] = (byte)(_BitField & 0x00FF);
 				_EntryHeader[j++] = (byte)((_BitField & 0xFF00) >> 8);
 
-				if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-					Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+				if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+					DotNetZip.EncryptionAlgorithm.WinZipAes256)
 				{
 					// Fix the extra field - overwrite the 0x9901 headerId
 					// with dummy data. (arbitrarily, 0x9999)
@@ -1985,8 +1985,8 @@ internal partial class ZipEntry
 
 			return new ZipCipherStream(s, _zipCrypto_forWrite, CryptoMode.Encrypt);
 		}
-		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-				 Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+				 DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			TraceWriteLine("MaybeApplyEncryption: e({0}) AES", FileName);
 
@@ -2296,8 +2296,8 @@ internal partial class ZipEntry
 			_LengthOfHeader += cipherText.Length;  // 12 bytes
 		}
 
-		else if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		else if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+			DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			// If WinZip AES encryption is in use, then the encrypted entry data is
 			// preceded by a variable-sized Salt and a 2-byte "password

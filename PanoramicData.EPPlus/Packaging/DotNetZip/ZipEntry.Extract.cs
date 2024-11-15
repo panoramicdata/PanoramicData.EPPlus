@@ -904,8 +904,8 @@ internal partial class ZipEntry
 			return;
 
 		// calculate the MAC
-		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		if (Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+			DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			var wzs = _inputDecryptorStream as WinZipAesCipherStream;
 			_aesCrypto_forExtract.CalculatedMac = wzs.FinalAuthentication;
@@ -1064,8 +1064,8 @@ internal partial class ZipEntry
 		if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 			input2 = new ZipCipherStream(input, _zipCrypto_forExtract, CryptoMode.Decrypt);
 
-		else if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-			 _Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		else if (_Encryption_FromZipFile is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+			 DotNetZip.EncryptionAlgorithm.WinZipAes256)
 			input2 = new WinZipAesCipherStream(input, _aesCrypto_forExtract, _CompressedFileDataSize, CryptoMode.Decrypt);
 
 		else
@@ -1233,8 +1233,8 @@ internal partial class ZipEntry
 			_zipCrypto_forExtract = ZipCrypto.ForRead(password, this);
 		}
 
-		else if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-			 _Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		else if (_Encryption_FromZipFile is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+			 DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			if (password == null)
 				throw new ZipException("Missing password.");

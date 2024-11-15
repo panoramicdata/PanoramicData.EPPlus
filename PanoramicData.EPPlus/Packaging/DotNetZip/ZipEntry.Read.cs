@@ -267,8 +267,8 @@ internal partial class ZipEntry
 		// bit 0 set indicates that some kind of encryption is in use
 		if ((ze._BitField & 0x01) == 0x01)
 		{
-			if (ze.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
-				ze.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+			if (ze.Encryption is DotNetZip.EncryptionAlgorithm.WinZipAes128 or
+				DotNetZip.EncryptionAlgorithm.WinZipAes256)
 			{
 				var bits = GetKeyStrengthInBits(ze._Encryption_FromZipFile);
 				// read in the WinZip AES metadata: salt + PV. 18 bytes for AES256. 10 bytes for AES128.
@@ -587,7 +587,7 @@ internal partial class ZipEntry
 
 			_WinZipAesMethod = BitConverter.ToInt16(buffer, j);
 			j += 2;
-			if (_WinZipAesMethod != 0x01 && _WinZipAesMethod != 0x02)
+			if (_WinZipAesMethod is not 0x01 and not 0x02)
 				throw new BadReadException(String.Format("  Unexpected vendor version number (0x{0:X4}) for WinZip AES metadata at position 0x{1:X16}",
 					_WinZipAesMethod, posn));
 
