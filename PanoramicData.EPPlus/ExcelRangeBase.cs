@@ -51,7 +51,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Xml;
 
 namespace OfficeOpenXml;
@@ -2343,11 +2342,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		if (string.IsNullOrEmpty(Author))
 		{
-#if Core
-                Author = System.Security.Claims.ClaimsPrincipal.Current.Identity.Name;
-#else
-			Author = Thread.CurrentPrincipal.Identity.Name;
-#endif
+			Author = System.Security.Claims.ClaimsPrincipal.Current.Identity.Name;
 		}
 		//Check if any comments exists in the range and throw an exception
 		_changePropMethod(this, _setExistsCommentDelegate, null);

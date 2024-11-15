@@ -54,9 +54,6 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-#if SILVERLIGHT
-using System.Linq;
-#endif
 
 namespace OfficeOpenXml.Packaging.Ionic;
 
@@ -314,7 +311,6 @@ internal partial class TypeCriterion : SelectionCriterion
 }
 
 
-#if !SILVERLIGHT
 internal partial class AttributesCriterion : SelectionCriterion
 {
 	private FileAttributes _Attributes;
@@ -419,11 +415,7 @@ internal partial class AttributesCriterion : SelectionCriterion
 			// the operator is NotEqualTo.
 			return (Operator != ComparisonOperator.EqualTo);
 		}
-#if NETCF
-            FileAttributes fileAttrs = NetCfFile.GetAttributes(filename);
-#else
 		var fileAttrs = System.IO.File.GetAttributes(filename);
-#endif
 
 		return _Evaluate(fileAttrs);
 	}
@@ -448,7 +440,6 @@ internal partial class AttributesCriterion : SelectionCriterion
 		return result;
 	}
 }
-#endif
 
 
 internal partial class CompoundCriterion : SelectionCriterion
@@ -548,18 +539,6 @@ internal partial class FileSelector
 {
 	internal SelectionCriterion _Criterion;
 
-#if NOTUSED
-        /// <summary>
-        ///   The default constructor.
-        /// </summary>
-        /// <remarks>
-        ///   Typically, applications won't use this constructor.  Instead they'll
-        ///   call the constructor that accepts a selectionCriteria string.  If you
-        ///   use this constructor, you'll want to set the SelectionCriteria
-        ///   property on the instance before calling SelectFiles().
-        /// </remarks>
-        protected FileSelector() { }
-#endif
 	/// <summary>
 	///   Constructor that allows the caller to specify file selection criteria.
 	/// </summary>
@@ -1142,10 +1121,8 @@ internal partial class FileSelector
 
 					break;
 
-#if !SILVERLIGHT
 				case "attrs":
 				case "attributes":
-#endif
 				case "type":
 					{
 						if (tokens.Length <= i + 2)
@@ -1156,14 +1133,6 @@ internal partial class FileSelector
 
 						if (c is not ComparisonOperator.NotEqualTo and not ComparisonOperator.EqualTo)
 							throw new ArgumentException(String.Join(" ", tokens, i, tokens.Length - i));
-
-#if SILVERLIGHT
-                            current = (SelectionCriterion) new TypeCriterion
-                                    {
-                                        AttributeString = tokens[i + 2],
-                                        Operator = c
-                                    };
-#else
 						current = (tok1 == "type")
 							? (SelectionCriterion)new TypeCriterion
 							{
@@ -1175,7 +1144,6 @@ internal partial class FileSelector
 								AttributeString = tokens[i + 2],
 								Operator = c
 							};
-#endif
 						i += 2;
 						stateStack.Push(ParseState.CriterionDone);
 					}
@@ -1319,9 +1287,7 @@ internal partial class FileSelector
 					foreach (var dir in dirnames)
 					{
 						if (TraverseReparsePoints
-#if !SILVERLIGHT
 							|| ((File.GetAttributes(dir) & FileAttributes.ReparsePoint) == 0)
-#endif
 							)
 						{
 							// workitem 10191
@@ -1379,32 +1345,7 @@ internal sealed class EnumUtil
 	internal static object Parse(Type enumType, string stringRepresentation) => Parse(enumType, stringRepresentation, false);
 
 
-#if SILVERLIGHT
-       public static System.Enum[] GetEnumValues(Type type)
-        {
-            if (!type.IsEnum)
-                throw new ArgumentException("not an enum");
 
-            return (
-              from field in type.GetFields(BindingFlags.Public | BindingFlags.Static)
-              where field.IsLiteral
-              select (System.Enum)field.GetValue(null)
-            ).ToArray();
-        }
-
-        public static string[] GetEnumStrings<T>()
-        {
-            var type = typeof(T);
-            if (!type.IsEnum)
-                throw new ArgumentException("not an enum");
-
-            return (
-              from field in type.GetFields(BindingFlags.Public | BindingFlags.Static)
-              where field.IsLiteral
-              select field.Name
-            ).ToArray();
-        }
-#endif
 
 	/// <summary>
 	///   Converts the string representation of the name or numeric value of one
@@ -1424,11 +1365,7 @@ internal sealed class EnumUtil
 		if (ignoreCase)
 			stringRepresentation = stringRepresentation.ToLower(CultureInfo.InvariantCulture);
 
-#if SILVERLIGHT
-            foreach (System.Enum enumVal in GetEnumValues(enumType))
-#else
-		foreach (System.Enum enumVal in System.Enum.GetValues(enumType))
-#endif
+		foreach (Enum enumVal in Enum.GetValues(enumType))
 		{
 			var description = GetDescription(enumVal);
 			if (ignoreCase)
@@ -1437,7 +1374,7 @@ internal sealed class EnumUtil
 				return enumVal;
 		}
 
-		return System.Enum.Parse(enumType, stringRepresentation, ignoreCase);
+		return Enum.Parse(enumType, stringRepresentation, ignoreCase);
 	}
 }
 

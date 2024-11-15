@@ -80,10 +80,8 @@ internal partial class ZipEntry
 		_OutputUsesZip64 ??= new Nullable<bool>(_container.Zip64 == Zip64Option.Always);
 
 		var versionNeededToExtract = (Int16)(_OutputUsesZip64.Value ? 45 : vNeeded);
-#if BZIP
-            if (this.CompressionMethod == Ionic.Zip.CompressionMethod.BZip2)
-                versionNeededToExtract = 46;
-#endif
+		if (this.CompressionMethod == Ionic.Zip.CompressionMethod.BZip2)
+			versionNeededToExtract = 46;
 
 		bytes[i++] = (byte)(versionNeededToExtract & 0x00FF);
 		bytes[i++] = (byte)((versionNeededToExtract & 0xFF00) >> 8);
@@ -94,15 +92,13 @@ internal partial class ZipEntry
 		bytes[i++] = (byte)(_CompressionMethod & 0x00FF);
 		bytes[i++] = (byte)((_CompressionMethod & 0xFF00) >> 8);
 
-#if AESCRYPTO
-            if (Encryption == EncryptionAlgorithm.WinZipAes128 ||
-            Encryption == EncryptionAlgorithm.WinZipAes256)
-            {
-                i -= 2;
-                bytes[i++] = 0x63;
-                bytes[i++] = 0;
-            }
-#endif
+		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+		Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			i -= 2;
+			bytes[i++] = 0x63;
+			bytes[i++] = 0;
+		}
 
 		bytes[i++] = (byte)(_TimeBlob & 0x000000FF);
 		bytes[i++] = (byte)((_TimeBlob & 0x0000FF00) >> 8);
@@ -369,46 +365,44 @@ internal partial class ZipEntry
 		}
 
 
-#if AESCRYPTO
-            if (Encryption == EncryptionAlgorithm.WinZipAes128 ||
-                Encryption == EncryptionAlgorithm.WinZipAes256)
-            {
-                block = new byte[4 + 7];
-                int i = 0;
-                // extra field for WinZip AES
-                // header id
-                block[i++] = 0x01;
-                block[i++] = 0x99;
+		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			block = new byte[4 + 7];
+			int i = 0;
+			// extra field for WinZip AES
+			// header id
+			block[i++] = 0x01;
+			block[i++] = 0x99;
 
-                // data size
-                block[i++] = 0x07;
-                block[i++] = 0x00;
+			// data size
+			block[i++] = 0x07;
+			block[i++] = 0x00;
 
-                // vendor number
-                block[i++] = 0x01;  // AE-1 - means "Verify CRC"
-                block[i++] = 0x00;
+			// vendor number
+			block[i++] = 0x01;  // AE-1 - means "Verify CRC"
+			block[i++] = 0x00;
 
-                // vendor id "AE"
-                block[i++] = 0x41;
-                block[i++] = 0x45;
+			// vendor id "AE"
+			block[i++] = 0x41;
+			block[i++] = 0x45;
 
-                // key strength
-                int keystrength = GetKeyStrengthInBits(Encryption);
-                if (keystrength == 128)
-                    block[i] = 1;
-                else if (keystrength == 256)
-                    block[i] = 3;
-                else
-                    block[i] = 0xFF;
-                i++;
+			// key strength
+			int keystrength = GetKeyStrengthInBits(Encryption);
+			if (keystrength == 128)
+				block[i] = 1;
+			else if (keystrength == 256)
+				block[i] = 3;
+			else
+				block[i] = 0xFF;
+			i++;
 
-                // actual compression method
-                block[i++] = (byte)(_CompressionMethod & 0x00FF);
-                block[i++] = (byte)(_CompressionMethod & 0xFF00);
+			// actual compression method
+			block[i++] = (byte)(_CompressionMethod & 0x00FF);
+			block[i++] = (byte)(_CompressionMethod & 0xFF00);
 
-                listOfBlocks.Add(block);
-            }
-#endif
+			listOfBlocks.Add(block);
+		}
 
 		if (_ntfsTimesAreSet && _emitNtfsTimes)
 		{
@@ -688,9 +682,7 @@ internal partial class ZipEntry
 
 		if (_Source == ZipEntrySource.Stream && !_sourceStream.CanSeek) return false;
 
-#if AESCRYPTO
-            if (_aesCrypto_forWrite != null && (CompressedSize - _aesCrypto_forWrite.SizeOfEncryptionMetadata) <= UncompressedSize + 0x10) return false;
-#endif
+		if (_aesCrypto_forWrite != null && (CompressedSize - _aesCrypto_forWrite.SizeOfEncryptionMetadata) <= UncompressedSize + 0x10) return false;
 
 		return _zipCrypto_forWrite == null || (CompressedSize - 12) > UncompressedSize;
 	}
@@ -881,10 +873,8 @@ internal partial class ZipEntry
 		_presumeZip64 = (_container.Zip64 == Zip64Option.Always ||
 						 (_container.Zip64 == Zip64Option.AsNecessary && !s.CanSeek));
 		var VersionNeededToExtract = (Int16)(_presumeZip64 ? 45 : 20);
-#if BZIP
-            if (this.CompressionMethod == Ionic.Zip.CompressionMethod.BZip2)
-                VersionNeededToExtract = 46;
-#endif
+		if (this.CompressionMethod == Ionic.Zip.CompressionMethod.BZip2)
+			VersionNeededToExtract = 46;
 
 		// (i==4)
 		block[i++] = (byte)(VersionNeededToExtract & 0x00FF);
@@ -908,7 +898,7 @@ internal partial class ZipEntry
 		// Here we set or unset the encryption bit.
 		// _BitField may already be set, as with a ZipEntry added into ZipOutputStream, which
 		// has bit 3 always set. We only want to set one bit
-		if (_Encryption == EncryptionAlgorithm.None)
+		if (_Encryption == DotNetZip.EncryptionAlgorithm.None)
 			_BitField &= ~1;  // encryption bit OFF
 		else
 			_BitField |= 1;   // encryption bit ON
@@ -919,11 +909,7 @@ internal partial class ZipEntry
 		//                 _BitField |= 0x0020;
 
 		// set the UTF8 bit if necessary
-#if SILVERLIGHT
-            if (_actualEncoding.WebName == "utf-8")
-#else
 		if (_actualEncoding.CodePage == System.Text.Encoding.UTF8.CodePage)
-#endif
 			_BitField |= 0x0800;
 
 		// The PKZIP spec says that if bit 3 is set (0x0008) in the General
@@ -961,7 +947,7 @@ internal partial class ZipEntry
 
 			_BitField &= ~0x0008;  // unset bit 3 - no "data descriptor" - ever
 			_BitField &= ~0x0001;  // unset bit 1 - no encryption - ever
-			Encryption = EncryptionAlgorithm.None;
+			Encryption = DotNetZip.EncryptionAlgorithm.None;
 			Password = null;
 		}
 		else if (!s.CanSeek)
@@ -1030,14 +1016,12 @@ internal partial class ZipEntry
 			SetZip64Flags();
 		}
 
-#if AESCRYPTO
-            else if (Encryption == EncryptionAlgorithm.WinZipAes128 || Encryption == EncryptionAlgorithm.WinZipAes256)
-            {
-                i -= 2;
-                block[i++] = 0x63;
-                block[i++] = 0;
-            }
-#endif
+		else if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 || Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			i -= 2;
+			block[i++] = 0x63;
+			block[i++] = 0;
+		}
 
 		// LastMod
 		_TimeBlob = SharedUtilities.DateTimeToPacked(LastModified);
@@ -1161,7 +1145,7 @@ internal partial class ZipEntry
 			// get the original stream:
 			if (_Source == ZipEntrySource.WriteDelegate)
 			{
-				var output = new Ionic.Crc.CrcCalculatorStream(Stream.Null);
+				var output = new CrcCalculatorStream(Stream.Null);
 				// allow the application to write the data
 				_WriteDelegate(FileName, output);
 				_Crc32 = output.Crc;
@@ -1193,16 +1177,12 @@ internal partial class ZipEntry
 					input = File.Open(LocalFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 				}
 
-				var crc32 = new Ionic.Crc.CRC32();
+				var crc32 = new CRC32();
 				_Crc32 = crc32.GetCrc32(input);
 
 				if (_sourceStream == null)
 				{
-#if NETCF
-                        input.Close();
-#else
 					input.Dispose();
-#endif
 				}
 			}
 
@@ -1249,7 +1229,7 @@ internal partial class ZipEntry
 			// this will happen the first cycle through, if seekable
 			_sourceStreamOriginalPosition = new Nullable<Int64>(_sourceStream.Position);
 		}
-		else if (Encryption == EncryptionAlgorithm.PkzipWeak)
+		else if (Encryption == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 		{
 			// In general, using PKZIP encryption on a a zip entry whose input
 			// comes from a non-seekable stream, is tricky.  Here's why:
@@ -1383,7 +1363,7 @@ internal partial class ZipEntry
 
 			// Wrap a CrcCalculatorStream around that.
 			// This will happen BEFORE compression (if any) as we write data out.
-			var output = new Ionic.Crc.CrcCalculatorStream(compressor, true);
+			var output = new CrcCalculatorStream(compressor, true);
 
 			// output.Write() causes this flow:
 			// calc-crc -> compress -> encrypt -> count -> actually write
@@ -1419,11 +1399,7 @@ internal partial class ZipEntry
 			}
 			else if ((input as FileStream) != null)
 			{
-#if NETCF
-                    input.Close();
-#else
 				input.Dispose();
-#endif
 			}
 		}
 
@@ -1458,7 +1434,7 @@ internal partial class ZipEntry
 		else if (_Source == ZipEntrySource.ZipFile)
 		{
 			// we are "re-streaming" the zip entry.
-			var pwd = (_Encryption_FromZipFile == EncryptionAlgorithm.None) ? null : (_Password ?? _container.Password);
+			var pwd = (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.None) ? null : (_Password ?? _container.Password);
 			_sourceStream = InternalOpenReader(pwd);
 			PrepSourceStream();
 			input = _sourceStream;
@@ -1477,10 +1453,8 @@ internal partial class ZipEntry
 		{
 			// workitem 7145
 			var fs = FileShare.ReadWrite;
-#if !NETCF
 			// FileShare.Delete is not defined for the Compact Framework
 			fs |= FileShare.Delete;
-#endif
 			// workitem 8423
 			input = File.Open(LocalFileName, FileMode.Open, FileAccess.Read, fs);
 			fileLength = input.Length;
@@ -1507,22 +1481,16 @@ internal partial class ZipEntry
 			compressor.Close();
 			compressor.Dispose();
 		}
-#if BZIP
-            else if ((compressor as Ionic.BZip2.BZip2OutputStream) != null)
-                compressor.Close();
-#if !NETCF
-            else if ((compressor as Ionic.BZip2.ParallelBZip2OutputStream) != null)
-                compressor.Close();
-#endif
-#endif
+		//else if ((compressor as BZip2OutputStream) != null)
+		//	compressor.Close();
+		//else if ((compressor as ParallelBZip2OutputStream) != null)
+		//	compressor.Close();
 
-#if !NETCF
 		else if ((compressor as ParallelDeflateOutputStream) != null)
 		{
 			compressor.Close();
 			compressor.Dispose();
 		}
-#endif
 
 		encryptor.Flush();
 		encryptor.Close();
@@ -1566,19 +1534,17 @@ internal partial class ZipEntry
 			if (_Password != null)
 			{
 				var headerBytesToRetract = 0;
-				if (Encryption == EncryptionAlgorithm.PkzipWeak)
+				if (Encryption == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 					headerBytesToRetract = 12;
-#if AESCRYPTO
-                    else if (Encryption == EncryptionAlgorithm.WinZipAes128 ||
-                             Encryption == EncryptionAlgorithm.WinZipAes256)
-                    {
-                        headerBytesToRetract = _aesCrypto_forWrite._Salt.Length + _aesCrypto_forWrite.GeneratedPV.Length;
-                    }
-#endif
+				else if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+						 Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+				{
+					headerBytesToRetract = _aesCrypto_forWrite._Salt.Length + _aesCrypto_forWrite.GeneratedPV.Length;
+				}
 				if (_Source == ZipEntrySource.ZipOutputStream && !s.CanSeek)
 					throw new ZipException("Zero bytes written, encryption in use, and non-seekable output.");
 
-				if (Encryption != EncryptionAlgorithm.None)
+				if (Encryption != DotNetZip.EncryptionAlgorithm.None)
 				{
 					// seek back in the stream to un-output the security metadata
 					s.Seek(-1 * headerBytesToRetract, SeekOrigin.Current);
@@ -1605,35 +1571,31 @@ internal partial class ZipEntry
 				_EntryHeader[j++] = (byte)(_BitField & 0x00FF);
 				_EntryHeader[j++] = (byte)((_BitField & 0xFF00) >> 8);
 
-#if AESCRYPTO
-                    if (Encryption == EncryptionAlgorithm.WinZipAes128 ||
-                        Encryption == EncryptionAlgorithm.WinZipAes256)
-                    {
-                        // Fix the extra field - overwrite the 0x9901 headerId
-                        // with dummy data. (arbitrarily, 0x9999)
-                        Int16 fnLength = (short)(_EntryHeader[26] + _EntryHeader[27] * 256);
-                        int offx = 30 + fnLength;
-                        int aesIndex = FindExtraFieldSegment(_EntryHeader, offx, 0x9901);
-                        if (aesIndex >= 0)
-                        {
-                            _EntryHeader[aesIndex++] = 0x99;
-                            _EntryHeader[aesIndex++] = 0x99;
-                        }
-                    }
-#endif
+				if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+					Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+				{
+					// Fix the extra field - overwrite the 0x9901 headerId
+					// with dummy data. (arbitrarily, 0x9999)
+					Int16 fnLength = (short)(_EntryHeader[26] + _EntryHeader[27] * 256);
+					int offx = 30 + fnLength;
+					int aesIndex = FindExtraFieldSegment(_EntryHeader, offx, 0x9901);
+					if (aesIndex >= 0)
+					{
+						_EntryHeader[aesIndex++] = 0x99;
+						_EntryHeader[aesIndex++] = 0x99;
+					}
+				}
 			}
 
 			CompressionMethod = 0;
-			Encryption = EncryptionAlgorithm.None;
+			Encryption = DotNetZip.EncryptionAlgorithm.None;
 		}
 		else if (_zipCrypto_forWrite != null
-#if AESCRYPTO
-                     || _aesCrypto_forWrite != null
-#endif
+					 || _aesCrypto_forWrite != null
 				 )
 
 		{
-			if (Encryption == EncryptionAlgorithm.PkzipWeak)
+			if (Encryption == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 			{
 				_CompressedSize += 12; // 12 extra bytes for the encryption header
 			}
@@ -1931,7 +1893,7 @@ internal partial class ZipEntry
 		}
 		// Wrap a CrcCalculatorStream around that.
 		// This will happen BEFORE compression (if any) as we write data out.
-		output = new Ionic.Crc.CrcCalculatorStream(compressor, true);
+		output = new CrcCalculatorStream(compressor, true);
 	}
 
 
@@ -1940,7 +1902,6 @@ internal partial class ZipEntry
 	{
 		if (_CompressionMethod == 0x08 && CompressionLevel != DotNetZip.Zlib.CompressionLevel.None)
 		{
-#if !NETCF
 			// ParallelDeflateThreshold == 0    means ALWAYS use parallel deflate
 			// ParallelDeflateThreshold == -1L  means NEVER use parallel deflate
 			// Other values specify the actual threshold.
@@ -1986,7 +1947,7 @@ internal partial class ZipEntry
 				o1.Reset(s);
 				return o1;
 			}
-#endif
+
 			var o = new DeflateStream(s, CompressionMode.Compress,
 												 CompressionLevel,
 												 true);
@@ -1997,23 +1958,19 @@ internal partial class ZipEntry
 		}
 
 
-#if BZIP
-            if (_CompressionMethod == 0x0c)
-            {
-#if !NETCF
-                if (_container.ParallelDeflateThreshold == 0L ||
-                    (streamLength > _container.ParallelDeflateThreshold &&
-                     _container.ParallelDeflateThreshold > 0L))
-                {
+		//if (_CompressionMethod == 0x0c)
+		//{
+		//	if (_container.ParallelDeflateThreshold == 0L ||
+		//		(streamLength > _container.ParallelDeflateThreshold &&
+		//		 _container.ParallelDeflateThreshold > 0L))
+		//	{
 
-                    var o1 = new Ionic.BZip2.ParallelBZip2OutputStream(s, true);
-                    return o1;
-                }
-#endif
-                var o = new Ionic.BZip2.BZip2OutputStream(s, true);
-                return o;
-            }
-#endif
+		//		var o1 = new ParallelBZip2OutputStream(s, true);
+		//		return o1;
+		//	}
+		//	var o = new BZip2OutputStream(s, true);
+		//	return o;
+		//}
 
 		return s;
 	}
@@ -2022,21 +1979,19 @@ internal partial class ZipEntry
 
 	private Stream MaybeApplyEncryption(Stream s)
 	{
-		if (Encryption == EncryptionAlgorithm.PkzipWeak)
+		if (Encryption == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 		{
 			TraceWriteLine("MaybeApplyEncryption: e({0}) PKZIP", FileName);
 
 			return new ZipCipherStream(s, _zipCrypto_forWrite, CryptoMode.Encrypt);
 		}
-#if AESCRYPTO
-            if (Encryption == EncryptionAlgorithm.WinZipAes128 ||
-                     Encryption == EncryptionAlgorithm.WinZipAes256)
-            {
-                TraceWriteLine("MaybeApplyEncryption: e({0}) AES", FileName);
+		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+				 Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			TraceWriteLine("MaybeApplyEncryption: e({0}) AES", FileName);
 
-                return new WinZipAesCipherStream(s, _aesCrypto_forWrite, CryptoMode.Encrypt);
-            }
-#endif
+			return new WinZipAesCipherStream(s, _aesCrypto_forWrite, CryptoMode.Encrypt);
+		}
 		TraceWriteLine("MaybeApplyEncryption: e({0}) None", FileName);
 
 		return s;
@@ -2259,7 +2214,7 @@ internal partial class ZipEntry
 
 	internal void WriteSecurityMetadata(Stream outstream)
 	{
-		if (Encryption == EncryptionAlgorithm.None)
+		if (Encryption == DotNetZip.EncryptionAlgorithm.None)
 			return;
 
 		var pwd = _Password;
@@ -2280,16 +2235,14 @@ internal partial class ZipEntry
 		if (pwd == null)
 		{
 			_zipCrypto_forWrite = null;
-#if AESCRYPTO
-                _aesCrypto_forWrite = null;
-#endif
+			_aesCrypto_forWrite = null;
 			return;
 		}
 
 		TraceWriteLine("WriteSecurityMetadata: e({0}) crypto({1}) pw({2})",
 					   FileName, Encryption.ToString(), pwd);
 
-		if (Encryption == EncryptionAlgorithm.PkzipWeak)
+		if (Encryption == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 		{
 			// If PKZip (weak) encryption is in use, then the encrypted entry data
 			// is preceded by 12-byte "encryption header" for the entry.
@@ -2343,26 +2296,23 @@ internal partial class ZipEntry
 			_LengthOfHeader += cipherText.Length;  // 12 bytes
 		}
 
-#if AESCRYPTO
-            else if (Encryption == EncryptionAlgorithm.WinZipAes128 ||
-                Encryption == EncryptionAlgorithm.WinZipAes256)
-            {
-                // If WinZip AES encryption is in use, then the encrypted entry data is
-                // preceded by a variable-sized Salt and a 2-byte "password
-                // verification" value for the entry.
+		else if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			// If WinZip AES encryption is in use, then the encrypted entry data is
+			// preceded by a variable-sized Salt and a 2-byte "password
+			// verification" value for the entry.
 
-                int keystrength = GetKeyStrengthInBits(Encryption);
-                _aesCrypto_forWrite = WinZipAesCrypto.Generate(pwd, keystrength);
-                outstream.Write(_aesCrypto_forWrite.Salt, 0, _aesCrypto_forWrite._Salt.Length);
-                outstream.Write(_aesCrypto_forWrite.GeneratedPV, 0, _aesCrypto_forWrite.GeneratedPV.Length);
-                _LengthOfHeader += _aesCrypto_forWrite._Salt.Length + _aesCrypto_forWrite.GeneratedPV.Length;
+			int keystrength = GetKeyStrengthInBits(Encryption);
+			_aesCrypto_forWrite = WinZipAesCrypto.Generate(pwd, keystrength);
+			outstream.Write(_aesCrypto_forWrite.Salt, 0, _aesCrypto_forWrite._Salt.Length);
+			outstream.Write(_aesCrypto_forWrite.GeneratedPV, 0, _aesCrypto_forWrite.GeneratedPV.Length);
+			_LengthOfHeader += _aesCrypto_forWrite._Salt.Length + _aesCrypto_forWrite.GeneratedPV.Length;
 
-                TraceWriteLine("WriteSecurityMetadata: AES e({0}) keybits({1}) _LOH({2})",
-                               FileName, keystrength, _LengthOfHeader);
+			TraceWriteLine("WriteSecurityMetadata: AES e({0}) keybits({1}) _LOH({2})",
+						   FileName, keystrength, _LengthOfHeader);
 
-            }
-#endif
-
+		}
 	}
 
 
@@ -2558,23 +2508,16 @@ internal partial class ZipEntry
 		}
 	}
 
-
-
-
 	[System.Diagnostics.ConditionalAttribute("Trace")]
 	private void TraceWriteLine(string format, params object[] varParams)
 	{
 		lock (_outputLock)
 		{
 			var tid = System.Threading.Thread.CurrentThread.GetHashCode();
-#if !(NETCF || SILVERLIGHT)
 			Console.ForegroundColor = (ConsoleColor)(tid % 8 + 8);
-#endif
 			Console.Write("{0:000} ZipEntry.Write ", tid);
 			Console.WriteLine(format, varParams);
-#if !(NETCF || SILVERLIGHT)
 			Console.ResetColor();
-#endif
 		}
 	}
 

@@ -208,7 +208,7 @@ partial class ZipEntry
 			return signature is not (int)ZipConstants.EndOfCentralDirectorySignature and
 				not (int)ZipConstants.Zip64EndOfCentralDirectoryRecordSignature and
 				not ZipConstants.ZipEntrySignature
-				?                throw new BadReadException(String.Format("  Bad signature (0x{0:X8}) at position 0x{1:X8}", signature, s.Position))
+				? throw new BadReadException(String.Format("  Bad signature (0x{0:X8}) at position 0x{1:X8}", signature, s.Position))
 				: null;
 		}
 
@@ -230,7 +230,7 @@ partial class ZipEntry
 			zde._VersionMadeBy = (short)(block[i++] + block[i++] * 256);
 			zde._VersionNeeded = (short)(block[i++] + block[i++] * 256);
 			zde._BitField = (short)(block[i++] + block[i++] * 256);
-			zde._CompressionMethod = (Int16)(block[i++] + block[i++] * 256);
+			zde._CompressionMethod = (short)(block[i++] + block[i++] * 256);
 			zde._TimeBlob = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
 			zde._LastModified = SharedUtilities.PackedToDateTime(zde._TimeBlob);
 			zde._timestamp |= ZipEntryTimestamp.DOS;
@@ -246,7 +246,7 @@ partial class ZipEntry
 		zde._filenameLength = (short)(block[i++] + block[i++] * 256);
 		zde._extraFieldLength = (short)(block[i++] + block[i++] * 256);
 		zde._commentLength = (short)(block[i++] + block[i++] * 256);
-		zde._diskNumber = (UInt32)(block[i++] + block[i++] * 256);
+		zde._diskNumber = (uint)(block[i++] + block[i++] * 256);
 
 		zde._InternalFileAttrs = (short)(block[i++] + block[i++] * 256);
 		zde._ExternalFileAttrs = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
@@ -287,7 +287,7 @@ partial class ZipEntry
 		{
 			// this may change after processing the Extra field
 			zde._Encryption_FromZipFile = zde._Encryption =
-				EncryptionAlgorithm.PkzipWeak;
+				OfficeOpenXml.Packaging.DotNetZip.EncryptionAlgorithm.PkzipWeak;
 			zde._sourceIsEncrypted = true;
 		}
 
@@ -304,20 +304,18 @@ partial class ZipEntry
 		}
 
 		// we've processed the extra field, so we know the encryption method is set now.
-		if (zde._Encryption == EncryptionAlgorithm.PkzipWeak)
+		if (zde._Encryption == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 		{
 			// the "encryption header" of 12 bytes precedes the file data
 			zde._CompressedFileDataSize -= 12;
 		}
-#if AESCRYPTO
-            else if (zde.Encryption == EncryptionAlgorithm.WinZipAes128 ||
-                        zde.Encryption == EncryptionAlgorithm.WinZipAes256)
-            {
-                zde._CompressedFileDataSize = zde.CompressedSize -
-                    (ZipEntry.GetLengthOfCryptoHeaderBytes(zde.Encryption) + 10);
-                zde._LengthOfTrailer = 10;
-            }
-#endif
+		else if (zde.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+					zde.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			zde._CompressedFileDataSize = zde.CompressedSize -
+				(ZipEntry.GetLengthOfCryptoHeaderBytes(zde.Encryption) + 10);
+			zde._LengthOfTrailer = 10;
+		}
 
 		// tally the trailing descriptor
 		if ((zde._BitField & 0x0008) == 0x0008)

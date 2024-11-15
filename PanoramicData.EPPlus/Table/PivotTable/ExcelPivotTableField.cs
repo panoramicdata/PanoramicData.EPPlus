@@ -442,7 +442,7 @@ public class ExcelPivotTableField : XmlHelper
 			{
 				var innerXml = "";
 				var count = 0;
-				foreach (eSubTotalFunctions e in Enum.GetValues<eSubTotalFunctions>())
+				foreach (var e in Enum.GetValues<eSubTotalFunctions>())
 				{
 					if ((value & e) == e)
 					{
@@ -1075,7 +1075,7 @@ public class ExcelPivotTableField : XmlHelper
 				rowColFields = TopNode.SelectSingleNode("../../d:colFields", NameSpaceManager);
 			}
 
-			int index = 0;
+			var index = 0;
 			foreach (XmlElement rowfield in rowColFields.ChildNodes)
 			{
 				if (int.TryParse(rowfield.GetAttribute("x"), out var fieldIndex))

@@ -43,9 +43,7 @@ namespace OfficeOpenXml.Packaging.DotNetZip;
 
 //    [Interop.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000C")]
 //    [Interop.ComVisible(true)]
-//#if !NETCF
 //    [Interop.ClassInterface(Interop.ClassInterfaceType.AutoDispatch)]
-//#endif
 internal class CRC32
 {
 	/// <summary>
@@ -741,18 +739,4 @@ internal class CrcCalculatorStream : System.IO.Stream, IDisposable
 	/// </summary>
 	/// <param name="value">N/A</param>
 	public override void SetLength(long value) => throw new NotSupportedException();
-
-#if !Core
-	void IDisposable.Dispose() => Close();
-
-	/// <summary>
-	/// Closes the stream.
-	/// </summary>
-	public override void Close()
-	{
-		base.Close();
-		if (!_leaveOpen)
-			_innerStream.Close();
-	}
-#endif
 }

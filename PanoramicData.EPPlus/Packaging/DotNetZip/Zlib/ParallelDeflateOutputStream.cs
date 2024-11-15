@@ -26,9 +26,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.IO;
-using OfficeOpenXml.Packaging.DotNetZip;
+using System.Threading;
 
 
 namespace OfficeOpenXml.Packaging.DotNetZip.Zlib;
@@ -488,7 +487,7 @@ public class ParallelDeflateOutputStream : Stream
 		}
 
 		_newlyCompressedBlob = new AutoResetEvent(false);
-		_runningCrc = new Ionic.Crc.CRC32();
+		_runningCrc = new CRC32();
 		_currentlyFilling = -1;
 		_lastFilled = -1;
 		_lastWritten = -1;
@@ -857,7 +856,7 @@ public class ParallelDeflateOutputStream : Stream
 
 		_firstWriteDone = false;
 		_totalBytesProcessed = 0L;
-		_runningCrc = new Ionic.Crc.CRC32();
+		_runningCrc = new CRC32();
 		_isClosed = false;
 		_currentlyFilling = -1;
 		_lastFilled = -1;

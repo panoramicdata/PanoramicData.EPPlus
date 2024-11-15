@@ -576,7 +576,7 @@ public class DrawingTest : TestBase
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Shapes");
 		int y = 100, i = 1;
-		foreach (eShapeStyle style in Enum.GetValues<eShapeStyle>())
+		foreach (var style in Enum.GetValues<eShapeStyle>())
 		{
 			var shape = ws.Drawings.AddShape("shape" + i.ToString(), style);
 			shape.SetPosition(y, 100);

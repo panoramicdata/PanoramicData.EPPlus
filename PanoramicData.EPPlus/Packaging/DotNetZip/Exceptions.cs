@@ -25,9 +25,7 @@
 
 
 using System;
-#if !NETCF
 //using System.Runtime.Serialization;
-#endif
 
 namespace OfficeOpenXml.Packaging.DotNetZip;
 
@@ -43,9 +41,7 @@ namespace OfficeOpenXml.Packaging.DotNetZip;
 /// Issued when an <c>ZipEntry.ExtractWithPassword()</c> method is invoked
 /// with an incorrect password.
 /// </summary>
-//#if !SILVERLIGHT
 //    [Serializable]
-//#endif
 //    [System.Runtime.InteropServices.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000B")]
 public class BadPasswordException : ZipException
 {
@@ -72,8 +68,6 @@ public class BadPasswordException : ZipException
 	{
 	}
 
-
-#if !(NETCF || SILVERLIGHT)
 	///// <summary>
 	///// Come on, you know how exceptions work. Why are you looking at this documentation?
 	///// </summary>
@@ -82,7 +76,6 @@ public class BadPasswordException : ZipException
 	//protected BadPasswordException(SerializationInfo info, StreamingContext context)
 	//    : base(info, context)
 	//  {  }
-#endif
 
 }
 
@@ -90,9 +83,7 @@ public class BadPasswordException : ZipException
 /// Indicates that a read was attempted on a stream, and bad or incomplete data was
 /// received.
 /// </summary>
-//#if !SILVERLIGHT
 //    [Serializable]
-//#endif
 //    [System.Runtime.InteropServices.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000A")]
 public class BadReadException : ZipException
 {
@@ -119,7 +110,6 @@ public class BadReadException : ZipException
 	{
 	}
 
-	//#if ! (NETCF || SILVERLIGHT)
 	//        /// <summary>
 	//        /// Come on, you know how exceptions work. Why are you looking at this documentation?
 	//        /// </summary>
@@ -128,7 +118,6 @@ public class BadReadException : ZipException
 	//        protected BadReadException(SerializationInfo info, StreamingContext context)
 	//            : base(info, context)
 	//          {  }
-	//#endif
 
 }
 
@@ -137,9 +126,7 @@ public class BadReadException : ZipException
 /// <summary>
 /// Issued when an CRC check fails upon extracting an entry from a zip archive.
 /// </summary>
-//#if !SILVERLIGHT
 //    [Serializable]
-//#endif
 //    [System.Runtime.InteropServices.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d00009")]
 public class BadCrcException : ZipException
 {
@@ -157,7 +144,6 @@ public class BadCrcException : ZipException
 	{ }
 
 
-	//#if ! (NETCF || SILVERLIGHT)
 	//        /// <summary>
 	//        /// Come on, you know how exceptions work. Why are you looking at this documentation?
 	//        /// </summary>
@@ -166,7 +152,6 @@ public class BadCrcException : ZipException
 	//        protected BadCrcException(SerializationInfo info, StreamingContext context)
 	//            : base(info, context)
 	//          {  }
-	//#endif
 
 }
 
@@ -174,9 +159,7 @@ public class BadCrcException : ZipException
 /// <summary>
 /// Issued when errors occur saving a self-extracting archive.
 /// </summary>
-//#if !SILVERLIGHT
 //    [Serializable]
-//#endif
 //    [System.Runtime.InteropServices.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d00008")]
 public class SfxGenerationException : ZipException
 {
@@ -193,7 +176,6 @@ public class SfxGenerationException : ZipException
 		: base(message)
 	{ }
 
-	//#if ! (NETCF || SILVERLIGHT)
 	//        /// <summary>
 	//        /// Come on, you know how exceptions work. Why are you looking at this documentation?
 	//        /// </summary>
@@ -202,8 +184,6 @@ public class SfxGenerationException : ZipException
 	//        protected SfxGenerationException(SerializationInfo info, StreamingContext context)
 	//            : base(info, context)
 	//          {  }
-	//#endif
-
 }
 
 
@@ -212,9 +192,7 @@ public class SfxGenerationException : ZipException
 //    /// given the state of the instance. For example, if you call <c>Save()</c> on a ZipFile
 //    /// which has no filename set, you can get this exception.
 //    /// </summary>
-//#if !SILVERLIGHT
 //    [Serializable]
-//#endif
 //    [System.Runtime.InteropServices.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d00007")]
 public class BadStateException : ZipException
 {
@@ -240,7 +218,6 @@ public class BadStateException : ZipException
 		: base(message, innerException)
 	{ }
 
-	//#if ! (NETCF || SILVERLIGHT)
 	//        /// <summary>
 	//        /// Come on, you know how exceptions work. Why are you looking at this documentation?
 	//        /// </summary>
@@ -249,16 +226,13 @@ public class BadStateException : ZipException
 	//        protected BadStateException(SerializationInfo info, StreamingContext context)
 	//            : base(info, context)
 	//          {  }
-	//#endif
 
 }
 
 /// <summary>
 /// Base class for all exceptions defined by and throw by the Zip library.
 /// </summary>
-//#if !SILVERLIGHT
 //    [Serializable]
-//#endif
 //    [System.Runtime.InteropServices.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d00006")]
 public class ZipException : Exception
 {
@@ -282,7 +256,6 @@ public class ZipException : Exception
 		: base(message, innerException)
 	{ }
 
-	//#if ! (NETCF || SILVERLIGHT)
 	//        /// <summary>
 	//        /// Come on, you know how exceptions work. Why are you looking at this documentation?
 	//        /// </summary>
@@ -291,6 +264,5 @@ public class ZipException : Exception
 	//        //protected ZipException(SerializationInfo info, StreamingContext context)
 	//        //    : base(info, context)
 	//        //{ }
-	//#endif
 
 }

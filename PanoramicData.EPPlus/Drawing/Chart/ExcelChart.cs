@@ -29,15 +29,15 @@
  * Jan Källman		Added		2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Packaging;
+using OfficeOpenXml.Table.PivotTable;
+using OfficeOpenXml.Utils;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Xml;
-using System.IO;
-using OfficeOpenXml.Table.PivotTable;
-using OfficeOpenXml.Utils;
-using OfficeOpenXml.Packaging;
 namespace OfficeOpenXml.Drawing.Chart;
 
 #region "Chart Enums"
@@ -491,9 +491,6 @@ public class ExcelChart : ExcelDrawing
 
 			StreamWriter streamChart = new(Part.GetStream(FileMode.Create, FileAccess.Write));
 			ChartXml.Save(streamChart);
-#if !Core
-			streamChart.Close();
-#endif
 			ZipPackage.Flush();
 
 			var chartRelation = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, UriChart), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/chart");

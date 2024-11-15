@@ -29,12 +29,12 @@
  * Jan Källman                      Added                       2012-03-04  
  *******************************************************************************/
 
-using System.Threading;
+using OfficeOpenXml.FormulaParsing.DependencyChains;
+using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System;
 using System.Collections.Generic;
-using OfficeOpenXml.FormulaParsing.Exceptions;
-using OfficeOpenXml.FormulaParsing.DependencyChain;
+using System.Threading;
 
 namespace OfficeOpenXml.FormulaParsing;
 

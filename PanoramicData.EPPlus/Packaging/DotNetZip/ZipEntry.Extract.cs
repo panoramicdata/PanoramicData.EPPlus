@@ -585,7 +585,7 @@ internal partial class ZipEntry
 		_inputDecryptorStream = GetExtractDecryptor(input);
 		var input3 = GetExtractDecompressor(_inputDecryptorStream);
 
-		return new Ionic.Crc.CrcCalculatorStream(input3, LeftToRead);
+		return new CrcCalculatorStream(input3, LeftToRead);
 	}
 
 
@@ -635,14 +635,8 @@ internal partial class ZipEntry
 	{
 		// workitem 7881
 		// reset ReadOnly bit if necessary
-#if NETCF
-            if ( (NetCfFile.GetAttributes(fileName) & (uint)FileAttributes.ReadOnly) == (uint)FileAttributes.ReadOnly)
-                NetCfFile.SetAttributes(fileName, (uint)FileAttributes.Normal);
-#elif SILVERLIGHT
-#else
 		if ((File.GetAttributes(fileName) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
 			File.SetAttributes(fileName, FileAttributes.Normal);
-#endif
 		File.Delete(fileName);
 	}
 
@@ -716,7 +710,7 @@ internal partial class ZipEntry
 			// If no password explicitly specified, use the password on the entry itself,
 			// or on the zipfile itself.
 			var p = password ?? _Password ?? _container.Password;
-			if (_Encryption_FromZipFile != EncryptionAlgorithm.None)
+			if (_Encryption_FromZipFile != DotNetZip.EncryptionAlgorithm.None)
 			{
 				if (p == null)
 					throw new BadPasswordException();
@@ -894,41 +888,31 @@ internal partial class ZipEntry
 	internal void VerifyCrcAfterExtract(Int32 actualCrc32)
 	{
 
-#if AESCRYPTO
-                // After extracting, Validate the CRC32
-                if (actualCrc32 != _Crc32)
-                {
-                    // CRC is not meaningful with WinZipAES and AES method 2 (AE-2)
-                    if ((Encryption != EncryptionAlgorithm.WinZipAes128 &&
-                         Encryption != EncryptionAlgorithm.WinZipAes256)
-                        || _WinZipAesMethod != 0x02)
-                        throw new BadCrcException("CRC error: the file being extracted appears to be corrupted. " +
-                                                  String.Format("Expected 0x{0:X8}, Actual 0x{1:X8}", _Crc32, actualCrc32));
-                }
-
-                // ignore MAC if the size of the file is zero
-                if (this.UncompressedSize == 0)
-                    return;
-
-                // calculate the MAC
-                if (Encryption == EncryptionAlgorithm.WinZipAes128 ||
-                    Encryption == EncryptionAlgorithm.WinZipAes256)
-                {
-                    WinZipAesCipherStream wzs = _inputDecryptorStream as WinZipAesCipherStream;
-                    _aesCrypto_forExtract.CalculatedMac = wzs.FinalAuthentication;
-
-                    _aesCrypto_forExtract.ReadAndVerifyMac(this.ArchiveStream); // throws if MAC is bad
-                    // side effect: advances file position.
-                }
-
-
-
-
-#else
+		// After extracting, Validate the CRC32
 		if (actualCrc32 != _Crc32)
-			throw new BadCrcException("CRC error: the file being extracted appears to be corrupted. " +
-									  String.Format("Expected 0x{0:X8}, Actual 0x{1:X8}", _Crc32, actualCrc32));
-#endif
+		{
+			// CRC is not meaningful with WinZipAES and AES method 2 (AE-2)
+			if ((Encryption != DotNetZip.EncryptionAlgorithm.WinZipAes128 &&
+				 Encryption != DotNetZip.EncryptionAlgorithm.WinZipAes256)
+				|| _WinZipAesMethod != 0x02)
+				throw new BadCrcException("CRC error: the file being extracted appears to be corrupted. " +
+										  String.Format("Expected 0x{0:X8}, Actual 0x{1:X8}", _Crc32, actualCrc32));
+		}
+
+		// ignore MAC if the size of the file is zero
+		if (this.UncompressedSize == 0)
+			return;
+
+		// calculate the MAC
+		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			WinZipAesCipherStream wzs = _inputDecryptorStream as WinZipAesCipherStream;
+			_aesCrypto_forExtract.CalculatedMac = wzs.FinalAuthentication;
+
+			_aesCrypto_forExtract.ReadAndVerifyMac(this.ArchiveStream); // throws if MAC is bad
+																		// side effect: advances file position.
+		}
 	}
 
 
@@ -1015,7 +999,7 @@ internal partial class ZipEntry
 
 			Int64 bytesWritten = 0;
 			// As we read, we maybe decrypt, and then we maybe decompress. Then we write.
-			using var s1 = new Ionic.Crc.CrcCalculatorStream(input3);
+			using var s1 = new CrcCalculatorStream(input3);
 			while (LeftToRead > 0)
 			{
 				//Console.WriteLine("ExtractOne: LeftToRead {0}", LeftToRead);
@@ -1047,12 +1031,8 @@ internal partial class ZipEntry
 		{
 			if (input is ZipSegmentedStream zss)
 			{
-#if NETCF
-                    zss.Close();
-#else
 				// need to dispose it
 				zss.Dispose();
-#endif
 				_archiveStream = null;
 			}
 		}
@@ -1070,38 +1050,29 @@ internal partial class ZipEntry
 			case (short)CompressionMethod.None:
 				return input2;
 			case (short)CompressionMethod.Deflate:
-				return new Ionic.Zlib.DeflateStream(input2, CompressionMode.Decompress, true);
-#if BZIP
-                case (short)CompressionMethod.BZip2:
-                    return new Ionic.BZip2.BZip2InputStream(input2, true);
-#endif
+				return new DeflateStream(input2, CompressionMode.Decompress, true);
+			//case (short)CompressionMethod.BZip2:
+			//	return new BZip2InputStream(input2, true);
 			default:
 				throw new ZipException("Unsupported compression method " + _CompressionMethod_FromZipFile);
 		}
 	}
 
-
-
 	internal Stream GetExtractDecryptor(Stream input)
 	{
 		Stream input2 = null;
-		if (_Encryption_FromZipFile == EncryptionAlgorithm.PkzipWeak)
+		if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 			input2 = new ZipCipherStream(input, _zipCrypto_forExtract, CryptoMode.Decrypt);
 
-#if AESCRYPTO
-            else if (_Encryption_FromZipFile == EncryptionAlgorithm.WinZipAes128 ||
-                 _Encryption_FromZipFile == EncryptionAlgorithm.WinZipAes256)
-                input2 = new WinZipAesCipherStream(input, _aesCrypto_forExtract, _CompressedFileDataSize, CryptoMode.Decrypt);
-#endif
+		else if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+			 _Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+			input2 = new WinZipAesCipherStream(input, _aesCrypto_forExtract, _CompressedFileDataSize, CryptoMode.Decrypt);
 
 		else
 			input2 = input;
 
 		return input2;
 	}
-
-
-
 
 	internal void _SetTimes(string fileOrDirectory, bool isFile)
 	{
@@ -1221,8 +1192,7 @@ internal partial class ZipEntry
 
 	internal void ValidateEncryption()
 	{
-		if (Encryption is not EncryptionAlgorithm.PkzipWeak and
-not EncryptionAlgorithm.None)
+		if (Encryption is not DotNetZip.EncryptionAlgorithm.PkzipWeak and not DotNetZip.EncryptionAlgorithm.None)
 		{
 			// workitem 7968
 			if (_UnsupportedAlgorithmId != 0)
@@ -1237,23 +1207,22 @@ not EncryptionAlgorithm.None)
 
 	private void ValidateCompression()
 	{
-		if (_CompressionMethod_FromZipFile is not ((short)CompressionMethod.None) and
-			not ((short)CompressionMethod.Deflate)
-#if BZIP
-                && (_CompressionMethod_FromZipFile != (short)CompressionMethod.BZip2)
-#endif
-			)
+		if (_CompressionMethod_FromZipFile is not ((short)CompressionMethod.None)
+			and not ((short)CompressionMethod.Deflate)
+			and not (short)CompressionMethod.BZip2)
+		{
 			throw new ZipException(String.Format("Entry {0} uses an unsupported compression method (0x{1:X2}, {2})",
 													  FileName, _CompressionMethod_FromZipFile, UnsupportedCompressionMethod));
+		}
 	}
 
 
 	private void SetupCryptoForExtract(string password)
 	{
 		//if (password == null) return;
-		if (_Encryption_FromZipFile == EncryptionAlgorithm.None) return;
+		if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.None) return;
 
-		if (_Encryption_FromZipFile == EncryptionAlgorithm.PkzipWeak)
+		if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.PkzipWeak)
 		{
 			if (password == null)
 				throw new ZipException("Missing password.");
@@ -1264,30 +1233,28 @@ not EncryptionAlgorithm.None)
 			_zipCrypto_forExtract = ZipCrypto.ForRead(password, this);
 		}
 
-#if AESCRYPTO
-            else if (_Encryption_FromZipFile == EncryptionAlgorithm.WinZipAes128 ||
-                 _Encryption_FromZipFile == EncryptionAlgorithm.WinZipAes256)
-            {
-                if (password == null)
-                    throw new ZipException("Missing password.");
+		else if (_Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+			 _Encryption_FromZipFile == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			if (password == null)
+				throw new ZipException("Missing password.");
 
-                // If we already have a WinZipAesCrypto object in place, use it.
-                // It can be set up in the ReadDirEntry(), or during a previous Extract.
-                if (_aesCrypto_forExtract != null)
-                {
-                    _aesCrypto_forExtract.Password = password;
-                }
-                else
-                {
-                    int sizeOfSaltAndPv = GetLengthOfCryptoHeaderBytes(_Encryption_FromZipFile);
-                    this.ArchiveStream.Seek(this.FileDataPosition - sizeOfSaltAndPv, SeekOrigin.Begin);
-                    // workitem 10178
-                    Ionic.Zip.SharedUtilities.Workaround_Ladybug318918(this.ArchiveStream);
-                    int keystrength = GetKeyStrengthInBits(_Encryption_FromZipFile);
-                    _aesCrypto_forExtract = WinZipAesCrypto.ReadFromStream(password, keystrength, this.ArchiveStream);
-                }
-            }
-#endif
+			// If we already have a WinZipAesCrypto object in place, use it.
+			// It can be set up in the ReadDirEntry(), or during a previous Extract.
+			if (_aesCrypto_forExtract != null)
+			{
+				_aesCrypto_forExtract.Password = password;
+			}
+			else
+			{
+				int sizeOfSaltAndPv = GetLengthOfCryptoHeaderBytes(_Encryption_FromZipFile);
+				this.ArchiveStream.Seek(this.FileDataPosition - sizeOfSaltAndPv, SeekOrigin.Begin);
+				// workitem 10178
+				SharedUtilities.Workaround_Ladybug318918(this.ArchiveStream);
+				int keystrength = GetKeyStrengthInBits(_Encryption_FromZipFile);
+				_aesCrypto_forExtract = WinZipAesCrypto.ReadFromStream(password, keystrength, this.ArchiveStream);
+			}
+		}
 	}
 
 

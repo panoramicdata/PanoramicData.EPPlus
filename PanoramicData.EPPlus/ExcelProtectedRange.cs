@@ -104,16 +104,13 @@ public class ExcelProtectedRange : XmlHelper
 		SpinCount = SpinCount < 100000 ? 100000 : SpinCount;
 
 		//Combine salt and password and calculate the initial hash
-#if Core
-            var hp = SHA512.Create();
-#else
-#endif
+		var hp = SHA512.Create();
 		var buffer = new byte[byPwd.Length + bySalt.Length];
 		Array.Copy(bySalt, buffer, bySalt.Length);
 		Array.Copy(byPwd, 0, buffer, 16, byPwd.Length);
 		var hash = SHA512.HashData(buffer);
 
-		//Now iterate the number of spinns.
+		//Now iterate the number of spins.
 		for (var i = 0; i < SpinCount; i++)
 		{
 			buffer = new byte[hash.Length + 4];

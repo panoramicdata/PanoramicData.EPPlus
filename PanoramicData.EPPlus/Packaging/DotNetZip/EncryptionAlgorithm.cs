@@ -113,17 +113,15 @@ internal enum EncryptionAlgorithm
 	/// </summary>
 	PkzipWeak,
 
-#if AESCRYPTO
-        /// <summary>
-        /// WinZip AES encryption (128 key bits).
-        /// </summary>
-        WinZipAes128,
+	/// <summary>
+	/// WinZip AES encryption (128 key bits).
+	/// </summary>
+	WinZipAes128,
 
-        /// <summary>
-        /// WinZip AES encryption (256 key bits).
-        /// </summary>
-        WinZipAes256,
-#endif
+	/// <summary>
+	/// WinZip AES encryption (256 key bits).
+	/// </summary>
+	WinZipAes256,
 
 	/// <summary>
 	/// An encryption algorithm that is not supported by DotNetZip.

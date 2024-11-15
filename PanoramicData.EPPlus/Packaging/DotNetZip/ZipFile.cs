@@ -1130,7 +1130,7 @@ IDisposable
 	/// </remarks>
 	/// <seealso cref="UseZip64WhenSaving"/>
 	/// <seealso cref="RequiresZip64"/>
-	public Nullable<bool> OutputUsedZip64 => _OutputUsesZip64;
+	public Nullable<bool> OutputUsedZip64 => _outputUsesZip64;
 
 
 	/// <summary>
@@ -1657,11 +1657,11 @@ IDisposable
 			_Password = value;
 			if (_Password == null)
 			{
-				Encryption = EncryptionAlgorithm.None;
+				Encryption = DotNetZip.EncryptionAlgorithm.None;
 			}
-			else if (Encryption == EncryptionAlgorithm.None)
+			else if (Encryption == DotNetZip.EncryptionAlgorithm.None)
 			{
-				Encryption = EncryptionAlgorithm.PkzipWeak;
+				Encryption = DotNetZip.EncryptionAlgorithm.PkzipWeak;
 			}
 		}
 		private get
@@ -1925,9 +1925,9 @@ IDisposable
 	///
 	/// </example>
 	///
-	/// <seealso cref="Ionic.Zip.ZipFile.Password">ZipFile.Password</seealso>
+	/// <seealso cref="Password">ZipFile.Password</seealso>
 	/// <seealso cref="ZipEntry.Encryption">ZipEntry.Encryption</seealso>
-	internal EncryptionAlgorithm Encryption
+	internal DotNetZip.EncryptionAlgorithm Encryption
 	{
 		get
 		{
@@ -1935,7 +1935,7 @@ IDisposable
 		}
 		set
 		{
-			if (value == EncryptionAlgorithm.Unsupported)
+			if (value == DotNetZip.EncryptionAlgorithm.Unsupported)
 				throw new InvalidOperationException("You may not set Encryption to that value.");
 			_Encryption = value;
 		}
@@ -3561,7 +3561,7 @@ IDisposable
 	private bool _emitNtfsTimes = true;
 	private bool _emitUnixTimes;
 	private CompressionStrategy _Strategy = CompressionStrategy.Default;
-	private Ionic.Zip.CompressionMethod _compressionMethod = Ionic.Zip.CompressionMethod.Deflate;
+	private CompressionMethod _compressionMethod = CompressionMethod.Deflate;
 	private bool _fileAlreadyExists;
 	private string _temporaryFileName;
 	private bool _contentsChanged;
@@ -3572,12 +3572,12 @@ IDisposable
 	private bool _saveOperationCanceled;
 	private bool _extractOperationCanceled;
 	private bool _addOperationCanceled;
-	private EncryptionAlgorithm _Encryption;
+	private DotNetZip.EncryptionAlgorithm _Encryption;
 	private bool _JustSaved;
 	private long _locEndOfCDS = -1;
 	private uint _OffsetOfCentralDirectory;
 	private Int64 _OffsetOfCentralDirectory64;
-	private Nullable<bool> _OutputUsesZip64;
+	private bool? _outputUsesZip64;
 	internal bool _inExtractAll;
 	private System.Text.Encoding _alternateEncoding = System.Text.Encoding.GetEncoding("UTF-8");
 	private ZipOption _alternateEncodingUsage = ZipOption.Never;

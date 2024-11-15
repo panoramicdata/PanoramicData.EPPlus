@@ -841,15 +841,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		_package.DoAdjustDrawings = false;
 		Stream stream = packPart.GetStream();
 
-#if Core
-            var xr = XmlReader.Create(stream,new XmlReaderSettings() { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true });
-#else
-		var xr = new XmlTextReader(stream)
-		{
-			ProhibitDtd = true,
-			WhitespaceHandling = WhitespaceHandling.None
-		};
-#endif
+		var xr = XmlReader.Create(stream, new XmlReaderSettings() { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true });
 		LoadColumns(xr);    //columnXml
 		var start = stream.Position;
 		LoadCells(xr);
@@ -1104,6 +1096,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 	}
+
 	/// <summary>
 	/// Read until the node is found. If not found the xmlreader is reseted.
 	/// </summary>
@@ -1118,11 +1111,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			if (xr.LocalName == nodeText || xr.LocalName == altNode) return true;
 		}
 		while (xr.Read());
-#if !Core
-		xr.Close();
-#endif
 		return false;
 	}
+
 	/// <summary>
 	/// Load Hyperlinks
 	/// </summary>
@@ -1892,7 +1883,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
+			foreach (var dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				var newAddr = addr.AddRow(rowFrom, rows).Address;
@@ -2095,7 +2086,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
+			foreach (var dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				var newAddr = addr.AddColumn(columnFrom, columns).Address;
@@ -2507,7 +2498,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				}
 			}
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
+			foreach (var dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				if (addr.Start.Row > rowFrom + rows)
@@ -2618,7 +2609,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 
 			//Issue 15573
-			foreach (ExcelDataValidation dv in DataValidations.Cast<ExcelDataValidation>())
+			foreach (var dv in DataValidations.Cast<ExcelDataValidation>())
 			{
 				var addr = dv.Address;
 				if (addr.Start.Column > columnFrom + columns)
@@ -3678,7 +3669,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					else if (v != null)
 					{
 						// Fix for issue 15460
-						if (v is System.Collections.IEnumerable enumerableResult && !(v is string))
+						if (v is System.Collections.IEnumerable enumerableResult and not string)
 						{
 							var enumerator = enumerableResult.GetEnumerator();
 							if (enumerator.MoveNext() && enumerator.Current != null)
@@ -3752,7 +3743,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		{
 			var addr = new ExcelAddressBase(f.Address);
 			var shIx = _formulas.GetValue(addr._fromRow, addr._fromCol);
-			if (!(shIx is int) || (shIx is int && (int)shIx != f.Index))
+			if (shIx is not int || (shIx is int v && v != f.Index))
 			{
 				for (var row = addr._fromRow; row <= addr._toRow; row++)
 				{

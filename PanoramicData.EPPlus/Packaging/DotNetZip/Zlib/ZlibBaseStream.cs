@@ -24,7 +24,6 @@
 //
 // ------------------------------------------------------------------
 
-using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 using System.IO;
 
@@ -76,7 +75,7 @@ internal class ZlibBaseStream : Stream
 		// workitem 7159
 		if (flavor == ZlibStreamFlavor.GZIP)
 		{
-			crc = new Ionic.Crc.CRC32();
+			crc = new CRC32();
 		}
 	}
 

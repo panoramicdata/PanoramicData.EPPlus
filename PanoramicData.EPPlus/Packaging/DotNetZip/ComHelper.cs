@@ -35,9 +35,7 @@ namespace OfficeOpenXml.Packaging.DotNetZip;
 /// </summary>
 //    [System.Runtime.InteropServices.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d0000F")]
 //    [System.Runtime.InteropServices.ComVisible(true)]
-//#if !NETCF
 //    [System.Runtime.InteropServices.ClassInterface(System.Runtime.InteropServices.ClassInterfaceType.AutoDispatch)]
-//#endif
 
 internal class ComHelper
 {
@@ -59,7 +57,6 @@ internal class ComHelper
 	/// <returns>true if the file contains a valid zip file.</returns>
 	public static bool IsZipFileWithExtract(string filename) => ZipFile.IsZipFile(filename, true);
 
-#if !NETCF
 	/// <summary>
 	///  A wrapper for <see cref="ZipFile.CheckZip(string)">ZipFile.CheckZip(string)</see>
 	/// </summary>
@@ -84,7 +81,6 @@ internal class ComHelper
 	/// </summary>
 	/// <param name="filename">The filename to of the zip file to fix.</param>
 	public static void FixZipDirectory(string filename) => ZipFile.FixZipDirectory(filename);
-#endif
 
 	/// <summary>
 	///  A wrapper for <see cref="ZipFile.LibraryVersion">ZipFile.LibraryVersion</see>

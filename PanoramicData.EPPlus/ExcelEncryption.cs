@@ -121,11 +121,11 @@ public class ExcelEncryption
 			}
 		}
 	}
-	string _password = null;
+	string? _password = null;
 	/// <summary>
 	/// The password used to encrypt the workbook.
 	/// </summary>
-	public string Password
+	public string? Password
 	{
 		get
 		{
@@ -143,7 +143,7 @@ public class ExcelEncryption
 	public EncryptionAlgorithm Algorithm { get; set; }
 	private EncryptionVersion _version = EncryptionVersion.Agile;
 	/// <summary>
-	/// The version of the encryption.        
+	/// The version of the encryption.
 	/// </summary>
 	public EncryptionVersion Version
 	{

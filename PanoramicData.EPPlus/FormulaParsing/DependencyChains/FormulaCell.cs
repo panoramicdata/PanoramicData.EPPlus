@@ -22,10 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+using System.Collections.Generic;
 
-namespace OfficeOpenXml.FormulaParsing.DependencyChain.DependencyChain;
+namespace OfficeOpenXml.FormulaParsing.DependencyChains;
 
 internal class FormulaCell
 {

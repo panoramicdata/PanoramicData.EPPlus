@@ -40,9 +40,7 @@ namespace OfficeOpenXml.Packaging.Ionic.Zip;
 
 [Interop.GuidAttribute("ebc25cf6-9120-4283-b972-0e5520d00004")]
 [Interop.ComVisible(true)]
-//#if !NETCF
 //    [Interop.ClassInterface(Interop.ClassInterfaceType.AutoDispatch)]  // AutoDual
-//#endif
 internal partial class ZipEntry
 {
 	/// <summary>
@@ -56,7 +54,7 @@ internal partial class ZipEntry
 	{
 		_CompressionMethod = (Int16)CompressionMethod.Deflate;
 		_CompressionLevel = DotNetZip.Zlib.CompressionLevel.Default;
-		_Encryption = EncryptionAlgorithm.None;
+		_Encryption = DotNetZip.EncryptionAlgorithm.None;
 		_Source = ZipEntrySource.None;
 		AlternateEncoding = System.Text.Encoding.GetEncoding("UTF-8");
 		AlternateEncodingUsage = ZipOption.Never;
@@ -1339,12 +1337,10 @@ internal partial class ZipEntry
 		{
 			if (value == (CompressionMethod)_CompressionMethod) return; // nothing to do.
 
-			if (value is not CompressionMethod.None and not CompressionMethod.Deflate
-#if BZIP
-                    && value != CompressionMethod.BZip2
-#endif
-				)
+			if (value is not CompressionMethod.None and not CompressionMethod.Deflate and not CompressionMethod.BZip2)
+			{
 				throw new InvalidOperationException("Unsupported compression method.");
+			}
 
 			// If the source is a zip archive and there was encryption on the
 			// entry, changing the compression method is not supported.
@@ -1540,7 +1536,7 @@ internal partial class ZipEntry
 	///   was something other than <see cref="EncryptionAlgorithm.None"/>.
 	/// </para>
 	/// </remarks>
-	public bool UsesEncryption => (_Encryption_FromZipFile != EncryptionAlgorithm.None);
+	public bool UsesEncryption => (_Encryption_FromZipFile != DotNetZip.EncryptionAlgorithm.None);
 
 
 	/// <summary>
@@ -1693,7 +1689,7 @@ internal partial class ZipEntry
 	///
 	/// <seealso cref="Ionic.Zip.ZipEntry.Password">ZipEntry.Password</seealso>
 	/// <seealso cref="Ionic.Zip.ZipFile.Encryption">ZipFile.Encryption</seealso>
-	internal EncryptionAlgorithm Encryption
+	internal DotNetZip.EncryptionAlgorithm Encryption
 	{
 		get
 		{
@@ -1703,7 +1699,7 @@ internal partial class ZipEntry
 		{
 			if (value == _Encryption) return; // no change
 
-			if (value == EncryptionAlgorithm.Unsupported)
+			if (value == DotNetZip.EncryptionAlgorithm.Unsupported)
 				throw new InvalidOperationException("You may not set Encryption to that value.");
 
 			// If the source is a zip archive and there was encryption
@@ -1854,14 +1850,14 @@ internal partial class ZipEntry
 	///
 	/// <seealso cref="Ionic.Zip.ZipEntry.Encryption"/>
 	/// <seealso cref="Ionic.Zip.ZipFile.Password">ZipFile.Password</seealso>
-	public string Password
+	public string? Password
 	{
 		set
 		{
 			_Password = value;
 			if (_Password == null)
 			{
-				_Encryption = EncryptionAlgorithm.None;
+				_Encryption = DotNetZip.EncryptionAlgorithm.None;
 			}
 			else
 			{
@@ -1881,9 +1877,9 @@ internal partial class ZipEntry
 				if (_Source == ZipEntrySource.ZipFile && !_sourceIsEncrypted)
 					_restreamRequiredOnSave = true;
 
-				if (Encryption == EncryptionAlgorithm.None)
+				if (Encryption == DotNetZip.EncryptionAlgorithm.None)
 				{
-					_Encryption = EncryptionAlgorithm.PkzipWeak;
+					_Encryption = DotNetZip.EncryptionAlgorithm.PkzipWeak;
 				}
 			}
 		}
@@ -2249,7 +2245,7 @@ internal partial class ZipEntry
 	private static ZipEntry Create(string nameInArchive, ZipEntrySource source, Object arg1, Object arg2)
 	{
 		if (String.IsNullOrEmpty(nameInArchive))
-			throw new Ionic.Zip.ZipException("The entry name must be non-null and non-empty.");
+			throw new ZipException("The entry name must be non-null and non-empty.");
 
 		ZipEntry entry = new()
 		{
@@ -2287,7 +2283,7 @@ internal partial class ZipEntry
 			var filename = (arg1 as String);   // must not be null
 
 			if (String.IsNullOrEmpty(filename))
-				throw new Ionic.Zip.ZipException("The filename must be non-null and non-empty.");
+				throw new ZipException("The filename must be non-null and non-empty.");
 
 			try
 			{
@@ -2296,24 +2292,6 @@ internal partial class ZipEntry
 				// when necessary: when saving the ZipFile, or when getting the
 				// attributes, and so on.
 
-#if NETCF
-                    // workitem 6878
-                    // Ionic.Zip.SharedUtilities.AdjustTime_Win32ToDotNet
-                    entry._Mtime = File.GetLastWriteTime(filename).ToUniversalTime();
-                    entry._Ctime = File.GetCreationTime(filename).ToUniversalTime();
-                    entry._Atime = File.GetLastAccessTime(filename).ToUniversalTime();
-
-                    // workitem 7071
-                    // can only get attributes of files that exist.
-                    if (File.Exists(filename) || Directory.Exists(filename))
-                        entry._ExternalFileAttrs = (int)NetCfFile.GetAttributes(filename);
-
-#elif SILVERLIGHT
-                    entry._Mtime =
-                        entry._Ctime =
-                        entry._Atime = System.DateTime.UtcNow;
-                    entry._ExternalFileAttrs = (int)0;
-#else
 				// workitem 6878??
 				entry._Mtime = File.GetLastWriteTime(filename).ToUniversalTime();
 				entry._Ctime = File.GetCreationTime(filename).ToUniversalTime();
@@ -2324,7 +2302,6 @@ internal partial class ZipEntry
 				if (File.Exists(filename) || Directory.Exists(filename))
 					entry._ExternalFileAttrs = (int)File.GetAttributes(filename);
 
-#endif
 				entry._ntfsTimesAreSet = true;
 
 				entry._LocalFileName = Path.GetFullPath(filename); // workitem 8813
@@ -2538,30 +2515,26 @@ internal partial class ZipEntry
 
 
 
-#if AESCRYPTO
-        private static int GetKeyStrengthInBits(EncryptionAlgorithm a)
-        {
-            if (a == EncryptionAlgorithm.WinZipAes256) return 256;
-            else if (a == EncryptionAlgorithm.WinZipAes128) return 128;
-            return -1;
-        }
-#endif
+	private static int GetKeyStrengthInBits(DotNetZip.EncryptionAlgorithm a)
+	{
+		if (a == DotNetZip.EncryptionAlgorithm.WinZipAes256) return 256;
+		else if (a == DotNetZip.EncryptionAlgorithm.WinZipAes128) return 128;
+		return -1;
+	}
 
-	internal static int GetLengthOfCryptoHeaderBytes(EncryptionAlgorithm a)
+	internal static int GetLengthOfCryptoHeaderBytes(DotNetZip.EncryptionAlgorithm a)
 	{
 		//if ((_BitField & 0x01) != 0x01) return 0;
-		if (a == EncryptionAlgorithm.None) return 0;
+		if (a == DotNetZip.EncryptionAlgorithm.None) return 0;
 
-#if AESCRYPTO
-            if (a == EncryptionAlgorithm.WinZipAes128 ||
-                a == EncryptionAlgorithm.WinZipAes256)
-            {
-                int KeyStrengthInBits = GetKeyStrengthInBits(a);
-                int sizeOfSaltAndPv = ((KeyStrengthInBits / 8 / 2) + 2);
-                return sizeOfSaltAndPv;
-            }
-#endif
-		return a == EncryptionAlgorithm.PkzipWeak ? 12 : throw new ZipException("internal error");
+		if (a == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
+			a == DotNetZip.EncryptionAlgorithm.WinZipAes256)
+		{
+			int KeyStrengthInBits = GetKeyStrengthInBits(a);
+			int sizeOfSaltAndPv = ((KeyStrengthInBits / 8 / 2) + 2);
+			return sizeOfSaltAndPv;
+		}
+		return a == DotNetZip.EncryptionAlgorithm.PkzipWeak ? 12 : throw new ZipException("internal error");
 	}
 
 
@@ -2590,12 +2563,10 @@ internal partial class ZipEntry
 
 
 	private ZipCrypto _zipCrypto_forExtract;
-	private ZipCrypto _zipCrypto_forWrite;
-#if AESCRYPTO
-        private WinZipAesCrypto _aesCrypto_forExtract;
-        private WinZipAesCrypto _aesCrypto_forWrite;
-        private Int16 _WinZipAesMethod;
-#endif
+	private ZipCrypto? _zipCrypto_forWrite;
+	private WinZipAesCrypto _aesCrypto_forExtract;
+	private WinZipAesCrypto? _aesCrypto_forWrite;
+	private Int16 _WinZipAesMethod;
 
 	internal DateTime _LastModified;
 	private DateTime _Mtime, _Atime, _Ctime;  // workitem 6878: NTFS quantities
@@ -2643,10 +2614,10 @@ internal partial class ZipEntry
 
 	internal string _Password;
 	internal ZipEntrySource _Source;
-	internal EncryptionAlgorithm _Encryption;
-	internal EncryptionAlgorithm _Encryption_FromZipFile;
+	internal DotNetZip.EncryptionAlgorithm _Encryption;
+	internal DotNetZip.EncryptionAlgorithm _Encryption_FromZipFile;
 	internal byte[] _WeakEncryptionHeader;
-	internal Stream _archiveStream;
+	internal Stream? _archiveStream;
 	private Stream _sourceStream;
 	private Nullable<Int64> _sourceStreamOriginalPosition;
 	private bool _sourceWasJitProvided;
@@ -2780,11 +2751,9 @@ internal enum CompressionMethod
 	/// </summary>
 	Deflate = 8,
 
-#if BZIP
-        /// <summary>
-        ///   BZip2 compression, a compression algorithm developed by Julian Seward.
-        ///   For COM environments, the value is 12.
-        /// </summary>
-        BZip2 = 12,
-#endif
+	/// <summary>
+	///   BZip2 compression, a compression algorithm developed by Julian Seward.
+	///   For COM environments, the value is 12.
+	/// </summary>
+	BZip2 = 12,
 }

@@ -206,7 +206,7 @@ internal partial class ZipFile
 			_contentsChanged = false;
 
 			thisSaveUsedZip64 |= directoryNeededZip64;
-			_OutputUsesZip64 = new Nullable<bool>(thisSaveUsedZip64);
+			_outputUsesZip64 = new Nullable<bool>(thisSaveUsedZip64);
 
 
 			// do the rename as necessary

@@ -29,18 +29,18 @@
  * Jan Källman		    Initial Release		       2009-10-01
  * Jan Källman		    License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
+using OfficeOpenXml.Drawing;
+using OfficeOpenXml.Drawing.Chart;
+using OfficeOpenXml.Drawing.Vml;
+using OfficeOpenXml.Table.PivotTable;
+using OfficeOpenXml.Utils;
+using OfficeOpenXml.VBA;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml;
 using System.IO;
 using System.Linq;
-using OfficeOpenXml.Drawing.Chart;
-using OfficeOpenXml.Drawing.Vml;
-using OfficeOpenXml.Utils;
-using OfficeOpenXml.VBA;
-using OfficeOpenXml.Table.PivotTable;
-using OfficeOpenXml.Drawing;
+using System.Xml;
 
 namespace OfficeOpenXml;
 
@@ -998,27 +998,19 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		_worksheets = worksheets;
 	}
 
-#if Core
-        /// <summary>
-        /// Returns the worksheet at the specified position. 
-        /// </summary>
-        /// <param name="PositionID">The position of the worksheet. Collection is zero-based or one-base depending on the Package.Compatibility.IsWorksheets1Based propery. Default is Zero based</param>
-        /// <seealso cref="ExcelPackage.Compatibility"/>
-        /// <returns></returns>
-#else
 	/// <summary>
 	/// Returns the worksheet at the specified position. 
 	/// </summary>
-	/// <param name="PositionID">The position of the worksheet. Collection is zero-based or one-base depending on the Package.Compatibility.IsWorksheets1Based propery. Default is One based</param>
+	/// <param name="PositionID">The position of the worksheet. Collection is zero-based or one-base depending on the Package.Compatibility.IsWorksheets1Based propery. Default is Zero based</param>
 	/// <seealso cref="ExcelPackage.Compatibility"/>
 	/// <returns></returns>
-#endif
 	public ExcelWorksheet this[int PositionID]
 	{
 		get
 		{
 			return _worksheets.TryGetValue(PositionID, out var value)
-				? value :              throw (new IndexOutOfRangeException("Worksheet position out of range."));
+				? value
+				: throw (new IndexOutOfRangeException("Worksheet position out of range."));
 		}
 	}
 

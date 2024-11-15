@@ -28,12 +28,12 @@
  * ******************************************************************************
  * Jan Källman                      Added                       2012-03-04  
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.Exceptions;
 
-namespace OfficeOpenXml.FormulaParsing.DependencyChain;
+namespace OfficeOpenXml.FormulaParsing.DependencyChains;
 
 internal static class DependencyChainFactory
 {
@@ -172,14 +172,14 @@ internal static class DependencyChainFactory
 	}
 	/// <summary>
 	/// This method follows the calculation chain to get the order of the calculation
-	/// Goto (!) is used internally to prevent stackoverflow on extremly larget dependency trees (that is, many recursive formulas).
+	/// Goto (!) is used internally to prevent stackoverflow on extremely large dependency trees (that is, many recursive formulas).
 	/// </summary>
 	/// <param name="depChain">The dependency chain object</param>
 	/// <param name="lexer">The formula tokenizer</param>
 	/// <param name="wb">The workbook where the formula comes from</param>
 	/// <param name="ws">The worksheet where the formula comes from</param>
 	/// <param name="f">The cell function object</param>
-	/// <param name="options">Calcultaiton options</param>
+	/// <param name="options">Calculation options</param>
 	private static void FollowChain(DependencyChain depChain, ILexer lexer, ExcelWorkbook wb, ExcelWorksheet ws, FormulaCell f, ExcelCalculationOption options)
 	{
 		Stack<FormulaCell> stack = new();
