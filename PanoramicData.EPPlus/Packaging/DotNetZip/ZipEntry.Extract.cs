@@ -907,7 +907,7 @@ internal partial class ZipEntry
 		if (Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
 			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
-			WinZipAesCipherStream wzs = _inputDecryptorStream as WinZipAesCipherStream;
+			var wzs = _inputDecryptorStream as WinZipAesCipherStream;
 			_aesCrypto_forExtract.CalculatedMac = wzs.FinalAuthentication;
 
 			_aesCrypto_forExtract.ReadAndVerifyMac(ArchiveStream); // throws if MAC is bad
@@ -1247,11 +1247,11 @@ internal partial class ZipEntry
 			}
 			else
 			{
-				int sizeOfSaltAndPv = GetLengthOfCryptoHeaderBytes(_Encryption_FromZipFile);
+				var sizeOfSaltAndPv = GetLengthOfCryptoHeaderBytes(_Encryption_FromZipFile);
 				ArchiveStream.Seek(FileDataPosition - sizeOfSaltAndPv, SeekOrigin.Begin);
 				// workitem 10178
 				SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
-				int keystrength = GetKeyStrengthInBits(_Encryption_FromZipFile);
+				var keystrength = GetKeyStrengthInBits(_Encryption_FromZipFile);
 				_aesCrypto_forExtract = WinZipAesCrypto.ReadFromStream(password, keystrength, ArchiveStream);
 			}
 		}

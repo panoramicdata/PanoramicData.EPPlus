@@ -369,7 +369,7 @@ internal partial class ZipEntry
 			Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			block = new byte[4 + 7];
-			int i = 0;
+			var i = 0;
 			// extra field for WinZip AES
 			// header id
 			block[i++] = 0x01;
@@ -388,7 +388,7 @@ internal partial class ZipEntry
 			block[i++] = 0x45;
 
 			// key strength
-			int keystrength = GetKeyStrengthInBits(Encryption);
+			var keystrength = GetKeyStrengthInBits(Encryption);
 			if (keystrength == 128)
 				block[i] = 1;
 			else if (keystrength == 256)
@@ -1576,9 +1576,9 @@ internal partial class ZipEntry
 				{
 					// Fix the extra field - overwrite the 0x9901 headerId
 					// with dummy data. (arbitrarily, 0x9999)
-					Int16 fnLength = (short)(_EntryHeader[26] + _EntryHeader[27] * 256);
-					int offx = 30 + fnLength;
-					int aesIndex = FindExtraFieldSegment(_EntryHeader, offx, 0x9901);
+					var fnLength = (short)(_EntryHeader[26] + _EntryHeader[27] * 256);
+					var offx = 30 + fnLength;
+					var aesIndex = FindExtraFieldSegment(_EntryHeader, offx, 0x9901);
 					if (aesIndex >= 0)
 					{
 						_EntryHeader[aesIndex++] = 0x99;
@@ -2303,7 +2303,7 @@ internal partial class ZipEntry
 			// preceded by a variable-sized Salt and a 2-byte "password
 			// verification" value for the entry.
 
-			int keystrength = GetKeyStrengthInBits(Encryption);
+			var keystrength = GetKeyStrengthInBits(Encryption);
 			_aesCrypto_forWrite = WinZipAesCrypto.Generate(pwd, keystrength);
 			outstream.Write(_aesCrypto_forWrite.Salt, 0, _aesCrypto_forWrite._Salt.Length);
 			outstream.Write(_aesCrypto_forWrite.GeneratedPV, 0, _aesCrypto_forWrite.GeneratedPV.Length);

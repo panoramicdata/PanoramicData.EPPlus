@@ -2530,8 +2530,8 @@ internal partial class ZipEntry
 		if (a == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
 			a == DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
-			int KeyStrengthInBits = GetKeyStrengthInBits(a);
-			int sizeOfSaltAndPv = ((KeyStrengthInBits / 8 / 2) + 2);
+			var KeyStrengthInBits = GetKeyStrengthInBits(a);
+			var sizeOfSaltAndPv = ((KeyStrengthInBits / 8 / 2) + 2);
 			return sizeOfSaltAndPv;
 		}
 		return a == DotNetZip.EncryptionAlgorithm.PkzipWeak ? 12 : throw new ZipException("internal error");

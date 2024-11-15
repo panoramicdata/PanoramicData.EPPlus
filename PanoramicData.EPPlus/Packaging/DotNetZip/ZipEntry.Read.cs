@@ -270,7 +270,7 @@ internal partial class ZipEntry
 			if (ze.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
 				ze.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
 			{
-				int bits = GetKeyStrengthInBits(ze._Encryption_FromZipFile);
+				var bits = GetKeyStrengthInBits(ze._Encryption_FromZipFile);
 				// read in the WinZip AES metadata: salt + PV. 18 bytes for AES256. 10 bytes for AES128.
 				ze._aesCrypto_forExtract = WinZipAesCrypto.ReadFromStream(null, bits, ze.ArchiveStream);
 				bytesRead += ze._aesCrypto_forExtract.SizeOfEncryptionMetadata - 10; // MAC (follows crypto bytes)
@@ -591,12 +591,12 @@ internal partial class ZipEntry
 				throw new BadReadException(String.Format("  Unexpected vendor version number (0x{0:X4}) for WinZip AES metadata at position 0x{1:X16}",
 					_WinZipAesMethod, posn));
 
-			Int16 vendorId = BitConverter.ToInt16(buffer, j);
+			var vendorId = BitConverter.ToInt16(buffer, j);
 			j += 2;
 			if (vendorId != 0x4541)
 				throw new BadReadException(String.Format("  Unexpected vendor ID (0x{0:X4}) for WinZip AES metadata at position 0x{1:X16}", vendorId, posn));
 
-			int keystrength = (buffer[j] == 1) ? 128 : (buffer[j] == 3) ? 256 : -1;
+			var keystrength = (buffer[j] == 1) ? 128 : (buffer[j] == 3) ? 256 : -1;
 			if (keystrength < 0)
 				throw new BadReadException(String.Format("Invalid key strength ({0})", keystrength));
 
