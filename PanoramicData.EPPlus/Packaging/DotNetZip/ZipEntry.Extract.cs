@@ -806,7 +806,7 @@ internal partial class ZipEntry
 					// the zip archive.
 
 					// String.Contains is not available on .NET CF 2.0
-					if (FileName.IndexOf('/') != -1)
+					if (FileName.Contains('/'))
 					{
 						var dirname = Path.GetDirectoryName(FileName);
 						if (_container.ZipFile[dirname] == null)
@@ -1286,7 +1286,7 @@ internal partial class ZipEntry
 
 			if (_container.ZipFile.FlattenFoldersOnExtract)
 				outFileName = Path.Combine(basedir,
-										  (f.IndexOf('/') != -1) ? Path.GetFileName(f) : f);
+										  (f.Contains('/')) ? Path.GetFileName(f) : f);
 			else
 				outFileName = Path.Combine(basedir, f);
 

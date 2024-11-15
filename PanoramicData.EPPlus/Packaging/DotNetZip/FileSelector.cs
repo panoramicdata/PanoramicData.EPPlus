@@ -257,7 +257,7 @@ internal partial class NameCriterion : SelectionCriterion
 		CriterionTrace("NameCriterion::Evaluate({0})", fullpath);
 		// No slash in the pattern implicitly means recurse, which means compare to
 		// filename only, not full path.
-		var f = (_MatchingFileSpec.IndexOf('\\') == -1)
+		var f = (!_MatchingFileSpec.Contains('\\'))
 			? Path.GetFileName(fullpath)
 			: fullpath; // compare to fullpath
 
@@ -945,7 +945,7 @@ internal partial class FileSelector
 		s = NormalizeCriteriaExpression(s);
 
 		// no spaces in the criteria is shorthand for filename glob
-		if (s.IndexOf(' ') == -1)
+		if (!s.Contains(' '))
 			s = "name = " + s;
 
 		// split the expression into tokens

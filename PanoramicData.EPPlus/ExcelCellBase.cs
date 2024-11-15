@@ -680,7 +680,7 @@ public abstract class ExcelCellBase
 	internal static string GetFullAddress(string worksheetName, string address, bool fullRowCol)
 	{
 		if (!string.IsNullOrEmpty(worksheetName)) worksheetName = worksheetName.Replace("'", "''");   //Makesure addresses handle single qoutes
-		if (address.IndexOf("!") == -1 || address == "#REF!")
+		if (!address.Contains("!", StringComparison.CurrentCulture) || address == "#REF!")
 		{
 			if (fullRowCol)
 			{

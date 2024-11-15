@@ -1796,7 +1796,7 @@ internal partial class ZipFile
 			throw new ArgumentNullException(nameof(entryName));
 
 		string directoryPathInArchive = null;
-		if (entryName.IndexOf('\\') != -1)
+		if (entryName.Contains('\\'))
 		{
 			directoryPathInArchive = Path.GetDirectoryName(entryName);
 			entryName = Path.GetFileName(entryName);

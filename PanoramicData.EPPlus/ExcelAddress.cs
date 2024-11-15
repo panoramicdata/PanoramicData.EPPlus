@@ -1274,7 +1274,7 @@ public class ExcelFormulaAddress : ExcelAddressBase
 
 	private void SetFixed()
 	{
-		if (Address.IndexOf('[') >= 0) return;
+		if (Address.Contains('[')) return;
 		var address = FirstAddress;
 		if (_fromRow == _toRow && _fromCol == _toCol)
 		{

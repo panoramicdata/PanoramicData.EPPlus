@@ -185,14 +185,14 @@ public class GZipStream : Stream
 			if (_disposed) throw new ObjectDisposedException("GZipStream");
 			_FileName = value;
 			if (_FileName == null) return;
-			if (_FileName.IndexOf("/") != -1)
+			if (_FileName.Contains("/", StringComparison.CurrentCulture))
 			{
 				_FileName = _FileName.Replace("/", "\\");
 			}
 
 			if (_FileName.EndsWith("\\"))
 				throw new Exception("Illegal filename");
-			if (_FileName.IndexOf("\\") != -1)
+			if (_FileName.Contains("\\", StringComparison.CurrentCulture))
 			{
 				// trim any leading path
 				_FileName = Path.GetFileName(_FileName);
