@@ -853,7 +853,7 @@ internal partial class ZipEntry
 			// rename the entry!
 			if (String.IsNullOrEmpty(value)) throw new ZipException("The FileName must be non empty and non-null.");
 
-			var filename = ZipEntry.NameInArchive(value, null);
+			var filename = NameInArchive(value, null);
 			// workitem 8180
 			if (_FileNameInArchive == filename) return; // nothing to do
 
@@ -1349,7 +1349,7 @@ internal partial class ZipEntry
 
 			_CompressionMethod = (Int16)value;
 
-			if (_CompressionMethod == (Int16)Ionic.Zip.CompressionMethod.None)
+			if (_CompressionMethod == (Int16)CompressionMethod.None)
 				_CompressionLevel = DotNetZip.Zlib.CompressionLevel.None;
 			else if (CompressionLevel == DotNetZip.Zlib.CompressionLevel.None)
 				_CompressionLevel = DotNetZip.Zlib.CompressionLevel.Default;
@@ -1423,9 +1423,9 @@ internal partial class ZipEntry
 				return; // nothing more to do
 
 			if (_CompressionLevel == DotNetZip.Zlib.CompressionLevel.None)
-				_CompressionMethod = (short)OfficeOpenXml.Packaging.Ionic.Zip.CompressionMethod.None;
+				_CompressionMethod = (short)CompressionMethod.None;
 			else
-				_CompressionMethod = (short)OfficeOpenXml.Packaging.Ionic.Zip.CompressionMethod.Deflate;
+				_CompressionMethod = (short)CompressionMethod.Deflate;
 
 			_container.ZipFile?.NotifyEntryChanged();
 			_restreamRequiredOnSave = true;
@@ -2071,7 +2071,7 @@ internal partial class ZipEntry
 			}
 			else
 			{
-				AlternateEncoding = Ionic.Zip.ZipFile.DefaultEncoding;
+				AlternateEncoding = ZipFile.DefaultEncoding;
 				AlternateEncodingUsage = ZipOption.Never;
 			}
 		}
@@ -2629,7 +2629,7 @@ internal partial class ZipEntry
 	private ZipEntryTimestamp _timestamp;
 
 	private static readonly System.DateTime _unixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-	private static readonly System.DateTime _win32Epoch = System.DateTime.FromFileTimeUtc(0L);
+	private static readonly System.DateTime _win32Epoch = DateTime.FromFileTimeUtc(0L);
 	private static readonly System.DateTime _zeroHour = new(1, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 	private WriteDelegate _WriteDelegate;

@@ -541,7 +541,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			{
 				if (_vmlDrawingsHF.Uri == null)
 				{
-					_vmlDrawingsHF.Uri = XmlHelper.GetNewUri(_ws._package.Package, @"/xl/drawings/vmlDrawing{0}.vml");
+					_vmlDrawingsHF.Uri = GetNewUri(_ws._package.Package, @"/xl/drawings/vmlDrawing{0}.vml");
 				}
 
 				if (_vmlDrawingsHF.Part == null)

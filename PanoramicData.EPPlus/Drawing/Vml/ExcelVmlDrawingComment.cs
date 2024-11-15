@@ -158,7 +158,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 			else
 			{
 				if (col.StartsWith("#")) col = col[1..];
-				return int.TryParse(col, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out var res)
+				return int.TryParse(col, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out var res)
 					? Color.FromArgb(res)
 					: Color.Empty;
 			}
@@ -233,7 +233,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 			else
 			{
 				if (col.StartsWith("#")) col = col[1..];
-				return int.TryParse(col, System.Globalization.NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out var res)
+				return int.TryParse(col, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out var res)
 					? Color.FromArgb(res)
 					: Color.Empty;
 			}
@@ -256,7 +256,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 			if (wt == "") return (Single).75;
 			if (wt.EndsWith("pt")) wt = wt[..^2];
 
-			return Single.TryParse(wt, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out var ret) ? ret : 0;
+			return Single.TryParse(wt, NumberStyles.Any, CultureInfo.InvariantCulture, out var ret) ? ret : 0;
 		}
 		set
 		{

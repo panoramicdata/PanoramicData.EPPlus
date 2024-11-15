@@ -123,7 +123,7 @@ public class ExcelVmlDrawingPosition : XmlHelper
 		var numbers = anchor.Split(',');
 		if (numbers.Length == 8)
 		{
-			if (int.TryParse(numbers[_startPos + pos], System.Globalization.NumberStyles.Number, CultureInfo.InvariantCulture, out var ret))
+			if (int.TryParse(numbers[_startPos + pos], NumberStyles.Number, CultureInfo.InvariantCulture, out var ret))
 			{
 				return ret;
 			}

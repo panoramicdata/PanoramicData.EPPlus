@@ -43,8 +43,8 @@ public sealed class ExcelBubbleChartSeries : ExcelChartSeries
 	{
 		//_chartSeries = new ExcelChartSeries(this, _drawings.NameSpaceManager, _chartNode, isPivot);
 	}
-	public ExcelChartSerie Add(ExcelRangeBase Serie, ExcelRangeBase XSerie, ExcelRangeBase BubbleSize) => base.AddSeries(Serie.FullAddressAbsolute, XSerie.FullAddressAbsolute, BubbleSize.FullAddressAbsolute);
-	public ExcelChartSerie Add(string SerieAddress, string XSerieAddress, string BubbleSizeAddress) => base.AddSeries(SerieAddress, XSerieAddress, BubbleSizeAddress);
+	public ExcelChartSerie Add(ExcelRangeBase Serie, ExcelRangeBase XSerie, ExcelRangeBase BubbleSize) => AddSeries(Serie.FullAddressAbsolute, XSerie.FullAddressAbsolute, BubbleSize.FullAddressAbsolute);
+	public ExcelChartSerie Add(string SerieAddress, string XSerieAddress, string BubbleSizeAddress) => AddSeries(SerieAddress, XSerieAddress, BubbleSizeAddress);
 }
 /// <summary>
 /// Collection class for chart series

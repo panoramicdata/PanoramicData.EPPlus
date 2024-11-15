@@ -43,7 +43,7 @@ public class Find : ExcelFunction
 			startIndex = ArgToInt(functionArguments, 2);
 		}
 
-		var result = searchIn.IndexOf(search, startIndex, System.StringComparison.Ordinal);
+		var result = searchIn.IndexOf(search, startIndex, StringComparison.Ordinal);
 		if (result == -1)
 		{
 			return CreateResult(ExcelErrorValue.Create(eErrorType.Value), DataType.ExcelError);

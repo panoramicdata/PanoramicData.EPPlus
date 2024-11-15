@@ -38,7 +38,7 @@ public class ExcelProtectedRangeCollection : XmlHelper, IEnumerable<ExcelProtect
 
 		var newNode = TopNode.OwnerDocument.CreateElement("protectedRange", ExcelPackage.schemaMain);
 		TopNode.SelectSingleNode("d:protectedRanges", NameSpaceManager).AppendChild(newNode);
-		var item = new ExcelProtectedRange(name, address, base.NameSpaceManager, newNode);
+		var item = new ExcelProtectedRange(name, address, NameSpaceManager, newNode);
 		_baseList.Add(item);
 		return item;
 	}

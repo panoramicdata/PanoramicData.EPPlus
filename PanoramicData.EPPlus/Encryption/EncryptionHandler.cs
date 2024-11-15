@@ -331,7 +331,7 @@ internal class EncryptedPackageHandler
 
 		var tr = "StrongEncryptionTransform";
 		bw.Write((int)tr.Length * 2);
-		bw.Write(UTF8Encoding.Unicode.GetBytes(tr + "\0")); // end \0 is for padding
+		bw.Write(Encoding.Unicode.GetBytes(tr + "\0")); // end \0 is for padding
 
 		bw.Flush();
 		return ms.ToArray();
@@ -343,7 +343,7 @@ internal class EncryptedPackageHandler
 
 		bw.Write((short)0x3C);  //Major
 		bw.Write((short)0);     //Minor
-		bw.Write(UTF8Encoding.Unicode.GetBytes("Microsoft.Container.DataSpaces"));
+		bw.Write(Encoding.Unicode.GetBytes("Microsoft.Container.DataSpaces"));
 		bw.Write((int)1);       //ReaderVersion
 		bw.Write((int)1);       //UpdaterVersion
 		bw.Write((int)1);       //WriterVersion
@@ -364,9 +364,9 @@ internal class EncryptedPackageHandler
 		bw.Write((int)1);       //ReferenceComponentCount
 		bw.Write((int)0);       //Stream=0
 		bw.Write((int)s1.Length * 2); //Length s1
-		bw.Write(UTF8Encoding.Unicode.GetBytes(s1));
+		bw.Write(Encoding.Unicode.GetBytes(s1));
 		bw.Write((int)(s2.Length * 2));   //Length s2
-		bw.Write(UTF8Encoding.Unicode.GetBytes(s2 + "\0"));   // end \0 is for padding
+		bw.Write(Encoding.Unicode.GetBytes(s2 + "\0"));   // end \0 is for padding
 
 		bw.Flush();
 		return ms.ToArray();
@@ -380,9 +380,9 @@ internal class EncryptedPackageHandler
 		bw.Write(TransformID.Length * 2 + 12);
 		bw.Write((int)1);
 		bw.Write(TransformID.Length * 2);
-		bw.Write(UTF8Encoding.Unicode.GetBytes(TransformID));
+		bw.Write(Encoding.Unicode.GetBytes(TransformID));
 		bw.Write(TransformName.Length * 2);
-		bw.Write(UTF8Encoding.Unicode.GetBytes(TransformName + "\0"));
+		bw.Write(Encoding.Unicode.GetBytes(TransformName + "\0"));
 		bw.Write((int)1);   //ReaderVersion
 		bw.Write((int)1);   //UpdaterVersion
 		bw.Write((int)1);   //WriterVersion
@@ -815,7 +815,7 @@ internal class EncryptedPackageHandler
 
 			// Append "block" (0)
 			Array.Copy(hash, tempHash, hash.Length);
-			Array.Copy(System.BitConverter.GetBytes(0), 0, tempHash, hash.Length, 4);
+			Array.Copy(BitConverter.GetBytes(0), 0, tempHash, hash.Length, 4);
 			hash = hashProvider.ComputeHash(tempHash);
 
 			/***** Now use the derived key algorithm *****/
@@ -932,7 +932,7 @@ internal class EncryptedPackageHandler
 			password = "VelvetSweatshop";   //Used if Password is blank
 		}
 		// Convert password to unicode...
-		var passwordBuf = UnicodeEncoding.Unicode.GetBytes(password);
+		var passwordBuf = Encoding.Unicode.GetBytes(password);
 
 		var inputBuf = new byte[salt.Length + passwordBuf.Length];
 		Array.Copy(salt, inputBuf, salt.Length);

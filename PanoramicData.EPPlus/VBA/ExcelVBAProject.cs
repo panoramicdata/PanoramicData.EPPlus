@@ -1006,7 +1006,7 @@ public class ExcelVbaProject
 	}
 	private string WriteVisibilityState() => Encrypt([(byte)(Protection.VisibilityState ? 0xFF : 0)]);
 	#endregion
-	private string GetString(BinaryReader br, uint size) => GetString(br, size, System.Text.Encoding.GetEncoding(CodePage));
+	private string GetString(BinaryReader br, uint size) => GetString(br, size, Encoding.GetEncoding(CodePage));
 	private static string GetString(BinaryReader br, uint size, Encoding enc)
 	{
 		if (size > 0)
@@ -1025,7 +1025,7 @@ public class ExcelVbaProject
 		var s = GetString(br, size);
 		int reserved = br.ReadUInt16();
 		var sizeUC = br.ReadUInt32();
-		var sUC = GetString(br, sizeUC, System.Text.Encoding.Unicode);
+		var sUC = GetString(br, sizeUC, Encoding.Unicode);
 		return sUC.Length == 0 ? s : sUC;
 	}
 	internal CompoundDocument Document { get; set; }

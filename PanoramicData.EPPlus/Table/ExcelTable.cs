@@ -432,11 +432,11 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 			{
 				if (value)
 				{
-					Address = new ExcelAddress(WorkSheet.Name, ExcelAddressBase.GetAddress(Address.Start.Row, Address.Start.Column, Address.End.Row + 1, Address.End.Column));
+					Address = new ExcelAddress(WorkSheet.Name, ExcelCellBase.GetAddress(Address.Start.Row, Address.Start.Column, Address.End.Row + 1, Address.End.Column));
 				}
 				else
 				{
-					Address = new ExcelAddress(WorkSheet.Name, ExcelAddressBase.GetAddress(Address.Start.Row, Address.Start.Column, Address.End.Row - 1, Address.End.Column));
+					Address = new ExcelAddress(WorkSheet.Name, ExcelCellBase.GetAddress(Address.Start.Row, Address.Start.Column, Address.End.Row - 1, Address.End.Column));
 				}
 
 				SetXmlNodeString("@ref", Address.Address);

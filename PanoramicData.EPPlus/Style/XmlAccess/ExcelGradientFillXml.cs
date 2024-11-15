@@ -137,7 +137,7 @@ public sealed class ExcelGradientFillXml : ExcelFillXml
 	{
 		ExcelGradientFillXml newFill = new(NameSpaceManager)
 		{
-			PatternType = base._fillPatternType,
+			PatternType = _fillPatternType,
 			BackgroundColor = _backgroundColor.Copy(),
 			PatternColor = _patternColor.Copy(),
 

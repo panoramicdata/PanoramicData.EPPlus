@@ -157,7 +157,7 @@ public class TokenFactory : ITokenFactory
 			return new Token(token, TokenType.Enumerable);
 		}
 
-		var at = OfficeOpenXml.ExcelAddressBase.IsValid(token, _r1c1);
+		var at = ExcelAddressBase.IsValid(token, _r1c1);
 		if (at == ExcelAddressBase.AddressType.InternalAddress)
 		{
 			return new Token(token.ToUpper(CultureInfo.InvariantCulture), TokenType.ExcelAddress);

@@ -493,7 +493,7 @@ public class ExcelChart : ExcelDrawing
 			ChartXml.Save(streamChart);
 			ZipPackage.Flush();
 
-			var chartRelation = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, UriChart), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/chart");
+			var chartRelation = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, UriChart), TargetMode.Internal, ExcelPackage.schemaRelationships + "/chart");
 			graphFrame.SelectSingleNode("a:graphic/a:graphicData/c:chart", NameSpaceManager).Attributes["r:id"].Value = chartRelation.Id;
 			ZipPackage.Flush();
 			_chartNode = ChartXml.SelectSingleNode(string.Format("c:chartSpace/c:chart/c:plotArea/{0}", GetChartNodeText()), NameSpaceManager);

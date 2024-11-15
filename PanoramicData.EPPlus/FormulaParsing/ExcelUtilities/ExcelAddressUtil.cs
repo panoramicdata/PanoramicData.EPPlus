@@ -65,7 +65,7 @@ public static class ExcelAddressUtil
 			token = token[(token.IndexOf('!') + 1)..];
 		}
 
-		return OfficeOpenXml.ExcelAddress.IsValidAddress(token);
+		return ExcelCellBase.IsValidAddress(token);
 	}
 	readonly static char[] NameInvalidChars = ['!', '@', '#', '$', '£', '%', '&', '/', '(', ')', '[', ']', '{', '}', '<', '>', '=', '+', '*', '-', '~', '^', ':', ';', '|', ',', ' '];
 	public static bool IsValidName(string name)

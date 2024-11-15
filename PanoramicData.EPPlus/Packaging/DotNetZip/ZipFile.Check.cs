@@ -125,7 +125,7 @@ internal partial class ZipFile
 			};
 			zip1.Initialize(zipFileName);
 
-			zip2 = ZipFile.Read(zipFileName);
+			zip2 = Read(zipFileName);
 
 			foreach (var e1 in zip1)
 			{
@@ -275,13 +275,13 @@ internal partial class ZipFile
 		var success = false;
 		try
 		{
-			using (var zip1 = ZipFile.Read(zipFileName))
+			using (var zip1 = Read(zipFileName))
 			{
 				foreach (var e in zip1)
 				{
 					if (!e.IsDirectory && e.UsesEncryption)
 					{
-						e.ExtractWithPassword(System.IO.Stream.Null, password);
+						e.ExtractWithPassword(Stream.Null, password);
 					}
 				}
 			}

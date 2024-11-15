@@ -129,27 +129,27 @@ public class ExcelDataValidationType
 	/// <returns></returns>
 	internal static ExcelDataValidationType GetByValidationType(eDataValidationType type) => type switch
 	{
-		eDataValidationType.Any => ExcelDataValidationType.Any,
-		eDataValidationType.Whole => ExcelDataValidationType.Whole,
-		eDataValidationType.List => ExcelDataValidationType.List,
-		eDataValidationType.Decimal => ExcelDataValidationType.Decimal,
-		eDataValidationType.TextLength => ExcelDataValidationType.TextLength,
-		eDataValidationType.DateTime => ExcelDataValidationType.DateTime,
-		eDataValidationType.Time => ExcelDataValidationType.Time,
-		eDataValidationType.Custom => ExcelDataValidationType.Custom,
+		eDataValidationType.Any => Any,
+		eDataValidationType.Whole => Whole,
+		eDataValidationType.List => List,
+		eDataValidationType.Decimal => Decimal,
+		eDataValidationType.TextLength => TextLength,
+		eDataValidationType.DateTime => DateTime,
+		eDataValidationType.Time => Time,
+		eDataValidationType.Custom => Custom,
 		_ => throw new InvalidOperationException("Non supported Validationtype : " + type.ToString()),
 	};
 
 	internal static ExcelDataValidationType GetBySchemaName(string schemaName) => schemaName switch
 	{
-		DataValidationSchemaNames.Any => ExcelDataValidationType.Any,
-		DataValidationSchemaNames.Whole => ExcelDataValidationType.Whole,
-		DataValidationSchemaNames.Decimal => ExcelDataValidationType.Decimal,
-		DataValidationSchemaNames.List => ExcelDataValidationType.List,
-		DataValidationSchemaNames.TextLength => ExcelDataValidationType.TextLength,
-		DataValidationSchemaNames.Date => ExcelDataValidationType.DateTime,
-		DataValidationSchemaNames.Time => ExcelDataValidationType.Time,
-		DataValidationSchemaNames.Custom => ExcelDataValidationType.Custom,
+		DataValidationSchemaNames.Any => Any,
+		DataValidationSchemaNames.Whole => Whole,
+		DataValidationSchemaNames.Decimal => Decimal,
+		DataValidationSchemaNames.List => List,
+		DataValidationSchemaNames.TextLength => TextLength,
+		DataValidationSchemaNames.Date => DateTime,
+		DataValidationSchemaNames.Time => Time,
+		DataValidationSchemaNames.Custom => Custom,
 		_ => throw new ArgumentException("Invalid schemaname: " + schemaName),
 	};
 

@@ -116,7 +116,7 @@ internal partial class ZipFile
 	///
 	/// <returns>The instance read from the zip archive.</returns>
 	///
-	public static ZipFile Read(string fileName) => ZipFile.Read(fileName, null, null, null);
+	public static ZipFile Read(string fileName) => Read(fileName, null, null, null);
 
 
 	/// <summary>
@@ -520,7 +520,7 @@ internal partial class ZipFile
 		ZipFile zf = new()
 		{
 			_StatusMessageTextWriter = statusMessageWriter,
-			_alternateEncoding = encoding ?? ZipFile.DefaultEncoding,
+			_alternateEncoding = encoding ?? DefaultEncoding,
 			_alternateEncodingUsage = ZipOption.Always
 		};
 		if (readProgress != null)
@@ -1069,7 +1069,7 @@ internal partial class ZipFile
 
 			var bitBucket = Stream.Null;
 
-			using (var zip1 = ZipFile.Read(stream, null, null, null))
+			using (var zip1 = Read(stream, null, null, null))
 			{
 				if (testExtract)
 				{

@@ -93,7 +93,7 @@ public class ExcelColumn : IRangeID
 	/// <summary>
 	/// Internal range id for the column
 	/// </summary>
-	internal ulong ColumnID => ExcelColumn.GetColumnID(_worksheet.SheetID, ColumnMin);
+	internal ulong ColumnID => GetColumnID(_worksheet.SheetID, ColumnMin);
 	#region ExcelColumn Hidden
 	/// <summary>
 	/// Allows the column to be hidden in the worksheet

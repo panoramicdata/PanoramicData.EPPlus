@@ -736,7 +736,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		get
 		{
 			var col = GetXmlNodeString(TabColorPath);
-			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, System.Globalization.NumberStyles.AllowHexSpecifier));
+			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, NumberStyles.AllowHexSpecifier));
 		}
 		set
 		{
@@ -981,7 +981,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		{
 			var s = sb.ToString();
 			var xml = s[..startmMatch.Index];
-			if (Utils.ConvertUtil._invariantCompareInfo.IsSuffix(startmMatch.Value, "/>"))        //Empty sheetdata
+			if (ConvertUtil._invariantCompareInfo.IsSuffix(startmMatch.Value, "/>"))        //Empty sheetdata
 			{
 				xml += s[startmMatch.Index..];
 			}
@@ -1055,13 +1055,13 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	private static bool ReadUntil(XmlReader xr, params string[] tagName)
 	{
 		if (xr.EOF) return false;
-		while (!Array.Exists(tagName, tag => Utils.ConvertUtil._invariantCompareInfo.IsSuffix(xr.LocalName, tag)))
+		while (!Array.Exists(tagName, tag => ConvertUtil._invariantCompareInfo.IsSuffix(xr.LocalName, tag)))
 		{
 			xr.Read();
 			if (xr.EOF) return false;
 		}
 
-		return (Utils.ConvertUtil._invariantCompareInfo.IsSuffix(xr.LocalName, tagName[0]));
+		return (ConvertUtil._invariantCompareInfo.IsSuffix(xr.LocalName, tagName[0]));
 	}
 	private void LoadColumns(XmlReader xr)//(string xml)
 	{
@@ -1838,7 +1838,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					a._toRow += rows;
 				}
 
-				f.Address = ExcelAddressBase.GetAddress(a._fromRow, a._fromCol, a._toRow, a._toCol);
+				f.Address = ExcelCellBase.GetAddress(a._fromRow, a._fromCol, a._toRow, a._toCol);
 				f.Formula = ExcelCellBase.UpdateFormulaReferences(f.Formula, rows, 0, rowFrom, 0, Name, Name);
 			}
 
@@ -1957,7 +1957,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					a._toCol += columns;
 				}
 
-				f.Address = ExcelAddressBase.GetAddress(a._fromRow, a._fromCol, a._toRow, a._toCol);
+				f.Address = ExcelCellBase.GetAddress(a._fromRow, a._fromCol, a._toRow, a._toCol);
 				f.Formula = ExcelCellBase.UpdateFormulaReferences(f.Formula, 0, columns, 0, columnFrom, Name, Name);
 			}
 
@@ -2342,13 +2342,13 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		string formualR1C1;
 		if (rows > 0 || fromRow <= startRow)
 		{
-			formualR1C1 = ExcelRangeBase.TranslateToR1C1(formula.Formula, formula.StartRow, formula.StartCol);
-			formula.Formula = ExcelRangeBase.TranslateFromR1C1(formualR1C1, fromRow, formula.StartCol);
+			formualR1C1 = ExcelCellBase.TranslateToR1C1(formula.Formula, formula.StartRow, formula.StartCol);
+			formula.Formula = ExcelCellBase.TranslateFromR1C1(formualR1C1, fromRow, formula.StartCol);
 		}
 		else
 		{
-			formualR1C1 = ExcelRangeBase.TranslateToR1C1(formula.Formula, formula.StartRow - rows, formula.StartCol);
-			formula.Formula = ExcelRangeBase.TranslateFromR1C1(formualR1C1, formula.StartRow, formula.StartCol);
+			formualR1C1 = ExcelCellBase.TranslateToR1C1(formula.Formula, formula.StartRow - rows, formula.StartCol);
+			formula.Formula = ExcelCellBase.TranslateFromR1C1(formualR1C1, formula.StartRow, formula.StartCol);
 		}
 		//bool isRef = false;
 		//Formulas restFormula=formula;
@@ -2362,12 +2362,12 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				if (rows > 0 || row < startRow)
 				{
 					newFormula = ExcelCellBase.UpdateFormulaReferences(ExcelCellBase.TranslateFromR1C1(formualR1C1, row, col), rows, 0, startRow, 0, Name, Name);
-					currentFormulaR1C1 = ExcelRangeBase.TranslateToR1C1(newFormula, row, col);
+					currentFormulaR1C1 = ExcelCellBase.TranslateToR1C1(newFormula, row, col);
 				}
 				else
 				{
 					newFormula = ExcelCellBase.UpdateFormulaReferences(ExcelCellBase.TranslateFromR1C1(formualR1C1, row - rows, col), rows, 0, startRow, 0, Name, Name);
-					currentFormulaR1C1 = ExcelRangeBase.TranslateToR1C1(newFormula, row, col);
+					currentFormulaR1C1 = ExcelCellBase.TranslateToR1C1(newFormula, row, col);
 				}
 
 				if (currentFormulaR1C1 != prevFormualR1C1) //newFormula.Contains("#REF!"))
@@ -2782,7 +2782,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	public void SetValue(string Address, object Value)
 	{
 		CheckSheetType();
-		ExcelAddressBase.GetRowCol(Address, out var row, out var col, true);
+		ExcelCellBase.GetRowCol(Address, out var row, out var col, true);
 		if (row < 1 || col < 1 || row > ExcelPackage.MaxRows && col > ExcelPackage.MaxColumns)
 		{
 			throw new ArgumentOutOfRangeException("Address is invalid or out of range");
@@ -3047,7 +3047,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				if (_comments.Uri == null)
 				{
 					var id = SheetID;
-					_comments.Uri = XmlHelper.GetNewUri(_package.Package, @"/xl/comments{0}.xml", ref id); //Issue 236-Part already exists fix
+					_comments.Uri = GetNewUri(_package.Package, @"/xl/comments{0}.xml", ref id); //Issue 236-Part already exists fix
 				}
 
 				if (_comments.Part == null)
@@ -3075,7 +3075,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				if (_vmlDrawings.Uri == null)
 				{
 					var id = SheetID;
-					_vmlDrawings.Uri = XmlHelper.GetNewUri(_package.Package, @"/xl/drawings/vmlDrawing{0}.vml", ref id);
+					_vmlDrawings.Uri = GetNewUri(_package.Package, @"/xl/drawings/vmlDrawing{0}.vml", ref id);
 				}
 
 				if (_vmlDrawings.Part == null)
@@ -3384,7 +3384,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	private void SaveXml(Stream stream)
 	{
 		//Create the nodes if they do not exist.
-		StreamWriter sw = new(stream, System.Text.Encoding.UTF8, 65536);
+		StreamWriter sw = new(stream, Encoding.UTF8, 65536);
 		if (this is ExcelChartsheet)
 		{
 			sw.Write(_worksheetXml.OuterXml);

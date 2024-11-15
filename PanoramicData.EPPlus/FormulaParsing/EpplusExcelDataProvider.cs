@@ -300,7 +300,7 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 			}
 		}
 
-		id = ExcelAddressBase.GetCellID(nameItem.LocalSheetId, nameItem.Index, 0);
+		id = ExcelCellBase.GetCellID(nameItem.LocalSheetId, nameItem.Index, 0);
 
 		if (_names.TryGetValue(id, out var value))
 		{

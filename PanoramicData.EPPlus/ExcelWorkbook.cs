@@ -220,7 +220,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 						namedRange = nameWorksheet.Names.Add(elem.GetAttribute("name"), range);
 					}
 
-					if (Utils.ConvertUtil._invariantCompareInfo.IsPrefix(fullAddress, "\"")) //String value
+					if (ConvertUtil._invariantCompareInfo.IsPrefix(fullAddress, "\"")) //String value
 					{
 						namedRange.NameValue = fullAddress[1..^1];
 					}

@@ -281,7 +281,7 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 		if (v.EndsWith("f"))
 		{
 			v = v[..^1];
-			if (double.TryParse(v, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+			if (double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
 			{
 				d /= 65535;
 			}
@@ -292,7 +292,7 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 		}
 		else
 		{
-			if (!double.TryParse(v, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out d))
+			if (!double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
 			{
 				d = def;
 			}

@@ -286,7 +286,7 @@ partial class ZipEntry
 		{
 			// this may change after processing the Extra field
 			zde._Encryption_FromZipFile = zde._Encryption =
-				OfficeOpenXml.Packaging.DotNetZip.EncryptionAlgorithm.PkzipWeak;
+				DotNetZip.EncryptionAlgorithm.PkzipWeak;
 			zde._sourceIsEncrypted = true;
 		}
 
@@ -312,7 +312,7 @@ partial class ZipEntry
 					zde.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
 		{
 			zde._CompressedFileDataSize = zde.CompressedSize -
-				(ZipEntry.GetLengthOfCryptoHeaderBytes(zde.Encryption) + 10);
+				(GetLengthOfCryptoHeaderBytes(zde.Encryption) + 10);
 			zde._LengthOfTrailer = 10;
 		}
 

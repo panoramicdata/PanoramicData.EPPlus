@@ -482,7 +482,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		if (Copy.HeaderFooter.Pictures.Count > 0)
 		{
 			var source = Copy.HeaderFooter.Pictures.Uri;
-			var dest = XmlHelper.GetNewUri(_pck.Package, @"/xl/drawings/vmlDrawing{0}.vml");
+			var dest = GetNewUri(_pck.Package, @"/xl/drawings/vmlDrawing{0}.vml");
 			added.DeleteNode("d:legacyDrawingHF");
 
 			//var part = _pck.Package.CreatePart(dest, "application/vnd.openxmlformats-officedocument.vmlDrawing", _pck.Compression);
@@ -612,7 +612,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		var uriComment = new Uri(string.Format("/xl/comments{0}.xml", workSheet.SheetID), UriKind.Relative);
 		if (_pck.Package.PartExists(uriComment))
 		{
-			uriComment = XmlHelper.GetNewUri(_pck.Package, "/xl/drawings/vmldrawing{0}.vml");
+			uriComment = GetNewUri(_pck.Package, "/xl/drawings/vmldrawing{0}.vml");
 		}
 
 		var part = _pck.Package.CreatePart(uriComment, "application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml", _pck.Compression);
@@ -629,7 +629,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		var uriVml = new Uri(string.Format("/xl/drawings/vmldrawing{0}.vml", workSheet.SheetID), UriKind.Relative);
 		if (_pck.Package.PartExists(uriVml))
 		{
-			uriVml = XmlHelper.GetNewUri(_pck.Package, "/xl/drawings/vmldrawing{0}.vml");
+			uriVml = GetNewUri(_pck.Package, "/xl/drawings/vmldrawing{0}.vml");
 		}
 
 		var vmlPart = _pck.Package.CreatePart(uriVml, "application/vnd.openxmlformats-officedocument.vmlDrawing", _pck.Compression);
@@ -676,7 +676,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 				var chart = draw as ExcelChart;
 				xml = chart.ChartXml.InnerXml;
 
-				var UriChart = XmlHelper.GetNewUri(_pck.Package, "/xl/charts/chart{0}.xml");
+				var UriChart = GetNewUri(_pck.Package, "/xl/charts/chart{0}.xml");
 				var chartPart = _pck.Package.CreatePart(UriChart, "application/vnd.openxmlformats-officedocument.drawingml.chart+xml", _pck.Compression);
 				StreamWriter streamChart = new(chartPart.GetStream(FileMode.Create, FileAccess.Write));
 				streamChart.Write(xml);

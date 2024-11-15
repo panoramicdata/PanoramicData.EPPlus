@@ -159,7 +159,7 @@ public class ExcelTextFont : XmlHelper
 		get
 		{
 			var col = GetXmlNodeString(_underLineColorPath);
-			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, System.Globalization.NumberStyles.AllowHexSpecifier));
+			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, NumberStyles.AllowHexSpecifier));
 		}
 		set
 		{
@@ -212,7 +212,7 @@ public class ExcelTextFont : XmlHelper
 		get
 		{
 			var col = GetXmlNodeString(_colorPath);
-			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, System.Globalization.NumberStyles.AllowHexSpecifier));
+			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, NumberStyles.AllowHexSpecifier));
 		}
 		set
 		{

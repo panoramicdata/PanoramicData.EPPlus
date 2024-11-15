@@ -915,7 +915,7 @@ public class ExcelPivotTable : XmlHelper
 			SetXmlNodeString(STYLENAME_PATH, value, true);
 		}
 	}
-	TableStyles _tableStyle = Table.TableStyles.Medium6;
+	TableStyles _tableStyle = TableStyles.Medium6;
 	/// <summary>
 	/// The table style. If this property is cusom the style from the StyleName propery is used.
 	/// </summary>

@@ -1989,7 +1989,7 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 		}
 	}
 
-	public string CellAddress => ExcelAddressBase.GetAddress(Row, Column);
+	public string CellAddress => ExcelCellBase.GetAddress(Row, Column);
 
 	public IEnumerator<T> GetEnumerator()
 	{

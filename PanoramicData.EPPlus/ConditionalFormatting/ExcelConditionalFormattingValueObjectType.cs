@@ -110,7 +110,7 @@ internal static class ExcelConditionalFormattingValueObjectType
 				// {0}
 				ExcelConditionalFormattingConstants.Paths.Cfvo,
 				// {1}
-				ExcelConditionalFormattingValueObjectType.GetOrderByPosition(position, ruleType)),
+				GetOrderByPosition(position, ruleType)),
 			nameSpaceManager);
 
 		return node == null

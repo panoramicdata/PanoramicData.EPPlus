@@ -351,7 +351,7 @@ public sealed class ExcelFontXml : StyleXmlHelper
 		}
 
 		if (_verticalAlign != "") SetXmlNodeString(verticalAlignPath, _verticalAlign.ToString());
-		if (_size > 0) SetXmlNodeString(sizePath, _size.ToString(System.Globalization.CultureInfo.InvariantCulture));
+		if (_size > 0) SetXmlNodeString(sizePath, _size.ToString(CultureInfo.InvariantCulture));
 		if (_color.Exists)
 		{
 			CreateNode(_colorPath);

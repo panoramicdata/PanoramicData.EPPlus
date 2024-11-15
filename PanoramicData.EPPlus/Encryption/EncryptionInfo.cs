@@ -509,7 +509,7 @@ internal class EncryptionInfoBinary : EncryptionInfo
 
 		var text = new byte[(int)HeaderSize - 34];
 		Array.Copy(data, 44, text, 0, (int)HeaderSize - 34);
-		Header.CSPName = UTF8Encoding.Unicode.GetString(text);
+		Header.CSPName = Encoding.Unicode.GetString(text);
 
 		var pos = (int)HeaderSize + 12;
 

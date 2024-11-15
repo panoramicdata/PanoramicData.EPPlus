@@ -55,7 +55,7 @@ public class FunctionArgument
 
 	public int ExcelAddressReferenceId { get; set; }
 
-	public bool IsExcelRange => Value is not null and EpplusExcelDataProvider.IRangeInfo;
+	public bool IsExcelRange => Value is not null and ExcelDataProvider.IRangeInfo;
 
 	public bool ValueIsExcelError => ExcelErrorValue.Values.IsErrorValue(Value);
 

@@ -2128,7 +2128,7 @@ internal partial class ZipFile
 #elif NETCF
                             FileAttributes fileAttrs = (FileAttributes) NetCfFile.GetAttributes(dir);
 #else
-						var fileAttrs = System.IO.File.GetAttributes(dir);
+						var fileAttrs = File.GetAttributes(dir);
 #endif
 						if (AddDirectoryWillTraverseReparsePoints
 #if !SILVERLIGHT

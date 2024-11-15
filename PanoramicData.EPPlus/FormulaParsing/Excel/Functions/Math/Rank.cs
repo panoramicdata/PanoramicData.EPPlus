@@ -20,7 +20,7 @@ public class Rank : ExcelFunction
 		var asc = false;
 		if (arguments.Count() > 2)
 		{
-			asc = base.ArgToBool(arguments, 2);
+			asc = ArgToBool(arguments, 2);
 		}
 
 		var l = new List<double>();

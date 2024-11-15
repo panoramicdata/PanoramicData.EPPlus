@@ -75,7 +75,7 @@ internal partial class ZipEntry
 		bytesRead += 4;
 
 		// Return false if this is not a local file header signature.
-		if (ZipEntry.IsNotValidSig(signature))
+		if (IsNotValidSig(signature))
 		{
 			// Getting "not a ZipEntry signature" is not always wrong or an error.
 			// This will happen after the last entry in a zipfile.  In that case, we
@@ -88,7 +88,7 @@ internal partial class ZipEntry
 			ze.ArchiveStream.Seek(-4, SeekOrigin.Current); // unread the signature
 														   // workitem 10178
 			SharedUtilities.Workaround_Ladybug318918(ze.ArchiveStream);
-			return ZipEntry.IsNotValidZipDirEntrySig(signature) && (signature != ZipConstants.EndOfCentralDirectorySignature)
+			return IsNotValidZipDirEntrySig(signature) && (signature != ZipConstants.EndOfCentralDirectorySignature)
 				? throw new BadReadException(String.Format("  Bad signature (0x{0:X8}) at position  0x{1:X8}", signature, ze.ArchiveStream.Position))
 				: false;
 		}
@@ -270,7 +270,7 @@ internal partial class ZipEntry
 			if (ze.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes128 ||
 				ze.Encryption == DotNetZip.EncryptionAlgorithm.WinZipAes256)
 			{
-				int bits = ZipEntry.GetKeyStrengthInBits(ze._Encryption_FromZipFile);
+				int bits = GetKeyStrengthInBits(ze._Encryption_FromZipFile);
 				// read in the WinZip AES metadata: salt + PV. 18 bytes for AES256. 10 bytes for AES128.
 				ze._aesCrypto_forExtract = WinZipAesCrypto.ReadFromStream(null, bits, ze.ArchiveStream);
 				bytesRead += ze._aesCrypto_forExtract.SizeOfEncryptionMetadata - 10; // MAC (follows crypto bytes)
@@ -282,7 +282,7 @@ internal partial class ZipEntry
 			{
 				// read in the header data for "weak" encryption
 				ze._WeakEncryptionHeader = new byte[12];
-				bytesRead += ZipEntry.ReadWeakEncryptionHeader(ze._archiveStream, ze._WeakEncryptionHeader);
+				bytesRead += ReadWeakEncryptionHeader(ze._archiveStream, ze._WeakEncryptionHeader);
 				// decrease the filedata size by 12 bytes
 				ze._CompressedFileDataSize -= 12;
 			}

@@ -80,7 +80,7 @@ internal partial class ZipEntry
 		_OutputUsesZip64 ??= new Nullable<bool>(_container.Zip64 == Zip64Option.Always);
 
 		var versionNeededToExtract = (Int16)(_OutputUsesZip64.Value ? 45 : vNeeded);
-		if (this.CompressionMethod == Ionic.Zip.CompressionMethod.BZip2)
+		if (this.CompressionMethod == CompressionMethod.BZip2)
 			versionNeededToExtract = 46;
 
 		bytes[i++] = (byte)(versionNeededToExtract & 0x00FF);
@@ -514,7 +514,7 @@ internal partial class ZipEntry
 			aggregateBlock = new byte[totalLength];
 			for (i = 0; i < listOfBlocks.Count; i++)
 			{
-				System.Array.Copy(listOfBlocks[i], 0, aggregateBlock, current, listOfBlocks[i].Length);
+				Array.Copy(listOfBlocks[i], 0, aggregateBlock, current, listOfBlocks[i].Length);
 				current += listOfBlocks[i].Length;
 			}
 		}
@@ -745,7 +745,7 @@ internal partial class ZipEntry
 
 		// finally, set CompressionMethod to None if CompressionLevel is None
 		if (CompressionLevel == (short)DotNetZip.Zlib.CompressionLevel.None &&
-			CompressionMethod == Ionic.Zip.CompressionMethod.Deflate)
+			CompressionMethod == CompressionMethod.Deflate)
 			_CompressionMethod = 0x00;
 
 		return;
@@ -873,7 +873,7 @@ internal partial class ZipEntry
 		_presumeZip64 = (_container.Zip64 == Zip64Option.Always ||
 						 (_container.Zip64 == Zip64Option.AsNecessary && !s.CanSeek));
 		var VersionNeededToExtract = (Int16)(_presumeZip64 ? 45 : 20);
-		if (this.CompressionMethod == Ionic.Zip.CompressionMethod.BZip2)
+		if (this.CompressionMethod == CompressionMethod.BZip2)
 			VersionNeededToExtract = 46;
 
 		// (i==4)

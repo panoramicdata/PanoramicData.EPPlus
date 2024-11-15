@@ -106,7 +106,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		_worksheet = xlWorksheet;
 		_workbook = _worksheet.Workbook;
-		base.SetRCFromTable(_worksheet._package, null);
+		SetRCFromTable(_worksheet._package, null);
 		if (string.IsNullOrEmpty(_ws)) _ws = _worksheet == null ? "" : _worksheet.Name;
 		SetDelegate();
 	}
@@ -867,7 +867,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			else
 			{
 				r = (r <= 90 ? r : r - 90);
-				width = (((size.Width - size.Height) * Math.Abs(System.Math.Cos(System.Math.PI * r / 180.0)) + size.Height) + 5) / normalSize;
+				width = (((size.Width - size.Height) * Math.Abs(Math.Cos(Math.PI * r / 180.0)) + size.Height) + 5) / normalSize;
 			}
 
 			foreach (var a in afAddr)
@@ -1115,18 +1115,18 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			if (value == null || value.Trim() == "")
 			{
 				//Set the cells to null
-				_worksheet.Cells[ExcelCellBase.TranslateFromR1C1(value, _fromRow, _fromCol)].Value = null;
+				_worksheet.Cells[TranslateFromR1C1(value, _fromRow, _fromCol)].Value = null;
 			}
 			else if (Addresses == null)
 			{
-				Set_SharedFormula(this, ExcelCellBase.TranslateFromR1C1(value, _fromRow, _fromCol), this, false);
+				Set_SharedFormula(this, TranslateFromR1C1(value, _fromRow, _fromCol), this, false);
 			}
 			else
 			{
-				Set_SharedFormula(this, ExcelCellBase.TranslateFromR1C1(value, _fromRow, _fromCol), new ExcelAddress(WorkSheet, FirstAddress), false);
+				Set_SharedFormula(this, TranslateFromR1C1(value, _fromRow, _fromCol), new ExcelAddress(WorkSheet, FirstAddress), false);
 				foreach (var address in Addresses)
 				{
-					Set_SharedFormula(this, ExcelCellBase.TranslateFromR1C1(value, address.Start.Row, address.Start.Column), address, false);
+					Set_SharedFormula(this, TranslateFromR1C1(value, address.Start.Row, address.Start.Column), address, false);
 				}
 			}
 		}
@@ -1298,7 +1298,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			}
 			else
 			{
-				xml.LoadXml("<d:si xmlns:d=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" ><d:r><d:t>" + OfficeOpenXml.Utils.ConvertUtil.ExcelEscapeString(v.ToString()) + "</d:t></d:r></d:si>");
+				xml.LoadXml("<d:si xmlns:d=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" ><d:r><d:t>" + ConvertUtil.ExcelEscapeString(v.ToString()) + "</d:t></d:r></d:si>");
 			}
 		}
 		else
@@ -1380,7 +1380,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		get
 		{
-			var wbwsRef = string.IsNullOrEmpty(base._wb) ? base._ws : "[" + base._wb.Replace("'", "''") + "]" + _ws;
+			var wbwsRef = string.IsNullOrEmpty(_wb) ? _ws : "[" + _wb.Replace("'", "''") + "]" + _ws;
 			string fullAddress;
 			if (Addresses == null)
 			{
@@ -1413,7 +1413,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		get
 		{
-			var wbwsRef = string.IsNullOrEmpty(base._wb) ? base._ws : "[" + base._wb.Replace("'", "''") + "]" + _ws;
+			var wbwsRef = string.IsNullOrEmpty(_wb) ? _ws : "[" + _wb.Replace("'", "''") + "]" + _ws;
 			string fullAddress;
 			if (Addresses == null)
 			{
@@ -1538,7 +1538,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			//Top Range
 			if (fRange._fromRow < _fromRow)
 			{
-				f.Address = ExcelCellBase.GetAddress(fRange._fromRow, fRange._fromCol, _fromRow - 1, fRange._toCol);
+				f.Address = GetAddress(fRange._fromRow, fRange._fromCol, _fromRow - 1, fRange._toCol);
 				fIsSet = true;
 			}
 			//Left Range
@@ -1568,12 +1568,12 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 				if (fRange._toRow < address._toRow)
 				{
-					f.Address = ExcelCellBase.GetAddress(f.StartRow, f.StartCol,
+					f.Address = GetAddress(f.StartRow, f.StartCol,
 							fRange._toRow, address._fromCol - 1);
 				}
 				else
 				{
-					f.Address = ExcelCellBase.GetAddress(f.StartRow, f.StartCol,
+					f.Address = GetAddress(f.StartRow, f.StartCol,
 						 address._toRow, address._fromCol - 1);
 				}
 
@@ -1607,12 +1607,12 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 				if (fRange._toRow < address._toRow)
 				{
-					f.Address = ExcelCellBase.GetAddress(f.StartRow, f.StartCol,
+					f.Address = GetAddress(f.StartRow, f.StartCol,
 							fRange._toRow, fRange._toCol);
 				}
 				else
 				{
-					f.Address = ExcelCellBase.GetAddress(f.StartRow, f.StartCol,
+					f.Address = GetAddress(f.StartRow, f.StartCol,
 							address._toRow, fRange._toCol);
 				}
 
@@ -1637,7 +1637,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 				f.Formula = TranslateFromR1C1(formulaR1C1, f.StartRow, f.StartCol);
 
-				f.Address = ExcelCellBase.GetAddress(f.StartRow, f.StartCol,
+				f.Address = GetAddress(f.StartRow, f.StartCol,
 						fRange._toRow, fRange._toCol);
 				_worksheet.Cells[f.Address].SetSharedFormulaID(f.Index);
 
@@ -2720,12 +2720,12 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <summary>
 	/// The current range when enumerating
 	/// </summary>
-	public ExcelRangeBase Current => new(_worksheet, ExcelAddressBase.GetAddress(_cellEnum.Row, _cellEnum.Column));
+	public ExcelRangeBase Current => new(_worksheet, GetAddress(_cellEnum.Row, _cellEnum.Column));
 
 	/// <summary>
 	/// The current range when enumerating
 	/// </summary>
-	object IEnumerator.Current => ((object)(new ExcelRangeBase(_worksheet, ExcelAddressBase.GetAddress(_cellEnum.Row, _cellEnum.Column))));
+	object IEnumerator.Current => ((object)(new ExcelRangeBase(_worksheet, GetAddress(_cellEnum.Row, _cellEnum.Column))));
 
 	//public object FormatedText { get; private set; }
 
@@ -2908,13 +2908,13 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 						var f = Worksheet._sharedFormulas[sfIx];
 						if (startAddr._fromRow > row)
 						{
-							f.Formula = ExcelCellBase.TranslateFromR1C1(ExcelCellBase.TranslateToR1C1(f.Formula, f.StartRow, f.StartCol), row, f.StartCol);
+							f.Formula = TranslateFromR1C1(TranslateToR1C1(f.Formula, f.StartRow, f.StartCol), row, f.StartCol);
 							f.StartRow = row;
-							f.Address = ExcelCellBase.GetAddress(row, startAddr._fromCol, startAddr._toRow, startAddr._toCol);
+							f.Address = GetAddress(row, startAddr._fromCol, startAddr._toRow, startAddr._toCol);
 						}
 						else if (startAddr._toRow < row)
 						{
-							f.Address = ExcelCellBase.GetAddress(startAddr._fromRow, startAddr._fromCol, row, startAddr._toCol);
+							f.Address = GetAddress(startAddr._fromRow, startAddr._fromCol, row, startAddr._toCol);
 						}
 					}
 				}

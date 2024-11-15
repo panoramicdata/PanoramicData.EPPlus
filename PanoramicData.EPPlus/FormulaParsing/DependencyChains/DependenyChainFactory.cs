@@ -197,7 +197,7 @@ internal static class DependencyChainFactory
 
 				if (adr.WorkSheet == null && adr.Collide(new ExcelAddressBase(f.Row, f.Column, f.Row, f.Column)) != ExcelAddressBase.eAddressCollition.No && !options.AllowCirculareReferences)
 				{
-					throw new CircularReferenceException(string.Format("Circular Reference in cell {0}", ExcelAddressBase.GetAddress(f.Row, f.Column)));
+					throw new CircularReferenceException(string.Format("Circular Reference in cell {0}", ExcelCellBase.GetAddress(f.Row, f.Column)));
 				}
 
 				if (adr._fromRow > 0 && adr._fromCol > 0)
@@ -300,7 +300,7 @@ internal static class DependencyChainFactory
 								//Check for circular references
 								foreach (var par in stack)
 								{
-									if (ExcelAddressBase.GetCellID(par.SheetID, par.Row, par.Column) == id && !options.AllowCirculareReferences)
+									if (ExcelCellBase.GetCellID(par.SheetID, par.Row, par.Column) == id && !options.AllowCirculareReferences)
 									{
 										throw new CircularReferenceException(string.Format("Circular Reference in name {0}", name.Name));
 									}
@@ -328,7 +328,7 @@ internal static class DependencyChainFactory
 		{
 			var v = f.iterator.Value;
 			if (v == null || v.ToString().Trim() == "") continue;
-			var id = ExcelAddressBase.GetCellID(f.ws.SheetID, f.iterator.Row, f.iterator.Column);
+			var id = ExcelCellBase.GetCellID(f.ws.SheetID, f.iterator.Row, f.iterator.Column);
 			if (!depChain.index.ContainsKey(id))
 			{
 				var rf = new FormulaCell() { SheetID = f.ws.SheetID, Row = f.iterator.Row, Column = f.iterator.Column };
@@ -356,11 +356,11 @@ internal static class DependencyChainFactory
 					//Check for circular references
 					foreach (var par in stack)
 					{
-						if (ExcelAddressBase.GetCellID(par.ws.SheetID, par.iterator.Row, par.iterator.Column) == id)
+						if (ExcelCellBase.GetCellID(par.ws.SheetID, par.iterator.Row, par.iterator.Column) == id)
 						{
 							if (options.AllowCirculareReferences == false)
 							{
-								throw new CircularReferenceException(string.Format("Circular Reference in cell {0}!{1}", par.ws.Name, ExcelAddress.GetAddress(f.Row, f.Column)));
+								throw new CircularReferenceException(string.Format("Circular Reference in cell {0}!{1}", par.ws.Name, ExcelCellBase.GetAddress(f.Row, f.Column)));
 							}
 							else
 							{

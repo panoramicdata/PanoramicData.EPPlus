@@ -285,7 +285,7 @@ public class Operator : IOperator
 	{
 		var sl = (l ?? "").ToString();
 		var sr = (r ?? "").ToString();
-		return System.String.Compare(sl, sr, System.StringComparison.OrdinalIgnoreCase);
+		return System.String.Compare(sl, sr, StringComparison.OrdinalIgnoreCase);
 	}
 
 	private static bool EitherIsError(CompileResult l, CompileResult r, out ExcelErrorValue errorVal)

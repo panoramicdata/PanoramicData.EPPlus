@@ -441,7 +441,7 @@ public sealed class OfficeProperties : XmlHelper
 					return DateTime.TryParse(value, out dt) ? dt : null;
 				case "i4":
 					int i;
-					return int.TryParse(value, System.Globalization.NumberStyles.Number, CultureInfo.InvariantCulture, out i) ? i : null;
+					return int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out i) ? i : null;
 				case "r8":
 					double d;
 					return double.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out d) ? d : null;

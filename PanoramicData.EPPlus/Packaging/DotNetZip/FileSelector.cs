@@ -168,9 +168,9 @@ internal partial class TimeCriterion : SelectionCriterion
 	{
 		var x = Which switch
 		{
-			WhichTime.atime => System.IO.File.GetLastAccessTime(filename).ToUniversalTime(),
-			WhichTime.mtime => System.IO.File.GetLastWriteTime(filename).ToUniversalTime(),
-			WhichTime.ctime => System.IO.File.GetCreationTime(filename).ToUniversalTime(),
+			WhichTime.atime => File.GetLastAccessTime(filename).ToUniversalTime(),
+			WhichTime.mtime => File.GetLastWriteTime(filename).ToUniversalTime(),
+			WhichTime.ctime => File.GetCreationTime(filename).ToUniversalTime(),
 			_ => throw new ArgumentException("Operator"),
 		};
 		CriterionTrace("TimeCriterion({0},{1})= {2}", filename, Which.ToString(), x);
@@ -258,7 +258,7 @@ internal partial class NameCriterion : SelectionCriterion
 		// No slash in the pattern implicitly means recurse, which means compare to
 		// filename only, not full path.
 		var f = (_MatchingFileSpec.IndexOf('\\') == -1)
-			? System.IO.Path.GetFileName(fullpath)
+			? Path.GetFileName(fullpath)
 			: fullpath; // compare to fullpath
 
 		var result = _re.IsMatch(f);
@@ -415,7 +415,7 @@ internal partial class AttributesCriterion : SelectionCriterion
 			// the operator is NotEqualTo.
 			return (Operator != ComparisonOperator.EqualTo);
 		}
-		var fileAttrs = System.IO.File.GetAttributes(filename);
+		var fileAttrs = File.GetAttributes(filename);
 
 		return _Evaluate(fileAttrs);
 	}
@@ -1208,7 +1208,7 @@ internal partial class FileSelector
 	private void SelectorTrace(string format, params object[] args)
 	{
 		if (_Criterion != null && _Criterion.Verbose)
-			System.Console.WriteLine(format, args);
+			Console.WriteLine(format, args);
 	}
 
 	/// <summary>

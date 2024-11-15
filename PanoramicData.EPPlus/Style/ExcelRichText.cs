@@ -293,7 +293,7 @@ public class ExcelRichText : XmlHelper
 		get
 		{
 			var col = GetXmlNodeString(COLOR_PATH);
-			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, System.Globalization.NumberStyles.AllowHexSpecifier));
+			return col == "" ? Color.Empty : Color.FromArgb(int.Parse(col, NumberStyles.AllowHexSpecifier));
 		}
 		set
 		{

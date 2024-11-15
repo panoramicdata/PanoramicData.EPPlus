@@ -966,7 +966,7 @@ IDisposable
 			}
 			else
 			{
-				_alternateEncoding = Ionic.Zip.ZipFile.DefaultEncoding;
+				_alternateEncoding = DefaultEncoding;
 				_alternateEncodingUsage = ZipOption.Never;
 			}
 		}

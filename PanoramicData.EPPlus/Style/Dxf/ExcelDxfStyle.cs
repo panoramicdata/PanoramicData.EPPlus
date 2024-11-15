@@ -92,10 +92,10 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 		var rgb = helper.GetXmlNodeString(path + "/@rgb");
 		if (rgb != "")
 		{
-			ret.Color = Color.FromArgb(int.Parse(rgb[..2], System.Globalization.NumberStyles.AllowHexSpecifier),
-										int.Parse(rgb.Substring(2, 2), System.Globalization.NumberStyles.AllowHexSpecifier),
-										int.Parse(rgb.Substring(4, 2), System.Globalization.NumberStyles.AllowHexSpecifier),
-										int.Parse(rgb.Substring(6, 2), System.Globalization.NumberStyles.AllowHexSpecifier));
+			ret.Color = Color.FromArgb(int.Parse(rgb[..2], NumberStyles.AllowHexSpecifier),
+										int.Parse(rgb.Substring(2, 2), NumberStyles.AllowHexSpecifier),
+										int.Parse(rgb.Substring(4, 2), NumberStyles.AllowHexSpecifier),
+										int.Parse(rgb.Substring(6, 2), NumberStyles.AllowHexSpecifier));
 		}
 
 		ret.Auto = helper.GetXmlNodeBoolNullable(path + "/@auto");

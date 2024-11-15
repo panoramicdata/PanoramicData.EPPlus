@@ -683,10 +683,10 @@ public sealed class ExcelPackage : IDisposable
 		//  and create a prefix for the default namespace:
 		NameTable nt = new();
 		var ns = new XmlNamespaceManager(nt);
-		ns.AddNamespace(string.Empty, ExcelPackage.schemaMain);
-		ns.AddNamespace("d", ExcelPackage.schemaMain);
-		ns.AddNamespace("r", ExcelPackage.schemaRelationships);
-		ns.AddNamespace("c", ExcelPackage.schemaChart);
+		ns.AddNamespace(string.Empty, schemaMain);
+		ns.AddNamespace("d", schemaMain);
+		ns.AddNamespace("r", schemaRelationships);
+		ns.AddNamespace("c", schemaChart);
 		ns.AddNamespace("vt", schemaVt);
 		// extended properties (app.xml)
 		ns.AddNamespace("xp", schemaExtended);

@@ -114,7 +114,7 @@ public class ExcelBackgroundImage : XmlHelper
 		}
 
 		var contentType = ExcelPicture.GetContentType(PictureFile.Extension);
-		var imageURI = XmlHelper.GetNewUri(_workSheet._package.Package, "/xl/media/" + PictureFile.Name[..^PictureFile.Extension.Length] + "{0}" + PictureFile.Extension);
+		var imageURI = GetNewUri(_workSheet._package.Package, "/xl/media/" + PictureFile.Name[..^PictureFile.Extension.Length] + "{0}" + PictureFile.Extension);
 
 		var ii = _workSheet.Workbook._package.AddImage(fileBytes, imageURI, contentType);
 

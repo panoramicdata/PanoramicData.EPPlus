@@ -314,7 +314,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 		var s = xPath4Alpha(xPath);
 		if (s.Length > 0)
 		{
-			if (int.TryParse(GetXmlNodeString(s), System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out var i))
+			if (int.TryParse(GetXmlNodeString(s), NumberStyles.Any, CultureInfo.InvariantCulture, out var i))
 			{
 				r = (i == 0) ? 0 : 100 - (i / 1000);
 			}

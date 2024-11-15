@@ -198,7 +198,7 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 	/// <param name="comment">The comment to remove</param>
 	public void Remove(ExcelComment comment)
 	{
-		var id = ExcelAddress.GetCellID(Worksheet.SheetID, comment.Range._fromRow, comment.Range._fromCol);
+		var id = ExcelCellBase.GetCellID(Worksheet.SheetID, comment.Range._fromRow, comment.Range._fromCol);
 		//int ix=_comments.IndexOf(id);
 		var i = -1;
 		ExcelComment c = null;

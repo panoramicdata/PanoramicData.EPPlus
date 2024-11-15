@@ -141,7 +141,7 @@ public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, I
 			{
 				if (draw.Id.Length > 3 && draw.Id.StartsWith("vml"))
 				{
-					if (int.TryParse(draw.Id[3..], System.Globalization.NumberStyles.Number, CultureInfo.InvariantCulture, out var id))
+					if (int.TryParse(draw.Id[3..], NumberStyles.Number, CultureInfo.InvariantCulture, out var id))
 					{
 						if (id > _nextID)
 						{

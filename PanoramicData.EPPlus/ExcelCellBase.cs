@@ -699,7 +699,7 @@ public abstract class ExcelCellBase
 				var a = new ExcelAddressBase(address);
 				if ((a._fromRow == 1 && a._toRow == ExcelPackage.MaxRows) || (a._fromCol == 1 && a._toCol == ExcelPackage.MaxColumns))
 				{
-					address = string.Format("'{0}'!{1}{2}:{3}{4}", worksheetName, ExcelAddress.GetColumnLetter(a._fromCol), a._fromRow, ExcelAddress.GetColumnLetter(a._toCol), a._toRow);
+					address = string.Format("'{0}'!{1}{2}:{3}{4}", worksheetName, GetColumnLetter(a._fromCol), a._fromRow, GetColumnLetter(a._toCol), a._toRow);
 				}
 				else
 				{

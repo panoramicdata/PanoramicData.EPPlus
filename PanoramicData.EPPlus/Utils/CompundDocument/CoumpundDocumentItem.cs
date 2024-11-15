@@ -142,7 +142,7 @@ internal class CompoundDocumentItem : IComparable<CompoundDocumentItem>
 		var sz = br.ReadInt16();
 		if (sz > 0)
 		{
-			Name = UTF8Encoding.Unicode.GetString(s, 0, sz - 2);
+			Name = Encoding.Unicode.GetString(s, 0, sz - 2);
 		}
 
 		ObjectType = br.ReadByte();

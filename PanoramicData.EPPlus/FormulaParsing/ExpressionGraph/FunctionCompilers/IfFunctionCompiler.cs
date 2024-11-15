@@ -85,9 +85,9 @@ public class IfFunctionCompiler : FunctionCompiler
 		}
 		else if (!Utils.ConvertUtil.TryParseBooleanString(v, out boolVal))
 		{
-			if (OfficeOpenXml.Utils.ConvertUtil.IsNumeric(v))
+			if (Utils.ConvertUtil.IsNumeric(v))
 			{
-				boolVal = OfficeOpenXml.Utils.ConvertUtil.GetValueDouble(v) != 0;
+				boolVal = Utils.ConvertUtil.GetValueDouble(v) != 0;
 			}
 			else
 			{
