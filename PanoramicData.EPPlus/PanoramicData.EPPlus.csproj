@@ -15,7 +15,7 @@
 		<RootNamespace>OfficeOpenXml</RootNamespace>
 		<RepositoryUrl>https://github.com/panoramicdata/PanoramicData.EPPlus</RepositoryUrl>
 		<PackageTags>EPPlus Excel Spreadsheet xlsx ooxml</PackageTags>
-		<Copyright>Rimland 2020, Panoramic Data Limited 2024</Copyright>
+		<Copyright>Rimland 2020, Panoramic Data Limited 2026</Copyright>
 		<PackageReleaseNotes>
 			# Panoramic Data's EPPlus Free Edition
 			# LGPL License continue
