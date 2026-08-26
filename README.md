@@ -11,6 +11,10 @@ With the new license EPPlus is still free to use in some cases, but will require
 
 More information on the license change on [our website]( https://www.epplussoftware.com)
 ***
+## PanoramicData fork additions
+
+* `AddPicture(name, imageBytes, widthPixels, heightPixels)` (plus a hyperlink overload) - add pictures to a worksheet from raw image bytes (PNG, JPEG, GIF or BMP) without System.Drawing, enabling picture support on platforms where GDI+ is unavailable (System.Drawing.Common 7 and later is Windows-only, so this is the only route on e.g. Linux containers). The content type is sniffed from the byte signature and the display size is supplied in pixels at 96 DPI.
+***
 Create advanced Excel spreadsheets using .NET, without the need of interop.
 
 EPPlus is a .NET library that reads and writes Excel files using the Office Open XML format (xlsx). 

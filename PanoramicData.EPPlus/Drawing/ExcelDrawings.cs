@@ -196,6 +196,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	Uri _uriDrawing = null;
 	public Uri UriDrawing => _uriDrawing;
 	#endregion
+	
 	#region Add functions
 	/// <summary>
 	/// Add a new chart to the worksheet.
@@ -316,6 +317,61 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		}
 
 		throw (new Exception("AddPicture: ImageFile can't be null"));
+	}
+
+	/// <summary>
+	/// Add a picture to the worksheet from raw image bytes, without using System.Drawing - works on
+	/// platforms where GDI+ is unavailable (System.Drawing.Common 7 and later is Windows-only).
+	/// MagicSuite MS-25871.
+	/// </summary>
+	/// <param name="Name"></param>
+	/// <param name="ImageBytes">The image file's bytes (PNG, JPEG, GIF or BMP - the content type is sniffed from the byte signature)</param>
+	/// <param name="WidthPixels">The display width in pixels at 96 DPI</param>
+	/// <param name="HeightPixels">The display height in pixels at 96 DPI</param>
+	/// <returns></returns>
+	public ExcelPicture AddPicture(string Name, byte[] ImageBytes, int WidthPixels, int HeightPixels) => AddPicture(Name, ImageBytes, WidthPixels, HeightPixels, null);
+	/// <summary>
+	/// Add a picture to the worksheet from raw image bytes, without using System.Drawing - works on
+	/// platforms where GDI+ is unavailable (System.Drawing.Common 7 and later is Windows-only).
+	/// MagicSuite MS-25871.
+	/// </summary>
+	/// <param name="Name"></param>
+	/// <param name="ImageBytes">The image file's bytes (PNG, JPEG, GIF or BMP - the content type is sniffed from the byte signature)</param>
+	/// <param name="WidthPixels">The display width in pixels at 96 DPI</param>
+	/// <param name="HeightPixels">The display height in pixels at 96 DPI</param>
+	/// <param name="Hyperlink">Picture hyperlink</param>
+	/// <returns></returns>
+	public ExcelPicture AddPicture(string Name, byte[] ImageBytes, int WidthPixels, int HeightPixels, Uri Hyperlink)
+	{
+		if (ImageBytes == null || ImageBytes.Length == 0)
+		{
+			throw new ArgumentException("AddPicture: ImageBytes can't be null or empty", nameof(ImageBytes));
+		}
+
+		if (WidthPixels <= 0 || HeightPixels <= 0)
+		{
+			throw new ArgumentOutOfRangeException(WidthPixels <= 0 ? nameof(WidthPixels) : nameof(HeightPixels), "AddPicture: pixel dimensions must be positive");
+		}
+
+		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
+		{
+			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
+		}
+
+		if (_drawingNames.ContainsKey(Name))
+		{
+			throw new Exception("Name already exists in the drawings collection");
+		}
+
+		var drawNode = CreateDrawingXml();
+		drawNode.SetAttribute("editAs", "oneCell");
+		ExcelPicture pic = new(this, drawNode, ImageBytes, WidthPixels, HeightPixels, Hyperlink)
+		{
+			Name = Name
+		};
+		_drawings.Add(pic);
+		_drawingNames.Add(Name, _drawings.Count - 1);
+		return pic;
 	}
 
 	/// <summary>
@@ -442,6 +498,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		return drawNode;
 	}
 	#endregion
+
 	#region Remove methods
 	/// <summary>
 	/// Removes a drawing.
@@ -500,6 +557,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		}
 	}
 	#endregion
+
 	internal void AdjustWidth(int[,] pos)
 	{
 		var ix = 0;
