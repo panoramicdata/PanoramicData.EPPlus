@@ -29,7 +29,6 @@
  * Jan Källman		                Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
-using OfficeOpenXml;
 using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.Utils;
 using System;
@@ -48,6 +47,7 @@ namespace OfficeOpenXml.Drawing;
 public sealed class ExcelPicture : ExcelDrawing
 {
 	#region "Constructors"
+
 	internal ExcelPicture(ExcelDrawings drawings, XmlNode node) :
 		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
 	{
@@ -152,6 +152,87 @@ public sealed class ExcelPicture : ExcelDrawing
 		node.SelectSingleNode("xdr:pic/xdr:blipFill/a:blip/@r:embed", NameSpaceManager).Value = relID;
 		Packaging.ZipPackage.Flush();
 	}
+
+	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, byte[] imageBytes, int widthPixels, int heightPixels, Uri hyperlink) :
+		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
+	{
+		var picNode = node.OwnerDocument.CreateElement("xdr", "pic", ExcelPackage.schemaSheetDrawings);
+		node.InsertAfter(picNode, node.SelectSingleNode("xdr:to", NameSpaceManager));
+		Hyperlink = hyperlink;
+		picNode.InnerXml = PicStartXml();
+
+		node.InsertAfter(node.OwnerDocument.CreateElement("xdr", "clientData", ExcelPackage.schemaSheetDrawings), picNode);
+
+		// MagicSuite MS-25871: the byte-based path touches System.Drawing nowhere, so it works on
+		// platforms where GDI+ is unavailable (System.Drawing.Common 7+ is Windows-only). The
+		// caller supplies the pixel size, so no decode is needed; the bytes are written into the
+		// package verbatim, with the content type sniffed from the byte signature.
+		var package = drawings.Worksheet._package.Package;
+		ContentType = GetContentTypeFromBytes(imageBytes);
+		UriPic = GetNewUri(package, "/xl/media/image{0}" + GetExtension(ContentType));
+		var ii = _drawings._package.AddImage(imageBytes, UriPic, ContentType);
+		string relID;
+		if (!drawings._hashes.TryGetValue(ii.Hash, out var value))
+		{
+			Part = ii.Part;
+			RelPic = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, ii.Uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
+			relID = RelPic.Id;
+			_drawings._hashes.Add(ii.Hash, relID);
+		}
+		else
+		{
+			relID = value;
+			var rel = _drawings.Part.GetRelationship(relID);
+			UriPic = UriHelper.ResolvePartUri(rel.SourceUri, rel.TargetUri);
+		}
+
+		ImageHash = ii.Hash;
+		_height = heightPixels;
+		_width = widthPixels;
+		EditAs = eEditAs.OneCell;
+		SetPixelWidth(widthPixels);
+		SetPixelHeight(heightPixels);
+		//Create relationship
+		node.SelectSingleNode("xdr:pic/xdr:blipFill/a:blip/@r:embed", NameSpaceManager).Value = relID;
+		Packaging.ZipPackage.Flush();
+	}
+
+	/// <summary>
+	/// MagicSuite MS-25871: content type from the byte signature, so the byte-based AddPicture
+	/// needs no decode and no file extension.
+	/// </summary>
+	internal static string GetContentTypeFromBytes(byte[] imageBytes)
+	{
+		if (imageBytes.Length >= 4 && imageBytes[0] == 0x89 && imageBytes[1] == 0x50 && imageBytes[2] == 0x4E && imageBytes[3] == 0x47)
+		{
+			return "image/png";
+		}
+
+		if (imageBytes.Length >= 3 && imageBytes[0] == 0xFF && imageBytes[1] == 0xD8 && imageBytes[2] == 0xFF)
+		{
+			return "image/jpeg";
+		}
+
+		if (imageBytes.Length >= 3 && imageBytes[0] == 0x47 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46)
+		{
+			return "image/gif";
+		}
+
+		if (imageBytes.Length >= 2 && imageBytes[0] == 0x42 && imageBytes[1] == 0x4D)
+		{
+			return "image/bmp";
+		}
+
+		return "image/jpeg";
+	}
+
+	internal static string GetExtension(string contentType) => contentType switch
+	{
+		"image/png" => ".png",
+		"image/gif" => ".gif",
+		"image/bmp" => ".bmp",
+		_ => ".jpg",
+	};
 
 	internal static string GetContentType(string extension) => extension.ToLower(CultureInfo.InvariantCulture) switch
 	{
@@ -381,7 +462,8 @@ public sealed class ExcelPicture : ExcelDrawing
 	{
 		base.Dispose();
 		Hyperlink = null;
-		_image.Dispose();
+		// MagicSuite MS-25871: a picture created from raw bytes has no Image
+		_image?.Dispose();
 		_image = null;
 	}
 }

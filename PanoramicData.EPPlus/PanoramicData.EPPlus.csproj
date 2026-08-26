@@ -19,6 +19,7 @@
 		<PackageReleaseNotes>
 			# Panoramic Data's EPPlus Free Edition
 			# LGPL License continue
+			Added AddPicture(name, imageBytes, widthPixels, heightPixels) - add pictures from raw image bytes without System.Drawing, enabling picture support on platforms where GDI+ is unavailable (e.g. Linux). Fixed Dispose for pictures created without an Image.
 		</PackageReleaseNotes>
 		<SignAssembly>False</SignAssembly>
 		<AssemblyOriginatorKeyFile>OpenOfficeXml.Rimland.snk</AssemblyOriginatorKeyFile>
