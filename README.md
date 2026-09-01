@@ -1,3 +1,9 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[![NuGet version](https://img.shields.io/nuget/v/PanoramicData.EPPlus.svg)](https://www.nuget.org/packages/PanoramicData.EPPlus/)
+
+[![Codacy Badge](https://app.codacy.com/project/badge/grade/PanoramicData.EPPlus)](https://app.codacy.com/gh/panoramicdata/PanoramicData.EPPlus/dashboard)
+
 # Continuous Version of EPPlus Free Edition 4.5.3.3
 **The [JanKallman/EPPlus](https://github.com/JanKallman/EPPlus) repository has been archived by the owner. So I fork it to my repository and continue to maintain the source code.**
 

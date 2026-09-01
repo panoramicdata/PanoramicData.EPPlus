@@ -55,3 +55,4 @@ _ReSharper*/
 packages/
 
 **/Test Output/**
+nuget-key.txt
