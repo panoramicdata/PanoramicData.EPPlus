@@ -34,6 +34,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageId>PanoramicData.EPPlus</PackageId>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\EPPlusFree.xml</DocumentationFile>
