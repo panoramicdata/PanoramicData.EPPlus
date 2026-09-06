@@ -277,7 +277,16 @@ public class ZipPackage : ZipPackageRelationshipBase
 		var enc = Encoding.UTF8;
 		ZipOutputStream os = new(stream, true)
 		{
-			CompressionLevel = (DotNetZip.Zlib.CompressionLevel)_compression
+			CompressionLevel = (DotNetZip.Zlib.CompressionLevel)_compression,
+
+			// Without this, EnableZip64 keeps its constructor default of Zip64Option.Never, which
+			// caps every workbook at the classic ZIP limits: 4 GB of size or offset, and 65,534
+			// entries. A large workbook then throws while saving, after all its content has been
+			// built, so the work is lost at the final step.
+			//
+			// AsNecessary rather than Always: a workbook that fits the classic format is still
+			// written in it, so existing files and older readers are unaffected.
+			EnableZip64 = Ionic.Zip.Zip64Option.AsNecessary
 		};
 		/**** ContentType****/
 		var entry = os.PutNextEntry("[Content_Types].xml");
