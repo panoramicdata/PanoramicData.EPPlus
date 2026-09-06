@@ -2,7 +2,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- This sample is written against the older ASP.NET Core hosting API. Implicit usings pull in
+         both Microsoft.AspNetCore.Hosting and Microsoft.Extensions.Hosting, which makes
+         IHostingEnvironment ambiguous (CS0104). -->
+    <ImplicitUsings>disable</ImplicitUsings>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>

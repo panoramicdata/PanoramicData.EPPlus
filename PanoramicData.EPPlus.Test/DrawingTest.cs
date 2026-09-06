@@ -4,9 +4,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Style;
-using System;
 using System.Drawing;
-using System.IO;
 using System.Xml;
 
 namespace PanoramicData.EPPlus.Test;
