@@ -20,6 +20,8 @@
 			# Panoramic Data's EPPlus Free Edition
 			# LGPL License continue
 			Large workbooks can now be saved. A workbook that exceeded the classic ZIP limits, being 4 GB of size or offset or 65,534 internal entries, previously threw while saving, after all of its content had been built. Zip64 is now used automatically when, and only when, a workbook needs it, so files that fit the classic format are written exactly as before and remain readable by older tools.
+
+			This release targets .NET 10. The previous release, 10.1.1, targeted .NET 9.
 		</PackageReleaseNotes>
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenOfficeXml.Rimland.snk</AssemblyOriginatorKeyFile>
