@@ -5,8 +5,9 @@
     <!-- This sample is written against the older ASP.NET Core hosting API. Implicit usings pull in
          both Microsoft.AspNetCore.Hosting and Microsoft.Extensions.Hosting, which makes
          IHostingEnvironment ambiguous (CS0104). -->
-    <ImplicitUsings>disable</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="wwwroot\" />
