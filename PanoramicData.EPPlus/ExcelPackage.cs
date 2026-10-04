@@ -1082,7 +1082,7 @@ public sealed class ExcelPackage : IDisposable
 		var byRet = new byte[Stream.Length];
 		var pos = Stream.Position;
 		Stream.Seek(0, SeekOrigin.Begin);
-		Stream.Read(byRet, 0, (int)Stream.Length);
+		Stream.ReadExactly(byRet, 0, (int)Stream.Length);
 
 		//Encrypt Workbook?
 		if (Encryption.IsEncrypted)

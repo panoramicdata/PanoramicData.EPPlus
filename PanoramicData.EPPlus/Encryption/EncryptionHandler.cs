@@ -637,7 +637,7 @@ internal class EncryptedPackageHandler
 
 				var decryptedData = new byte[size];
 
-				cryptoStream.Read(decryptedData, 0, (int)size);
+				cryptoStream.ReadExactly(decryptedData, 0, (int)size);
 				doc.Write(decryptedData, 0, (int)size);
 			}
 			else
@@ -672,7 +672,7 @@ internal class EncryptedPackageHandler
 													  decryptor,
 													  CryptoStreamMode.Read);
 		var decryptedVerifier = new byte[16];
-		cryptoStream.Read(decryptedVerifier, 0, 16);
+		cryptoStream.ReadExactly(decryptedVerifier, 0, 16);
 
 		dataStream = new MemoryStream(encryptionInfo.Verifier.EncryptedVerifierHash);
 
@@ -682,7 +682,7 @@ internal class EncryptedPackageHandler
 
 		//Decrypt the verifier hash
 		var decryptedVerifierHash = new byte[16];
-		cryptoStream.Read(decryptedVerifierHash, 0, (int)16);
+		cryptoStream.ReadExactly(decryptedVerifierHash, 0, (int)16);
 
 		//Get the hash for the decrypted verifier
 		var hash = SHA1.HashData(decryptedVerifier);
@@ -741,7 +741,7 @@ internal class EncryptedPackageHandler
 
 		var decryptedData = new byte[size];
 
-		cryptoStream.Read(decryptedData, 0, (int)size);
+		cryptoStream.ReadExactly(decryptedData, 0, (int)size);
 		return decryptedData;
 	}
 
