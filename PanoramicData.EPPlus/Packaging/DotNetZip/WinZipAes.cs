@@ -428,7 +428,8 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 
 			_aesCipher = Aes.Create();
 			_aesCipher.KeySize = keySizeInBits;  // 128, 192, 256
-			_aesCipher.Mode = CipherMode.ECB;
+			// WinZip AES is CTR mode: ECB only encrypts single counter blocks, and HMAC-SHA1 provides integrity.
+			_aesCipher.Mode = CipherMode.ECB; // nosemgrep
 			_aesCipher.Padding = PaddingMode.None;
 
 			var iv = new byte[BLOCK_SIZE_IN_BYTES]; // all zeroes
