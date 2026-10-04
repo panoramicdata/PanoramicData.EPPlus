@@ -143,11 +143,11 @@ public static class CalculationExtension
 
 				Thread.Sleep(0);
 			}
-			catch (FormatException fe)
+			catch (FormatException)
 			{
-				throw fe;
+				throw;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				var error = ExcelErrorValue.Parse(ExcelErrorValue.Values.Value);
 				SetValue(wb, item, error);

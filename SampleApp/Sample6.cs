@@ -29,6 +29,7 @@
  *******************************************************************************
  * Jan Källman		Added		25-JAN-2010
  *******************************************************************************/
+using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -71,6 +72,7 @@ class Sample6
 	/// <param name="dir">Directory to scan</param>
 	/// <param name="depth">How many levels?</param>
 	/// <param name="skipIcons">Skip the icons in column A. A lot faster</param>
+	[SupportedOSPlatform("windows")]
 	public static string RunSample6(DirectoryInfo dir, int depth, bool skipIcons)
 	{
 		_maxLevels = depth;
@@ -210,6 +212,7 @@ class Sample6
 	/// <param name="pck">Package</param>
 	/// <param name="rows"></param>
 	/// <param name="header"></param>
+	[SupportedOSPlatform("windows")]
 	private static void AddGraphs(ExcelPackage pck, int rows, string dir)
 	{
 		var ws = pck.Workbook.Worksheets.Add("Statistics");
@@ -308,6 +311,7 @@ class Sample6
 	/// <param name="header">Header text</param>
 	/// <param name="propertyName">Size or Count</param>
 	/// <returns></returns>
+	[SupportedOSPlatform("windows")]
 	private static int AddStatRows(ExcelWorksheet ws, List<StatItem> lst, int startRow, string header, string propertyName)
 	{
 		//Add Headers
@@ -405,6 +409,7 @@ class Sample6
 		}
 	}
 
+	[SupportedOSPlatform("windows")]
 	private static int AddDirectory(ExcelWorksheet ws, DirectoryInfo dir, int row, double height, int level, bool skipIcons)
 	{
 		//Get the icon as a bitmap
@@ -519,6 +524,7 @@ class Sample6
 	/// </summary>
 	/// <param name="FileName"></param>
 	/// <returns></returns>
+	[SupportedOSPlatform("windows")]
 	private static Bitmap GetIcon(string FileName)
 	{
 		if (File.Exists(FileName))

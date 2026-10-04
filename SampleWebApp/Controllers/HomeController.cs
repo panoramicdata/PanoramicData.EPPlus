@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using System.Runtime.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
@@ -11,13 +12,14 @@ using System.Threading.Tasks;
 
 namespace SampleWebApp.Controllers;
 
-public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
+public class HomeController(IWebHostEnvironment hostingEnvironment) : Controller
 {
 	private const string XlsxContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 	/// <summary>
 	/// /Home/FileReport
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public IActionResult FileReport()
 	{
 		var fileDownloadName = "report.xlsx";
@@ -36,6 +38,7 @@ public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 	/// <summary>
 	/// An in-memory report
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public IActionResult InMemoryReport()
 	{
 		byte[] reportBytes;
@@ -50,6 +53,7 @@ public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 	/// <summary>
 	/// /Home/ReadFile
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public IActionResult ReadFile()
 	{
 		var fileDownloadName = "report.xlsx";
@@ -82,6 +86,7 @@ public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 	/// <summary>
 	/// /Home/DataTableReport
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public IActionResult DataTableReport()
 	{
 		var dataTable = new DataTable("Users");
@@ -137,6 +142,7 @@ public class HomeController(IHostingEnvironment hostingEnvironment) : Controller
 		return sb.ToString();
 	}
 
+	[SupportedOSPlatform("windows")]
 	private ExcelPackage createExcelPackage()
 	{
 		var package = new ExcelPackage();

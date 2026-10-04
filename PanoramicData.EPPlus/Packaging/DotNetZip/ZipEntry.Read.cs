@@ -44,7 +44,7 @@ internal partial class ZipEntry
 		SharedUtilities.Workaround_Ladybug318918(ArchiveStream);
 
 		var block = new byte[30];
-		ArchiveStream.Read(block, 0, block.Length);
+		ArchiveStream.ReadAtLeast(block, block.Length, throwOnEndOfStream: false);
 		var i = 26;
 		var filenameLength = (short)(block[i++] + block[i++] * 256);
 		var extraFieldLength = (short)(block[i++] + block[i++] * 256);

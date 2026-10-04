@@ -29,6 +29,7 @@
  *******************************************************************************
  * Jan Källman		Added		10-SEP-2009
  *******************************************************************************/
+using System.Runtime.Versioning;
 using System;
 using System.IO;
 
@@ -36,6 +37,7 @@ namespace SampleApp;
 
 class Sample_Main
 {
+	[SupportedOSPlatform("windows")]
 	static void Main(string[] args)
 	{
 		try

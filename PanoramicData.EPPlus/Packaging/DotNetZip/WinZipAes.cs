@@ -103,8 +103,8 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 			c._Salt = new byte[saltSizeInBytes];
 			c._providedPv = new byte[2];
 
-			s.Read(c._Salt, 0, c._Salt.Length);
-			s.Read(c._providedPv, 0, c._providedPv.Length);
+			s.ReadAtLeast(c._Salt, c._Salt.Length, throwOnEndOfStream: false);
+			s.ReadAtLeast(c._providedPv, c._providedPv.Length, throwOnEndOfStream: false);
 
 			c.PasswordVerificationStored = (short)(c._providedPv[0] + c._providedPv[1] * 256);
 			if (password != null)
@@ -177,12 +177,12 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 		{
 			//Console.WriteLine(" provided password: '{0}'", _Password);
 
-			var rfc2898 =
-				new Rfc2898DeriveBytes(_Password, Salt, Rfc2898KeygenIterations);
+			// WinZip AES: one PBKDF2-HMAC-SHA1 stream split into key, MAC key and 2-byte verifier.
+			var derived = Rfc2898DeriveBytes.Pbkdf2(_Password, Salt, Rfc2898KeygenIterations, HashAlgorithmName.SHA1, 2 * _KeyStrengthInBytes + 2);
 
-			_keyBytes = rfc2898.GetBytes(_KeyStrengthInBytes); // 16 or 24 or 32 ???
-			_MacInitializationVector = rfc2898.GetBytes(_KeyStrengthInBytes);
-			_generatedPv = rfc2898.GetBytes(2);
+			_keyBytes = derived[.._KeyStrengthInBytes];
+			_MacInitializationVector = derived[_KeyStrengthInBytes..(2 * _KeyStrengthInBytes)];
+			_generatedPv = derived[(2 * _KeyStrengthInBytes)..];
 
 			_cryptoGenerated = true;
 		}
@@ -217,7 +217,7 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 			// read integrityCheckVector.
 			// caller must ensure that the file pointer is in the right spot!
 			_StoredMac = new byte[10];  // aka "authentication code"
-			s.Read(_StoredMac, 0, _StoredMac.Length);
+			s.ReadAtLeast(_StoredMac, _StoredMac.Length, throwOnEndOfStream: false);
 
 			if (_StoredMac.Length != CalculatedMac.Length)
 				invalid = true;
@@ -354,12 +354,7 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 
 		internal HMACSHA1 _mac;
 
-		// Use RijndaelManaged from .NET 2.0.
-		// AesManaged came in .NET 3.5, but we want to limit
-		// dependency to .NET 2.0.  AES is just a restricted form
-		// of Rijndael (fixed block size of 128, some crypto modes not supported).
-
-		internal RijndaelManaged _aesCipher;
+		internal Aes _aesCipher;
 		internal ICryptoTransform _xform;
 
 		private const int BLOCK_SIZE_IN_BYTES = 16;
@@ -431,13 +426,11 @@ namespace OfficeOpenXml.Packaging.DotNetZip
 
 			_mac = new HMACSHA1(_params.MacIv);
 
-			_aesCipher = new RijndaelManaged
-			{
-				BlockSize = 128,
-				KeySize = keySizeInBits,  // 128, 192, 256
-				Mode = CipherMode.ECB,
-				Padding = PaddingMode.None
-			};
+			_aesCipher = Aes.Create();
+			_aesCipher.KeySize = keySizeInBits;  // 128, 192, 256
+			// WinZip AES is CTR mode: ECB only encrypts single counter blocks, and HMAC-SHA1 provides integrity.
+			_aesCipher.Mode = CipherMode.ECB; // nosemgrep
+			_aesCipher.Padding = PaddingMode.None;
 
 			var iv = new byte[BLOCK_SIZE_IN_BYTES]; // all zeroes
 
