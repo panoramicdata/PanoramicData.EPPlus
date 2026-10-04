@@ -1533,7 +1533,7 @@ internal partial class ZipEntry
 	///   property for each <c>ZipEntry</c> indicates whether encryption was
 	///   actually used (which will have been true if the <see
 	///   cref="Password"/> was set and the <see cref="Encryption"/> property
-	///   was something other than <see cref="EncryptionAlgorithm.None"/>.
+	///   was something other than <see cref="DotNetZip.EncryptionAlgorithm.None"/>.
 	/// </para>
 	/// </remarks>
 	public bool UsesEncryption => (_Encryption_FromZipFile != DotNetZip.EncryptionAlgorithm.None);
@@ -1550,7 +1550,7 @@ internal partial class ZipEntry
 	///   Set this property in order to encrypt the entry when the <c>ZipFile</c> is
 	///   saved. When setting this property, you must also set a <see
 	///   cref="Password"/> on the entry.  If you set a value other than <see
-	///   cref="EncryptionAlgorithm.None"/> on this property and do not set a
+	///   cref="DotNetZip.EncryptionAlgorithm.None"/> on this property and do not set a
 	///   <c>Password</c> then the entry will not be encrypted. The <c>ZipEntry</c>
 	///   data is encrypted as the <c>ZipFile</c> is saved, when you call <see
 	///   cref="ZipFile.Save()"/> or one of its cousins on the containing
@@ -2481,7 +2481,7 @@ internal partial class ZipEntry
 		}
 
 		var block = new byte[30];
-		ArchiveStream.Read(block, 0, block.Length);
+		ArchiveStream.ReadAtLeast(block, block.Length, throwOnEndOfStream: false);
 
 		// At this point we could verify the contents read from the local header
 		// with the contents read from the central header.  We could, but don't need to.

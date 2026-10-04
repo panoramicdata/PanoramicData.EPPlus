@@ -46,9 +46,10 @@
  * All code and executables are provided "as is" with no warranty either express or implied. 
  * The author accepts no liability for any damage or loss of business that this product may cause.
  */
+using System.Runtime.Versioning;
 using System;
 using OfficeOpenXml;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Drawing;
 using OfficeOpenXml.Style;
 
@@ -64,6 +65,7 @@ class Sample3
 	/// <param name="outputDir">The output directory</param>
 	/// <param name="templateDir">The location of the sample template</param>
 	/// <param name="connectionString">The connection string to your copy of the AdventureWorks database</param>
+	[SupportedOSPlatform("windows")]
 	public static string RunSample3(string connectionString)
 	{
 		var file = Utils.GetFileInfo("Sample3.xlsx");

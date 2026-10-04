@@ -31,6 +31,7 @@
  *******************************************************************************/
 using System;
 using System.Drawing;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml.Style;
 
@@ -200,6 +201,7 @@ public sealed class ExcelFont : StyleBase
 	/// Set the font from a Font object
 	/// </summary>
 	/// <param name="Font"></param>
+	[SupportedOSPlatform("windows")]
 	public void SetFromFont(Font Font)
 	{
 		Name = Font.Name;

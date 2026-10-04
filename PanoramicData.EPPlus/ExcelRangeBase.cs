@@ -52,6 +52,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml;
 
@@ -723,6 +724,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// Note: Cells containing formulas must be calculated before autofit is called.
 	/// Wrapped and merged cells are also ignored.
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns() => AutoFitColumns(_worksheet.DefaultColWidth);
 
 	/// <summary>
@@ -732,6 +734,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// </summary>
 	/// <remarks>This method will not work if you run in an environment that does not support GDI</remarks>
 	/// <param name="MinimumWidth">Minimum column width</param>
+	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns(double MinimumWidth) => AutoFitColumns(MinimumWidth, double.MaxValue);
 
 	/// <summary>
@@ -742,6 +745,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// </summary>
 	/// <param name="MinimumWidth">Minimum column width</param>
 	/// <param name="MaximumWidth">Maximum column width</param>
+	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns(double MinimumWidth, double MaximumWidth)
 	{
 		if (_worksheet.Dimension == null)
@@ -2565,24 +2569,8 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		//Check that the range is not larger than the dimensions of the worksheet. 
 		//If so set the copied range to the worksheet dimensions to avoid copying empty cells.
-		ExcelAddressBase range;
-
-		if (Worksheet.Dimension == null)
-		{
-			range = this;
-		}
-		else
-		{
-			var collideStatus = Collide(Worksheet.Dimension);
-			if (collideStatus is not eAddressCollition.Equal or not eAddressCollition.Inside)
-			{
-				range = Worksheet.Dimension;
-			}
-			else
-			{
-				range = this;
-			}
-		}
+		// Upstream behaviour kept: its collision test was always true, so any dimension is used.
+		ExcelAddressBase range = Worksheet.Dimension ?? (ExcelAddressBase)this;
 
 		if (_fromCol == 1 && _toCol == ExcelPackage.MaxColumns)
 		{

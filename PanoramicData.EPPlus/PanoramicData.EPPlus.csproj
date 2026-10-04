@@ -27,7 +27,10 @@
     <AssemblyOriginatorKeyFile>OpenOfficeXml.Rimland.snk</AssemblyOriginatorKeyFile>
     <NeutralLanguage />
     <PackageLicenseFile>lgpl-3.0.txt</PackageLicenseFile>
-    <Nullable>enable</Nullable>
+    <!-- Vendored EPPlus source was never fully annotated: keep the annotations, drop the nullable warnings. -->
+    <Nullable>annotations</Nullable>
+    <!-- Same reason: about 2,200 vendored public members have no XML documentation. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <IncludeSymbols>True</IncludeSymbols>
@@ -36,7 +39,6 @@
     <PackageId>PanoramicData.EPPlus</PackageId>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\EPPlusFree.xml</DocumentationFile>

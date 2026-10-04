@@ -33,6 +33,7 @@ using System;
 using System.Drawing;
 using System.Globalization;
 using System.Xml;
+using System.Runtime.Versioning;
 namespace OfficeOpenXml.Style.XmlAccess;
 
 /// <summary>
@@ -261,6 +262,7 @@ public sealed class ExcelFontXml : StyleXmlHelper
 			_verticalAlign = value;
 		}
 	}
+	[SupportedOSPlatform("windows")]
 	public void SetFromFont(System.Drawing.Font Font)
 	{
 		Name = Font.Name;

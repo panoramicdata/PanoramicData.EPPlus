@@ -31,7 +31,7 @@
 
 using OfficeOpenXml;
 using System.IO;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Style;
 using System.Drawing;

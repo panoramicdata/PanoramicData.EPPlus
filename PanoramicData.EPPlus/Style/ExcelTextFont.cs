@@ -33,6 +33,7 @@ using System;
 using System.Globalization;
 using System.Xml;
 using System.Drawing;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml.Style;
 
@@ -258,6 +259,7 @@ public class ExcelTextFont : XmlHelper
 	/// Set the font style from a font object
 	/// </summary>
 	/// <param name="Font"></param>
+	[SupportedOSPlatform("windows")]
 	public void SetFromFont(Font Font)
 	{
 		LatinFont = Font.Name;

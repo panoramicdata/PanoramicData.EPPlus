@@ -2404,7 +2404,7 @@ internal partial class ZipEntry
 				var size = 16;
 				if (_InputUsesZip64) size += 8;
 				var Descriptor = new byte[size];
-				input.Read(Descriptor, 0, size);
+				input.ReadAtLeast(Descriptor.AsSpan(0, size), size, throwOnEndOfStream: false);
 
 				if (_InputUsesZip64 && _container.UseZip64WhenSaving == Zip64Option.Never)
 				{

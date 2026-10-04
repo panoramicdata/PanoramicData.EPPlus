@@ -1,4 +1,5 @@
 ﻿using EPPlusTest.Properties;
+using System.Runtime.Versioning;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
@@ -15,6 +16,7 @@ namespace PanoramicData.EPPlus.Test;
 [TestClass]
 public class DrawingTest : TestBase
 {
+	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void RunDrawingTests()
 	{
@@ -59,6 +61,7 @@ public class DrawingTest : TestBase
 		Assert.AreEqual(cht.Title.Text, "Test");
 	}
 
+	[SupportedOSPlatform("windows")]
 	public void Picture()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Picture");
@@ -109,6 +112,7 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
+	[SupportedOSPlatform("windows")]
 	public void DrawingSizingAndPositioning()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("DrawingPosSize");
@@ -251,6 +255,7 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
+	[SupportedOSPlatform("windows")]
 	public void Scatter()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Scatter");
@@ -570,6 +575,7 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
+	[SupportedOSPlatform("windows")]
 	public void Drawings()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Shapes");
@@ -755,6 +761,7 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
+	[SupportedOSPlatform("windows")]
 	public void DeleteDrawing()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("DeleteDrawing1");
@@ -952,6 +959,7 @@ public class DrawingTest : TestBase
 		// Cleanup:
 		File.Delete(savedPath);
 	}
+	[SupportedOSPlatform("windows")]
 	public void DrawingRowheightDynamic()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("PicResize");

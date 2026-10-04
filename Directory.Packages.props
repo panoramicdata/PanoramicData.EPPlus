@@ -19,7 +19,7 @@
     <PackageVersion Include="System.Xml.XPath.XmlDocument" Version="4.7.0" />
     <!-- Sample projects -->
     <PackageVersion Include="Microsoft.AspNetCore.App" Version="2.2.8" />
-    <PackageVersion Include="System.Data.SqlClient" Version="4.9.1" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.1" />
     <!-- Not referenced by any project here. Retained rather than removed, so that restoring the
          build is not conflated with pruning it. -->
     <PackageVersion Include="xunit.v3" Version="4.0.1" />

@@ -38,6 +38,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Xml;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml.Drawing;
 
@@ -247,6 +248,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <param name="Name"></param>
 	/// <param name="image">An image. Always saved in then JPeg format</param>
 	/// <returns></returns>
+	[SupportedOSPlatform("windows")]
 	public ExcelPicture AddPicture(string Name, Image image) => AddPicture(Name, image, null);
 	/// <summary>
 	/// Add a picture to the worksheet
@@ -255,6 +257,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <param name="image">An image. Always saved in then JPeg format</param>
 	/// <param name="Hyperlink">Picture hyperlink</param>
 	/// <returns></returns>
+	[SupportedOSPlatform("windows")]
 	public ExcelPicture AddPicture(string Name, Image image, Uri Hyperlink)
 	{
 		if (image != null)
@@ -283,6 +286,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <param name="Name"></param>
 	/// <param name="ImageFile">The image file</param>
 	/// <returns></returns>
+	[SupportedOSPlatform("windows")]
 	public ExcelPicture AddPicture(string Name, FileInfo ImageFile) => AddPicture(Name, ImageFile, null);
 	/// <summary>
 	/// Add a picure to the worksheet
@@ -291,6 +295,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <param name="ImageFile">The image file</param>
 	/// <param name="Hyperlink">Picture Hyperlink</param>
 	/// <returns></returns>
+	[SupportedOSPlatform("windows")]
 	public ExcelPicture AddPicture(string Name, FileInfo ImageFile, Uri Hyperlink)
 	{
 		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)

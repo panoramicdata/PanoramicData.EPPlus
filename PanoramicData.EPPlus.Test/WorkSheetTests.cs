@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -34,6 +35,7 @@ internal class InhItem : BaseItem
 [TestClass]
 public class WorkSheetTest : TestBase
 {
+	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void RunWorksheetTests()
 	{
@@ -402,6 +404,7 @@ public class WorkSheetTest : TestBase
 	// Use ClassCleanup to run code after all tests in a class have run
 	//[Ignore]
 	//[TestMethod]
+	[SupportedOSPlatform("windows")]
 	public void LoadData()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("newsheet");
@@ -1137,6 +1140,7 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
+	[SupportedOSPlatform("windows")]
 	public void PictureURL()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Pic URL");
@@ -1875,6 +1879,7 @@ public class WorkSheetTest : TestBase
 		//  return pkg
 
 	}
+	[SupportedOSPlatform("windows")]
 	[Ignore]
 	[TestMethod]
 	public void CloseProblem()
@@ -2250,6 +2255,7 @@ public class WorkSheetTest : TestBase
 		pck.Save();
 	}
 	//[Ignore]
+	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void SetBackground()
 	{
@@ -2260,6 +2266,7 @@ public class WorkSheetTest : TestBase
 		ws.BackgroundImage.SetFromFile(new FileInfo(Path.Combine(_clipartPath, "Vector Drawing.wmf")));
 	}
 	//[Ignore]
+	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void SetHeaderFooterImage()
 	{
@@ -2293,6 +2300,7 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
+	[SupportedOSPlatform("windows")]
 	public void NamedStyles()
 	{
 		var wsSheet = _pck.Workbook.Worksheets.Add("NamedStyles");
@@ -2413,6 +2421,7 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
+	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Autofit");
@@ -2868,6 +2877,7 @@ public class WorkSheetTest : TestBase
 		excelPackage.Save();
 		var s = stream.ToArray();
 	}
+	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void ColumnsTest()
 	{

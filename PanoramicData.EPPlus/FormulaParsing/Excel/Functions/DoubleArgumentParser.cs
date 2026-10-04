@@ -26,7 +26,7 @@ using System.Linq;
 using System.Globalization;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using OfficeOpenXml.FormulaParsing.Exceptions;
-using util = OfficeOpenXml.Utils;
+using Utils = OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
@@ -42,7 +42,7 @@ public class DoubleArgumentParser : ArgumentParser
 		}
 
 		if (obj is double) return obj;
-		if (obj.IsNumeric()) return util.ConvertUtil.GetValueDouble(obj);
+		if (obj.IsNumeric()) return Utils.ConvertUtil.GetValueDouble(obj);
 		var str = obj != null ? obj.ToString() : string.Empty;
 		try
 		{

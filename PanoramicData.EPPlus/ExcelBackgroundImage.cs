@@ -36,6 +36,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Xml;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml;
 
@@ -62,6 +63,7 @@ public class ExcelBackgroundImage : XmlHelper
 	/// The background image of the worksheet. 
 	/// The image will be saved internally as a jpg.
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public Image Image
 	{
 		get
@@ -97,6 +99,7 @@ public class ExcelBackgroundImage : XmlHelper
 	/// The image file will be saved as a blob, so make sure Excel supports the image format.
 	/// </summary>
 	/// <param name="PictureFile">The image file.</param>
+	[SupportedOSPlatform("windows")]
 	public void SetFromFile(FileInfo PictureFile)
 	{
 		DeletePrevImage();
@@ -134,6 +137,7 @@ public class ExcelBackgroundImage : XmlHelper
 		var rel = _workSheet.Part.CreateRelationship(imageURI, Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 		SetXmlNodeString(BACKGROUNDPIC_PATH, rel.Id);
 	}
+	[SupportedOSPlatform("windows")]
 	private void DeletePrevImage()
 	{
 		var relID = GetXmlNodeString(BACKGROUNDPIC_PATH);
