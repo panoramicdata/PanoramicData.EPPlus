@@ -693,6 +693,11 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 				var uri = pic.UriPic;
 				if (!workSheet.Workbook._package.Package.PartExists(uri))
 				{
+					if (!OperatingSystem.IsWindowsVersionAtLeast(6, 1))
+					{
+						throw new PlatformNotSupportedException("Copying a picture to another package uses System.Drawing, which is only supported on Windows.");
+					}
+
 					var picPart = workSheet.Workbook._package.Package.CreatePart(uri, pic.ContentType, CompressionLevel.None);
 					pic.Image.Save(picPart.GetStream(FileMode.Create, FileAccess.Write), ExcelPicture.GetImageFormat(pic.ContentType));
 				}

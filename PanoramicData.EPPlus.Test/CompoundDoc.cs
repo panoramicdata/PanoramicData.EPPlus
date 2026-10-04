@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using OfficeOpenXml.Utils.CompundDocument;
@@ -163,6 +164,7 @@ public class CompoundDoc
 
 		package.Save();
 	}
+	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void Sample7EncrLargeTest()
 	{

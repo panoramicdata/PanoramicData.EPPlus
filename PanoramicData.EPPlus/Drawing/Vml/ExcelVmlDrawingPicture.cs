@@ -33,6 +33,7 @@ using System;
 using System.Xml;
 using System.Globalization;
 using System.Drawing;
+using System.Runtime.Versioning;
 
 
 namespace OfficeOpenXml.Drawing.Vml;
@@ -125,6 +126,7 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 	/// <summary>
 	/// The image
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public Image Image
 	{
 		get

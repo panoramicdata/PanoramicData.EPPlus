@@ -38,6 +38,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Xml;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml;
 
@@ -121,6 +122,7 @@ public class ExcelHeaderFooterText
 	/// </summary>
 	/// <param name="Picture">The image object containing the Picture</param>
 	/// <param name="Alignment">Alignment. The image object will be inserted at the end of the Text.</param>
+	[SupportedOSPlatform("windows")]
 	public ExcelVmlDrawingPicture InsertPicture(Image Picture, PictureAlignment Alignment)
 	{
 		var id = ValidateImage(Alignment);
@@ -137,6 +139,7 @@ public class ExcelHeaderFooterText
 	/// </summary>
 	/// <param name="PictureFile">The image object containing the Picture</param>
 	/// <param name="Alignment">Alignment. The image object will be inserted at the end of the Text.</param>
+	[SupportedOSPlatform("windows")]
 	public ExcelVmlDrawingPicture InsertPicture(FileInfo PictureFile, PictureAlignment Alignment)
 	{
 		var id = ValidateImage(Alignment);
@@ -165,6 +168,7 @@ public class ExcelHeaderFooterText
 		return AddImage(Picture, id, ii);
 	}
 
+	[SupportedOSPlatform("windows")]
 	private ExcelVmlDrawingPicture AddImage(Image Picture, string id, ExcelPackage.ImageInfo ii)
 	{
 		double width = Picture.Width * 72 / Picture.HorizontalResolution,      //Pixel --> Points

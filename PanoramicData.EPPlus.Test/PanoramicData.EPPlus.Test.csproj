@@ -8,7 +8,9 @@
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <Description>Package Description</Description>
-    <Nullable>enable</Nullable>
+    <!-- Vendored EPPlus code, never fully annotated: keep the annotations, drop the nullable warnings. -->
+    <Nullable>annotations</Nullable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

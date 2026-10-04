@@ -29,6 +29,7 @@
  *******************************************************************************
  * Jan Källman		Added		21 Mar 2010
  *******************************************************************************/
+using System.Runtime.Versioning;
 using OfficeOpenXml;
 using System.Drawing;
 using OfficeOpenXml.Style;
@@ -41,6 +42,7 @@ class Sample1
 	/// Sample 1 - simply creates a new workbook from scratch.
 	/// The workbook contains one worksheet with a simple invertory list
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public static string RunSample1()
 	{
 		using var package = new ExcelPackage();

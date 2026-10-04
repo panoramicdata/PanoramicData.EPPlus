@@ -32,6 +32,7 @@
 using System;
 using System.Xml;
 using OfficeOpenXml.Style;
+using System.Runtime.Versioning;
 namespace OfficeOpenXml;
 
 /// <summary>
@@ -249,6 +250,7 @@ public class ExcelColumn : IRangeID
 	/// Note: Cells containing formulas are ignored since EPPlus don't have a calculation engine.
 	///       Wrapped and merged cells are also ignored.
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public void AutoFit() => _worksheet.Cells[1, _columnMin, ExcelPackage.MaxRows, _columnMax].AutoFitColumns();
 
 	/// <summary>
@@ -257,6 +259,7 @@ public class ExcelColumn : IRangeID
 	///       Wrapped and merged cells are also ignored.
 	/// </summary>
 	/// <param name="MinimumWidth">Minimum column width</param>
+	[SupportedOSPlatform("windows")]
 	public void AutoFit(double MinimumWidth) => _worksheet.Cells[1, _columnMin, ExcelPackage.MaxRows, _columnMax].AutoFitColumns(MinimumWidth);
 
 	/// <summary>
@@ -266,6 +269,7 @@ public class ExcelColumn : IRangeID
 	/// </summary>
 	/// <param name="MinimumWidth">Minimum column width</param>
 	/// <param name="MaximumWidth">Maximum column width</param>
+	[SupportedOSPlatform("windows")]
 	public void AutoFit(double MinimumWidth, double MaximumWidth) => _worksheet.Cells[1, _columnMin, ExcelPackage.MaxRows, _columnMax].AutoFitColumns(MinimumWidth, MaximumWidth);
 
 	/// <summary>

@@ -92,7 +92,7 @@ public abstract class ZipPackageRelationshipBase
 			catch
 			{
 				//The URI is not a valid URI. Encode it to make i valid.
-				rel.TargetUri = new Uri(Uri.EscapeUriString("Invalid:URI " + c.GetAttribute("Target")), UriKind.RelativeOrAbsolute);
+				rel.TargetUri = new Uri(EscapeUriString("Invalid:URI " + c.GetAttribute("Target")), UriKind.RelativeOrAbsolute);
 			}
 
 			if (!string.IsNullOrEmpty(source))
@@ -113,5 +113,25 @@ public abstract class ZipPackageRelationshipBase
 
 			_rels.Add(rel);
 		}
+	}
+
+	// Same output as the obsolete Uri.EscapeUriString, which this saved Target text must keep matching.
+	private static string EscapeUriString(string value)
+	{
+		var sb = new StringBuilder(value.Length);
+		foreach (var b in Encoding.UTF8.GetBytes(value))
+		{
+			var c = (char)b;
+			if (b < 0x80 && (char.IsAsciiLetterOrDigit(c) || "-._~:/?#[]@!$&'()*+,;=".Contains(c)))
+			{
+				sb.Append(c);
+			}
+			else
+			{
+				sb.Append('%').Append(b.ToString("X2"));
+			}
+		}
+
+		return sb.ToString();
 	}
 }

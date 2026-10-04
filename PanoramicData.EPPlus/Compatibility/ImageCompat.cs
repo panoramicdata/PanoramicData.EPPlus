@@ -1,9 +1,11 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml.Compatibility;
 
+[SupportedOSPlatform("windows")]
 internal class ImageCompat
 {
 	internal static byte[] GetImageAsByteArray(Image image)

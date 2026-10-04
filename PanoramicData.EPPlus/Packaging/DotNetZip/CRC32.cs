@@ -631,7 +631,7 @@ internal class CrcCalculatorStream : System.IO.Stream, IDisposable
 	/// </summary>
 	/// <remarks>
 	///   <para>
-	///     Set this at any point before calling <see cref="Close()"/>.
+	///     Set this at any point before calling <c>Close()</c>.
 	///   </para>
 	/// </remarks>
 	public bool LeaveOpen

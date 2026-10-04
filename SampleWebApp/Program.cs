@@ -1,19 +1,12 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace SampleWebApp;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllersWithViews();
 
-public class Program
-{
-	public static void Main(string[] args)
-	{
-		var host = new WebHostBuilder()
-			.UseKestrel()
-			.UseContentRoot(Directory.GetCurrentDirectory())
-			.UseIISIntegration()
-			.UseStartup<Startup>()
-			.Build();
-
-		host.Run();
-	}
-}
+var app = builder.Build();
+app.UseDeveloperExceptionPage();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+app.MapDefaultControllerRoute();
+app.Run();

@@ -38,6 +38,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Runtime.Versioning;
 
 namespace OfficeOpenXml.Drawing;
 
@@ -60,6 +61,11 @@ public sealed class ExcelPicture : ExcelDrawing
 			Part = drawings.Part.Package.GetPart(UriPic);
 			FileInfo f = new(UriPic.OriginalString);
 			ContentType = GetContentType(f.Extension);
+			if (!OperatingSystem.IsWindowsVersionAtLeast(6, 1))
+			{
+				throw new PlatformNotSupportedException("Loading a picture uses System.Drawing, which is only supported on Windows.");
+			}
+
 			_image = Image.FromStream(Part.GetStream());
 
 			var iby = ImageCompat.GetImageAsByteArray(_image);
@@ -85,6 +91,7 @@ public sealed class ExcelPicture : ExcelDrawing
 			}
 		}
 	}
+	[SupportedOSPlatform("windows")]
 	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, Image image, Uri hyperlink) :
 		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
 	{
@@ -107,6 +114,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		SetPosDefaults(image);
 		Packaging.ZipPackage.Flush();
 	}
+	[SupportedOSPlatform("windows")]
 	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, FileInfo imageFile, Uri hyperlink) :
 		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
 	{
@@ -249,6 +257,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		".wmf" => "image/x-wmf",
 		_ => "image/jpeg",
 	};
+	[SupportedOSPlatform("windows")]
 	internal static ImageFormat GetImageFormat(string contentType) => contentType.ToLower(CultureInfo.InvariantCulture) switch
 	{
 		"image/bmp" => ImageFormat.Bmp,
@@ -270,6 +279,7 @@ public sealed class ExcelPicture : ExcelDrawing
 		//_drawings._pics.Add(newPic);
 	}
 	#endregion
+	[SupportedOSPlatform("windows")]
 	private string SavePicture(Image image)
 	{
 		var img = ImageCompat.GetImageAsByteArray(image);
@@ -297,6 +307,7 @@ public sealed class ExcelPicture : ExcelDrawing
 
 		return RelPic.Id;
 	}
+	[SupportedOSPlatform("windows")]
 	private void SetPosDefaults(Image image)
 	{
 		EditAs = eEditAs.OneCell;
@@ -345,6 +356,7 @@ public sealed class ExcelPicture : ExcelDrawing
 	/// <summary>
 	/// The Image
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public Image Image
 	{
 		get
@@ -371,16 +383,17 @@ public sealed class ExcelPicture : ExcelDrawing
 			}
 		}
 	}
-	ImageFormat _imageFormat = ImageFormat.Jpeg;
+	ImageFormat _imageFormat;
 	/// <summary>
 	/// Image format
 	/// If the picture is created from an Image this type is always Jpeg
 	/// </summary>
+	[SupportedOSPlatform("windows")]
 	public ImageFormat ImageFormat
 	{
 		get
 		{
-			return _imageFormat;
+			return _imageFormat ?? ImageFormat.Jpeg;
 		}
 		internal set
 		{
@@ -399,7 +412,8 @@ public sealed class ExcelPicture : ExcelDrawing
 	/// <param name="Percent">Percent</param>
 	public override void SetSize(int Percent)
 	{
-		if (Image == null)
+		// Image is only ever set on Windows.
+		if (!OperatingSystem.IsWindowsVersionAtLeast(6, 1) || Image == null)
 		{
 			base.SetSize(Percent);
 		}
@@ -463,7 +477,10 @@ public sealed class ExcelPicture : ExcelDrawing
 		base.Dispose();
 		Hyperlink = null;
 		// MagicSuite MS-25871: a picture created from raw bytes has no Image
-		_image?.Dispose();
+		if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
+		{
+			_image?.Dispose();
+		}
 		_image = null;
 	}
 }

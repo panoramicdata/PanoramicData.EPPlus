@@ -26,6 +26,7 @@
  * ******************************************************************************
  * Jan Källman                      Added       		        2018-03-20
  *******************************************************************************/
+using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Sparkline;
 using OfficeOpenXml.Table;
@@ -37,6 +38,7 @@ namespace SampleApp;
 
 public static class Sample16
 {
+	[SupportedOSPlatform("windows")]
 	public static void RunSample16()
 	{
 		using var package = new ExcelPackage();

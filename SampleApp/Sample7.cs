@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -9,9 +10,10 @@ class Sample7
 {
 	/// <summary>
 	/// This sample load a number of rows, style them and insert a row at the top.
-	/// A password is set to protect locked cells. Column 3 & 4 will be editable, the rest will be locked.
+	/// A password is set to protect locked cells. Column 3 and 4 will be editable, the rest will be locked.
 	/// </summary>
 	/// <param name="rows"></param>
+	[SupportedOSPlatform("windows")]
 	public static string RunSample7(int rows)
 	{
 		var newFile = Utils.GetFileInfo("sample7.xlsx");
