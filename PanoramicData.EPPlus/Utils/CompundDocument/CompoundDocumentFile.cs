@@ -111,7 +111,7 @@ internal class CompoundDocumentFile : IDisposable
 	{
 		try
 		{
-			var fs = fi.OpenRead();
+			using var fs = fi.OpenRead();
 			var b = new byte[8];
 			fs.ReadAtLeast(b.AsSpan(0, 8), 8, throwOnEndOfStream: false);
 			return IsCompoundDocument(b);

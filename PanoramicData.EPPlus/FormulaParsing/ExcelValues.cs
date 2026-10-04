@@ -166,5 +166,5 @@ public class ExcelErrorValue
 
 	public override int GetHashCode() => base.GetHashCode();
 
-	public override bool Equals(object obj) => obj is ExcelErrorValue && ((ExcelErrorValue)obj).ToString() == ToString();
+	public override bool Equals(object? obj) => obj is ExcelErrorValue && ((ExcelErrorValue)obj).ToString() == ToString();
 }
