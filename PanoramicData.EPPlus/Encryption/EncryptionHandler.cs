@@ -824,18 +824,23 @@ internal class EncryptedPackageHandler
 
 			//First XOR hash bytes with 0x36 and fill the rest with 0x36
 			for (var i = 0; i < derivedKey.Length; i++)
+			{
 				derivedKey[i] = (byte)(i < hash.Length ? 0x36 ^ hash[i] : 0x36);
-
+			}
 
 			var X1 = hashProvider.ComputeHash(derivedKey);
 
 			//if verifier size is bigger than the key size we can return X1
 			if ((int)encryptionInfo.Verifier.VerifierHashSize > keySizeBytes)
+			{
 				return FixHashSize(X1, keySizeBytes);
+			}
 
 			//Else XOR hash bytes with 0x5C and fill the rest with 0x5C
 			for (var i = 0; i < derivedKey.Length; i++)
+			{
 				derivedKey[i] = (byte)(i < hash.Length ? 0x5C ^ hash[i] : 0x5C);
+			}
 
 			var X2 = hashProvider.ComputeHash(derivedKey);
 
@@ -906,7 +911,9 @@ internal class EncryptedPackageHandler
 	private static byte[] FixHashSize(byte[] hash, int size, byte fill = 0)
 	{
 		if (hash.Length == size)
+		{
 			return hash;
+		}
 		else if (hash.Length < size)
 		{
 			var buff = new byte[size];

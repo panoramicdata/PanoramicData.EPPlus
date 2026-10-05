@@ -29,10 +29,10 @@
  * Jan Källman		Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Table.PivotTable;
 using System;
 using System.Globalization;
 using System.Xml;
-using OfficeOpenXml.Table.PivotTable;
 
 namespace OfficeOpenXml.Drawing.Chart;
 

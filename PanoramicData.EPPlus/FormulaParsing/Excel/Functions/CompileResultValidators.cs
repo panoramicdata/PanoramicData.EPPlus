@@ -22,8 +22,8 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-26
  *******************************************************************************/
-using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 

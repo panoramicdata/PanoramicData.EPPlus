@@ -28,10 +28,10 @@
  * ******************************************************************************
  * Eyal Seagull		    Conditional Formatting      2012-04-03
  *******************************************************************************/
-using System;
-using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Rules;
 using OfficeOpenXml.Utils;
+using System;
+using System.Xml;
 
 namespace OfficeOpenXml.ConditionalFormatting;
 

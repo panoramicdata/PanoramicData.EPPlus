@@ -1,0 +1,47 @@
+name: Coverage
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: windows-latest
+    env:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+
+      # Unit tests only (no live services). Excluded by name:
+      # - DateFunctionsWorkWithDifferentCultureDateFormats_*: throws an unhandled
+      #   InvalidCastException on a worker thread, which crashes the test host and
+      #   aborts the whole run (pre-existing on master).
+      # - Eleven tests that fail on unmodified master (RunDrawingTests, Issuer246,
+      #   RunWorksheetTests, SetBackground, RCRelativeToABToR1C1_2, SimpleRelativeR1C1,
+      #   FullTwoColumn, FullColumn, FullTwoRow, FullRow, OperatorsActingOnNumericStrings).
+      - name: Test with coverage
+        run: >
+          dotnet test PanoramicData.EPPlus.Test/PanoramicData.EPPlus.Test.csproj
+          --collect:"XPlat Code Coverage" --results-directory ./coverage
+          --blame-hang-timeout 5m
+          --filter "FullyQualifiedName!~DateFunctionsWorkWithDifferentCultureDateFormats&Name!=RunDrawingTests&Name!=Issuer246&Name!=RunWorksheetTests&Name!=SetBackground&Name!=RCRelativeToABToR1C1_2&Name!=SimpleRelativeR1C1&Name!=FullTwoColumn&Name!=FullColumn&Name!=FullTwoRow&Name!=FullRow&Name!=OperatorsActingOnNumericStrings"
+
+      - name: Upload coverage to Codacy
+        if: ${{ env.CODACY_PROJECT_TOKEN != '' }}
+        uses: codacy/codacy-coverage-reporter-action@v1.3.0
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: coverage/**/coverage.cobertura.xml

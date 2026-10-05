@@ -24,9 +24,9 @@
  * Robert J. McKee                  Fix rounding with negative digits parameter 2016-08-10
  *                                  Fix rounding of negative numbers            2016-08-10
  *****************************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System;
 using System.Collections.Generic;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 

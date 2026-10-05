@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+﻿using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.Utils;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 

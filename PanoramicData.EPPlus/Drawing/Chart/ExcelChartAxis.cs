@@ -29,10 +29,10 @@
  * Jan Källman		Added		2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
-using System;
-using System.Xml;
 using OfficeOpenXml.Style;
+using System;
 using System.Globalization;
+using System.Xml;
 namespace OfficeOpenXml.Drawing.Chart;
 
 /// <summary>
@@ -807,7 +807,9 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				var node = TopNode.SelectSingleNode(_majorGridlinesPath, NameSpaceManager);
 				if (node == null)
+				{
 					CreateNode(_majorGridlinesPath);
+				}
 
 				_majorGridlines = new ExcelDrawingBorder(NameSpaceManager, TopNode, $"{_majorGridlinesPath}/c:spPr/a:ln");
 			}
@@ -830,7 +832,9 @@ public sealed class ExcelChartAxis : XmlHelper
 			{
 				var node = TopNode.SelectSingleNode(_minorGridlinesPath, NameSpaceManager);
 				if (node == null)
+				{
 					CreateNode(_minorGridlinesPath);
+				}
 
 				_minorGridlines = new ExcelDrawingBorder(NameSpaceManager, TopNode, $"{_minorGridlinesPath}/c:spPr/a:ln");
 			}

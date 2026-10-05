@@ -28,10 +28,10 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
-using System;
-using System.Text.RegularExpressions;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System;
+using System.Text.RegularExpressions;
 
 namespace OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
@@ -56,8 +56,15 @@ public class ExpressionEvaluator
 	{
 		if (!string.IsNullOrEmpty(expression))
 		{
-			if (Regex.IsMatch(expression, @"^([^a-zA-Z0-9]{2})")) return expression[..2];
-			if (Regex.IsMatch(expression, @"^([^a-zA-Z0-9]{1})")) return expression[..1];
+			if (Regex.IsMatch(expression, @"^([^a-zA-Z0-9]{2})"))
+			{
+				return expression[..2];
+			}
+
+			if (Regex.IsMatch(expression, @"^([^a-zA-Z0-9]{1})"))
+			{
+				return expression[..1];
+			}
 		}
 
 		return null;

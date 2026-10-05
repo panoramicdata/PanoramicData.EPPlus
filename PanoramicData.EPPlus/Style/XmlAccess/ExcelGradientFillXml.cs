@@ -29,8 +29,8 @@
  * Jan Källman		                Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
-using System.Xml;
 using System.Globalization;
+using System.Xml;
 namespace OfficeOpenXml.Style.XmlAccess;
 
 /// <summary>
@@ -158,8 +158,16 @@ public sealed class ExcelGradientFillXml : ExcelFillXml
 	{
 		TopNode = topNode;
 		CreateNode("d:gradientFill");
-		if (Type == ExcelFillGradientType.Path) SetXmlNodeString(_typePath, "path");
-		if (!double.IsNaN(Degree)) SetXmlNodeString(_degreePath, Degree.ToString(CultureInfo.InvariantCulture));
+		if (Type == ExcelFillGradientType.Path)
+		{
+			SetXmlNodeString(_typePath, "path");
+		}
+
+		if (!double.IsNaN(Degree))
+		{
+			SetXmlNodeString(_degreePath, Degree.ToString(CultureInfo.InvariantCulture));
+		}
+
 		if (GradientColor1 != null)
 		{
 			/*** Gradient color node 1***/
@@ -181,10 +189,25 @@ public sealed class ExcelGradientFillXml : ExcelFillXml
 			GradientColor2.CreateXmlNode(colorNode);
 		}
 
-		if (!double.IsNaN(Top)) SetXmlNodeString(_topPath, Top.ToString("F5", CultureInfo.InvariantCulture));
-		if (!double.IsNaN(Bottom)) SetXmlNodeString(_bottomPath, Bottom.ToString("F5", CultureInfo.InvariantCulture));
-		if (!double.IsNaN(Left)) SetXmlNodeString(_leftPath, Left.ToString("F5", CultureInfo.InvariantCulture));
-		if (!double.IsNaN(Right)) SetXmlNodeString(_rightPath, Right.ToString("F5", CultureInfo.InvariantCulture));
+		if (!double.IsNaN(Top))
+		{
+			SetXmlNodeString(_topPath, Top.ToString("F5", CultureInfo.InvariantCulture));
+		}
+
+		if (!double.IsNaN(Bottom))
+		{
+			SetXmlNodeString(_bottomPath, Bottom.ToString("F5", CultureInfo.InvariantCulture));
+		}
+
+		if (!double.IsNaN(Left))
+		{
+			SetXmlNodeString(_leftPath, Left.ToString("F5", CultureInfo.InvariantCulture));
+		}
+
+		if (!double.IsNaN(Right))
+		{
+			SetXmlNodeString(_rightPath, Right.ToString("F5", CultureInfo.InvariantCulture));
+		}
 
 		return topNode;
 	}

@@ -332,9 +332,32 @@ public sealed class ExcelFontXml : StyleXmlHelper
 	{
 		TopNode = topElement;
 
-		if (_bold) CreateNode(boldPath); else DeleteAllNode(boldPath);
-		if (_italic) CreateNode(italicPath); else DeleteAllNode(italicPath);
-		if (_strike) CreateNode(strikePath); else DeleteAllNode(strikePath);
+		if (_bold)
+		{
+			CreateNode(boldPath);
+		}
+		else
+		{
+			DeleteAllNode(boldPath);
+		}
+
+		if (_italic)
+		{
+			CreateNode(italicPath);
+		}
+		else
+		{
+			DeleteAllNode(italicPath);
+		}
+
+		if (_strike)
+		{
+			CreateNode(strikePath);
+		}
+		else
+		{
+			DeleteAllNode(strikePath);
+		}
 
 		if (_underlineType == ExcelUnderLineType.None)
 		{
@@ -350,17 +373,36 @@ public sealed class ExcelFontXml : StyleXmlHelper
 			SetXmlNodeString(underLinedPath + "/@val", v[..1].ToLower(CultureInfo.InvariantCulture) + v[1..]);
 		}
 
-		if (_verticalAlign != "") SetXmlNodeString(verticalAlignPath, _verticalAlign.ToString());
-		if (_size > 0) SetXmlNodeString(sizePath, _size.ToString(CultureInfo.InvariantCulture));
+		if (_verticalAlign != "")
+		{
+			SetXmlNodeString(verticalAlignPath, _verticalAlign.ToString());
+		}
+
+		if (_size > 0)
+		{
+			SetXmlNodeString(sizePath, _size.ToString(CultureInfo.InvariantCulture));
+		}
+
 		if (_color.Exists)
 		{
 			CreateNode(_colorPath);
 			TopNode.AppendChild(_color.CreateXmlNode(TopNode.SelectSingleNode(_colorPath, NameSpaceManager)));
 		}
 
-		if (!string.IsNullOrEmpty(_name)) SetXmlNodeString(namePath, _name);
-		if (_family > int.MinValue) SetXmlNodeString(familyPath, _family.ToString());
-		if (_scheme != "") SetXmlNodeString(schemePath, _scheme.ToString());
+		if (!string.IsNullOrEmpty(_name))
+		{
+			SetXmlNodeString(namePath, _name);
+		}
+
+		if (_family > int.MinValue)
+		{
+			SetXmlNodeString(familyPath, _family.ToString());
+		}
+
+		if (_scheme != "")
+		{
+			SetXmlNodeString(schemePath, _scheme.ToString());
+		}
 
 		return TopNode;
 	}

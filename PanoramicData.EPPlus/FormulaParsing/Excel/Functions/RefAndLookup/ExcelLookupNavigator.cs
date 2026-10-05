@@ -66,7 +66,11 @@ public class ExcelLookupNavigator : LookupNavigator
 
 	public override bool MoveNext()
 	{
-		if (!HasNext()) return false;
+		if (!HasNext())
+		{
+			return false;
+		}
+
 		if (Direction == LookupDirection.Vertical)
 		{
 			_currentRow++;

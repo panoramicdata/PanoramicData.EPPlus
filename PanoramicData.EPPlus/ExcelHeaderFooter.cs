@@ -71,7 +71,11 @@ public class ExcelHeaderFooterText
 	{
 		_ws = ws;
 		_hf = hf;
-		if (TextNode == null || string.IsNullOrEmpty(TextNode.InnerText)) return;
+		if (TextNode == null || string.IsNullOrEmpty(TextNode.InnerText))
+		{
+			return;
+		}
+
 		var text = TextNode.InnerText;
 		var code = text[..2];
 		var startPos = 2;
@@ -565,11 +569,20 @@ public sealed class ExcelHeaderFooter : XmlHelper
 	{
 		var ret = "";
 		if (headerFooter.LeftAlignedText != null)
+		{
 			ret += "&L" + headerFooter.LeftAlignedText;
+		}
+
 		if (headerFooter.CenteredText != null)
+		{
 			ret += "&C" + headerFooter.CenteredText;
+		}
+
 		if (headerFooter.RightAlignedText != null)
+		{
 			ret += "&R" + headerFooter.RightAlignedText;
+		}
+
 		return ret;
 	}
 	#endregion

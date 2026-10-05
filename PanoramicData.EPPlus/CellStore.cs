@@ -367,7 +367,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			for (var c = fromIndex; c < ColumnCount; c++)
 			{
 				int first, last;
-				if (_columnIndex[c].PageCount == 0) continue;
+				if (_columnIndex[c].PageCount == 0)
+				{
+					continue;
+				}
+
 				if (_columnIndex[c]._pages[0].RowCount > 0 && _columnIndex[c]._pages[0].Rows[0].Index > 0)
 				{
 					first = _columnIndex[c]._pages[0].IndexOffset + _columnIndex[c]._pages[0].Rows[0].Index;
@@ -571,7 +575,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			for (var rowIx = fromRow; rowIx <= toRow; rowIx++)
 			{
 				var pageIx = (short)(rowIx >> pageBits);
-				if (!pages.ContainsKey(pageIx)) pages.Add(pageIx, []);
+				if (!pages.ContainsKey(pageIx))
+				{
+					pages.Add(pageIx, []);
+				}
+
 				pages[pageIx].Add(rowIx);
 			}
 
@@ -815,9 +823,17 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					var column = _columnIndex[c];
 					if (column.Index >= fromCol)
 					{
-						if (column.Index > toCol) break;
+						if (column.Index > toCol)
+						{
+							break;
+						}
+
 						var pagePos = column.GetPosition(fromRow);
-						if (pagePos < 0) pagePos = ~pagePos;
+						if (pagePos < 0)
+						{
+							pagePos = ~pagePos;
+						}
+
 						if (pagePos < column.PageCount)
 						{
 							var page = column._pages[pagePos];
@@ -842,7 +858,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 							{
 								var endRow = fromRow + rows;
 								var delEndRow = CellStore<T>.DeleteCells(column._pages[pagePos], fromRow, endRow, shift);
-								if (shift && delEndRow != fromRow) UpdatePageOffset(column, pagePos, delEndRow - fromRow);
+								if (shift && delEndRow != fromRow)
+								{
+									UpdatePageOffset(column, pagePos, delEndRow - fromRow);
+								}
+
 								if (endRow > delEndRow && pagePos < column.PageCount && column._pages[pagePos].MinIndex < endRow)
 								{
 									pagePos = (delEndRow == fromRow ? pagePos : pagePos + 1);
@@ -853,7 +873,10 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 										var fr = shift ? fromRow : endRow - rowsLeft;
 										pagePos = column.GetPosition(fr);
 										delEndRow = CellStore<T>.DeleteCells(column._pages[pagePos], fr, shift ? fr + rowsLeft : endRow, shift);
-										if (shift) UpdatePageOffset(column, pagePos, rowsLeft);
+										if (shift)
+										{
+											UpdatePageOffset(column, pagePos, rowsLeft);
+										}
 									}
 								}
 							}
@@ -863,12 +886,18 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 								var rowPos = column._pages[pagePos - 1].GetPosition(offset);
 								if (rowPos > 0 && pagePos > 0)
 								{
-									if (shift) UpdateIndexOffset(column, pagePos - 1, rowPos, fromRow + rows - 1, -rows);
+									if (shift)
+									{
+										UpdateIndexOffset(column, pagePos - 1, rowPos, fromRow + rows - 1, -rows);
+									}
 								}
 							}
 							else
 							{
-								if (shift && pagePos + 1 < column.PageCount) UpdateIndexOffset(column, pagePos + 1, 0, column._pages[pagePos + 1].MinIndex, -rows);
+								if (shift && pagePos + 1 < column.PageCount)
+								{
+									UpdateIndexOffset(column, pagePos + 1, 0, column._pages[pagePos + 1].MinIndex, -rows);
+								}
 							}
 						}
 					}
@@ -1028,7 +1057,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 		var maxRow = page.MaxIndex;
 		var offset = toRow - page.IndexOffset;
-		if (offset > PageSizeMax) offset = PageSizeMax;
+		if (offset > PageSizeMax)
+		{
+			offset = PageSizeMax;
+		}
+
 		var toPos = page.GetPosition(offset);
 		if (toPos < 0)
 		{
@@ -1052,7 +1085,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			else
 			{
 				var rows = toRow - fromRow;
-				if (shift) UpdateRowIndex(page, toPos, rows);
+				if (shift)
+				{
+					UpdateRowIndex(page, toPos, rows);
+				}
+
 				Array.Copy(page.Rows, toPos, page.Rows, fromPos, page.RowCount - toPos);
 				page.RowCount -= toPos - fromPos;
 
@@ -1122,7 +1159,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 	private void UpdateIndexOffset(ColumnIndex column, int pagePos, int rowPos, int row, int rows)
 	{
-		if (pagePos >= column.PageCount) return;    //A page after last cell.
+		if (pagePos >= column.PageCount)
+		{
+			return;    //A page after last cell.
+		}
+
 		var page = column._pages[pagePos];
 		if (rows > PageSize)
 		{
@@ -1560,7 +1601,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		else
 		{
 			c = ~c;
-			if (c >= ColumnCount) c = ColumnCount - 1;
+			if (c >= ColumnCount)
+			{
+				c = ColumnCount - 1;
+			}
+
 			if (col > _columnIndex[c].Index)
 			{
 				if (col <= minColPos)
@@ -1697,7 +1742,9 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		else if (_columnIndex[colPos]._pages[pagePos[colPos]].RowCount <= row)
 		{
 			if (_columnIndex[colPos].PageCount > pagePos[colPos])
+			{
 				pagePos[colPos]++;
+			}
 			else
 			{
 				pagePos[colPos] = -2;
@@ -1937,9 +1984,17 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 		_maxRow = _endRow;
 
 		_minColPos = _cellStore.GetPosition(_startCol);
-		if (_minColPos < 0) _minColPos = ~_minColPos;
+		if (_minColPos < 0)
+		{
+			_minColPos = ~_minColPos;
+		}
+
 		_maxColPos = _cellStore.GetPosition(_endCol);
-		if (_maxColPos < 0) _maxColPos = ~_maxColPos - 1;
+		if (_maxColPos < 0)
+		{
+			_maxColPos = ~_maxColPos - 1;
+		}
+
 		_row = _minRow;
 		_colPos = _minColPos - 1;
 
@@ -1957,7 +2012,11 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 	{
 		get
 		{
-			if (_colPos == -1) MoveNext();
+			if (_colPos == -1)
+			{
+				MoveNext();
+			}
+
 			return _colPos == -1 ? 0 : _cellStore._columnIndex[_colPos].Index;
 		}
 	}

@@ -23,10 +23,10 @@
  * Mats Alm   		                Added		                2013-12-03
  * Eric Beiler                      Enable Multiple Selections  2015-09-01
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 

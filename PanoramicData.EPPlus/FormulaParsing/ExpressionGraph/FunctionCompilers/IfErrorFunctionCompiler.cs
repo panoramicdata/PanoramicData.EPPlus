@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using OfficeOpenXml.FormulaParsing.Excel.Functions;
+﻿using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
@@ -18,7 +18,11 @@ public class IfErrorFunctionCompiler : FunctionCompiler
 
 	public override CompileResult Compile(IEnumerable<Expression> children)
 	{
-		if (children.Count() != 2) throw new ExcelErrorValueException(eErrorType.Value);
+		if (children.Count() != 2)
+		{
+			throw new ExcelErrorValueException(eErrorType.Value);
+		}
+
 		var args = new List<FunctionArgument>();
 		Function.BeforeInvoke(Context);
 		var firstChild = children.First();

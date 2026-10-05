@@ -67,7 +67,11 @@ public class ExcelWorksheetView : XmlHelper
 			}
 			set
 			{
-				if (_selectionNode == null) CreateSelectionElement();
+				if (_selectionNode == null)
+				{
+					CreateSelectionElement();
+				}
+
 				ExcelCellBase.GetRowColFromAddress(value, out var fromRow, out var fromCol, out int toRow, out var toCol);
 				SetXmlNodeString(_activeCellPath, value);
 				if (((XmlElement)TopNode).GetAttribute("sqref") == "")
@@ -101,7 +105,11 @@ public class ExcelWorksheetView : XmlHelper
 			}
 			set
 			{
-				if (_selectionNode == null) CreateSelectionElement();
+				if (_selectionNode == null)
+				{
+					CreateSelectionElement();
+				}
+
 				ExcelCellBase.GetRowColFromAddress(value, out var fromRow, out var fromCol, out int toRow, out var toCol);
 				SetXmlNodeString(_selectionRangePath, value);
 				if (((XmlElement)TopNode).GetAttribute("activeCell") == "")
@@ -301,15 +309,18 @@ public class ExcelWorksheetView : XmlHelper
 			{
 				//    // ensure no other worksheet has its tabSelected attribute set to 1
 				foreach (var sheet in _worksheet._package.Workbook.Worksheets)
+				{
 					sheet.View.TabSelected = false;
-
+				}
 			}
 
 			var bookView = _worksheet.Workbook.WorkbookXml.SelectSingleNode("//d:workbookView", _worksheet.NameSpaceManager) as XmlElement;
 			bookView?.SetAttribute("activeTab", (_worksheet.PositionID - 1).ToString());
 		}
 		else
+		{
 			SetXmlNodeString("@tabSelected", "0");
+		}
 	}
 
 	/// <summary>
@@ -324,9 +335,13 @@ public class ExcelWorksheetView : XmlHelper
 		set
 		{
 			if (value)
+			{
 				SetXmlNodeString("@view", "pageLayout");
+			}
 			else
+			{
 				SheetViewElement.RemoveAttribute("view");
+			}
 		}
 	}
 	/// <summary>
@@ -341,9 +356,13 @@ public class ExcelWorksheetView : XmlHelper
 		set
 		{
 			if (value)
+			{
 				SetXmlNodeString("@view", "pageBreakPreview");
+			}
 			else
+			{
 				SheetViewElement.RemoveAttribute("view");
+			}
 		}
 	}
 	/// <summary>
@@ -436,7 +455,11 @@ public class ExcelWorksheetView : XmlHelper
 	public void FreezePanes(int Row, int Column)
 	{
 		//TODO:fix this method to handle splits as well.
-		if (Row == 1 && Column == 1) UnFreezePanes();
+		if (Row == 1 && Column == 1)
+		{
+			UnFreezePanes();
+		}
+
 		string sqRef = SelectedRange, activeCell = ActiveCell;
 
 		var paneNode = TopNode.SelectSingleNode(_paneNodePath, NameSpaceManager) as XmlElement;
@@ -447,8 +470,16 @@ public class ExcelWorksheetView : XmlHelper
 		}
 
 		paneNode.RemoveAll();   //Clear all attributes
-		if (Column > 1) paneNode.SetAttribute("xSplit", (Column - 1).ToString());
-		if (Row > 1) paneNode.SetAttribute("ySplit", (Row - 1).ToString());
+		if (Column > 1)
+		{
+			paneNode.SetAttribute("xSplit", (Column - 1).ToString());
+		}
+
+		if (Row > 1)
+		{
+			paneNode.SetAttribute("ySplit", (Row - 1).ToString());
+		}
+
 		paneNode.SetAttribute("topLeftCell", ExcelCellBase.GetAddress(Row, Column));
 		paneNode.SetAttribute("state", "frozen");
 
@@ -459,8 +490,16 @@ public class ExcelWorksheetView : XmlHelper
 			paneNode.SetAttribute("activePane", "bottomLeft");
 			var sel = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
 			sel.SetAttribute("pane", "bottomLeft");
-			if (activeCell != "") sel.SetAttribute("activeCell", activeCell);
-			if (sqRef != "") sel.SetAttribute("sqref", sqRef);
+			if (activeCell != "")
+			{
+				sel.SetAttribute("activeCell", activeCell);
+			}
+
+			if (sqRef != "")
+			{
+				sel.SetAttribute("sqref", sqRef);
+			}
+
 			sel.SetAttribute("sqref", sqRef);
 			TopNode.InsertAfter(sel, paneNode);
 		}
@@ -469,8 +508,16 @@ public class ExcelWorksheetView : XmlHelper
 			paneNode.SetAttribute("activePane", "topRight");
 			var sel = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
 			sel.SetAttribute("pane", "topRight");
-			if (activeCell != "") sel.SetAttribute("activeCell", activeCell);
-			if (sqRef != "") sel.SetAttribute("sqref", sqRef);
+			if (activeCell != "")
+			{
+				sel.SetAttribute("activeCell", activeCell);
+			}
+
+			if (sqRef != "")
+			{
+				sel.SetAttribute("sqref", sqRef);
+			}
+
 			TopNode.InsertAfter(sel, paneNode);
 		}
 		else
@@ -492,8 +539,16 @@ public class ExcelWorksheetView : XmlHelper
 
 			var sel3 = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
 			sel3.SetAttribute("pane", "bottomRight");
-			if (activeCell != "") sel3.SetAttribute("activeCell", activeCell);
-			if (sqRef != "") sel3.SetAttribute("sqref", sqRef);
+			if (activeCell != "")
+			{
+				sel3.SetAttribute("activeCell", activeCell);
+			}
+
+			if (sqRef != "")
+			{
+				sel3.SetAttribute("sqref", sqRef);
+			}
+
 			sel2.ParentNode.InsertAfter(sel3, sel2);
 
 		}

@@ -22,9 +22,9 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-01-10
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System.Collections.Generic;
 using System.Text;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 

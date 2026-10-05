@@ -29,9 +29,9 @@
  * Jan Källman		Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
+using OfficeOpenXml.Style;
 using System;
 using System.Xml;
-using OfficeOpenXml.Style;
 namespace OfficeOpenXml;
 
 /// <summary>
@@ -290,7 +290,10 @@ public class ExcelColumn : IRangeID
 			_columnMin = ((int)(value >> 15) & 0x3FF);
 			_columnMax += prevColMin - ColumnMin;
 			//Todo:More Validation
-			if (_columnMax > ExcelPackage.MaxColumns) _columnMax = ExcelPackage.MaxColumns;
+			if (_columnMax > ExcelPackage.MaxColumns)
+			{
+				_columnMax = ExcelPackage.MaxColumns;
+			}
 		}
 	}
 

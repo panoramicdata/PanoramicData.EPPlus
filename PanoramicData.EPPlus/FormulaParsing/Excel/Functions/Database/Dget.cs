@@ -22,10 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-06
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 
@@ -59,8 +59,16 @@ public class Dget : DatabaseFunction
 		while (db.HasMoreRows)
 		{
 			var dataRow = db.Read();
-			if (!RowMatcher.IsMatch(dataRow, criteria)) continue;
-			if (++nHits > 1) return CreateResult(ExcelErrorValue.Values.Num, DataType.ExcelError);
+			if (!RowMatcher.IsMatch(dataRow, criteria))
+			{
+				continue;
+			}
+
+			if (++nHits > 1)
+			{
+				return CreateResult(ExcelErrorValue.Values.Num, DataType.ExcelError);
+			}
+
 			retVal = dataRow[field];
 		}
 

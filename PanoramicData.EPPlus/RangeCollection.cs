@@ -51,8 +51,8 @@
  * Jan Källman		    License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 namespace OfficeOpenXml;
 
 /// <summary>
@@ -176,7 +176,11 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 	internal int InsertRowsUpdateIndex(ulong rowID, int rows)
 	{
 		var index = IndexOf(rowID);
-		if (index < 0) index = ~index; //No match found invert to get start cell
+		if (index < 0)
+		{
+			index = ~index; //No match found invert to get start cell
+		}
+
 		var rowAdd = (((ulong)rows) << 29);
 		for (var i = index; i < _cells.Count; i++)
 		{
@@ -194,7 +198,11 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 	internal int InsertRows(ulong rowID, int rows)
 	{
 		var index = IndexOf(rowID);
-		if (index < 0) index = ~index; //No match found invert to get start cell
+		if (index < 0)
+		{
+			index = ~index; //No match found invert to get start cell
+		}
+
 		var rowAdd = (((ulong)rows) << 29);
 		for (var i = index; i < _cells.Count; i++)
 		{
@@ -214,21 +222,34 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 	{
 		var rowAdd = (((ulong)rows) << 29);
 		var index = IndexOf(rowID);
-		if (index < 0) index = ~index; //No match found invert to get start cell
+		if (index < 0)
+		{
+			index = ~index; //No match found invert to get start cell
+		}
 
-		if (index >= _cells.Count || _cellIndex[index] == null) return -1;   //No row above this row
+		if (index >= _cells.Count || _cellIndex[index] == null)
+		{
+			return -1;   //No row above this row
+		}
+
 		while (index < _cells.Count && _cellIndex[index].RangeID < rowID + rowAdd)
 		{
 			Delete(_cellIndex[index].RangeID);
 		}
 
 		var updIndex = IndexOf(rowID + rowAdd);
-		if (updIndex < 0) updIndex = ~updIndex; //No match found invert to get start cell
+		if (updIndex < 0)
+		{
+			updIndex = ~updIndex; //No match found invert to get start cell
+		}
 
 		for (var i = updIndex; i < _cells.Count; i++)
 		{
 			_cellIndex[i].RangeID -= rowAdd;                        //Change the index
-			if (updateCells) _cells[_cellIndex[i].ListPointer].RangeID -= rowAdd;    //Change the cell/row or column object
+			if (updateCells)
+			{
+				_cells[_cellIndex[i].ListPointer].RangeID -= rowAdd;    //Change the cell/row or column object
+			}
 		}
 
 		return index;
@@ -244,7 +265,11 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 	private void InitSize(List<IRangeID> _cells)
 	{
 		_size = 128;
-		while (_cells.Count > _size) _size <<= 1;
+		while (_cells.Count > _size)
+		{
+			_size <<= 1;
+		}
+
 		_cellIndex = new IndexItem[_size];
 	}
 	/// <summary>

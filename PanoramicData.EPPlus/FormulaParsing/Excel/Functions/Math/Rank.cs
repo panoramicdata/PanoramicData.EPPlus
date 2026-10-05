@@ -1,7 +1,7 @@
-﻿using System;
+﻿using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
@@ -42,8 +42,15 @@ public class Rank : ExcelFunction
 			if (_isAvg)
 			{
 				var st = Convert.ToInt32(ix);
-				while (l.Count > st && l[st] == number) st++;
-				if (st > ix) ix = ix + ((st - ix) / 2D);
+				while (l.Count > st && l[st] == number)
+				{
+					st++;
+				}
+
+				if (st > ix)
+				{
+					ix = ix + ((st - ix) / 2D);
+				}
 			}
 		}
 		else
@@ -52,8 +59,15 @@ public class Rank : ExcelFunction
 			if (_isAvg)
 			{
 				var st = Convert.ToInt32(ix) - 1;
-				while (0 <= st && l[st] == number) st--;
-				if (st + 1 < ix) ix = ix - ((ix - st - 1) / 2D);
+				while (0 <= st && l[st] == number)
+				{
+					st--;
+				}
+
+				if (st + 1 < ix)
+				{
+					ix = ix - ((ix - st - 1) / 2D);
+				}
 			}
 
 			ix = l.Count - ix;

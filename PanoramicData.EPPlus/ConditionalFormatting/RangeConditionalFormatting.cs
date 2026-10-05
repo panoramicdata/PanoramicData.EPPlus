@@ -28,8 +28,8 @@
  * ******************************************************************************
  * Eyal Seagull       Conditional Formatting    2012-04-03
  *******************************************************************************/
-using OfficeOpenXml.Utils;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
+using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.ConditionalFormatting;
 

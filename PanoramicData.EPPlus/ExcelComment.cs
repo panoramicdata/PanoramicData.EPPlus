@@ -29,9 +29,9 @@
  * Jan Källman		Initial Release		     
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
+using OfficeOpenXml.Drawing.Vml;
 using OfficeOpenXml.Style;
 using System.Xml;
-using OfficeOpenXml.Drawing.Vml;
 
 namespace OfficeOpenXml;
 

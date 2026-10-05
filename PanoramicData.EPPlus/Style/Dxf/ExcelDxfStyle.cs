@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Drawing;
 using System.Globalization;
 using System.Xml;
-using System.Drawing;
 
 namespace OfficeOpenXml.Style.Dxf;
 
@@ -57,7 +57,11 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 	}
 	private static ExcelBorderStyle GetBorderStyleEnum(string style)
 	{
-		if (style == "") return ExcelBorderStyle.None;
+		if (style == "")
+		{
+			return ExcelBorderStyle.None;
+		}
+
 		var sInStyle = style[..1].ToUpper(CultureInfo.InvariantCulture) + style[1..];
 		try
 		{
@@ -71,7 +75,11 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 	}
 	private static ExcelFillStyle GetPatternTypeEnum(string patternType)
 	{
-		if (patternType == "") return ExcelFillStyle.None;
+		if (patternType == "")
+		{
+			return ExcelFillStyle.None;
+		}
+
 		patternType = patternType[..1].ToUpper(CultureInfo.InvariantCulture) + patternType[1..];
 		try
 		{
@@ -131,10 +139,25 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 
 	protected internal override void CreateNodes(XmlHelper helper, string path)
 	{
-		if (Font.HasValue) Font.CreateNodes(helper, "d:font");
-		if (NumberFormat.HasValue) NumberFormat.CreateNodes(helper, "d:numFmt");
-		if (Fill.HasValue) Fill.CreateNodes(helper, "d:fill");
-		if (Border.HasValue) Border.CreateNodes(helper, "d:border");
+		if (Font.HasValue)
+		{
+			Font.CreateNodes(helper, "d:font");
+		}
+
+		if (NumberFormat.HasValue)
+		{
+			NumberFormat.CreateNodes(helper, "d:numFmt");
+		}
+
+		if (Fill.HasValue)
+		{
+			Fill.CreateNodes(helper, "d:fill");
+		}
+
+		if (Border.HasValue)
+		{
+			Border.CreateNodes(helper, "d:border");
+		}
 	}
 	protected internal override bool HasValue => Font.HasValue || NumberFormat.HasValue || Fill.HasValue || Border.HasValue;
 }

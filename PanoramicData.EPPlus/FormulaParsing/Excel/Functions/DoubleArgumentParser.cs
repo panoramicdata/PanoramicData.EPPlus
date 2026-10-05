@@ -22,10 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System.Linq;
-using System.Globalization;
-using OfficeOpenXml.FormulaParsing.Utilities;
 using OfficeOpenXml.FormulaParsing.Exceptions;
+using OfficeOpenXml.FormulaParsing.Utilities;
+using System.Globalization;
+using System.Linq;
 using util = OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
@@ -41,8 +41,16 @@ public class DoubleArgumentParser : ArgumentParser
 			return r == null ? 0 : r.ValueDouble;
 		}
 
-		if (obj is double) return obj;
-		if (obj.IsNumeric()) return util.ConvertUtil.GetValueDouble(obj);
+		if (obj is double)
+		{
+			return obj;
+		}
+
+		if (obj.IsNumeric())
+		{
+			return util.ConvertUtil.GetValueDouble(obj);
+		}
+
 		var str = obj != null ? obj.ToString() : string.Empty;
 		try
 		{
