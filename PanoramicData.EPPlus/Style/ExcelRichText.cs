@@ -32,9 +32,9 @@
  * Richard Tallent					Remove VertAlign node if no alignment specified		2012-10-31
  *******************************************************************************/
 using System;
-using System.Xml;
 using System.Drawing;
 using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.Style;
 
@@ -75,7 +75,10 @@ public class ExcelRichText : XmlHelper
 				elem.SetAttribute("xml:space", "preserve");
 			}
 
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	/// <summary>
@@ -102,7 +105,10 @@ public class ExcelRichText : XmlHelper
 				}
 			}
 
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	const string BOLD_PATH = "d:rPr/d:b";
@@ -127,7 +133,10 @@ public class ExcelRichText : XmlHelper
 				DeleteNode(BOLD_PATH);
 			}
 
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	const string ITALIC_PATH = "d:rPr/d:i";
@@ -153,7 +162,10 @@ public class ExcelRichText : XmlHelper
 				DeleteNode(ITALIC_PATH);
 			}
 
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	const string STRIKE_PATH = "d:rPr/d:strike";
@@ -178,7 +190,10 @@ public class ExcelRichText : XmlHelper
 				DeleteNode(STRIKE_PATH);
 			}
 
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	const string UNDERLINE_PATH = "d:rPr/d:u";
@@ -203,7 +218,10 @@ public class ExcelRichText : XmlHelper
 				DeleteNode(UNDERLINE_PATH);
 			}
 
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 
@@ -247,7 +265,10 @@ public class ExcelRichText : XmlHelper
 				SetXmlNodeString(VERT_ALIGN_PATH, value.ToString().ToLowerInvariant());
 			}
 
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	const string SIZE_PATH = "d:rPr/d:sz/@val";
@@ -264,7 +285,10 @@ public class ExcelRichText : XmlHelper
 		{
 			_collection.ConvertRichtext();
 			SetXmlNodeString(SIZE_PATH, value.ToString(CultureInfo.InvariantCulture));
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	const string FONT_PATH = "d:rPr/d:rFont/@val";
@@ -281,7 +305,10 @@ public class ExcelRichText : XmlHelper
 		{
 			_collection.ConvertRichtext();
 			SetXmlNodeString(FONT_PATH, value);
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 	const string COLOR_PATH = "d:rPr/d:color/@rgb";
@@ -299,7 +326,10 @@ public class ExcelRichText : XmlHelper
 		{
 			_collection.ConvertRichtext();
 			SetXmlNodeString(COLOR_PATH, value.ToArgb().ToString("X")/*.Substring(2, 6)*/);
-			if (_callback != null) _callback();
+			if (_callback != null)
+			{
+				_callback();
+			}
 		}
 	}
 

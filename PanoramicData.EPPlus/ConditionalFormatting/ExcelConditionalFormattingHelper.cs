@@ -28,11 +28,11 @@
  * ******************************************************************************
  * Eyal Seagull        Added       		  2012-04-03
  *******************************************************************************/
-using System;
-using System.Text.RegularExpressions;
 using OfficeOpenXml.Utils;
+using System;
 using System.Drawing;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace OfficeOpenXml.ConditionalFormatting;

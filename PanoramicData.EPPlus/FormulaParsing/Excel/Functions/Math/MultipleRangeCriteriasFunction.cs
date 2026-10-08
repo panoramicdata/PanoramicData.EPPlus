@@ -22,10 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-01-15
  *******************************************************************************/
-using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using OfficeOpenXml.Utils;
+using System.Collections.Generic;
 using Require = OfficeOpenXml.FormulaParsing.Utilities.Require;
 
 

@@ -230,7 +230,11 @@ public class ExcelDrawing : XmlHelper, IDisposable
 		{
 			try
 			{
-				if (_nameXPath == "") throw new NotImplementedException();
+				if (_nameXPath == "")
+				{
+					throw new NotImplementedException();
+				}
+
 				SetXmlNodeString(_nameXPath, value);
 			}
 			catch
@@ -702,7 +706,11 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	public virtual void Dispose() => _topNode = null;
 	internal void GetPositionSize()
 	{
-		if (_doNotAdjust) return;
+		if (_doNotAdjust)
+		{
+			return;
+		}
+
 		_top = GetPixelTop();
 		_left = GetPixelLeft();
 		_height = GetPixelHeight();
@@ -714,7 +722,11 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	/// </summary>
 	public void AdjustPositionAndSize()
 	{
-		if (_drawings.Worksheet.Workbook._package.DoAdjustDrawings == false) return;
+		if (_drawings.Worksheet.Workbook._package.DoAdjustDrawings == false)
+		{
+			return;
+		}
+
 		if (EditAs == eEditAs.Absolute)
 		{
 			SetPixelLeft(_left);

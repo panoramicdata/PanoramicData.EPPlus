@@ -22,11 +22,11 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExcelUtilities;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 
@@ -41,7 +41,10 @@ public class Column : LookupFunction
 
 		var rangeAddress = ArgToAddress(arguments, 0, context);
 		if (!ExcelAddressUtil.IsValidAddress(rangeAddress))
+		{
 			throw new ArgumentException("An invalid argument was supplied");
+		}
+
 		var factory = new RangeAddressFactory(context.ExcelDataProvider);
 		var address = factory.Create(rangeAddress);
 		return CreateResult(address.FromCol, DataType.Integer);

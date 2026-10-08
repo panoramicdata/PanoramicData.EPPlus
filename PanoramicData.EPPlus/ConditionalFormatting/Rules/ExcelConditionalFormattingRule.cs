@@ -28,11 +28,11 @@
  * ******************************************************************************
  * Eyal Seagull        Added       		  2012-04-03
  *******************************************************************************/
-using System;
-using System.Xml;
-using OfficeOpenXml.Utils;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
 using OfficeOpenXml.Style.Dxf;
+using OfficeOpenXml.Utils;
+using System;
+using System.Xml;
 
 namespace OfficeOpenXml.ConditionalFormatting.Rules;
 

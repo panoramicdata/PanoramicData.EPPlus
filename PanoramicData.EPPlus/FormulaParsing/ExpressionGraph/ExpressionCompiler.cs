@@ -28,9 +28,9 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph.CompileStrategy;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph.CompileStrategy;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
@@ -77,13 +77,21 @@ public class ExpressionCompiler : IExpressionCompiler
 
 	private IEnumerable<Expression> HandleGroupedExpressions()
 	{
-		if (!_expressions.Any()) return [];
+		if (!_expressions.Any())
+		{
+			return [];
+		}
+
 		var first = _expressions.First();
 		var groupedExpressions = _expressions.Where(x => x.IsGroupedExpression);
 		foreach (var groupedExpression in groupedExpressions)
 		{
 			var result = groupedExpression.Compile();
-			if (result == CompileResult.Empty) continue;
+			if (result == CompileResult.Empty)
+			{
+				continue;
+			}
+
 			var newExp = _expressionConverter.FromCompileResult(result);
 			newExp.Operator = groupedExpression.Operator;
 			newExp.Prev = groupedExpression.Prev;

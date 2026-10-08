@@ -70,9 +70,16 @@ public abstract class LookupFunction : ExcelFunction
 			var matchResult = IsMatch(navigator.CurrentValue, lookupArgs.SearchedValue);
 			if (matchResult != 0)
 			{
-				if (lastValue != null && navigator.CurrentValue == null) break;
+				if (lastValue != null && navigator.CurrentValue == null)
+				{
+					break;
+				}
 
-				if (!lookupArgs.RangeLookup) continue;
+				if (!lookupArgs.RangeLookup)
+				{
+					continue;
+				}
+
 				if (lastValue == null && matchResult > 0)
 				{
 					return new CompileResult(eErrorType.NA);

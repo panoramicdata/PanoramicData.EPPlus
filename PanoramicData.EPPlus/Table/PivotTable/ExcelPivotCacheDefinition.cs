@@ -29,12 +29,12 @@
  * Jan Källman		Added		21-MAR-2011
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Utils;
 using System;
+using System.Linq;
+using System.Security;
 using System.Text;
 using System.Xml;
-using System.Linq;
-using OfficeOpenXml.Utils;
-using System.Security;
 
 namespace OfficeOpenXml.Table.PivotTable;
 

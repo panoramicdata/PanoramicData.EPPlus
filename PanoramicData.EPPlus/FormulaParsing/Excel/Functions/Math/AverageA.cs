@@ -22,9 +22,9 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2014-01-06
  *******************************************************************************/
-using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.Utils;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
@@ -60,7 +60,11 @@ public class AverageA : HiddenValuesHandlingFunction
 		{
 			foreach (var c in arg.ValueAsRangeInfo)
 			{
-				if (ShouldIgnore(c, context)) continue;
+				if (ShouldIgnore(c, context))
+				{
+					continue;
+				}
+
 				CheckForAndHandleExcelError(c);
 				if (IsNumeric(c.Value) && !(c.Value is bool))
 				{

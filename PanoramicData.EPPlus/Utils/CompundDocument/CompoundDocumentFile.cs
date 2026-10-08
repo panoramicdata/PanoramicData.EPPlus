@@ -132,7 +132,11 @@ internal class CompoundDocumentFile : IDisposable
 	}
 	public static bool IsCompoundDocument(byte[] b)
 	{
-		if (b == null || b.Length < 8) return false;
+		if (b == null || b.Length < 8)
+		{
+			return false;
+		}
+
 		for (var i = 0; i < 8; i++)
 		{
 			if (b[i] != header[i])
@@ -338,7 +342,11 @@ internal class CompoundDocumentFile : IDisposable
 	}
 	internal void AddChildTree(CompoundDocumentItem e, List<CompoundDocumentItem> dirs)
 	{
-		if (e._handled == true) return;
+		if (e._handled == true)
+		{
+			return;
+		}
+
 		e._handled = true;
 		if (e.ChildID > 0)
 		{
@@ -501,7 +509,10 @@ internal class CompoundDocumentFile : IDisposable
 
 		var item = children[pos];
 		if (item._handled)
+		{
 			return currSibl;
+		}
+
 		item._handled = true;
 		if (fromPos == toPos)
 		{
@@ -510,11 +521,16 @@ internal class CompoundDocumentFile : IDisposable
 
 		div = pos / 2;
 		if (div <= 0)
+		{
 			div = 1;
+		}
+
 		var lPos = GetPos(fromPos, pos - 1);
 		var rPos = GetPos(pos + 1, toPos);
 		if (div == 1 && children[lPos]._handled && children[rPos]._handled)
+		{
 			return pos + listAdd;
+		}
 
 		if (lPos > -1 && lPos >= fromPos)
 		{
@@ -537,22 +553,34 @@ internal class CompoundDocumentFile : IDisposable
 
 	private static bool NoGreater(List<CompoundDocumentItem> children, int pos, int lPos, int listAdd)
 	{
-		if (pos - lPos <= 1) return true;
+		if (pos - lPos <= 1)
+		{
+			return true;
+		}
+
 		for (var i = lPos + 1; i <= pos; i++)
 		{
 			if (children[i].RightSibling != -1 && children[i].RightSibling > lPos + listAdd)
+			{
 				return false;
+			}
 		}
 
 		return true;
 	}
 	private static bool NoLess(List<CompoundDocumentItem> children, int pos, int rPos, int listAdd)
 	{
-		if (rPos - pos <= 1) return true;
+		if (rPos - pos <= 1)
+		{
+			return true;
+		}
+
 		for (var i = pos + 1; i <= rPos; i++)
 		{
 			if (children[i].LeftSibling != -1 && children[i].LeftSibling < rPos + listAdd)
+			{
 				return false;
+			}
 		}
 
 		return true;
@@ -767,7 +795,10 @@ internal class CompoundDocumentFile : IDisposable
 			{
 				var rest = _sectorSize - entity.StreamSize % _sectorSize;
 				fullStreamSize += entity.StreamSize;
-				if (rest > 0 && rest < _sectorSize) fullStreamSize += rest;
+				if (rest > 0 && rest < _sectorSize)
+				{
+					fullStreamSize += rest;
+				}
 			}
 		}
 
@@ -812,7 +843,11 @@ internal class CompoundDocumentFile : IDisposable
 			}
 		}
 
-		if (_numberofDIFATSectors > 0) _firstDIFATSectorLocation = sectorPos + 1;
+		if (_numberofDIFATSectors > 0)
+		{
+			_firstDIFATSectorLocation = sectorPos + 1;
+		}
+
 		for (var j = 0; j < _numberofDIFATSectors; j++)
 		{
 			WriteFATItem(bw, DIFAT_SECTOR);
@@ -883,7 +918,9 @@ internal class CompoundDocumentFile : IDisposable
 	{
 		var rest = sectorSize - (bw.BaseStream.Length % sectorSize);
 		if (rest > 0 && rest < sectorSize)
+		{
 			bw.Write(new byte[rest]);
+		}
 	}
 	private void WriteHeader(BinaryWriter bw)
 	{
@@ -935,7 +972,11 @@ internal class CompoundDocumentFile : IDisposable
 	{
 		var rest = FATSectorSize - (stream.Length % FATSectorSize);
 		bw.Write(stream);
-		if (rest > 0 && rest < FATSectorSize) bw.Write(new byte[rest]);
+		if (rest > 0 && rest < FATSectorSize)
+		{
+			bw.Write(new byte[rest]);
+		}
+
 		var ret = fat.Count;
 		AddFAT(fat, stream.Length, FATSectorSize, 0);
 

@@ -19,7 +19,9 @@ public class HolidayWeekdaysFactory
 	public HolidayWeekdays Create(string weekdays)
 	{
 		if (string.IsNullOrEmpty(weekdays) || weekdays.Length != 7)
+		{
 			throw new ArgumentException("Illegal weekday string", nameof(Weekday));
+		}
 
 		var retVal = new List<DayOfWeek>();
 		var arr = weekdays.ToCharArray();

@@ -28,10 +28,10 @@
  *******************************************************************************
  * Jan Källman		Added		25-Oct-2012
  *******************************************************************************/
-using System;
-using System.IO;
 using OfficeOpenXml.Packaging.DotNetZip;
 using OfficeOpenXml.Packaging.Ionic.Zip;
+using System;
+using System.IO;
 
 namespace OfficeOpenXml.Packaging;
 

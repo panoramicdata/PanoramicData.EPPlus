@@ -22,12 +22,12 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.Exceptions;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.Exceptions;
 using MathObj = System.Math;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
@@ -46,7 +46,10 @@ public class Stdev : HiddenValuesHandlingFunction
 		if (values.Any())
 		{
 			var nValues = values.Count();
-			if (nValues == 1) throw new ExcelErrorValueException(eErrorType.Div0);
+			if (nValues == 1)
+			{
+				throw new ExcelErrorValueException(eErrorType.Div0);
+			}
 			//Compute the Average       
 			var avg = values.Average();
 			//Perform the Sum of (value-avg)_2_2       

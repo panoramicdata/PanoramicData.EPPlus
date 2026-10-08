@@ -16,12 +16,12 @@
  *******************************************************************************
  * Mats Alm Added		                2016-12-27
  *******************************************************************************/
-using System.Collections.Generic;
-using System.Linq;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using OfficeOpenXml.Utils;
 using OfficeOpenXml.Style.XmlAccess;
+using OfficeOpenXml.Utils;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing;
 
@@ -371,7 +371,10 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		{
 			_currentWorksheet = _package.Workbook.Worksheets[addressInfo.Worksheet];
 		}
-		else _currentWorksheet ??= _package.Workbook.Worksheets.First();
+		else
+		{
+			_currentWorksheet ??= _package.Workbook.Worksheets.First();
+		}
 	}
 
 	private void SetCurrentWorksheet(string worksheetName)

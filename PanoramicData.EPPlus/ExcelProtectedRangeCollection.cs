@@ -14,7 +14,10 @@ public class ExcelProtectedRangeCollection : XmlHelper, IEnumerable<ExcelProtect
 		foreach (XmlNode protectedRangeNode in topNode.SelectNodes("d:protectedRanges/d:protectedRange", nsm))
 		{
 			if (protectedRangeNode is not XmlElement)
+			{
 				continue;
+			}
+
 			_baseList.Add(new ExcelProtectedRange(protectedRangeNode.Attributes["name"].Value, new ExcelAddress(SqRefUtility.FromSqRefAddress(protectedRangeNode.Attributes["sqref"].Value)), nsm, topNode));
 		}
 	}
@@ -59,7 +62,10 @@ public class ExcelProtectedRangeCollection : XmlHelper, IEnumerable<ExcelProtect
 	{
 		DeleteAllNode("d:protectedRanges/d:protectedRange[@name='" + item.Name + "' and @sqref='" + item.Address.Address + "']");
 		if (_baseList.Count == 0)
+		{
 			DeleteNode("d:protectedRanges");
+		}
+
 		return _baseList.Remove(item);
 	}
 

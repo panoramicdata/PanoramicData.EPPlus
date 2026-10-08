@@ -354,7 +354,11 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 							if (DataType == eFormatType.DateTime || secCount == 3)
 							{
 								//Add qoutes
-								if (DataType == eFormatType.DateTime) SetDecimal(lstDec, sb); //Remove?
+								if (DataType == eFormatType.DateTime)
+								{
+									SetDecimal(lstDec, sb); //Remove?
+								}
+
 								lstDec = [];
 								format = sb.ToString();
 								sb = new StringBuilder();
@@ -460,7 +464,9 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 									}
 
 									if (startPos > 0)  //RemovePart
+									{
 										sb.Remove(sb.Length - (pos - startPos - 1), (pos - startPos - 1));
+									}
 
 									var endPos = pos + 1;
 									while (endPos < ExcelFormat.Length &&
@@ -503,7 +509,10 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 			}
 
 			//Add qoutes
-			if (DataType == eFormatType.DateTime) SetDecimal(lstDec, sb); //Remove?
+			if (DataType == eFormatType.DateTime)
+			{
+				SetDecimal(lstDec, sb); //Remove?
+			}
 
 			// AM/PM format
 			if (containsAmPm)
@@ -513,9 +522,13 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 
 
 			if (format == "")
+			{
 				format = sb.ToString();
+			}
 			else
+			{
 				text = sb.ToString();
+			}
 
 			if (forColWidth)
 			{
@@ -604,9 +617,15 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 
 					listPos = index;
 
-					if (result == prevResult) break;
+					if (result == prevResult)
+					{
+						break;
+					}
 
-					if (result == d) break;
+					if (result == d)
+					{
+						break;
+					}
 
 					prevResult = result;
 
@@ -624,7 +643,11 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 
 			if (numerator == denomerator || numerator == 0)
 			{
-				if (numerator == denomerator) intPart++;
+				if (numerator == denomerator)
+				{
+					intPart++;
+				}
+
 				return sign + intPart.ToString(NetFormat).Replace("?", new string(' ', FractionFormat.Length));
 			}
 			else

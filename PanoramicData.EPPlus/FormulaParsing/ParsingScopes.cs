@@ -16,10 +16,10 @@
  *******************************************************************************
  * Mats Alm Added		                2016-12-27
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
 namespace OfficeOpenXml.FormulaParsing;
 

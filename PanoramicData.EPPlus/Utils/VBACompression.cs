@@ -145,7 +145,10 @@ internal static class VBACompression
 					comprBuffer[cPos++] = buffer[dPos++];
 				}
 
-				if (dPos >= dEnd) break;
+				if (dPos >= dEnd)
+				{
+					break;
+				}
 			}
 
 			comprBuffer[flagPos] = tokenFlags;
@@ -199,7 +202,10 @@ internal static class VBACompression
 				//Decompress token
 				var token = compBuffer[pos++];
 				if (pos >= endPos)
+				{
 					break;
+				}
+
 				for (var i = 0; i < 8; i++)
 				{
 					//Literal token
@@ -244,7 +250,9 @@ internal static class VBACompression
 					}
 
 					if (pos >= endPos)
+					{
 						break;
+					}
 				}
 			}
 

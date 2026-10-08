@@ -28,8 +28,8 @@
  * ******************************************************************************
  * Raziq York   		            Added       		        2014-08-08
  *******************************************************************************/
-using System.Xml;
 using OfficeOpenXml.DataValidation.Contracts;
+using System.Xml;
 
 namespace OfficeOpenXml.DataValidation;
 

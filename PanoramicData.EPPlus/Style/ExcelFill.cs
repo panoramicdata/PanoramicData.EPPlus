@@ -53,7 +53,11 @@ public class ExcelFill : StyleBase
 		}
 		set
 		{
-			if (_gradient != null) _gradient = null;
+			if (_gradient != null)
+			{
+				_gradient = null;
+			}
+
 			_ChangedEvent(this, new StyleChangeEventArgs(eStyleClass.Fill, eStyleProperty.PatternType, value, _positionID, _address));
 		}
 	}
@@ -68,7 +72,10 @@ public class ExcelFill : StyleBase
 			if (_patternColor == null)
 			{
 				_patternColor = new ExcelColor(_styles, _ChangedEvent, _positionID, _address, eStyleClass.FillPatternColor, this);
-				if (_gradient != null) _gradient = null;
+				if (_gradient != null)
+				{
+					_gradient = null;
+				}
 			}
 
 			return _patternColor;
@@ -85,7 +92,10 @@ public class ExcelFill : StyleBase
 			if (_backgroundColor == null)
 			{
 				_backgroundColor = new ExcelColor(_styles, _ChangedEvent, _positionID, _address, eStyleClass.FillBackgroundColor, this);
-				if (_gradient != null) _gradient = null;
+				if (_gradient != null)
+				{
+					_gradient = null;
+				}
 			}
 
 			return _backgroundColor;

@@ -97,7 +97,9 @@ public abstract class ExcelCellBase
 	private static string Translate(string value, dlgTransl addressTranslator, int row, int col)
 	{
 		if (value == "")
+		{
 			return "";
+		}
 
 		var lexer = new Lexer(SourceCodeTokenizer.R1C1, new SyntacticAnalyzer());
 		var tokens = lexer.Tokenize(value, null);
@@ -142,7 +144,9 @@ public abstract class ExcelCellBase
 		}
 
 		else
+		{
 			return sh + ToR1C1_1(part, row, col);
+		}
 	}
 	private static string ToR1C1_1(string part, int row, int col)
 	{
@@ -197,7 +201,9 @@ public abstract class ExcelCellBase
 			return p1.Equals(p2) ? p1 : sh + p1 + ":" + p2;
 		}
 		else
+		{
 			return sh + ToAbs_1(part, row, col, true);
+		}
 	}
 	private static string ToAbs_1(string part, int row, int col, bool isSingle)
 	{
@@ -208,7 +214,10 @@ public abstract class ExcelCellBase
 		//if (rStart != 0)
 		//    return part;
 		if (rStart != 0 && cStart != 0)
+		{
 			return part;
+		}
+
 		if (part.Length == 1) //R or C
 		{
 			if (rStart == 0)
@@ -440,20 +449,33 @@ public abstract class ExcelCellBase
 			var cells = CellAddress.Split(':');
 			ret = GetRowColFromAddress(cells[0], out FromRow, out FromColumn, out fixedFromRow, out fixedFromColumn);
 			if (ret)
+			{
 				ret = GetRowColFromAddress(cells[1], out ToRow, out ToColumn, out fixedToRow, out fixedToColumn);
+			}
 			else
 			{
 				GetRowColFromAddress(cells[1], out ToRow, out ToColumn, out fixedToRow, out fixedToColumn);
 			}
 
 			if (FromColumn <= 0)
+			{
 				FromColumn = 1;
+			}
+
 			if (FromRow <= 0)
+			{
 				FromRow = 1;
+			}
+
 			if (ToColumn <= 0)
+			{
 				ToColumn = ExcelPackage.MaxColumns;
+			}
+
 			if (ToRow <= 0)
+			{
 				ToRow = ExcelPackage.MaxRows;
+			}
 		}
 
 		return ret;
@@ -675,7 +697,11 @@ public abstract class ExcelCellBase
 	public static string GetFullAddress(string worksheetName, string address) => GetFullAddress(worksheetName, address, true);
 	internal static string GetFullAddress(string worksheetName, string address, bool fullRowCol)
 	{
-		if (!string.IsNullOrEmpty(worksheetName)) worksheetName = worksheetName.Replace("'", "''");   //Makesure addresses handle single qoutes
+		if (!string.IsNullOrEmpty(worksheetName))
+		{
+			worksheetName = worksheetName.Replace("'", "''");   //Makesure addresses handle single qoutes
+		}
+
 		if (!address.Contains("!", StringComparison.CurrentCulture) || address == "#REF!")
 		{
 			if (fullRowCol)
@@ -710,7 +736,11 @@ public abstract class ExcelCellBase
 	#region IsValidCellAddress
 	public static bool IsValidAddress(string address)
 	{
-		if (string.IsNullOrEmpty(address.Trim())) return false;
+		if (string.IsNullOrEmpty(address.Trim()))
+		{
+			return false;
+		}
+
 		address = Utils.ConvertUtil._invariantTextInfo.ToUpper(address);
 		var addrs = address.Split(',');
 		foreach (var a in addrs)
@@ -723,15 +753,29 @@ public abstract class ExcelCellBase
 				{
 					if (isSecond == false)
 					{
-						if (r1 != "") return false;
+						if (r1 != "")
+						{
+							return false;
+						}
+
 						c1 += a[i];
-						if (c1.Length > 3) return false;
+						if (c1.Length > 3)
+						{
+							return false;
+						}
 					}
 					else
 					{
-						if (r2 != "") return false;
+						if (r2 != "")
+						{
+							return false;
+						}
+
 						c2 += a[i];
-						if (c2.Length > 3) return false;
+						if (c2.Length > 3)
+						{
+							return false;
+						}
 					}
 				}
 				else if (IsRow(a[i]))
@@ -739,17 +783,27 @@ public abstract class ExcelCellBase
 					if (isSecond == false)
 					{
 						r1 += a[i];
-						if (r1.Length > 7) return false;
+						if (r1.Length > 7)
+						{
+							return false;
+						}
 					}
 					else
 					{
 						r2 += a[i];
-						if (r2.Length > 7) return false;
+						if (r2.Length > 7)
+						{
+							return false;
+						}
 					}
 				}
 				else if (a[i] == ':')
 				{
-					if (isSecond || i == a.Length - 1) return false;
+					if (isSecond || i == a.Length - 1)
+					{
+						return false;
+					}
+
 					isSecond = true;
 				}
 				else if (a[i] == '$')
@@ -807,7 +861,10 @@ public abstract class ExcelCellBase
 				return false;
 			}
 
-			if (ret == false) return false;
+			if (ret == false)
+			{
+				return false;
+			}
 		}
 
 		return true;
@@ -829,9 +886,13 @@ public abstract class ExcelCellBase
 			if (GetRowColFromAddress(cellAddress, out var row, out var col))
 			{
 				if (row > 0 && col > 0 && row <= ExcelPackage.MaxRows && col <= ExcelPackage.MaxColumns)
+				{
 					result = true;
+				}
 				else
+				{
 					result = false;
+				}
 			}
 		}
 		catch { }
@@ -908,9 +969,13 @@ public abstract class ExcelCellBase
 						// If the address was not shifted, then a.Address will still have the sheet name.
 						var address = a.Address.Split('!');
 						if (address.Length > 1)
+						{
 							f += address[1];
+						}
 						else
+						{
 							f += a.Address;
+						}
 					}
 
 
@@ -939,9 +1004,15 @@ public abstract class ExcelCellBase
 	internal static string UpdateFormulaSheetReferences(string formula, string oldSheetName, string newSheetName)
 	{
 		if (string.IsNullOrEmpty(oldSheetName))
+		{
 			throw new ArgumentNullException(nameof(oldSheetName));
+		}
+
 		if (string.IsNullOrEmpty(newSheetName))
+		{
 			throw new ArgumentNullException(nameof(newSheetName));
+		}
+
 		var d = new Dictionary<string, object>();
 		try
 		{

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System;
 using System.Collections.Generic;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
@@ -39,7 +39,10 @@ public class IsoWeekNum : ExcelFunction
 			case 53:
 				// If dec 31st falls before thursday it is week 01 of next year
 				if (endOfYear.DayOfWeek < DayOfWeek.Thursday)
+				{
 					return 1;
+				}
+
 				return wk;
 			default: return wk;
 		}
