@@ -40,7 +40,10 @@ internal static class ConvertUtil
 	internal static bool TryParseBooleanString(object candidate, out bool result)
 	{
 		if (candidate != null)
+		{
 			return bool.TryParse(candidate.ToString(), out result);
+		}
+
 		result = false;
 		return false;
 	}
@@ -201,14 +204,21 @@ internal static class ConvertUtil
 	internal static string ExcelDecodeString(string t)
 	{
 		var match = Regex.Match(t, "(_x005F|_x[0-9A-F]{4,4}_)");
-		if (!match.Success) return t;
+		if (!match.Success)
+		{
+			return t;
+		}
 
 		var useNextValue = false;
 		var ret = new StringBuilder();
 		var prevIndex = 0;
 		while (match.Success)
 		{
-			if (prevIndex < match.Index) ret.Append(t[prevIndex..match.Index]);
+			if (prevIndex < match.Index)
+			{
+				ret.Append(t[prevIndex..match.Index]);
+			}
+
 			if (!useNextValue && match.Value == "_x005F")
 			{
 				useNextValue = true;
@@ -271,35 +281,51 @@ internal static class ConvertUtil
 			: null;
 
 		if (fromType == toType || fromType == toNullableUnderlyingType)
+		{
 			return (T)value;
+		}
 
 		// if converting to nullable struct and input is blank string, return null
 		if (toNullableUnderlyingType != null && fromType == typeof(string) && ((string)value).Trim() == string.Empty)
+		{
 			return default;
+		}
 
 		toType = toNullableUnderlyingType ?? toType;
 
 		if (toType == typeof(DateTime))
 		{
 			if (value is double)
+			{
 				return (T)(object)(DateTime.FromOADate((double)value));
+			}
 
 			if (fromType == typeof(TimeSpan))
+			{
 				return ((T)(object)(new DateTime(((TimeSpan)value).Ticks)));
+			}
 
 			if (fromType == typeof(string))
+			{
 				return (T)(object)DateTime.Parse(value.ToString());
+			}
 		}
 		else if (toType == typeof(TimeSpan))
 		{
 			if (value is double)
+			{
 				return (T)(object)(new TimeSpan(DateTime.FromOADate((double)value).Ticks));
+			}
 
 			if (fromType == typeof(DateTime))
+			{
 				return ((T)(object)(new TimeSpan(((DateTime)value).Ticks)));
+			}
 
 			if (fromType == typeof(string))
+			{
 				return (T)(object)TimeSpan.Parse(value.ToString());
+			}
 		}
 
 		return (T)Convert.ChangeType(value, toType);

@@ -29,11 +29,11 @@
  * Jan Källman		Added		21-MAR-2011
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Utils;
 using System;
 using System.Text;
-using System.Xml;
 using System.Text.RegularExpressions;
-using OfficeOpenXml.Utils;
+using System.Xml;
 
 namespace OfficeOpenXml.Table.PivotTable;
 

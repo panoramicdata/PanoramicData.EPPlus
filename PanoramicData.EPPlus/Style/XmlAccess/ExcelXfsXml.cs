@@ -30,9 +30,9 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
+using System.Drawing;
 using System.Globalization;
 using System.Xml;
-using System.Drawing;
 namespace OfficeOpenXml.Style.XmlAccess;
 
 /// <summary>
@@ -51,7 +51,11 @@ public sealed class ExcelXfs : StyleXmlHelper
 	{
 		_styles = styles;
 		_xfID = GetXmlNodeInt("@xfId");
-		if (_xfID == 0) isBuildIn = true; //Normal taggen
+		if (_xfID == 0)
+		{
+			isBuildIn = true; //Normal taggen
+		}
+
 		_numFmtId = GetXmlNodeInt("@numFmtId");
 		_fontId = GetXmlNodeInt("@fontId");
 		_fillId = GetXmlNodeInt("@fillId");
@@ -77,7 +81,11 @@ public sealed class ExcelXfs : StyleXmlHelper
 
 	private static ExcelHorizontalAlignment GetHorizontalAlign(string align)
 	{
-		if (align == "") return ExcelHorizontalAlignment.General;
+		if (align == "")
+		{
+			return ExcelHorizontalAlignment.General;
+		}
+
 		align = align[..1].ToUpper(CultureInfo.InvariantCulture) + align[1..];
 		try
 		{
@@ -91,7 +99,11 @@ public sealed class ExcelXfs : StyleXmlHelper
 
 	private static ExcelVerticalAlignment GetVerticalAlign(string align)
 	{
-		if (align == "") return ExcelVerticalAlignment.Bottom;
+		if (align == "")
+		{
+			return ExcelVerticalAlignment.Bottom;
+		}
+
 		align = align[..1].ToUpper(CultureInfo.InvariantCulture) + align[1..];
 		try
 		{
@@ -797,42 +809,93 @@ public sealed class ExcelXfs : StyleXmlHelper
 		if (_numFmtId >= 0)
 		{
 			SetXmlNodeString("@numFmtId", _numFmtId.ToString());
-			if (doSetXfId) SetXmlNodeString("@applyNumberFormat", "1");
+			if (doSetXfId)
+			{
+				SetXmlNodeString("@applyNumberFormat", "1");
+			}
 		}
 
 		if (_fontId >= 0)
 		{
 			SetXmlNodeString("@fontId", _styles.Fonts[_fontId].newID.ToString());
-			if (doSetXfId) SetXmlNodeString("@applyFont", "1");
+			if (doSetXfId)
+			{
+				SetXmlNodeString("@applyFont", "1");
+			}
 		}
 
 		if (_fillId >= 0)
 		{
 			SetXmlNodeString("@fillId", _styles.Fills[_fillId].newID.ToString());
-			if (doSetXfId) SetXmlNodeString("@applyFill", "1");
+			if (doSetXfId)
+			{
+				SetXmlNodeString("@applyFill", "1");
+			}
 		}
 
 		if (_borderId >= 0)
 		{
 			SetXmlNodeString("@borderId", _styles.Borders[_borderId].newID.ToString());
-			if (doSetXfId) SetXmlNodeString("@applyBorder", "1");
+			if (doSetXfId)
+			{
+				SetXmlNodeString("@applyBorder", "1");
+			}
 		}
 
-		if (_horizontalAlignment != ExcelHorizontalAlignment.General) SetXmlNodeString(horizontalAlignPath, SetAlignString(_horizontalAlignment));
+		if (_horizontalAlignment != ExcelHorizontalAlignment.General)
+		{
+			SetXmlNodeString(horizontalAlignPath, SetAlignString(_horizontalAlignment));
+		}
+
 		if (doSetXfId)
 		{
 			SetXmlNodeString("@xfId", _styles.CellStyleXfs[_xfID].newID.ToString());
 		}
 
-		if (_verticalAlignment != ExcelVerticalAlignment.Bottom) SetXmlNodeString(verticalAlignPath, SetAlignString(_verticalAlignment));
-		if (_wrapText) SetXmlNodeString(wrapTextPath, "1");
-		if (_readingOrder != ExcelReadingOrder.ContextDependent) SetXmlNodeString(readingOrderPath, ((int)_readingOrder).ToString());
-		if (_shrinkToFit) SetXmlNodeString(shrinkToFitPath, "1");
-		if (_indent > 0) SetXmlNodeString(indentPath, _indent.ToString());
-		if (_textRotation > 0) SetXmlNodeString(textRotationPath, _textRotation.ToString());
-		if (!_locked) SetXmlNodeString(lockedPath, "0");
-		if (_hidden) SetXmlNodeString(hiddenPath, "1");
-		if (_quotePrefix) SetXmlNodeString(quotePrefixPath, "1");
+		if (_verticalAlignment != ExcelVerticalAlignment.Bottom)
+		{
+			SetXmlNodeString(verticalAlignPath, SetAlignString(_verticalAlignment));
+		}
+
+		if (_wrapText)
+		{
+			SetXmlNodeString(wrapTextPath, "1");
+		}
+
+		if (_readingOrder != ExcelReadingOrder.ContextDependent)
+		{
+			SetXmlNodeString(readingOrderPath, ((int)_readingOrder).ToString());
+		}
+
+		if (_shrinkToFit)
+		{
+			SetXmlNodeString(shrinkToFitPath, "1");
+		}
+
+		if (_indent > 0)
+		{
+			SetXmlNodeString(indentPath, _indent.ToString());
+		}
+
+		if (_textRotation > 0)
+		{
+			SetXmlNodeString(textRotationPath, _textRotation.ToString());
+		}
+
+		if (!_locked)
+		{
+			SetXmlNodeString(lockedPath, "0");
+		}
+
+		if (_hidden)
+		{
+			SetXmlNodeString(hiddenPath, "1");
+		}
+
+		if (_quotePrefix)
+		{
+			SetXmlNodeString(quotePrefixPath, "1");
+		}
 
 		if ((_locked || _hidden) && doSetXfId)
 		{

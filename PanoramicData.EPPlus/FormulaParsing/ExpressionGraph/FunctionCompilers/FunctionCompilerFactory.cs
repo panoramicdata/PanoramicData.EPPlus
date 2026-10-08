@@ -28,11 +28,11 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 using OfficeOpenXml.FormulaParsing.Utilities;
+using System;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
@@ -60,7 +60,11 @@ public class FunctionCompilerFactory
 	}
 	public virtual FunctionCompiler Create(ExcelFunction function)
 	{
-		if (function.IsLookupFuction) return new LookupFunctionCompiler(function, _context);
+		if (function.IsLookupFuction)
+		{
+			return new LookupFunctionCompiler(function, _context);
+		}
+
 		return function.IsErrorHandlingFunction ? new ErrorHandlingFunctionCompiler(function, _context) : GetCompilerByType(function);
 	}
 }

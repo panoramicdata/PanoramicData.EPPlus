@@ -29,10 +29,10 @@
  * Jan Källman		Added		30-AUG-2010
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Utils;
 using System;
 using System.Globalization;
 using System.Xml;
-using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.Table;
 
@@ -177,7 +177,11 @@ public class ExcelTableColumn : XmlHelper
 		}
 		set
 		{
-			if (value.StartsWith("=")) value = value[1..];
+			if (value.StartsWith("="))
+			{
+				value = value[1..];
+			}
+
 			SetXmlNodeString("@totalsRowFunction", "custom");
 			SetXmlNodeString(TOTALSROWFORMULA_PATH, value);
 			_tbl.WorkSheet.SetTableTotalFunction(_tbl, this);
@@ -228,7 +232,11 @@ public class ExcelTableColumn : XmlHelper
 		}
 		set
 		{
-			if (value.StartsWith("=")) value = value[1..];
+			if (value.StartsWith("="))
+			{
+				value = value[1..];
+			}
+
 			SetXmlNodeString(CALCULATEDCOLUMNFORMULA_PATH, value);
 		}
 	}

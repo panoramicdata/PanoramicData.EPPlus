@@ -1,8 +1,8 @@
 ﻿using OfficeOpenXml.Style;
 using System;
 using System.Drawing;
-using System.Xml;
 using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.Sparkline;
 

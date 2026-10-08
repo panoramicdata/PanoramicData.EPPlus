@@ -30,9 +30,9 @@
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  * Raziq York 		                Added support for Any type  2014-08-08
  *******************************************************************************/
+using OfficeOpenXml.Utils;
 using System;
 using System.Xml;
-using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.DataValidation;
 

@@ -30,11 +30,11 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using System.Drawing;
-using System.Globalization;
 
 namespace OfficeOpenXml.Style;
 
@@ -72,7 +72,11 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 		get
 		{
 			var item = _list[Index];
-			if (_cells != null) item.SetCallback(UpdateCells);
+			if (_cells != null)
+			{
+				item.SetCallback(UpdateCells);
+			}
+
 			return item;
 		}
 	}
@@ -165,7 +169,11 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 
 	internal void ConvertRichtext()
 	{
-		if (_cells == null) return;
+		if (_cells == null)
+		{
+			return;
+		}
+
 		var isRt = _cells.Worksheet._flags.GetFlagValue(_cells._fromRow, _cells._fromCol, CellFlags.RichText);
 		if (Count == 1 && isRt == false)
 		{
@@ -195,7 +203,10 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 		_list.Clear();
 		TopNode.RemoveAll();
 		UpdateCells();
-		if (_cells != null) _cells.IsRichText = false;
+		if (_cells != null)
+		{
+			_cells.IsRichText = false;
+		}
 	}
 	/// <summary>
 	/// Removes an item at the specific index
@@ -205,7 +216,10 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 	{
 		TopNode.RemoveChild(_list[Index].TopNode);
 		_list.RemoveAt(Index);
-		if (_cells != null && _list.Count == 0) _cells.IsRichText = false;
+		if (_cells != null && _list.Count == 0)
+		{
+			_cells.IsRichText = false;
+		}
 	}
 	/// <summary>
 	/// Removes an item
@@ -215,7 +229,10 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 	{
 		TopNode.RemoveChild(Item.TopNode);
 		_list.Remove(Item);
-		if (_cells != null && _list.Count == 0) _cells.IsRichText = false;
+		if (_cells != null && _list.Count == 0)
+		{
+			_cells.IsRichText = false;
+		}
 	}
 	//public void Insert(int index, string Text)
 	//{

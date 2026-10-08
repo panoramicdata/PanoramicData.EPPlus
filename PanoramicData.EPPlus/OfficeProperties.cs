@@ -31,11 +31,11 @@
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  * Raziq York                       Added Created & Modified    2014-08-20
  *******************************************************************************/
-using System;
-using System.Xml;
-using System.IO;
-using System.Globalization;
 using OfficeOpenXml.Utils;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Xml;
 
 namespace OfficeOpenXml;
 
@@ -105,7 +105,9 @@ public sealed class OfficeProperties : XmlHelper
 	{
 		XmlDocument xmlDoc;
 		if (_package.Package.PartExists(uri))
+		{
 			xmlDoc = _package.GetXmlFromUri(uri);
+		}
 		else
 		{
 			xmlDoc = new XmlDocument();
@@ -501,7 +503,10 @@ public sealed class OfficeProperties : XmlHelper
 		}
 		else
 		{
-			while (node.ChildNodes.Count > 0) node.RemoveChild(node.ChildNodes[0]);
+			while (node.ChildNodes.Count > 0)
+			{
+				node.RemoveChild(node.ChildNodes[0]);
+			}
 		}
 
 		XmlElement valueElem;

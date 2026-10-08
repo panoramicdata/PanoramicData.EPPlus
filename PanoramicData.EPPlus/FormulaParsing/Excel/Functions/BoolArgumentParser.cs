@@ -22,9 +22,9 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.Utilities;
 using System;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.Utilities;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
@@ -38,9 +38,21 @@ public class BoolArgumentParser : ArgumentParser
 			obj = (r?.Value);
 		}
 
-		if (obj == null) return false;
-		if (obj is bool) return (bool)obj;
-		if (obj.IsNumeric()) return Convert.ToBoolean(obj);
+		if (obj == null)
+		{
+			return false;
+		}
+
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
+
+		if (obj.IsNumeric())
+		{
+			return Convert.ToBoolean(obj);
+		}
+
 		return bool.TryParse(obj.ToString(), out var result) ? result : (object)result;
 	}
 }

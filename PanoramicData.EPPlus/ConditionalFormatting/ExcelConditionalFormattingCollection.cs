@@ -28,14 +28,14 @@
  * ******************************************************************************
  * Eyal Seagull		Conditional Formatting            2012-04-03
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using OfficeOpenXml.Utils;
-using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
-using System.Drawing;
 using OfficeOpenXml.ConditionalFormatting.Rules;
+using OfficeOpenXml.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Xml;
 
 namespace OfficeOpenXml.ConditionalFormatting;
 
@@ -169,7 +169,9 @@ public class ExcelConditionalFormattingCollection
 
 					// Add the new rule to the list
 					if (cfRule != null)
+					{
 						_rules.Add(cfRule);
+					}
 				}
 			}
 		}

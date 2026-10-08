@@ -71,7 +71,10 @@ public class WorkdayCalculator
 		while (workdaysCounted < nWorkDays)
 		{
 			tmpDate = tmpDate.AddDays(direction);
-			if (!_holidayWeekdays.IsHolidayWeekday(tmpDate)) workdaysCounted++;
+			if (!_holidayWeekdays.IsHolidayWeekday(tmpDate))
+			{
+				workdaysCounted++;
+			}
 		}
 
 		return new WorkdayCalculatorResult(workdaysCounted, startDate, tmpDate, calcDirection);
@@ -110,9 +113,21 @@ public class WorkdayCalculator
 		var additionalDays = new AdditionalHolidayDays(holidayArgument);
 		foreach (var date in additionalDays.AdditionalDates)
 		{
-			if (direction == WorkdayCalculationDirection.Forward && (date < startDate || date > endDate)) continue;
-			if (direction == WorkdayCalculationDirection.Backward && (date > startDate || date < endDate)) continue;
-			if (_holidayWeekdays.IsHolidayWeekday(date)) continue;
+			if (direction == WorkdayCalculationDirection.Forward && (date < startDate || date > endDate))
+			{
+				continue;
+			}
+
+			if (direction == WorkdayCalculationDirection.Backward && (date > startDate || date < endDate))
+			{
+				continue;
+			}
+
+			if (_holidayWeekdays.IsHolidayWeekday(date))
+			{
+				continue;
+			}
+
 			var tmpDate = _holidayWeekdays.GetNextWorkday(endDate, direction);
 			while (additionalDays.AdditionalDates.Contains(tmpDate))
 			{

@@ -76,7 +76,9 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 				var hidden = eWorkSheetHidden.Visible;
 				XmlNode attr = sheetNode.Attributes["state"];
 				if (attr != null)
+				{
 					hidden = TranslateHidden(attr.Value);
+				}
 
 				var sheetRelation = pck.Workbook.Part.GetRelationship(relId);
 				var uriWorksheet = UriHelper.ResolvePartUri(pck.Workbook.WorkbookUri, sheetRelation.TargetUri);
@@ -354,7 +356,10 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 
 			//var uriTbl = new Uri(string.Format("/xl/tables/table{0}.xml", Id), UriKind.Relative);
 			var uriTbl = GetNewUri(_pck.Package, "/xl/tables/table{0}.xml", ref Id);
-			if (_pck.Workbook._nextTableID < Id) _pck.Workbook._nextTableID = Id;
+			if (_pck.Workbook._nextTableID < Id)
+			{
+				_pck.Workbook._nextTableID = Id;
+			}
 
 			var part = _pck.Package.CreatePart(uriTbl, "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml", _pck.Compression);
 			StreamWriter streamTbl = new(part.GetStream(FileMode.Create, FileAccess.Write));
@@ -431,7 +436,11 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 
 			var Id = _pck.Workbook._nextPivotTableID++;
 			var uriTbl = GetNewUri(_pck.Package, "/xl/pivotTables/pivotTable{0}.xml", ref Id);
-			if (_pck.Workbook._nextPivotTableID < Id) _pck.Workbook._nextPivotTableID = Id;
+			if (_pck.Workbook._nextPivotTableID < Id)
+			{
+				_pck.Workbook._nextPivotTableID = Id;
+			}
+
 			var partTbl = _pck.Package.CreatePart(uriTbl, ExcelPackage.schemaPivotTable, _pck.Compression);
 			StreamWriter streamTbl = new(partTbl.GetStream(FileMode.Create, FileAccess.Write));
 			streamTbl.Write(xml);
@@ -469,14 +478,40 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	}
 	private void CopyHeaderFooterPictures(ExcelWorksheet Copy, ExcelWorksheet added)
 	{
-		if (Copy.TopNode != null && Copy.TopNode.SelectSingleNode("d:headerFooter", NameSpaceManager) == null) return;
+		if (Copy.TopNode != null && Copy.TopNode.SelectSingleNode("d:headerFooter", NameSpaceManager) == null)
+		{
+			return;
+		}
 		//Copy the texts
-		if (Copy.HeaderFooter._oddHeader != null) CopyText(Copy.HeaderFooter._oddHeader, added.HeaderFooter.OddHeader);
-		if (Copy.HeaderFooter._oddFooter != null) CopyText(Copy.HeaderFooter._oddFooter, added.HeaderFooter.OddFooter);
-		if (Copy.HeaderFooter._evenHeader != null) CopyText(Copy.HeaderFooter._evenHeader, added.HeaderFooter.EvenHeader);
-		if (Copy.HeaderFooter._evenFooter != null) CopyText(Copy.HeaderFooter._evenFooter, added.HeaderFooter.EvenFooter);
-		if (Copy.HeaderFooter._firstHeader != null) CopyText(Copy.HeaderFooter._firstHeader, added.HeaderFooter.FirstHeader);
-		if (Copy.HeaderFooter._firstFooter != null) CopyText(Copy.HeaderFooter._firstFooter, added.HeaderFooter.FirstFooter);
+		if (Copy.HeaderFooter._oddHeader != null)
+		{
+			CopyText(Copy.HeaderFooter._oddHeader, added.HeaderFooter.OddHeader);
+		}
+
+		if (Copy.HeaderFooter._oddFooter != null)
+		{
+			CopyText(Copy.HeaderFooter._oddFooter, added.HeaderFooter.OddFooter);
+		}
+
+		if (Copy.HeaderFooter._evenHeader != null)
+		{
+			CopyText(Copy.HeaderFooter._evenHeader, added.HeaderFooter.EvenHeader);
+		}
+
+		if (Copy.HeaderFooter._evenFooter != null)
+		{
+			CopyText(Copy.HeaderFooter._evenFooter, added.HeaderFooter.EvenFooter);
+		}
+
+		if (Copy.HeaderFooter._firstHeader != null)
+		{
+			CopyText(Copy.HeaderFooter._firstHeader, added.HeaderFooter.FirstHeader);
+		}
+
+		if (Copy.HeaderFooter._firstFooter != null)
+		{
+			CopyText(Copy.HeaderFooter._firstFooter, added.HeaderFooter.FirstFooter);
+		}
 
 		//Copy any images;
 		if (Copy.HeaderFooter.Pictures.Count > 0)
@@ -803,12 +838,35 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		//remove invalid characters
 		if (ValidateName(Name))
 		{
-			if (Name.IndexOf(':') > -1) Name = Name.Replace(":", " ");
-			if (Name.IndexOf('/') > -1) Name = Name.Replace("/", " ");
-			if (Name.IndexOf('\\') > -1) Name = Name.Replace("\\", " ");
-			if (Name.IndexOf('?') > -1) Name = Name.Replace("?", " ");
-			if (Name.IndexOf('[') > -1) Name = Name.Replace("[", " ");
-			if (Name.IndexOf(']') > -1) Name = Name.Replace("]", " ");
+			if (Name.IndexOf(':') > -1)
+			{
+				Name = Name.Replace(":", " ");
+			}
+
+			if (Name.IndexOf('/') > -1)
+			{
+				Name = Name.Replace("/", " ");
+			}
+
+			if (Name.IndexOf('\\') > -1)
+			{
+				Name = Name.Replace("\\", " ");
+			}
+
+			if (Name.IndexOf('?') > -1)
+			{
+				Name = Name.Replace("?", " ");
+			}
+
+			if (Name.IndexOf('[') > -1)
+			{
+				Name = Name.Replace("[", " ");
+			}
+
+			if (Name.IndexOf(']') > -1)
+			{
+				Name = Name.Replace("]", " ");
+			}
 		}
 
 		if (Name.Trim() == "")
@@ -821,7 +879,11 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			throw new ArgumentException("The worksheet name can not start or end with an apostrophe.");
 		}
 
-		if (Name.Length > 31) Name = Name[..31];   //A sheet can have max 31 char's            
+		if (Name.Length > 31)
+		{
+			Name = Name[..31];   //A sheet can have max 31 char's            
+		}
+
 		return Name;
 	}
 	/// <summary>
@@ -1041,7 +1103,9 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	{
 		var Copy = this[Name];
 		if (Copy == null)
+		{
 			throw new ArgumentException(string.Format("Copy worksheet error: Could not find worksheet to copy '{0}'", Name));
+		}
 
 		var added = Add(NewName, Copy);
 		return added;
@@ -1061,12 +1125,18 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	}
 	private ExcelWorksheet GetByName(string Name)
 	{
-		if (string.IsNullOrEmpty(Name)) return null;
+		if (string.IsNullOrEmpty(Name))
+		{
+			return null;
+		}
+
 		ExcelWorksheet xlWorksheet = null;
 		foreach (var worksheet in _worksheets.Values)
 		{
 			if (worksheet.Name.Equals(Name, StringComparison.OrdinalIgnoreCase))
+			{
 				xlWorksheet = worksheet;
+			}
 		}
 
 		return (xlWorksheet);
@@ -1163,7 +1233,10 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	{
 		// Bugfix: if source and target are the same worksheet the following code will create a duplicate
 		//         which will cause a corrupt workbook. /swmal 2014-05-10
-		if (sourcePositionId == targetPositionId) return;
+		if (sourcePositionId == targetPositionId)
+		{
+			return;
+		}
 
 		lock (_worksheets)
 		{

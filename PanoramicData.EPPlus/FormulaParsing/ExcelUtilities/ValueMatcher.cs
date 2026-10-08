@@ -38,9 +38,20 @@ public class ValueMatcher
 
 	public virtual int IsMatch(object o1, object o2)
 	{
-		if (o1 != null && o2 == null) return 1;
-		if (o1 == null && o2 != null) return -1;
-		if (o1 == null && o2 == null) return 0;
+		if (o1 != null && o2 == null)
+		{
+			return 1;
+		}
+
+		if (o1 == null && o2 != null)
+		{
+			return -1;
+		}
+
+		if (o1 == null && o2 == null)
+		{
+			return 0;
+		}
 		//Handle ranges and defined names
 		o1 = CheckGetRange(o1);
 		o2 = CheckGetRange(o2);

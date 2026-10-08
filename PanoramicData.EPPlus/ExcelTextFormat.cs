@@ -29,8 +29,8 @@
  * Jan Källman		    Initial Release		        2011-01-01
  * Jan Källman		    License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
-using System.Text;
 using System.Globalization;
+using System.Text;
 
 namespace OfficeOpenXml;
 

@@ -49,10 +49,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
-using System.Runtime.Versioning;
 
 namespace OfficeOpenXml;
 
@@ -108,7 +108,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		_worksheet = xlWorksheet;
 		_workbook = _worksheet.Workbook;
 		SetRCFromTable(_worksheet._package, null);
-		if (string.IsNullOrEmpty(_ws)) _ws = _worksheet == null ? "" : _worksheet.Name;
+		if (string.IsNullOrEmpty(_ws))
+		{
+			_ws = _worksheet == null ? "" : _worksheet.Name;
+		}
+
 		SetDelegate();
 	}
 	internal ExcelRangeBase(ExcelWorkbook wb, ExcelWorksheet xlWorksheet, string address, bool isName) :
@@ -117,7 +121,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		SetRCFromTable(wb._package, null);
 		_worksheet = xlWorksheet;
 		_workbook = wb;
-		if (string.IsNullOrEmpty(_ws)) _ws = (xlWorksheet?.Name);
+		if (string.IsNullOrEmpty(_ws))
+		{
+			_ws = (xlWorksheet?.Name);
+		}
+
 		SetDelegate();
 	}
 	#endregion
@@ -244,13 +252,20 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			range.SplitFormulas(range._worksheet.Cells[row, col]);
 		}
 
-		if (sfi != null) range._worksheet._formulas.SetValue(row, col, string.Empty);
+		if (sfi != null)
+		{
+			range._worksheet._formulas.SetValue(row, col, string.Empty);
+		}
+
 		range._worksheet.SetValueInner(row, col, value);
 	}
 	private static void Set_Formula(ExcelRangeBase range, object value, int row, int col)
 	{
 		var f = range._worksheet._formulas.GetValue(row, col);
-		if (f is int v && v >= 0) range.SplitFormulas(range._worksheet.Cells[row, col]);
+		if (f is int v && v >= 0)
+		{
+			range.SplitFormulas(range._worksheet.Cells[row, col]);
+		}
 
 		var formula = (value == null ? string.Empty : value.ToString());
 		if (formula == string.Empty)
@@ -259,7 +274,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		}
 		else
 		{
-			if (formula[0] == '=') value = formula[1..]; // remove any starting equalsign.
+			if (formula[0] == '=')
+			{
+				value = formula[1..]; // remove any starting equalsign.
+			}
+
 			range._worksheet._formulas.SetValue(row, col, formula);
 			range._worksheet.SetValueInner(row, col, null);
 		}
@@ -662,7 +681,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		if (_fromRow == 1 && _fromCol == 1 && _toRow == ExcelPackage.MaxRows && _toCol == ExcelPackage.MaxColumns)
 		{
 			addr = _worksheet.Dimension;
-			if (addr == null) return null;
+			if (addr == null)
+			{
+				return null;
+			}
 		}
 		else
 		{
@@ -767,7 +789,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		var fromCol = _fromCol > _worksheet.Dimension._fromCol ? _fromCol : _worksheet.Dimension._fromCol;
 		var toCol = _toCol < _worksheet.Dimension._toCol ? _toCol : _worksheet.Dimension._toCol;
 
-		if (fromCol > toCol) return; //Issue 15383
+		if (fromCol > toCol)
+		{
+			return; //Issue 15383
+		}
 
 		if (Addresses == null)
 		{
@@ -809,10 +834,26 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		var styles = _worksheet.Workbook.Styles;
 		var nf = styles.Fonts[styles.CellXfs[0].FontId];
 		var fs = FontStyle.Regular;
-		if (nf.Bold) fs |= FontStyle.Bold;
-		if (nf.UnderLine) fs |= FontStyle.Underline;
-		if (nf.Italic) fs |= FontStyle.Italic;
-		if (nf.Strike) fs |= FontStyle.Strikeout;
+		if (nf.Bold)
+		{
+			fs |= FontStyle.Bold;
+		}
+
+		if (nf.UnderLine)
+		{
+			fs |= FontStyle.Underline;
+		}
+
+		if (nf.Italic)
+		{
+			fs |= FontStyle.Italic;
+		}
+
+		if (nf.Strike)
+		{
+			fs |= FontStyle.Strikeout;
+		}
+
 		var nfont = new Font(nf.Name, nf.Size, fs);
 
 		var normalSize = Convert.ToSingle(ExcelWorkbook.GetWidthPixels(nf.Name, nf.Size));
@@ -834,9 +875,15 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		foreach (var cell in this)
 		{
 			if (_worksheet.Column(cell.Start.Column).Hidden)    //Issue 15338
+			{
 				continue;
+			}
 
-			if (cell.Merge == true || cell.Style.WrapText) continue;
+			if (cell.Merge == true || cell.Style.WrapText)
+			{
+				continue;
+			}
+
 			var fntID = styles.CellXfs[cell.StyleID].FontId;
 			Font f;
 			if (fontCache.TryGetValue(fntID, out var value))
@@ -847,10 +894,26 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			{
 				var fnt = styles.Fonts[fntID];
 				fs = FontStyle.Regular;
-				if (fnt.Bold) fs |= FontStyle.Bold;
-				if (fnt.UnderLine) fs |= FontStyle.Underline;
-				if (fnt.Italic) fs |= FontStyle.Italic;
-				if (fnt.Strike) fs |= FontStyle.Strikeout;
+				if (fnt.Bold)
+				{
+					fs |= FontStyle.Bold;
+				}
+
+				if (fnt.UnderLine)
+				{
+					fs |= FontStyle.Underline;
+				}
+
+				if (fnt.Italic)
+				{
+					fs |= FontStyle.Italic;
+				}
+
+				if (fnt.Strike)
+				{
+					fs |= FontStyle.Strikeout;
+				}
+
 				f = new Font(fnt.Name, fnt.Size, fs);
 
 				fontCache.Add(fntID, f);
@@ -859,7 +922,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			var ind = styles.CellXfs[cell.StyleID].Indent;
 			var textForWidth = cell.TextForWidth;
 			var t = textForWidth + (ind > 0 && !string.IsNullOrEmpty(textForWidth) ? new string('_', ind) : "");
-			if (t.Length > 32000) t = t[..32000]; //Issue
+			if (t.Length > 32000)
+			{
+				t = t[..32000]; //Issue
+			}
+
 			var size = g.MeasureString(t, f, 10000, StringFormat.GenericDefault);
 
 			double width;
@@ -923,7 +990,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	private string GetFormattedText(bool forWidthCalc)
 	{
 		var v = Value;
-		if (v == null) return "";
+		if (v == null)
+		{
+			return "";
+		}
+
 		var styles = Worksheet.Workbook.Styles;
 		var nfID = styles.CellXfs[StyleID].NumberFormatId;
 		ExcelNumberFormatXml.ExcelFormatTranslator nf = null;
@@ -1114,7 +1185,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		set
 		{
 			IsRangeValid("FormulaR1C1");
-			if (value.Length > 0 && value[0] == '=') value = value[1..]; // remove any starting equalsign.
+			if (value.Length > 0 && value[0] == '=')
+			{
+				value = value[1..]; // remove any starting equalsign.
+			}
 
 			if (value == null || value.Trim() == "")
 			{
@@ -1209,7 +1283,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			IsRangeValid("autofilter");
 			var address = _worksheet.AutoFilterAddress;
-			if (address == null) return false;
+			if (address == null)
+			{
+				return false;
+			}
+
 			return _fromRow >= address.Start.Row
 					&&
 					_toRow <= address.End.Row
@@ -1372,7 +1450,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 			}
 			else
+			{
 				fullAddress = GetFullAddress(_worksheet.Name, _address);
+			}
 
 			return fullAddress;
 		}
@@ -1395,7 +1475,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				fullAddress = "";
 				foreach (var a in Addresses)
 				{
-					if (fullAddress != "") fullAddress += ",";
+					if (fullAddress != "")
+					{
+						fullAddress += ",";
+					}
+
 					if (a.Address == "#REF!")
 					{
 						fullAddress += GetFullAddress(wbwsRef, "#REF!");
@@ -1428,7 +1512,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				fullAddress = "";
 				foreach (var a in Addresses)
 				{
-					if (fullAddress != "") fullAddress += ",";
+					if (fullAddress != "")
+					{
+						fullAddress += ",";
+					}
+
 					fullAddress += GetFullAddress(wbwsRef, GetAddress(a.Start.Row, a.Start.Column, a.End.Row, a.End.Column, true), false); ;
 				}
 			}
@@ -1564,7 +1652,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 
 				if (fRange._fromRow < address._fromRow)
+				{
 					f.StartRow = address._fromRow;
+				}
 				else
 				{
 					f.StartRow = fRange._fromRow;
@@ -1603,7 +1693,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 				f.StartCol = address._toCol + 1;
 				if (address._fromRow < fRange._fromRow)
+				{
 					f.StartRow = fRange._fromRow;
+				}
 				else
 				{
 					f.StartRow = address._fromRow;
@@ -1650,7 +1742,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	}
 	private static object ConvertData(ExcelTextFormat Format, string v, int col, bool isText)
 	{
-		if (isText && (Format.DataTypes == null || Format.DataTypes.Length < col)) return string.IsNullOrEmpty(v) ? null : v;
+		if (isText && (Format.DataTypes == null || Format.DataTypes.Length < col))
+		{
+			return string.IsNullOrEmpty(v) ? null : v;
+		}
 
 		double d;
 		DateTime dt;
@@ -1852,10 +1947,17 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		foreach (var item in Data)
 		{
 			rowArray.Add(item);
-			if (maxColumn < item.Length) maxColumn = item.Length;
+			if (maxColumn < item.Length)
+			{
+				maxColumn = item.Length;
+			}
 		}
 
-		if (rowArray.Count == 0) return null; //Issue #57
+		if (rowArray.Count == 0)
+		{
+			return null; //Issue #57
+		}
+
 		_worksheet._values.SetRangeValueSpecial(_fromRow, _fromCol, _fromRow + rowArray.Count - 1, _fromCol + maxColumn - 1,
 			(List<ExcelCoreValue> list, int index, int rowIx, int columnIx, object value) =>
 			{
@@ -1863,9 +1965,16 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				columnIx -= _fromCol;
 
 				var values = ((List<object[]>)value);
-				if (values.Count <= rowIx) return;
+				if (values.Count <= rowIx)
+				{
+					return;
+				}
+
 				var item = values[rowIx];
-				if (item.Length <= columnIx) return;
+				if (item.Length <= columnIx)
+				{
+					return;
+				}
 
 				var val = item[columnIx];
 				if (val != null && val != DBNull.Value && !string.IsNullOrEmpty(val.ToString()))
@@ -2147,11 +2256,17 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 
 				if (lineQCount % 2 == 1)
+				{
 					throw (new Exception(string.Format("Text delimiter is not closed in line : {0}", line)));
+				}
 
 				//_worksheet.SetValueInner(row, col, ConvertData(Format, v, col - _fromCol, isText));
 				items.Add(ConvertData(Format, v, col, isText));
-				if (col > maxCol) maxCol = col;
+				if (col > maxCol)
+				{
+					maxCol = col;
+				}
+
 				row++;
 			}
 
@@ -2164,7 +2279,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				rowIx -= _fromRow;
 				columnIx -= _fromCol;
 				var item = values[rowIx];
-				if (item == null || item.Count <= columnIx) return;
+				if (item == null || item.Count <= columnIx)
+				{
+					return;
+				}
 
 				list[index] = new ExcelCoreValue { _value = item[columnIx], _styleId = list[index]._styleId };
 			}, values);
@@ -2174,7 +2292,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 	private static string[] GetLines(string text, ExcelTextFormat Format)
 	{
-		if (Format.EOL == null || Format.EOL.Length == 0) return [text];
+		if (Format.EOL == null || Format.EOL.Length == 0)
+		{
+			return [text];
+		}
+
 		var eol = Format.EOL;
 		var list = new List<string>();
 		var inTQ = false;
@@ -2218,7 +2340,9 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		for (var i = 0; i < eol.Length; i++)
 		{
 			if (text[ix + i] != eol[i])
+			{
 				return false;
+			}
 		}
 
 		return ix + eol.Length <= text.Length;
@@ -2798,7 +2922,10 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 					ret = isNumX ? -1 : 1;
 				}
 
-				if (ret != 0) return ret * (descending[i] ? -1 : 1);
+				if (ret != 0)
+				{
+					return ret * (descending[i] ? -1 : 1);
+				}
 			}
 
 			return 0;

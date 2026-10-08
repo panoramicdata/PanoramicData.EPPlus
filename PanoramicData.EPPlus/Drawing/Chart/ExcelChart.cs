@@ -380,11 +380,16 @@ public class ExcelChart : ExcelDrawing
 		Init(drawings, _chartNode);
 
 		_chartSeries = new ExcelChartSeries(this, drawings.NameSpaceManager, _chartNode, PivotTableSource != null);
-		if (PivotTableSource != null) SetPivotSource(PivotTableSource);
+		if (PivotTableSource != null)
+		{
+			SetPivotSource(PivotTableSource);
+		}
 
 		SetTypeProperties();
 		if (topChart == null)
+		{
 			LoadAxis();
+		}
 		else
 		{
 			_axis = topChart.Axis;
@@ -544,8 +549,15 @@ public class ExcelChart : ExcelDrawing
 
 		_axis = [.. l];
 
-		if (_axis.Length > 0) XAxis = _axis[0];
-		if (_axis.Length > 1) YAxis = _axis[1];
+		if (_axis.Length > 0)
+		{
+			XAxis = _axis[0];
+		}
+
+		if (_axis.Length > 1)
+		{
+			YAxis = _axis[1];
+		}
 	}
 	//private void SetChartType()
 	//{

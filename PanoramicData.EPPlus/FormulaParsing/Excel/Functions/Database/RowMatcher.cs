@@ -54,7 +54,10 @@ public class RowMatcher
 			var crit = c.Value;
 			if (candidate.IsNumeric() && crit.IsNumeric())
 			{
-				if (System.Math.Abs(ConvertUtil.GetValueDouble(candidate) - ConvertUtil.GetValueDouble(crit)) > double.Epsilon) return false;
+				if (System.Math.Abs(ConvertUtil.GetValueDouble(candidate) - ConvertUtil.GetValueDouble(crit)) > double.Epsilon)
+				{
+					return false;
+				}
 			}
 			else
 			{
@@ -71,7 +74,11 @@ public class RowMatcher
 
 	private bool Evaluate(object obj, string expression)
 	{
-		if (obj == null) return false;
+		if (obj == null)
+		{
+			return false;
+		}
+
 		var candidate = default(double?);
 		if (ConvertUtil.IsNumeric(obj))
 		{

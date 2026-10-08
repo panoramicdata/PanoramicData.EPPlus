@@ -18,14 +18,14 @@
  *******************************************************************************
  * Jan Källman		Added		26-MAR-2012
  *******************************************************************************/
-using System;
-using System.Linq;
-using System.Text;
-using System.IO;
 using OfficeOpenXml.Utils;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 using OfficeOpenXml.Utils.CompundDocument;
+using System;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OfficeOpenXml.VBA;
 
@@ -1098,7 +1098,10 @@ public class ExcelVbaProject
 	/// </summary>
 	public void Remove()
 	{
-		if (Part == null) return;
+		if (Part == null)
+		{
+			return;
+		}
 
 		foreach (var rel in Part.GetRelationships())
 		{
