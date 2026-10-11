@@ -28,13 +28,13 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2014-01-27
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
@@ -50,13 +50,20 @@ public class IfFunctionCompiler : FunctionCompiler
 		: base(function, context)
 	{
 		Require.That(function).Named("function").IsNotNull();
-		if (function is not If) throw new ArgumentException("function must be of type If");
+		if (function is not If)
+		{
+			throw new ArgumentException("function must be of type If");
+		}
 	}
 
 	public override CompileResult Compile(IEnumerable<Expression> children)
 	{
 		// 2 is allowed, Excel returns FALSE if false is the outcome of the expression
-		if (children.Count() < 2) throw new ExcelErrorValueException(eErrorType.Value);
+		if (children.Count() < 2)
+		{
+			throw new ExcelErrorValueException(eErrorType.Value);
+		}
+
 		var args = new List<FunctionArgument>();
 		Function.BeforeInvoke(Context);
 		var firstChild = children.ElementAt(0);

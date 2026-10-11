@@ -32,13 +32,13 @@
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  * Raziq York		                Added support for Any type  2014-08-08
 *******************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using System.Globalization;
-using OfficeOpenXml.Utils;
-using System.Xml;
 using OfficeOpenXml.DataValidation.Contracts;
+using OfficeOpenXml.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.DataValidation;
 
@@ -91,7 +91,10 @@ public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataVa
 		{
 			foreach (XmlNode node in dataValidationNodes)
 			{
-				if (node.Attributes["sqref"] == null) continue;
+				if (node.Attributes["sqref"] == null)
+				{
+					continue;
+				}
 
 				var addr = node.Attributes["sqref"].Value;
 
@@ -164,7 +167,10 @@ public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataVa
 	{
 		Require.Argument(address).IsNotNullOrEmpty("address");
 
-		if (!InternalValidationEnabled) return;
+		if (!InternalValidationEnabled)
+		{
+			return;
+		}
 
 		// ensure that the new address does not collide with an existing validation.
 		var newAddress = new ExcelAddress(address);
@@ -193,7 +199,10 @@ public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataVa
 	/// </summary>
 	internal void ValidateAll()
 	{
-		if (!InternalValidationEnabled) return;
+		if (!InternalValidationEnabled)
+		{
+			return;
+		}
 
 		foreach (var validation in _validations)
 		{
@@ -338,7 +347,11 @@ public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataVa
 		var dvNode = _worksheet.WorksheetXml.DocumentElement.SelectSingleNode(DataValidationPath.TrimStart('/'), NameSpaceManager);
 		dvNode?.RemoveChild(((ExcelDataValidation)item).TopNode);
 		var retVal = _validations.Remove(item);
-		if (retVal) OnValidationCountChanged();
+		if (retVal)
+		{
+			OnValidationCountChanged();
+		}
+
 		return retVal;
 	}
 

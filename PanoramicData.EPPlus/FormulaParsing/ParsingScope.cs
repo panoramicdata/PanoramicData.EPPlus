@@ -16,8 +16,8 @@
  *******************************************************************************
  * Mats Alm Added		                2016-12-27
  *******************************************************************************/
-using System;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
+using System;
 
 namespace OfficeOpenXml.FormulaParsing;
 

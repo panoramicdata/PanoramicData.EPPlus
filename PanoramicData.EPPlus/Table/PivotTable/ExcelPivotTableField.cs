@@ -31,8 +31,8 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.Table.PivotTable;
 
@@ -392,7 +392,11 @@ public class ExcelPivotTableField : XmlHelper
 		{
 			eSubTotalFunctions ret = 0;
 			var nl = TopNode.SelectNodes("d:items/d:item/@t", NameSpaceManager);
-			if (nl.Count == 0) return eSubTotalFunctions.None;
+			if (nl.Count == 0)
+			{
+				return eSubTotalFunctions.None;
+			}
+
 			foreach (XmlAttribute item in nl)
 			{
 				try
@@ -1018,7 +1022,11 @@ public class ExcelPivotTableField : XmlHelper
 			fields.Add(AddField(eDateGroupBy.Years, startDate, endDate, ref firstField));
 		}
 
-		if (fields.Count > 1) _cacheFieldHelper.SetXmlNodeString("d:fieldGroup/@par", (_table.Fields.Count - 1).ToString());
+		if (fields.Count > 1)
+		{
+			_cacheFieldHelper.SetXmlNodeString("d:fieldGroup/@par", (_table.Fields.Count - 1).ToString());
+		}
+
 		if (groupInterval != 1)
 		{
 			_cacheFieldHelper.SetXmlNodeString("d:fieldGroup/d:rangePr/@groupInterval", groupInterval.ToString());

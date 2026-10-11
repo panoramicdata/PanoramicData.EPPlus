@@ -22,9 +22,9 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-01-11
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 
@@ -41,13 +41,19 @@ public class Offset : LookupFunction
 		if (functionArguments.Length > 3)
 		{
 			height = ArgToInt(functionArguments, 3);
-			if (height == 0) return new CompileResult(eErrorType.Ref);
+			if (height == 0)
+			{
+				return new CompileResult(eErrorType.Ref);
+			}
 		}
 
 		if (functionArguments.Length > 4)
 		{
 			width = ArgToInt(functionArguments, 4);
-			if (width == 0) return new CompileResult(eErrorType.Ref);
+			if (width == 0)
+			{
+				return new CompileResult(eErrorType.Ref);
+			}
 		}
 
 		var ws = context.Scopes.Current.Address.Worksheet;

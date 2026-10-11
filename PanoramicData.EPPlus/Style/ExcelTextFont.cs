@@ -30,10 +30,10 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
-using System.Globalization;
-using System.Xml;
 using System.Drawing;
+using System.Globalization;
 using System.Runtime.Versioning;
+using System.Xml;
 
 namespace OfficeOpenXml.Style;
 
@@ -265,9 +265,24 @@ public class ExcelTextFont : XmlHelper
 		LatinFont = Font.Name;
 		ComplexFont = Font.Name;
 		Size = Font.Size;
-		if (Font.Bold) Bold = Font.Bold;
-		if (Font.Italic) Italic = Font.Italic;
-		if (Font.Underline) UnderLine = eUnderLineType.Single;
-		if (Font.Strikeout) Strike = eStrikeType.Single;
+		if (Font.Bold)
+		{
+			Bold = Font.Bold;
+		}
+
+		if (Font.Italic)
+		{
+			Italic = Font.Italic;
+		}
+
+		if (Font.Underline)
+		{
+			UnderLine = eUnderLineType.Single;
+		}
+
+		if (Font.Strikeout)
+		{
+			Strike = eStrikeType.Single;
+		}
 	}
 }

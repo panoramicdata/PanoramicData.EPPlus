@@ -128,8 +128,16 @@ public sealed class ExcelNamedStyleXml : StyleXmlHelper
 		TopNode = topNode;
 		SetXmlNodeString(namePath, _name);
 		SetXmlNodeString("@xfId", _styles.CellStyleXfs[StyleXfId].newID.ToString());
-		if (BuildInId >= 0) SetXmlNodeString("@builtinId", BuildInId.ToString());
-		if (CustomBuildin) SetXmlNodeBool(customBuiltinPath, true);
+		if (BuildInId >= 0)
+		{
+			SetXmlNodeString("@builtinId", BuildInId.ToString());
+		}
+
+		if (CustomBuildin)
+		{
+			SetXmlNodeBool(customBuiltinPath, true);
+		}
+
 		return TopNode;
 	}
 }

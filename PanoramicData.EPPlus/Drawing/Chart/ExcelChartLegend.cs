@@ -29,10 +29,10 @@
  * Jan Källman		Added		2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Style;
 using System;
 using System.Globalization;
 using System.Xml;
-using OfficeOpenXml.Style;
 
 namespace OfficeOpenXml.Drawing.Chart;
 
@@ -78,7 +78,11 @@ public class ExcelChartLegend : XmlHelper
 		}
 		set
 		{
-			if (TopNode == null) throw (new Exception("Can't set position. Chart has no legend"));
+			if (TopNode == null)
+			{
+				throw (new Exception("Can't set position. Chart has no legend"));
+			}
+
 			switch (value)
 			{
 				case eLegendPosition.Top:
@@ -111,7 +115,11 @@ public class ExcelChartLegend : XmlHelper
 		}
 		set
 		{
-			if (TopNode == null) throw (new Exception("Can't set overlay. Chart has no legend"));
+			if (TopNode == null)
+			{
+				throw (new Exception("Can't set overlay. Chart has no legend"));
+			}
+
 			SetXmlNodeBool(OVERLAY_PATH, value);
 		}
 	}
@@ -168,7 +176,11 @@ public class ExcelChartLegend : XmlHelper
 	/// </summary>
 	public void Remove()
 	{
-		if (TopNode == null) return;
+		if (TopNode == null)
+		{
+			return;
+		}
+
 		TopNode.ParentNode.RemoveChild(TopNode);
 		TopNode = null;
 	}
@@ -177,7 +189,10 @@ public class ExcelChartLegend : XmlHelper
 	/// </summary>
 	public void Add()
 	{
-		if (TopNode != null) return;
+		if (TopNode != null)
+		{
+			return;
+		}
 
 		//XmlHelper xml = new XmlHelper(NameSpaceManager, _chart.ChartXml);
 		var xml = XmlHelperFactory.Create(NameSpaceManager, _chart.ChartXml);

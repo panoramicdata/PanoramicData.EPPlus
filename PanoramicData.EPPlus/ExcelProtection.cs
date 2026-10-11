@@ -29,8 +29,8 @@
  * Jan Källman		    Added		10-AUG-2010
  * Jan Källman		    License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
-using System.Xml;
 using OfficeOpenXml.Encryption;
+using System.Xml;
 namespace OfficeOpenXml;
 
 /// <summary>

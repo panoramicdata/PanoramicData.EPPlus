@@ -80,8 +80,16 @@ public class ExcelStyleCollection<T> : IEnumerable<T>
 	internal int Add(string key, T item)
 	{
 		_list.Add(item);
-		if (!_dic.ContainsKey(key.ToLower(CultureInfo.InvariantCulture))) _dic.Add(key.ToLower(CultureInfo.InvariantCulture), _list.Count - 1);
-		if (_setNextIdManual) NextId++;
+		if (!_dic.ContainsKey(key.ToLower(CultureInfo.InvariantCulture)))
+		{
+			_dic.Add(key.ToLower(CultureInfo.InvariantCulture), _list.Count - 1);
+		}
+
+		if (_setNextIdManual)
+		{
+			NextId++;
+		}
+
 		return _list.Count - 1;
 	}
 	/// <summary>

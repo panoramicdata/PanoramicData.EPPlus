@@ -158,7 +158,10 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 			{
 				foreach (var table in sheet.Tables)
 				{
-					if (table.Id > Table.Id) table.Id--;
+					if (table.Id > Table.Id)
+					{
+						table.Id--;
+					}
 				}
 
 				Table.WorkSheet.Workbook._nextTableID--;

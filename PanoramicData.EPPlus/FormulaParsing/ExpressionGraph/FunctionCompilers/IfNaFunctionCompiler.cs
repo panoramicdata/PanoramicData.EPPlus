@@ -1,8 +1,8 @@
-﻿using System;
+﻿using OfficeOpenXml.FormulaParsing.Excel.Functions;
+using OfficeOpenXml.FormulaParsing.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.Excel.Functions;
-using OfficeOpenXml.FormulaParsing.Exceptions;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
@@ -16,7 +16,11 @@ public class IfNaFunctionCompiler : FunctionCompiler
 
 	public override CompileResult Compile(IEnumerable<Expression> children)
 	{
-		if (children.Count() != 2) return new CompileResult(eErrorType.Value);
+		if (children.Count() != 2)
+		{
+			return new CompileResult(eErrorType.Value);
+		}
+
 		var args = new List<FunctionArgument>();
 		Function.BeforeInvoke(Context);
 		var firstChild = children.First();

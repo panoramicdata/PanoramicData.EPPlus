@@ -48,7 +48,7 @@ public class ExcelErrorCodes
 
 	public override int GetHashCode() => Code.GetHashCode();
 
-	public override bool Equals(object obj) => obj is ExcelErrorCodes && ((ExcelErrorCodes)obj).Code.Equals(Code);
+	public override bool Equals(object? obj) => obj is ExcelErrorCodes && ((ExcelErrorCodes)obj).Code.Equals(Code);
 
 	public static bool operator ==(ExcelErrorCodes c1, ExcelErrorCodes c2)
 	{

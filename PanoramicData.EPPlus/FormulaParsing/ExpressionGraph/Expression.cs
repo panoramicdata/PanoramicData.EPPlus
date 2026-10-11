@@ -28,10 +28,10 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.Excel.Operators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.Excel.Operators;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
@@ -97,7 +97,11 @@ public abstract class Expression
 			}
 
 			expression.Next = Next.Next;
-			if (expression.Next != null) expression.Next.Prev = expression;
+			if (expression.Next != null)
+			{
+				expression.Next.Prev = expression;
+			}
+
 			expression.Prev = Prev;
 		}
 		else

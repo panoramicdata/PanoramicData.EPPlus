@@ -30,9 +30,9 @@
  * Jan Källman		    License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
 
+using OfficeOpenXml.Style;
 using System;
 using System.Xml;
-using OfficeOpenXml.Style;
 namespace OfficeOpenXml;
 
 internal class RowInternal

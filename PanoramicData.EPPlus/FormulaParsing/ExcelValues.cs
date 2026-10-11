@@ -94,7 +94,11 @@ public class ExcelErrorValue
 		/// <returns></returns>
 		public static bool IsErrorValue(object candidate)
 		{
-			if (candidate is null or not ExcelErrorValue) return false;
+			if (candidate is null or not ExcelErrorValue)
+			{
+				return false;
+			}
+
 			var candidateString = candidate.ToString();
 			return !string.IsNullOrEmpty(candidateString) && _values.ContainsKey(candidateString);
 		}
@@ -126,7 +130,11 @@ public class ExcelErrorValue
 			return new ExcelErrorValue(Values.ToErrorType(val));
 		}
 
-		if (string.IsNullOrEmpty(val)) throw new ArgumentNullException(nameof(val));
+		if (string.IsNullOrEmpty(val))
+		{
+			throw new ArgumentNullException(nameof(val));
+		}
+
 		throw new ArgumentException("Not a valid error value: " + val);
 	}
 
@@ -166,5 +174,5 @@ public class ExcelErrorValue
 
 	public override int GetHashCode() => base.GetHashCode();
 
-	public override bool Equals(object obj) => obj is ExcelErrorValue && ((ExcelErrorValue)obj).ToString() == ToString();
+	public override bool Equals(object? obj) => obj is ExcelErrorValue && ((ExcelErrorValue)obj).ToString() == ToString();
 }

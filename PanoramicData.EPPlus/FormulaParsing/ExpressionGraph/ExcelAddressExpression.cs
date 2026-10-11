@@ -28,10 +28,10 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
-using System;
-using System.Linq;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.Utilities;
+using System;
+using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
@@ -112,7 +112,10 @@ public class ExcelAddressExpression : AtomicExpression
 	{
 		var cell = result.FirstOrDefault();
 		if (cell == null)
+		{
 			return CompileResult.Empty;
+		}
+
 		var factory = new CompileResultFactory();
 		var compileResult = factory.Create(cell.Value);
 		if (_negate && compileResult.IsNumeric)

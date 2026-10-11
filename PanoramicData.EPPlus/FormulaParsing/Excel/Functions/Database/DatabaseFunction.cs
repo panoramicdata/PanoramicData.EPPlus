@@ -22,10 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-19
  *******************************************************************************/
+using OfficeOpenXml.Utils;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 
@@ -58,7 +58,11 @@ public abstract class DatabaseFunction : ExcelFunction
 		while (db.HasMoreRows)
 		{
 			var dataRow = db.Read();
-			if (!RowMatcher.IsMatch(dataRow, criteria)) continue;
+			if (!RowMatcher.IsMatch(dataRow, criteria))
+			{
+				continue;
+			}
+
 			var candidate = ConvertUtil.IsNumeric(field) ? dataRow[(int)ConvertUtil.GetValueDouble(field)] : dataRow[field.ToString().ToLower(CultureInfo.InvariantCulture)];
 			if (ConvertUtil.IsNumeric(candidate))
 			{

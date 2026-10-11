@@ -29,9 +29,9 @@
  * Jan Källman		Added		2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Style;
 using System;
 using System.Xml;
-using OfficeOpenXml.Style;
 
 namespace OfficeOpenXml.Drawing.Chart;
 

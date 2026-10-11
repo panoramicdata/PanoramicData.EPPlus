@@ -52,7 +52,11 @@ public class ExcelVbaSignature
 	}
 	private void GetSignature()
 	{
-		if (_vbaPart == null) return;
+		if (_vbaPart == null)
+		{
+			return;
+		}
+
 		var rel = _vbaPart.GetRelationshipsByType(schemaRelVbaSignature).FirstOrDefault();
 		if (rel != null)
 		{

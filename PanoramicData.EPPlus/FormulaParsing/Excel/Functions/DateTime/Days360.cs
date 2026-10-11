@@ -1,8 +1,8 @@
-﻿using System;
+﻿using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
@@ -25,7 +25,10 @@ public class Days360 : ExcelFunction
 		if (arguments.Count() > 2)
 		{
 			var european = ArgToBool(arguments, 2);
-			if (european) calcType = Days360Calctype.European;
+			if (european)
+			{
+				calcType = Days360Calctype.European;
+			}
 		}
 
 		var startYear = dt1.Year;
@@ -37,8 +40,15 @@ public class Days360 : ExcelFunction
 
 		if (calcType == Days360Calctype.European)
 		{
-			if (startDay == 31) startDay = 30;
-			if (endDay == 31) endDay = 30;
+			if (startDay == 31)
+			{
+				startDay = 30;
+			}
+
+			if (endDay == 31)
+			{
+				endDay = 30;
+			}
 		}
 		else
 		{

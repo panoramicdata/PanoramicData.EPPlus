@@ -22,10 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System;
-using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.Utils;
+using System;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
@@ -37,7 +37,11 @@ public class DoubleEnumerableArgConverter : CollectionFlattener<ExcelDoubleCellV
 																																														{
 																																															foreach (var cell in arg.ValueAsRangeInfo)
 																																															{
-																																																if (!ignoreErrors && cell.IsExcelError) throw new ExcelErrorValueException(ExcelErrorValue.Parse(cell.Value.ToString()));
+																																																if (!ignoreErrors && cell.IsExcelError)
+																																																{
+																																																	throw new ExcelErrorValueException(ExcelErrorValue.Parse(cell.Value.ToString()));
+																																																}
+
 																																																if (!CellStateHelper.ShouldIgnore(ignoreHidden, cell, context) && ConvertUtil.IsNumeric(cell.Value))
 																																																{
 																																																	var val = new ExcelDoubleCellValue(cell.ValueDouble, cell.Row);
@@ -47,7 +51,11 @@ public class DoubleEnumerableArgConverter : CollectionFlattener<ExcelDoubleCellV
 																																														}
 																																														else
 																																														{
-																																															if (!ignoreErrors && arg.ValueIsExcelError) throw new ExcelErrorValueException(arg.ValueAsExcelErrorValue);
+																																															if (!ignoreErrors && arg.ValueIsExcelError)
+																																															{
+																																																throw new ExcelErrorValueException(arg.ValueAsExcelErrorValue);
+																																															}
+
 																																															if (ConvertUtil.IsNumeric(arg.Value) && !CellStateHelper.ShouldIgnore(ignoreHidden, arg, context))
 																																															{
 																																																var val = new ExcelDoubleCellValue(ConvertUtil.GetValueDouble(arg.Value));

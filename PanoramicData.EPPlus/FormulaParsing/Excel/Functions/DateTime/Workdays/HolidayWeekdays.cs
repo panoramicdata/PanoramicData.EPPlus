@@ -1,7 +1,7 @@
-﻿using System;
+﻿using OfficeOpenXml.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime.Workdays;
 
@@ -30,7 +30,11 @@ public class HolidayWeekdays
 	public System.DateTime AdjustResultWithHolidays(System.DateTime resultDate,
 													 IEnumerable<FunctionArgument> arguments)
 	{
-		if (arguments.Count() == 2) return resultDate;
+		if (arguments.Count() == 2)
+		{
+			return resultDate;
+		}
+
 		if (arguments.ElementAt(2).Value is IEnumerable<FunctionArgument> holidays)
 		{
 			foreach (var arg in holidays)

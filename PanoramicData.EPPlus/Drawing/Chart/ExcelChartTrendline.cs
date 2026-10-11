@@ -31,8 +31,8 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Globalization;
+using System.Xml;
 
 namespace OfficeOpenXml.Drawing.Chart;
 

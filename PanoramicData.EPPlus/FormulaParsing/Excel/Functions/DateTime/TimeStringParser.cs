@@ -75,7 +75,11 @@ public class TimeStringParser
 		var dayPart = string.Empty;
 		dayPart = input.Substring(input.Length - 2, 2);
 		GetValuesFromString(input, out var hour, out var minute, out var second);
-		if (dayPart == "PM") hour += 12;
+		if (dayPart == "PM")
+		{
+			hour += 12;
+		}
+
 		ValidateValues(hour, minute, second);
 		return GetSerialNumber(hour, minute, second);
 	}

@@ -158,7 +158,7 @@ public class ExcelDataValidationType
 	/// </summary>
 	/// <param name="obj"></param>
 	/// <returns></returns>
-	public override bool Equals(object obj) => obj is ExcelDataValidationType && ((ExcelDataValidationType)obj).Type == Type;
+	public override bool Equals(object? obj) => obj is ExcelDataValidationType && ((ExcelDataValidationType)obj).Type == Type;
 
 	/// <summary>
 	/// Overrides GetHashCode()

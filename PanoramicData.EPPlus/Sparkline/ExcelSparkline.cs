@@ -27,9 +27,13 @@ public class ExcelSparkline : XmlHelper
 			//SetXmlNodeString(_fPath, value.FullAddress);
 
 			if (value is ExcelNamedRange)
+			{
 				SetXmlNodeString(_fPath, (value as ExcelNamedRange).Name);
+			}
 			else
+			{
 				SetXmlNodeString(_fPath, value.FullAddress);
+			}
 		}
 	}
 

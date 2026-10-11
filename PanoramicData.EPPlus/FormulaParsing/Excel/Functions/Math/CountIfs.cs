@@ -22,10 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-01-11
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
@@ -40,7 +40,11 @@ public class CountIfs : MultipleRangeCriteriasFunction
 		var criterias = new List<string>();
 		for (var ix = 0; ix < 30; ix += 2)
 		{
-			if (functionArguments.Length <= ix) break;
+			if (functionArguments.Length <= ix)
+			{
+				break;
+			}
+
 			var rangeInfo = functionArguments[ix].ValueAsRangeInfo;
 			argRanges.Add(rangeInfo);
 			var value = functionArguments[ix + 1].Value?.ToString();

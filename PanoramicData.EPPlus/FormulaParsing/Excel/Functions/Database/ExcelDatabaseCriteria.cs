@@ -22,9 +22,9 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-06
  *******************************************************************************/
+using OfficeOpenXml.Utils;
 using System.Collections.Generic;
 using System.Globalization;
-using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 

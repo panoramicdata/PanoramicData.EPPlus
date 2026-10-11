@@ -560,7 +560,9 @@ public sealed class ExcelPackage : IDisposable
 			}
 		}
 		else
+		{
 			throw new Exception("Passed invalid TemplatePath to Excel Template");
+		}
 		//return newFile;
 	}
 	private void ConstructNewFile(string password)

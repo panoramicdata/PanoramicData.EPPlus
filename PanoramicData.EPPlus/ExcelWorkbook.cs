@@ -262,8 +262,15 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					}
 				}
 
-				if (elem.GetAttribute("hidden") == "1" && namedRange != null) namedRange.IsNameHidden = true;
-				if (!string.IsNullOrEmpty(elem.GetAttribute("comment"))) namedRange.NameComment = elem.GetAttribute("comment");
+				if (elem.GetAttribute("hidden") == "1" && namedRange != null)
+				{
+					namedRange.IsNameHidden = true;
+				}
+
+				if (!string.IsNullOrEmpty(elem.GetAttribute("comment")))
+				{
+					namedRange.NameComment = elem.GetAttribute("comment");
+				}
 			}
 		}
 	}
@@ -529,7 +536,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			}
 		}
 
-		if (ret) newID = cacheID;   //Not Found, return same ID
+		if (ret)
+		{
+			newID = cacheID;   //Not Found, return same ID
+		}
+
 		return ret;
 	}
 
@@ -570,7 +581,9 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	private void CreateWorkbookXml(XmlNamespaceManager namespaceManager)
 	{
 		if (_package.Package.PartExists(WorkbookUri))
+		{
 			_workbookXml = _package.GetXmlFromUri(WorkbookUri);
+		}
 		else
 		{
 			// create a new workbook part and add to the package
@@ -615,7 +628,9 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			if (_stylesXml == null)
 			{
 				if (_package.Package.PartExists(StylesUri))
+				{
 					_stylesXml = _package.GetXmlFromUri(StylesUri);
+				}
 				else
 				{
 					// create a new styles part and add to the package
@@ -750,7 +765,9 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	internal void Save()  // Workbook Save
 	{
 		if (Worksheets.Count == 0)
+		{
 			throw new InvalidOperationException("The workbook must contain at least one worksheet");
+		}
 
 		DeleteCalcChain();
 
@@ -919,7 +936,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			var top = WorkbookXml.SelectSingleNode("//d:definedNames", NameSpaceManager);
 			if (!ExistsNames())
 			{
-				if (top != null) TopNode.RemoveChild(top);
+				if (top != null)
+				{
+					TopNode.RemoveChild(top);
+				}
+
 				return;
 			}
 			else
@@ -940,8 +961,16 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					var elem = WorkbookXml.CreateElement("definedName", ExcelPackage.schemaMain);
 					top.AppendChild(elem);
 					elem.SetAttribute("name", name.Name);
-					if (name.IsNameHidden) elem.SetAttribute("hidden", "1");
-					if (!string.IsNullOrEmpty(name.NameComment)) elem.SetAttribute("comment", name.NameComment);
+					if (name.IsNameHidden)
+					{
+						elem.SetAttribute("hidden", "1");
+					}
+
+					if (!string.IsNullOrEmpty(name.NameComment))
+					{
+						elem.SetAttribute("comment", name.NameComment);
+					}
+
 					SetNameElement(name, elem);
 				}
 			}
@@ -956,8 +985,16 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 						top.AppendChild(elem);
 						elem.SetAttribute("name", name.Name);
 						elem.SetAttribute("localSheetId", name.LocalSheetId.ToString());
-						if (name.IsNameHidden) elem.SetAttribute("hidden", "1");
-						if (!string.IsNullOrEmpty(name.NameComment)) elem.SetAttribute("comment", name.NameComment);
+						if (name.IsNameHidden)
+						{
+							elem.SetAttribute("hidden", "1");
+						}
+
+						if (!string.IsNullOrEmpty(name.NameComment))
+						{
+							elem.SetAttribute("comment", name.NameComment);
+						}
+
 						SetNameElement(name, elem);
 					}
 				}
@@ -1008,7 +1045,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		{
 			foreach (var ws in Worksheets)
 			{
-				if (ws is ExcelChartsheet) continue;
+				if (ws is ExcelChartsheet)
+				{
+					continue;
+				}
+
 				if (ws.Names.Count > 0)
 				{
 					return true;
@@ -1122,7 +1163,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 
 	internal void ReadAllTables()
 	{
-		if (_nextTableID > 0) return;
+		if (_nextTableID > 0)
+		{
+			return;
+		}
+
 		_nextTableID = 1;
 		_nextPivotTableID = 1;
 		foreach (var ws in Worksheets)

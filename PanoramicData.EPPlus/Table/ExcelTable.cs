@@ -29,14 +29,14 @@
  * Jan Källman		Added		30-AUG-2010
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExcelUtilities;
+using OfficeOpenXml.Utils;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using System.Text.RegularExpressions;
-using OfficeOpenXml.Utils;
 using System.Security;
-using OfficeOpenXml.FormulaParsing.ExcelUtilities;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace OfficeOpenXml.Table;
 

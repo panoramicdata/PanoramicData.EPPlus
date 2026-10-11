@@ -107,11 +107,19 @@ public static class CalculationExtension
 		try
 		{
 			worksheet.CheckSheetType();
-			if (string.IsNullOrEmpty(Formula.Trim())) return null;
+			if (string.IsNullOrEmpty(Formula.Trim()))
+			{
+				return null;
+			}
+
 			Init(worksheet.Workbook);
 			var parser = worksheet.Workbook.FormulaParser;
 			parser.InitNewCalc();
-			if (Formula[0] == '=') Formula = Formula[1..]; //Remove any starting equal sign
+			if (Formula[0] == '=')
+			{
+				Formula = Formula[1..]; //Remove any starting equal sign
+			}
+
 			var dc = DependencyChainFactory.Create(worksheet, Formula, options);
 			var f = dc.list[0];
 			dc.CalcOrder.RemoveAt(dc.CalcOrder.Count - 1);

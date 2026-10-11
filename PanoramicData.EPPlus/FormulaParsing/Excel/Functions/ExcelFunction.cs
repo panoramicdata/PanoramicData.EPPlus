@@ -22,14 +22,14 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using OfficeOpenXml.Compatibility;
+using OfficeOpenXml.FormulaParsing.Exceptions;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using OfficeOpenXml.FormulaParsing.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using OfficeOpenXml.FormulaParsing.Utilities;
-using OfficeOpenXml.FormulaParsing.Exceptions;
-using OfficeOpenXml.Compatibility;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
@@ -116,11 +116,18 @@ public abstract class ExcelFunction
 					foreach (var arg in arguments)
 					{
 						nArgs++;
-						if (nArgs >= minLength) return false;
+						if (nArgs >= minLength)
+						{
+							return false;
+						}
+
 						if (arg.IsExcelRange)
 						{
 							nArgs += arg.ValueAsRangeInfo.GetNCells();
-							if (nArgs >= minLength) return false;
+							if (nArgs >= minLength)
+							{
+								return false;
+							}
 						}
 					}
 				}
@@ -149,11 +156,18 @@ public abstract class ExcelFunction
 					foreach (var arg in arguments)
 					{
 						nArgs++;
-						if (nArgs >= minLength) return false;
+						if (nArgs >= minLength)
+						{
+							return false;
+						}
+
 						if (arg.IsExcelRange)
 						{
 							nArgs += arg.ValueAsRangeInfo.GetNCells();
-							if (nArgs >= minLength) return false;
+							if (nArgs >= minLength)
+							{
+								return false;
+							}
 						}
 					}
 				}

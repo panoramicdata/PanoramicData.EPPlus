@@ -56,7 +56,11 @@ public class ExcelFillXml : StyleXmlHelper
 
 	private static ExcelFillStyle GetPatternType(string patternType)
 	{
-		if (patternType == "") return ExcelFillStyle.None;
+		if (patternType == "")
+		{
+			return ExcelFillStyle.None;
+		}
+
 		patternType = patternType[..1].ToUpper(CultureInfo.InvariantCulture) + patternType[1..];
 		try
 		{

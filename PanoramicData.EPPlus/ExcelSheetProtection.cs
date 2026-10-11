@@ -29,8 +29,8 @@
  * Jan Källman		    Initial Release		        2010-03-14
  * Jan Källman		    License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
-using System.Xml;
 using OfficeOpenXml.Encryption;
+using System.Xml;
 
 namespace OfficeOpenXml;
 
@@ -307,7 +307,10 @@ public sealed class ExcelSheetProtection : XmlHelper
 	/// <param name="Password"></param>
 	public void SetPassword(string Password)
 	{
-		if (IsProtected == false) IsProtected = true;
+		if (IsProtected == false)
+		{
+			IsProtected = true;
+		}
 
 		Password = Password.Trim();
 		if (Password == "")

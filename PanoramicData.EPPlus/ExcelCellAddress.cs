@@ -83,9 +83,13 @@ public class ExcelCellAddress
 
 			_row = value;
 			if (_column > 0)
+			{
 				_address = ExcelCellBase.GetAddress(_row, _column);
+			}
 			else
+			{
 				_address = "#REF!";
+			}
 		}
 	}
 	/// <summary>
@@ -106,9 +110,13 @@ public class ExcelCellAddress
 
 			_column = value;
 			if (_row > 0)
+			{
 				_address = ExcelCellBase.GetAddress(_row, _column);
+			}
 			else
+			{
 				_address = "#REF!";
+			}
 		}
 	}
 	/// <summary>

@@ -28,12 +28,12 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
@@ -149,7 +149,11 @@ public class ExpressionGraphBuilder : IExpressionGraphBuilder
 
 	private void CreateAndAppendExpression(ref Expression parent, Token token)
 	{
-		if (IsWaste(token)) return;
+		if (IsWaste(token))
+		{
+			return;
+		}
+
 		if (parent != null &&
 			(token.TokenType == TokenType.Comma || token.TokenType == TokenType.SemiColon))
 		{

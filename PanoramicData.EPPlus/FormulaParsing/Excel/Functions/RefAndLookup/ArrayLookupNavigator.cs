@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using OfficeOpenXml.FormulaParsing.Exceptions;
+﻿using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.Utilities;
+using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 
@@ -38,7 +38,11 @@ public class ArrayLookupNavigator : LookupNavigator
 
 	public override bool MoveNext()
 	{
-		if (!HasNext()) return false;
+		if (!HasNext())
+		{
+			return false;
+		}
+
 		if (Direction == LookupDirection.Vertical)
 		{
 			_index++;

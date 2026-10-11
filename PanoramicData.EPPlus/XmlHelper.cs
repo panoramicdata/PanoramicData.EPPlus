@@ -95,7 +95,11 @@ public abstract class XmlHelper
 	{
 		var node = TopNode;
 		XmlNode prependNode = null;
-		if (path.StartsWith('/')) path = path[1..];
+		if (path.StartsWith('/'))
+		{
+			path = path[1..];
+		}
+
 		var subPaths = path.Split('/');
 		for (var i = 0; i < subPaths.Length; i++)
 		{
@@ -118,7 +122,11 @@ public abstract class XmlHelper
 				if (nameSplit.Length > 1)
 				{
 					nodePrefix = nameSplit[0];
-					if (nodePrefix[0] == '@') nodePrefix = nodePrefix[1..];
+					if (nodePrefix[0] == '@')
+					{
+						nodePrefix = nodePrefix[1..];
+					}
+
 					nameSpaceURI = NameSpaceManager.LookupNamespace(nodePrefix);
 					nodeName = nameSplit[1];
 				}

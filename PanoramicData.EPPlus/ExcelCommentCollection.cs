@@ -28,11 +28,11 @@
  *******************************************************************************
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
+using OfficeOpenXml.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
-using System.Collections;
-using OfficeOpenXml.Utils;
 namespace OfficeOpenXml;
 
 /// <summary>

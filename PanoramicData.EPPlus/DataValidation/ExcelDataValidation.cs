@@ -29,11 +29,11 @@
  * Mats Alm   		                Added       		        2011-01-01
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
-using System;
-using OfficeOpenXml.Utils;
-using System.Xml;
-using System.Text.RegularExpressions;
 using OfficeOpenXml.DataValidation.Contracts;
+using OfficeOpenXml.Utils;
+using System;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace OfficeOpenXml.DataValidation;
 

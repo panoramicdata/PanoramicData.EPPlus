@@ -28,8 +28,8 @@
  * ******************************************************************************
  * Eyal Seagull        Added       		  2012-04-03
  *******************************************************************************/
-using System.Xml;
 using OfficeOpenXml.ConditionalFormatting.Contracts;
+using System.Xml;
 
 namespace OfficeOpenXml.ConditionalFormatting.Rules;
 

@@ -61,7 +61,11 @@ public sealed class ExcelBorderItemXml : StyleXmlHelper
 
 	private static ExcelBorderStyle GetBorderStyle(string style)
 	{
-		if (style == "") return ExcelBorderStyle.None;
+		if (style == "")
+		{
+			return ExcelBorderStyle.None;
+		}
+
 		var sInStyle = style[..1].ToUpper(CultureInfo.InvariantCulture) + style[1..];
 		try
 		{

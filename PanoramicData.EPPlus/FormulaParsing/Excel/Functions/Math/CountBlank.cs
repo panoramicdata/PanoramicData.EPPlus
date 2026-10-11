@@ -29,7 +29,11 @@ public class CountBlank : ExcelFunction
 	{
 		ValidateArguments(arguments, 1);
 		var arg = arguments.First();
-		if (!arg.IsExcelRange) throw new InvalidOperationException("CountBlank only support ranges as arguments");
+		if (!arg.IsExcelRange)
+		{
+			throw new InvalidOperationException("CountBlank only support ranges as arguments");
+		}
+
 		var result = arg.ValueAsRangeInfo.GetNCells();
 		foreach (var cell in arg.ValueAsRangeInfo)
 		{

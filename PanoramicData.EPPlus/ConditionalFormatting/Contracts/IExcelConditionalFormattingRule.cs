@@ -28,8 +28,8 @@
  * ******************************************************************************
  * Eyal Seagull    Conditional Formatting         2012-04-03
  *******************************************************************************/
-using System.Xml;
 using OfficeOpenXml.Style.Dxf;
+using System.Xml;
 
 namespace OfficeOpenXml.ConditionalFormatting.Contracts;
 

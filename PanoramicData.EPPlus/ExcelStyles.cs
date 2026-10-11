@@ -29,14 +29,14 @@
  * Jan Källman		    Initial Release		        2009-10-01
  * Jan Källman		    License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
-using System;
-using System.Xml;
-using System.Linq;
-using System.Collections.Generic;
-using OfficeOpenXml.Style;
-using OfficeOpenXml.Style.XmlAccess;
-using OfficeOpenXml.Style.Dxf;
 using OfficeOpenXml.ConditionalFormatting.Rules;
+using OfficeOpenXml.Style;
+using OfficeOpenXml.Style.Dxf;
+using OfficeOpenXml.Style.XmlAccess;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 namespace OfficeOpenXml;
 
 /// <summary>
@@ -81,7 +81,10 @@ public sealed class ExcelStyles : XmlHelper
 			{
 				ExcelNumberFormatXml nf = new(_nameSpaceManager, n);
 				NumberFormats.Add(nf.Id, nf);
-				if (nf.NumFmtId >= NumberFormats.NextId) NumberFormats.NextId = nf.NumFmtId + 1;
+				if (nf.NumFmtId >= NumberFormats.NextId)
+				{
+					NumberFormats.NextId = nf.NumFmtId + 1;
+				}
 			}
 		}
 
@@ -161,7 +164,11 @@ public sealed class ExcelStyles : XmlHelper
 	}
 	internal ExcelStyle GetStyleObject(int Id, int PositionID, string Address)
 	{
-		if (Id < 0) Id = 0;
+		if (Id < 0)
+		{
+			Id = 0;
+		}
+
 		return new ExcelStyle(this, PropertyChange, PositionID, Address, Id);
 	}
 	/// <summary>
@@ -314,7 +321,11 @@ public sealed class ExcelStyles : XmlHelper
 				cse = new CellsStoreEnumerator<ExcelCoreValue>(ws._values, 1, 0, address._toRow, 0);
 				while (cse.Next())
 				{
-					if (cse.Value._styleId == 0) continue;
+					if (cse.Value._styleId == 0)
+					{
+						continue;
+					}
+
 					for (var c = address._fromCol; c <= address._toCol; c++)
 					{
 						if (!ws.ExistsStyleInner(cse.Row, c))
@@ -349,7 +360,11 @@ public sealed class ExcelStyles : XmlHelper
 					while (cse.Next())
 					{
 						s = cse.Value._styleId;
-						if (s == 0) continue;
+						if (s == 0)
+						{
+							continue;
+						}
+
 						if (ws.GetValueInner(cse.Row, cse.Column) is ExcelColumn c && c.ColumnMax < ExcelPackage.MaxColumns)
 						{
 							for (var col = c.ColumnMin; col < c.ColumnMax; col++)
@@ -384,7 +399,11 @@ public sealed class ExcelStyles : XmlHelper
 			while (cse2.Next())
 			{
 				var s = cse2.Value._styleId;
-				if (s == 0) continue;
+				if (s == 0)
+				{
+					continue;
+				}
+
 				if (styleCashe.TryGetValue(s, out var value))
 				{
 					ws.SetStyleInner(cse2.Row, cse2.Column, value);
@@ -402,7 +421,11 @@ public sealed class ExcelStyles : XmlHelper
 			cse2 = new CellsStoreEnumerator<ExcelCoreValue>(ws._values, 0, 1, 0, address._toCol);
 			while (cse2.Next())
 			{
-				if (cse2.Value._styleId == 0) continue;
+				if (cse2.Value._styleId == 0)
+				{
+					continue;
+				}
+
 				for (var r = address._fromRow; r <= address._toRow; r++)
 				{
 					if (!ws.ExistsStyleInner(r, cse2.Column))
@@ -436,12 +459,20 @@ public sealed class ExcelStyles : XmlHelper
 					if (s == 0 && !ws.ExistsStyleInner(row, 0, ref s))
 					{
 						// get row styleId with cache
-						if (!rowCache.ContainsKey(row)) rowCache.Add(row, ws._values.GetValue(row, 0)._styleId);
+						if (!rowCache.ContainsKey(row))
+						{
+							rowCache.Add(row, ws._values.GetValue(row, 0)._styleId);
+						}
+
 						s = rowCache[row];
 						if (s == 0)
 						{
 							// get column styleId with cache
-							if (!colCache.ContainsKey(column)) colCache.Add(column, ws._values.GetValue(0, column));
+							if (!colCache.ContainsKey(column))
+							{
+								colCache.Add(column, ws._values.GetValue(0, column));
+							}
+
 							s = colCache[column]._styleId;
 							if (s == 0)
 							{
@@ -449,7 +480,11 @@ public sealed class ExcelStyles : XmlHelper
 								if (ws._values.PrevCell(ref r, ref c))
 								{
 									//var val = ws._values.GetValue(0, c);
-									if (!colCache.ContainsKey(c)) colCache.Add(c, ws._values.GetValue(0, c));
+									if (!colCache.ContainsKey(c))
+									{
+										colCache.Add(c, ws._values.GetValue(0, c));
+									}
+
 									var val = colCache[c];
 									var colObj = (ExcelColumn)(val._value);
 									if (colObj != null && colObj.ColumnMax >= column) //Fixes issue 15174
@@ -771,8 +806,15 @@ public sealed class ExcelStyles : XmlHelper
 			cellStyleNode.AppendChild(style.CreateXmlNode(_styleXml.CreateElement("cellStyle", ExcelPackage.schemaMain)));
 		}
 
-		if (cellStyleNode != null) (cellStyleNode as XmlElement).SetAttribute("count", count.ToString());
-		if (styleXfsNode != null) (styleXfsNode as XmlElement).SetAttribute("count", count.ToString());
+		if (cellStyleNode != null)
+		{
+			(cellStyleNode as XmlElement).SetAttribute("count", count.ToString());
+		}
+
+		if (styleXfsNode != null)
+		{
+			(styleXfsNode as XmlElement).SetAttribute("count", count.ToString());
+		}
 
 		//CellStyle
 		var xfix = 0;
@@ -794,7 +836,11 @@ public sealed class ExcelStyles : XmlHelper
 		var dxfsNode = _styleXml.SelectSingleNode(dxfsPath, _nameSpaceManager);
 		foreach (var ws in _wb.Worksheets)
 		{
-			if (ws is ExcelChartsheet) continue;
+			if (ws is ExcelChartsheet)
+			{
+				continue;
+			}
+
 			foreach (var cf in ws.ConditionalFormatting)
 			{
 				if (cf.Style.HasValue)
@@ -816,7 +862,10 @@ public sealed class ExcelStyles : XmlHelper
 			}
 		}
 
-		if (dxfsNode != null) (dxfsNode as XmlElement).SetAttribute("count", Dxfs.Count.ToString());
+		if (dxfsNode != null)
+		{
+			(dxfsNode as XmlElement).SetAttribute("count", Dxfs.Count.ToString());
+		}
 	}
 
 	private void AddNamedStyle(int id, XmlNode styleXfsNode, XmlNode cellXfsNode, ExcelNamedStyleXml style)
@@ -833,16 +882,24 @@ public sealed class ExcelStyles : XmlHelper
 		}
 		else
 		{
-			if (id < 0) CellXfs[ix].XfId = id;
+			if (id < 0)
+			{
+				CellXfs[ix].XfId = id;
+			}
+
 			cellXfsNode.AppendChild(CellXfs[ix].CreateXmlNode(_styleXml.CreateElement("xf", ExcelPackage.schemaMain)));
 			CellXfs[ix].useCnt = 0;
 			CellXfs[ix].newID = id;
 		}
 
 		if (style.XfId >= 0)
+		{
 			style.XfId = CellXfs[style.XfId].newID;
+		}
 		else
+		{
 			style.XfId = 0;
+		}
 	}
 
 	private void RemoveUnusedStyles()
@@ -870,9 +927,20 @@ public sealed class ExcelStyles : XmlHelper
 		{
 			if (xf.useCnt > 0)
 			{
-				if (xf.FontId >= 0) Fonts[xf.FontId].useCnt++;
-				if (xf.FillId >= 0) Fills[xf.FillId].useCnt++;
-				if (xf.BorderId >= 0) Borders[xf.BorderId].useCnt++;
+				if (xf.FontId >= 0)
+				{
+					Fonts[xf.FontId].useCnt++;
+				}
+
+				if (xf.FillId >= 0)
+				{
+					Fills[xf.FillId].useCnt++;
+				}
+
+				if (xf.BorderId >= 0)
+				{
+					Borders[xf.BorderId].useCnt++;
+				}
 			}
 		}
 
@@ -880,9 +948,20 @@ public sealed class ExcelStyles : XmlHelper
 		{
 			if (xf.useCnt > 0)
 			{
-				if (xf.FontId >= 0) Fonts[xf.FontId].useCnt++;
-				if (xf.FillId >= 0) Fills[xf.FillId].useCnt++;
-				if (xf.BorderId >= 0) Borders[xf.BorderId].useCnt++;
+				if (xf.FontId >= 0)
+				{
+					Fonts[xf.FontId].useCnt++;
+				}
+
+				if (xf.FillId >= 0)
+				{
+					Fills[xf.FillId].useCnt++;
+				}
+
+				if (xf.BorderId >= 0)
+				{
+					Borders[xf.BorderId].useCnt++;
+				}
 			}
 		}
 	}

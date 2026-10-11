@@ -22,9 +22,9 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-02-01
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
@@ -39,7 +39,11 @@ public class AverageIfs : MultipleRangeCriteriasFunction
 		var criterias = new List<string>();
 		for (var ix = 1; ix < 31; ix += 2)
 		{
-			if (functionArguments.Length <= ix) break;
+			if (functionArguments.Length <= ix)
+			{
+				break;
+			}
+
 			var rangeInfo = functionArguments[ix].ValueAsRangeInfo;
 			argRanges.Add(rangeInfo);
 			var value = functionArguments[ix + 1].Value?.ToString();

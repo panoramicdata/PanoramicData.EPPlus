@@ -22,8 +22,8 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
-using System.Collections.Generic;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 
@@ -35,7 +35,10 @@ public class Left : ExcelFunction
 		var str = ArgToString(arguments, 0);
 		var length = ArgToInt(arguments, 1);
 		if (str.Length < length)
+		{
 			length = str.Length;
+		}
+
 		return CreateResult(str[..length], DataType.String);
 	}
 }

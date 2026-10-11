@@ -35,8 +35,8 @@ using OfficeOpenXml.Utils;
 using System;
 using System.Drawing;
 using System.IO;
-using System.Xml;
 using System.Runtime.Versioning;
+using System.Xml;
 
 namespace OfficeOpenXml;
 

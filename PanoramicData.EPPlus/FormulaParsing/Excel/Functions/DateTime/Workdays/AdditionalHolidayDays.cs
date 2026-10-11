@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using OfficeOpenXml.Utils;
+using System.Collections.Generic;
 using System.Linq;
-using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime.Workdays;
 

@@ -367,7 +367,11 @@ public class ExcelAddressBase : ExcelCellBase
 	}
 	internal void ChangeWorksheet(string wsName, string newWs)
 	{
-		if (_ws == wsName) _ws = newWs;
+		if (_ws == wsName)
+		{
+			_ws = newWs;
+		}
+
 		var fullAddress = GetAddress();
 
 		if (Addresses != null)
@@ -403,9 +407,14 @@ public class ExcelAddressBase : ExcelCellBase
 		}
 
 		if (IsName)
+		{
 			adr += GetAddress(_fromRow, _fromCol, _toRow, _toCol);
+		}
 		else
+		{
 			adr += GetAddress(_fromRow, _fromCol, _toRow, _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+		}
+
 		return adr;
 	}
 	#endregion
@@ -810,7 +819,11 @@ public class ExcelAddressBase : ExcelCellBase
 		hasSheet = false;
 		if (string.IsNullOrEmpty(_firstAddress))
 		{
-			if (string.IsNullOrEmpty(_ws) || !string.IsNullOrEmpty(ws)) _ws = ws;
+			if (string.IsNullOrEmpty(_ws) || !string.IsNullOrEmpty(ws))
+			{
+				_ws = ws;
+			}
+
 			_firstAddress = address;
 			GetRowColFromAddress(address, out _fromRow, out _fromCol, out _toRow, out _toCol, out _fromRowFixed, out _fromColFixed, out _toRowFixed, out _toColFixed);
 		}
@@ -907,14 +920,21 @@ public class ExcelAddressBase : ExcelCellBase
 					break;
 				case 'R':
 					if (isC)
+					{
 						return false;
+					}
+
 					isROrC = true;
 					break;
 				case '[':
 					startBracket = true;
 					break;
 				case ']':
-					if (startBracket == false) return false;
+					if (startBracket == false)
+					{
+						return false;
+					}
+
 					isROrC = false;
 					break;
 				case ':':
@@ -944,7 +964,11 @@ public class ExcelAddressBase : ExcelCellBase
 
 	private static bool IsAddress(string intAddress)
 	{
-		if (string.IsNullOrEmpty(intAddress)) return false;
+		if (string.IsNullOrEmpty(intAddress))
+		{
+			return false;
+		}
+
 		var cells = intAddress.Split(':');
 		int toRow, toCol;
 
@@ -1063,7 +1087,10 @@ public class ExcelAddressBase : ExcelCellBase
 				// we need to check that this is not a table column reference in order to avoid false positives.  Since function names and
 				// formulas cannot contain [ ], we should be safe doing this check.
 				if (addressChar is '[' or ']')
+				{
 					return false;
+				}
+
 				if (isText == false && _formulaCharacters.Contains(addressChar))
 				{
 					return true;
@@ -1101,7 +1128,11 @@ public class ExcelAddressBase : ExcelCellBase
 	}
 	internal static string GetWorksheetPart(string address, string defaultWorkSheet, ref int endIx)
 	{
-		if (address == "") return defaultWorkSheet;
+		if (address == "")
+		{
+			return defaultWorkSheet;
+		}
+
 		var ix = 0;
 		if (address[0] == '[')
 		{
@@ -1205,12 +1236,18 @@ public class ExcelAddress : ExcelAddressBase
 	internal ExcelAddress(string ws, string address)
 		: base(address)
 	{
-		if (string.IsNullOrEmpty(_ws)) _ws = ws;
+		if (string.IsNullOrEmpty(_ws))
+		{
+			_ws = ws;
+		}
 	}
 	internal ExcelAddress(string ws, string address, bool isName)
 		: base(address, isName)
 	{
-		if (string.IsNullOrEmpty(_ws)) _ws = ws;
+		if (string.IsNullOrEmpty(_ws))
+		{
+			_ws = ws;
+		}
 	}
 
 	public ExcelAddress(string Address, ExcelPackage package, ExcelAddressBase referenceAddress) :
@@ -1261,20 +1298,34 @@ public class ExcelFormulaAddress : ExcelAddressBase
 	internal ExcelFormulaAddress(string ws, string address)
 		: base(address)
 	{
-		if (string.IsNullOrEmpty(_ws)) _ws = ws;
+		if (string.IsNullOrEmpty(_ws))
+		{
+			_ws = ws;
+		}
+
 		SetFixed();
 	}
 	internal ExcelFormulaAddress(string ws, string address, bool isName)
 		: base(address, isName)
 	{
-		if (string.IsNullOrEmpty(_ws)) _ws = ws;
+		if (string.IsNullOrEmpty(_ws))
+		{
+			_ws = ws;
+		}
+
 		if (!isName)
+		{
 			SetFixed();
+		}
 	}
 
 	private void SetFixed()
 	{
-		if (Address.Contains('[')) return;
+		if (Address.Contains('['))
+		{
+			return;
+		}
+
 		var address = FirstAddress;
 		if (_fromRow == _toRow && _fromCol == _toCol)
 		{

@@ -83,7 +83,11 @@ public class ExcelSparklineGroup : XmlHelper
 		get
 		{
 			var f = GetXmlNodeString("xm:f");
-			if (string.IsNullOrEmpty(f)) return null;
+			if (string.IsNullOrEmpty(f))
+			{
+				return null;
+			}
+
 			var a = new ExcelAddressBase(f);
 			if (a.WorkSheet.Equals(_ws.Name, StringComparison.CurrentCultureIgnoreCase))
 			{

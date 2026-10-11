@@ -146,7 +146,11 @@ internal static class DependencyChainFactory
 		var fs = new CellsStoreEnumerator<object>(ws._formulas, Range.Start.Row, Range.Start.Column, Range.End.Row, Range.End.Column);
 		while (fs.Next())
 		{
-			if (fs.Value == null || fs.Value.ToString().Trim() == "") continue;
+			if (fs.Value == null || fs.Value.ToString().Trim() == "")
+			{
+				continue;
+			}
+
 			var id = ExcelCellBase.GetCellID(ws.SheetID, fs.Row, fs.Column);
 			if (!depChain.index.ContainsKey(id))
 			{
@@ -246,7 +250,10 @@ internal static class DependencyChainFactory
 						name = null;
 					}
 
-					if (name != null) f.ws = name.Worksheet;
+					if (name != null)
+					{
+						f.ws = name.Worksheet;
+					}
 				}
 				else if (wb.Names.ContainsKey(adrName))
 				{
@@ -327,7 +334,11 @@ internal static class DependencyChainFactory
 		while (f.iterator != null && f.iterator.Next())
 		{
 			var v = f.iterator.Value;
-			if (v == null || v.ToString().Trim() == "") continue;
+			if (v == null || v.ToString().Trim() == "")
+			{
+				continue;
+			}
+
 			var id = ExcelCellBase.GetCellID(f.ws.SheetID, f.iterator.Row, f.iterator.Column);
 			if (!depChain.index.ContainsKey(id))
 			{

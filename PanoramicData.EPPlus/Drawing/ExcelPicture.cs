@@ -36,9 +36,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Xml;
-using System.Runtime.Versioning;
 
 namespace OfficeOpenXml.Drawing;
 

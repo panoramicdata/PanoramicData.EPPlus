@@ -53,10 +53,17 @@ public class ExcelAddressCache
 	{
 		lock (_myLock)
 		{
-			if (_addressCache.ContainsKey(id)) return false;
+			if (_addressCache.ContainsKey(id))
+			{
+				return false;
+			}
+
 			_addressCache.Add(id, address);
 			if (EnableLookupCache && !_lookupCache.ContainsKey(address))
+			{
 				_lookupCache.Add(address, id);
+			}
+
 			return true;
 		}
 

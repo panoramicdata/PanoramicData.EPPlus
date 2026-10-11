@@ -29,8 +29,8 @@
  * Mats Alm   		                Added       		        2011-03-23
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
-using OfficeOpenXml.Utils;
 using OfficeOpenXml.DataValidation.Contracts;
+using OfficeOpenXml.Utils;
 
 namespace OfficeOpenXml.DataValidation;
 

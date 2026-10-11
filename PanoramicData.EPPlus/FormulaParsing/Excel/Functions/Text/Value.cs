@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 
@@ -20,7 +20,11 @@ public class Value : ExcelFunction
 		ValidateArguments(arguments, 1);
 		var val = ArgToString(arguments, 0);
 		var result = 0d;
-		if (string.IsNullOrEmpty(val)) return CreateResult(result, DataType.Integer);
+		if (string.IsNullOrEmpty(val))
+		{
+			return CreateResult(result, DataType.Integer);
+		}
+
 		val = val.TrimEnd(' ');
 		if (Regex.IsMatch(val, $"^[\\d]*({Regex.Escape(_groupSeparator)}?[\\d]*)?({Regex.Escape(_decimalSeparator)}[\\d]*)*?[ ?% ?]?$"))
 		{
