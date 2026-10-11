@@ -4,7 +4,6 @@
     <TargetFramework>net10.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>icon.jpg</PackageIcon>
-    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/rimland/EPPlus</PackageProjectUrl>
     <Authors>Rimland, Panoramic Data Limited</Authors>
     <Company></Company>
@@ -26,7 +25,6 @@
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenOfficeXml.Rimland.snk</AssemblyOriginatorKeyFile>
     <NeutralLanguage />
-    <PackageLicenseFile>lgpl-3.0.txt</PackageLicenseFile>
     <!-- Vendored EPPlus source was never fully annotated: keep the annotations, drop the nullable warnings. -->
     <Nullable>annotations</Nullable>
     <!-- Same reason: about 2,200 vendored public members have no XML documentation. -->
