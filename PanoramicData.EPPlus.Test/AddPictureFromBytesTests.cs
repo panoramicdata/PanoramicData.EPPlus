@@ -33,6 +33,16 @@ public class AddPictureFromBytesTests
 			saved = package.GetAsByteArray();
 		}
 
+		if (!OperatingSystem.IsWindowsVersionAtLeast(6, 1))
+		{
+			// Reading a picture back goes through ExcelPicture's loading constructor, which uses
+			// System.Drawing and deliberately throws where that is unsupported. Adding and saving
+			// (asserted above) work everywhere; assert the documented limit rather than skip.
+			using var unsupported = new ExcelPackage(new MemoryStream(saved));
+			Assert.ThrowsException<PlatformNotSupportedException>(() => unsupported.Workbook.Worksheets[0].Drawings);
+			return;
+		}
+
 		using var reopened = new ExcelPackage(new MemoryStream(saved));
 		var drawing = reopened.Workbook.Worksheets[0].Drawings["CatBytes"];
 		Assert.IsInstanceOfType(drawing, typeof(ExcelPicture));
