@@ -42,7 +42,7 @@ public class ConditionalFormatting
 			Directory.CreateDirectory(string.Format("Test"));
 		}
 
-		_excelPackage = new ExcelPackage(new FileInfo(@"Test\ConditionalFormatting.xlsx"));
+		_excelPackage = new ExcelPackage(new FileInfo(Path.Combine("Test", "ConditionalFormatting.xlsx")));
 	}
 
 	// Use ClassCleanup to run code after all tests in a class have run

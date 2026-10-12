@@ -32,7 +32,6 @@
 using System;
 using System.Drawing;
 using System.Globalization;
-using System.Runtime.Versioning;
 using System.Xml;
 namespace OfficeOpenXml.Style.XmlAccess;
 
@@ -261,17 +260,6 @@ public sealed class ExcelFontXml : StyleXmlHelper
 		{
 			_verticalAlign = value;
 		}
-	}
-	[SupportedOSPlatform("windows")]
-	public void SetFromFont(System.Drawing.Font Font)
-	{
-		Name = Font.Name;
-		//Family=fnt.FontFamily.;
-		Size = (int)Font.Size;
-		Strike = Font.Strikeout;
-		Bold = Font.Bold;
-		UnderLine = Font.Underline;
-		Italic = Font.Italic;
 	}
 	public static float GetFontHeight(string name, float size)
 	{

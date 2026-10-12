@@ -46,7 +46,6 @@
  * All code and executables are provided "as is" with no warranty either express or implied. 
  * The author accepts no liability for any damage or loss of business that this product may cause.
  */
-using System.Runtime.Versioning;
 using System;
 using OfficeOpenXml;
 using Microsoft.Data.SqlClient;
@@ -65,7 +64,6 @@ class Sample3
 	/// <param name="outputDir">The output directory</param>
 	/// <param name="templateDir">The location of the sample template</param>
 	/// <param name="connectionString">The connection string to your copy of the AdventureWorks database</param>
-	[SupportedOSPlatform("windows")]
 	public static string RunSample3(string connectionString)
 	{
 		var file = Utils.GetFileInfo("Sample3.xlsx");
@@ -86,7 +84,9 @@ class Sample3
 				using (var r = worksheet.Cells["A1:G1"])
 				{
 					r.Merge = true;
-					r.Style.Font.SetFromFont(new Font("Britannic Bold", 22, FontStyle.Italic));
+					r.Style.Font.Name = "Britannic Bold";
+					r.Style.Font.Size = 22;
+					r.Style.Font.Italic = true;
 					r.Style.Font.Color.SetColor(Color.White);
 					r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
 					r.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -97,7 +97,9 @@ class Sample3
 				using (var r = worksheet.Cells["A2:G2"])
 				{
 					r.Merge = true;
-					r.Style.Font.SetFromFont(new Font("Britannic Bold", 18, FontStyle.Italic));
+					r.Style.Font.Name = "Britannic Bold";
+					r.Style.Font.Size = 18;
+					r.Style.Font.Italic = true;
 					r.Style.Font.Color.SetColor(Color.Black);
 					r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
 					r.Style.Fill.PatternType = ExcelFillStyle.Solid;

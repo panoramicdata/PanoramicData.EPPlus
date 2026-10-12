@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.Versioning;
 using OfficeOpenXml;
 using System.IO;
 
@@ -9,7 +8,6 @@ namespace PanoramicData.EPPlus.Test;
 public class DTS_FailingTests
 {
 
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void DeleteWorksheetWithReferencedImage()
 	{
@@ -32,7 +30,6 @@ public class DTS_FailingTests
 		}
 	}
 
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void CopyAndDeleteWorksheetWithImage()
 	{

@@ -29,6 +29,7 @@
  * Jan Källman		                Initial Release		        2009-12-22
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Table.PivotTable;
 using OfficeOpenXml.Utils;
@@ -37,7 +38,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Xml;
 
 namespace OfficeOpenXml.Drawing;
@@ -243,42 +243,55 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <returns>The chart</returns>
 	public ExcelChart AddChart(string Name, eChartType ChartType) => AddChart(Name, ChartType, null);
 	/// <summary>
-	/// Add a picture to the worksheet
+	/// Add a picture to the worksheet from an image file's bytes. The size and resolution are read
+	/// from the image header (PNG, JPEG, GIF, BMP, TIFF, EMF or WMF); no graphics library is used, so
+	/// this works on every platform. The bytes are stored in the package unchanged.
 	/// </summary>
 	/// <param name="Name"></param>
-	/// <param name="image">An image. Always saved in then JPeg format</param>
+	/// <param name="ImageBytes">The image file's bytes</param>
 	/// <returns></returns>
-	[SupportedOSPlatform("windows")]
-	public ExcelPicture AddPicture(string Name, Image image) => AddPicture(Name, image, null);
+	public ExcelPicture AddPicture(string Name, byte[] ImageBytes) => AddPicture(Name, ImageBytes, (Uri)null);
 	/// <summary>
-	/// Add a picture to the worksheet
+	/// Add a picture to the worksheet from an image file's bytes. The size and resolution are read
+	/// from the image header (PNG, JPEG, GIF, BMP, TIFF, EMF or WMF).
 	/// </summary>
 	/// <param name="Name"></param>
-	/// <param name="image">An image. Always saved in then JPeg format</param>
+	/// <param name="ImageBytes">The image file's bytes</param>
 	/// <param name="Hyperlink">Picture hyperlink</param>
 	/// <returns></returns>
-	[SupportedOSPlatform("windows")]
-	public ExcelPicture AddPicture(string Name, Image image, Uri Hyperlink)
+	public ExcelPicture AddPicture(string Name, byte[] ImageBytes, Uri Hyperlink)
 	{
-		if (image != null)
+		if (ImageBytes == null || ImageBytes.Length == 0)
 		{
-			if (_drawingNames.ContainsKey(Name))
-			{
-				throw new Exception("Name already exists in the drawings collection");
-			}
-
-			var drawNode = CreateDrawingXml();
-			drawNode.SetAttribute("editAs", "oneCell");
-			ExcelPicture pic = new(this, drawNode, image, Hyperlink)
-			{
-				Name = Name
-			};
-			_drawings.Add(pic);
-			_drawingNames.Add(Name, _drawings.Count - 1);
-			return pic;
+			throw new ArgumentException("AddPicture: ImageBytes can't be null or empty", nameof(ImageBytes));
 		}
 
-		throw (new Exception("AddPicture: Image can't be null"));
+		return AddPictureCore(Name, drawNode => new ExcelPicture(this, drawNode, ImageBytes, "/xl/media/image{0}" + ExcelPicture.GetExtension(ExcelPicture.GetContentTypeFromBytes(ImageBytes)), Hyperlink));
+	}
+	/// <summary>
+	/// Add a picture to the worksheet from a stream containing an image file. The stream is read to the end.
+	/// </summary>
+	/// <param name="Name"></param>
+	/// <param name="ImageStream">A stream containing the image file</param>
+	/// <returns></returns>
+	public ExcelPicture AddPicture(string Name, Stream ImageStream) => AddPicture(Name, ImageStream, null);
+	/// <summary>
+	/// Add a picture to the worksheet from a stream containing an image file. The stream is read to the end.
+	/// </summary>
+	/// <param name="Name"></param>
+	/// <param name="ImageStream">A stream containing the image file</param>
+	/// <param name="Hyperlink">Picture hyperlink</param>
+	/// <returns></returns>
+	public ExcelPicture AddPicture(string Name, Stream ImageStream, Uri Hyperlink)
+	{
+		if (ImageStream == null)
+		{
+			throw new ArgumentNullException(nameof(ImageStream), "AddPicture: ImageStream can't be null");
+		}
+
+		using var ms = new MemoryStream();
+		ImageStream.CopyTo(ms);
+		return AddPicture(Name, ms.ToArray(), Hyperlink);
 	}
 	/// <summary>
 	/// Add a picure to the worksheet
@@ -286,7 +299,6 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <param name="Name"></param>
 	/// <param name="ImageFile">The image file</param>
 	/// <returns></returns>
-	[SupportedOSPlatform("windows")]
 	public ExcelPicture AddPicture(string Name, FileInfo ImageFile) => AddPicture(Name, ImageFile, null);
 	/// <summary>
 	/// Add a picure to the worksheet
@@ -295,7 +307,6 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <param name="ImageFile">The image file</param>
 	/// <param name="Hyperlink">Picture Hyperlink</param>
 	/// <returns></returns>
-	[SupportedOSPlatform("windows")]
 	public ExcelPicture AddPicture(string Name, FileInfo ImageFile, Uri Hyperlink)
 	{
 		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
@@ -303,30 +314,49 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
 		}
 
-		if (ImageFile != null)
+		if (ImageFile == null)
 		{
-			if (_drawingNames.ContainsKey(Name))
-			{
-				throw new Exception("Name already exists in the drawings collection");
-			}
-
-			var drawNode = CreateDrawingXml();
-			drawNode.SetAttribute("editAs", "oneCell");
-			ExcelPicture pic = new(this, drawNode, ImageFile, Hyperlink)
-			{
-				Name = Name
-			};
-			_drawings.Add(pic);
-			_drawingNames.Add(Name, _drawings.Count - 1);
-			return pic;
+			throw new Exception("AddPicture: ImageFile can't be null");
 		}
 
-		throw (new Exception("AddPicture: ImageFile can't be null"));
+		byte[] bytes;
+		try
+		{
+			bytes = File.ReadAllBytes(ImageFile.FullName);
+			ImageHeaderReader.Read(bytes);
+		}
+		catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+		{
+			throw new InvalidDataException("File is not a supported image-file or is corrupt", ex);
+		}
+
+		return AddPictureCore(Name, drawNode => new ExcelPicture(this, drawNode, bytes, "/xl/media/{0}" + ImageFile.Name, Hyperlink));
+	}
+
+	private ExcelPicture AddPictureCore(string Name, Func<XmlElement, ExcelPicture> create)
+	{
+		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
+		{
+			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
+		}
+
+		if (_drawingNames.ContainsKey(Name))
+		{
+			throw new Exception("Name already exists in the drawings collection");
+		}
+
+		var drawNode = CreateDrawingXml();
+		drawNode.SetAttribute("editAs", "oneCell");
+		var pic = create(drawNode);
+		pic.Name = Name;
+		_drawings.Add(pic);
+		_drawingNames.Add(Name, _drawings.Count - 1);
+		return pic;
 	}
 
 	/// <summary>
-	/// Add a picture to the worksheet from raw image bytes, without using System.Drawing - works on
-	/// platforms where GDI+ is unavailable (System.Drawing.Common 7 and later is Windows-only).
+	/// Add a picture to the worksheet from raw image bytes, without a graphics library - works on
+	/// every platform.
 	/// MagicSuite MS-25871.
 	/// </summary>
 	/// <param name="Name"></param>
@@ -336,8 +366,8 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <returns></returns>
 	public ExcelPicture AddPicture(string Name, byte[] ImageBytes, int WidthPixels, int HeightPixels) => AddPicture(Name, ImageBytes, WidthPixels, HeightPixels, null);
 	/// <summary>
-	/// Add a picture to the worksheet from raw image bytes, without using System.Drawing - works on
-	/// platforms where GDI+ is unavailable (System.Drawing.Common 7 and later is Windows-only).
+	/// Add a picture to the worksheet from raw image bytes, without a graphics library - works on
+	/// every platform.
 	/// MagicSuite MS-25871.
 	/// </summary>
 	/// <param name="Name"></param>

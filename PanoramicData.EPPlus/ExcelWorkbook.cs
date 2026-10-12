@@ -325,7 +325,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	}
 	/// <summary>
 	/// Max font width for the workbook
-	/// <remarks>This method uses GDI. If you use Asure or another environment that does not support GDI, you have to set this value manually if you don't use the standard Calibri font</remarks>
+	/// <remarks>Taken from a built-in table of font metrics. For a font that is not in the table, set this value manually.</remarks>
 	/// </summary>
 	public decimal MaxFontWidth
 	{

@@ -21,6 +21,11 @@
 			Large workbooks can now be saved. A workbook that exceeded the classic ZIP limits, being 4 GB of size or offset or 65,534 internal entries, previously threw while saving, after all of its content had been built. Zip64 is now used automatically when, and only when, a workbook needs it, so files that fit the classic format are written exactly as before and remain readable by older tools.
 
 			This release targets .NET 10. The previous release, 10.1.1, targeted .NET 9.
+
+			11.0 - BREAKING: fully cross-platform. System.Drawing.Common (GDI+) is no longer used, so the library runs the same on Windows, Linux and macOS.
+			Removed: ExcelDrawings.AddPicture(string, Image[, Uri]); ExcelPicture.Image and ExcelPicture.ImageFormat; ExcelBackgroundImage.Image; ExcelVmlDrawingPicture.Image; ExcelHeaderFooterText.InsertPicture(Image, PictureAlignment); ExcelFont.SetFromFont(Font), ExcelTextFont.SetFromFont(Font) and ExcelFontXml.SetFromFont(Font); the [SupportedOSPlatform("windows")] attributes.
+			Added: ExcelDrawings.AddPicture(string, byte[]) and AddPicture(string, Stream) (with optional hyperlink); ExcelPicture.ImageBytes and ExcelPicture.ContentType; ExcelBackgroundImage.ImageBytes and SetFromStream; ExcelVmlDrawingPicture.ImageBytes; ExcelHeaderFooterText.InsertPicture(byte[], ...) and InsertPicture(Stream, ...). Image size and resolution are read from the PNG, JPEG, GIF, BMP, TIFF, EMF or WMF header and the file bytes are stored unchanged (pictures are no longer re-encoded as JPEG).
+			AutoFitColumns now measures text with SkiaSharp (MIT) instead of GDI+. Results can differ slightly from earlier versions, and on a machine without the named font the platform default font is measured.
 		</PackageReleaseNotes>
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenOfficeXml.Rimland.snk</AssemblyOriginatorKeyFile>
@@ -51,7 +56,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="SkiaSharp" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" />
   </ItemGroup>
   <ItemGroup>

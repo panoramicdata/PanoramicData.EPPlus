@@ -1,5 +1,4 @@
 ﻿using EPPlusTest.Properties;
-using System.Runtime.Versioning;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
@@ -16,7 +15,6 @@ namespace PanoramicData.EPPlus.Test;
 [TestClass]
 public class DrawingTest : TestBase
 {
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void RunDrawingTests()
 	{
@@ -61,7 +59,6 @@ public class DrawingTest : TestBase
 		Assert.AreEqual(cht.Title.Text, "Test");
 	}
 
-	[SupportedOSPlatform("windows")]
 	public void Picture()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Picture");
@@ -112,7 +109,6 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	public void DrawingSizingAndPositioning()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("DrawingPosSize");
@@ -255,7 +251,6 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	public void Scatter()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Scatter");
@@ -281,7 +276,9 @@ public class DrawingTest : TestBase
 		ser.DataLabel.Fill.Color = Color.BlueViolet;
 		ser.DataLabel.Font.Color = Color.White;
 		ser.DataLabel.Font.Italic = true;
-		ser.DataLabel.Font.SetFromFont(new Font("bookman old style", 8));
+		ser.DataLabel.Font.LatinFont = "bookman old style";
+		ser.DataLabel.Font.ComplexFont = "bookman old style";
+		ser.DataLabel.Font.Size = 8;
 		Assert.IsTrue(chrt.ChartType == eChartType.XYScatterSmoothNoMarkers, "Invalid Charttype");
 		chrt.Series[0].Header = "Test serie";
 		chrt = ws.Drawings.AddChart("ScatterChart2", eChartType.XYScatterSmooth) as ExcelScatterChart;
@@ -575,7 +572,6 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	public void Drawings()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Shapes");
@@ -601,7 +597,10 @@ public class DrawingTest : TestBase
 		rt = (ws.Drawings["shape2"] as ExcelShape).RichText.Add("\r\nAdded formated richtext");
 		rt.Bold = true;
 		rt.Color = Color.DarkGoldenrod;
-		rt.SetFromFont(new Font("Times new roman", 18, FontStyle.Underline));
+		rt.LatinFont = "Times new roman";
+		rt.ComplexFont = "Times new roman";
+		rt.Size = 18;
+		rt.UnderLine = eUnderLineType.Single;
 		rt.UnderLineColor = Color.Green;
 
 
@@ -761,7 +760,6 @@ public class DrawingTest : TestBase
 	}
 	//[TestMethod]
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	public void DeleteDrawing()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("DeleteDrawing1");
@@ -901,7 +899,7 @@ public class DrawingTest : TestBase
 	[TestMethod]
 	public void AllDrawingsInsideMarkupCompatibility()
 	{
-		var workbooksDir = Path.Combine(AppContext.BaseDirectory, @"..\..\workbooks");
+		var workbooksDir = Path.Combine(AppContext.BaseDirectory, Path.Combine("..", "..", "workbooks"));
 
 		// This is codeplex issue 15028: Making an unrelated change to an Excel file that contains drawings that ALL exist
 		// inside MarkupCompatibility/Choice nodes causes the drawings.xml file to be incorrectly garbage collected
@@ -959,7 +957,6 @@ public class DrawingTest : TestBase
 		// Cleanup:
 		File.Delete(savedPath);
 	}
-	[SupportedOSPlatform("windows")]
 	public void DrawingRowheightDynamic()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("PicResize");

@@ -32,7 +32,6 @@
 using System;
 using System.Drawing;
 using System.Globalization;
-using System.Runtime.Versioning;
 using System.Xml;
 
 namespace OfficeOpenXml.Style;
@@ -255,34 +254,4 @@ public class ExcelTextFont : XmlHelper
 		_ => "noStrike",
 	};
 	#endregion
-	/// <summary>
-	/// Set the font style from a font object
-	/// </summary>
-	/// <param name="Font"></param>
-	[SupportedOSPlatform("windows")]
-	public void SetFromFont(Font Font)
-	{
-		LatinFont = Font.Name;
-		ComplexFont = Font.Name;
-		Size = Font.Size;
-		if (Font.Bold)
-		{
-			Bold = Font.Bold;
-		}
-
-		if (Font.Italic)
-		{
-			Italic = Font.Italic;
-		}
-
-		if (Font.Underline)
-		{
-			UnderLine = eUnderLineType.Single;
-		}
-
-		if (Font.Strikeout)
-		{
-			Strike = eStrikeType.Single;
-		}
-	}
 }

@@ -75,19 +75,18 @@ namespace EPPlusTest.Properties
 		}
 
 		/// <summary>
-		///   Looks up a localized resource of type System.Drawing.Bitmap.
+		///   Looks up the Test1.jpg test image (file bytes).
 		/// </summary>
-		internal static System.Drawing.Bitmap Test1
+		internal static byte[] Test1
 		{
 			get
 			{
 				string path = AppContext.BaseDirectory;
-				while (!Directory.Exists(path + "\\Resources"))
+				while (!Directory.Exists(Path.Combine(path, "Resources")))
 				{
-					path = new DirectoryInfo(path + "\\..").FullName;
+					path = new DirectoryInfo(Path.Combine(path, "..")).FullName;
 				}
-				object obj = Image.FromFile(path + "\\Resources\\Test1.jpg");
-				return ((System.Drawing.Bitmap)(obj));
+				return File.ReadAllBytes(Path.Combine(path, "Resources", "Test1.jpg"));
 			}
 		}
 	}

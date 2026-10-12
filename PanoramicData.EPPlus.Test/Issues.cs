@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -73,7 +72,6 @@ public class Issues : TestBase
 		ws.Cells["A1"].Style.Numberformat.Format = "[t]:mm:ss";
 		ws.Dispose();
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void Issue15022()
 	{
@@ -435,7 +433,6 @@ public class Issues : TestBase
 
 		package.SaveAs(new FileInfo(@"C:\temp\bug\MyTemplate2.xlsx"));
 	}
-	[SupportedOSPlatform("windows")]
 	[Ignore]
 	[TestMethod]
 	public void PictureIssue()
@@ -693,7 +690,6 @@ public class Issues : TestBase
 	}
 	[TestMethod]
 	/**** Pivottable issue ****/
-	[SupportedOSPlatform("windows")]
 	public void Issue()
 	{
 		DirectoryInfo outputDir = new(@"c:\ExcelPivotTest");
@@ -703,7 +699,6 @@ public class Issues : TestBase
 		BuildPivotTable2(MyFile);
 	}
 
-	[SupportedOSPlatform("windows")]
 	private static void LoadData(FileInfo MyFile)
 	{
 		if (MyFile.Exists)
@@ -1479,7 +1474,6 @@ public class Issues : TestBase
 
 
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void Issuer27()
 	{
@@ -1515,8 +1509,8 @@ public class Issues : TestBase
 	public void Issue32()
 	{
 		var outputDir = new DirectoryInfo(@"c:\temp\sampleapp");
-		var existFile = new FileInfo(outputDir.FullName + @"\sample1.xlsx");
-		var newFileName = outputDir.FullName + @"\sample1_copied.xlsx";
+		var existFile = new FileInfo(Path.Combine(outputDir.FullName, "sample1.xlsx"));
+		var newFileName = Path.Combine(outputDir.FullName, "sample1_copied.xlsx");
 
 		File.Copy(existFile.FullName, newFileName, true);
 		var newFile = new FileInfo(newFileName);
@@ -1745,7 +1739,6 @@ public class Issues : TestBase
 		workbook.SaveAs(new FileInfo(outputPath));
 	}
 
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void Issue100()
 	{
@@ -1754,7 +1747,7 @@ public class Issues : TestBase
 		using ExcelPackage package = new(templateFile);
 		var wb = package.Workbook;
 		var sh = wb.Worksheets[1];
-		var img_ = Image.FromFile(@"C:\temp\img\background.gif");
+		var img_ = File.ReadAllBytes(@"C:\temp\img\background.gif");
 		var pic = sh.Drawings.AddPicture("logo", img_);
 		pic.SetPosition(1, 1);
 
@@ -1859,7 +1852,6 @@ public class Issues : TestBase
 		var a = pck.Workbook.Properties.Author;
 		pck.SaveAs(new FileInfo($@"C:\temp\bug\issue181-saved.xlsx"));
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void Issue10()
 	{
@@ -1874,7 +1866,7 @@ public class Issues : TestBase
 		var row = 1;
 		foreach (var f in Directory.EnumerateFiles(@"c:\temp\addin_temp\Addin\img\open_icon_library-full\icons\ico\16x16\actions\"))
 		{
-			var b = new Bitmap(f);
+			var b = File.ReadAllBytes(f);
 			var pic = ws.Drawings.AddPicture($"Image{(row + 1) / 2}", b);
 			pic.SetPosition(row, 0, 0, 0);
 			row += 2;
@@ -2050,7 +2042,6 @@ public class Issues : TestBase
 		_pck.Workbook.Worksheets["Sheet1"].Cells[7, 10].AddComment("test", "Author");
 		SaveWorksheet("Issue236-Saved.xlsx");
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void Issue228()
 	{
@@ -2121,8 +2112,9 @@ public class Issues : TestBase
 		pkg = OpenPackage("issue246.xlsx");
 		ws = _pck.Workbook.Worksheets["DateFormat"];
 		var pCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-		System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-Se");
-		Assert.AreEqual(ws.Cells["A1"].Text, "den 31 december 2018");
+		System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-SE", false);
+		var sv = new CultureInfo("sv-SE", false);
+		Assert.AreEqual(new DateTime(2018, 12, 31).ToString("D", sv), ws.Cells["A1"].Text);
 		Assert.AreEqual(ws.GetValue<DateTime>(1, 1), new DateTime(2018, 12, 31));
 		System.Threading.Thread.CurrentThread.CurrentCulture = pCulture;
 	}
@@ -2201,14 +2193,22 @@ public class Issues : TestBase
 	[TestMethod]
 	public void Issue333()
 	{
+		var previousCulture = CultureInfo.CurrentCulture;
+		CultureInfo.CurrentCulture = new CultureInfo("sv-SE", false); // the built-in mm-dd-yy format is the culture's short date, which is ISO in sv-SE
 		using var package = new ExcelPackage();
 		var ws = package.Workbook.Worksheets.Add("TextBug");
 		ws.Cells["A1"].Value = new DateTime(2019, 3, 7);
 		ws.Cells["A1"].Style.Numberformat.Format = "mm-dd-yy";
 
-		Assert.AreEqual("2019-03-07", ws.Cells["A1"].Text);
+		try
+		{
+			Assert.AreEqual("2019-03-07", ws.Cells["A1"].Text);
+		}
+		finally
+		{
+			CultureInfo.CurrentCulture = previousCulture;
+		}
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void Issue445()
 	{

@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -35,7 +34,6 @@ internal class InhItem : BaseItem
 [TestClass]
 public class WorkSheetTest : TestBase
 {
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void RunWorksheetTests()
 	{
@@ -183,11 +181,11 @@ public class WorkSheetTest : TestBase
 			Assert.AreEqual(ws.Cells["F5"].Style.Font.UnderLineType, ExcelUnderLineType.None);
 			Assert.AreEqual(ws.Cells["F5"].Style.Font.UnderLine, false);
 
-			Assert.AreEqual(ws.Cells["T20"].GetValue<string>(), 0.396180555555556d.ToString(CultureInfo.CurrentCulture));
+			Assert.AreEqual(ws.Cells["T20"].GetValue<string>(), 0.39618055555555554d.ToString(CultureInfo.CurrentCulture));
 			Assert.AreEqual(ws.Cells["T20"].GetValue<int>(), 0);
 			Assert.AreEqual(ws.Cells["T20"].GetValue<int?>(), 0);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<double>(), 0.396180555555556d);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<double?>(), 0.396180555555556d);
+			Assert.AreEqual(ws.Cells["T20"].GetValue<double>(), 0.39618055555555554d);
+			Assert.AreEqual(ws.Cells["T20"].GetValue<double?>(), 0.39618055555555554d);
 			Assert.AreEqual(ws.Cells["T20"].GetValue<decimal>(), 0.396180555555556m);
 			Assert.AreEqual(ws.Cells["T20"].GetValue<decimal?>(), 0.396180555555556m);
 			Assert.AreEqual(ws.Cells["T20"].GetValue<bool>(), true);
@@ -198,11 +196,11 @@ public class WorkSheetTest : TestBase
 			Assert.AreEqual(ws.Cells["T20"].GetValue<TimeSpan?>(), new TimeSpan(693593, 9, 30, 30));
 			Assert.AreEqual(ws.Cells["T20"].Text, "09:30:30");
 
-			Assert.AreEqual(ws.Cells["T24"].GetValue<string>(), 1.39618055555556d.ToString(CultureInfo.CurrentCulture));
+			Assert.AreEqual(ws.Cells["T24"].GetValue<string>(), 1.3961805555555555d.ToString(CultureInfo.CurrentCulture));
 			Assert.AreEqual(ws.Cells["T24"].GetValue<int>(), 1);
 			Assert.AreEqual(ws.Cells["T24"].GetValue<int?>(), 1);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<double>(), 1.39618055555556d);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<double?>(), 1.39618055555556d);
+			Assert.AreEqual(ws.Cells["T24"].GetValue<double>(), 1.3961805555555555d);
+			Assert.AreEqual(ws.Cells["T24"].GetValue<double?>(), 1.3961805555555555d);
 			Assert.AreEqual(ws.Cells["T24"].GetValue<decimal>(), 1.39618055555556m);
 			Assert.AreEqual(ws.Cells["T24"].GetValue<decimal?>(), 1.39618055555556m);
 			Assert.AreEqual(ws.Cells["T24"].GetValue<bool>(), true);
@@ -371,7 +369,7 @@ public class WorkSheetTest : TestBase
 
 			Assert.AreEqual(pck.Workbook.Worksheets["Address"].GetValue<string>(40, 1), "\b\t");
 
-			pck.SaveAs(new FileInfo(@"Test\Worksheet2.xlsx"));
+			pck.SaveAs(new FileInfo(Path.Combine("Test", "Worksheet2.xlsx")));
 		}
 
 		instream.Close();
@@ -404,7 +402,6 @@ public class WorkSheetTest : TestBase
 	// Use ClassCleanup to run code after all tests in a class have run
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void LoadData()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("newsheet");
@@ -1140,7 +1137,6 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void PictureURL()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Pic URL");
@@ -1879,7 +1875,6 @@ public class WorkSheetTest : TestBase
 		//  return pkg
 
 	}
-	[SupportedOSPlatform("windows")]
 	[Ignore]
 	[TestMethod]
 	public void CloseProblem()
@@ -1892,7 +1887,9 @@ public class WorkSheetTest : TestBase
 		using (var r = ws.Cells["A1:F1"])
 		{
 			r.Merge = true;
-			r.Style.Font.SetFromFont(new Font("Arial", 18, FontStyle.Italic));
+			r.Style.Font.Name = "Arial";
+			r.Style.Font.Size = 18;
+			r.Style.Font.Italic = true;
 			r.Style.Font.Color.SetColor(Color.DarkRed);
 			r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
 			//r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -2255,18 +2252,16 @@ public class WorkSheetTest : TestBase
 		pck.Save();
 	}
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void SetBackground()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("backimg");
 
-		ws.BackgroundImage.Image = EPPlusTest.Properties.Resources.Test1;
+		ws.BackgroundImage.ImageBytes = EPPlusTest.Properties.Resources.Test1;
 		ws = _pck.Workbook.Worksheets.Add("backimg2");
 		ws.BackgroundImage.SetFromFile(new FileInfo(Path.Combine(_clipartPath, "Vector Drawing.wmf")));
 	}
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void SetHeaderFooterImage()
 	{
@@ -2300,7 +2295,6 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void NamedStyles()
 	{
 		var wsSheet = _pck.Workbook.Worksheets.Add("NamedStyles");
@@ -2317,7 +2311,8 @@ public class WorkSheetTest : TestBase
 
 		var secondNamedStyle = _pck.Workbook.Styles.CreateNamedStyle("first", firstNamedStyle.Style).Style;
 		secondNamedStyle.Font.Bold = true;
-		secondNamedStyle.Font.SetFromFont(new Font("Arial Black", 8));
+		secondNamedStyle.Font.Name = "Arial Black";
+		secondNamedStyle.Font.Size = 8;
 		secondNamedStyle.Border.Bottom.Style = ExcelBorderStyle.Medium;
 		secondNamedStyle.Border.Left.Style = ExcelBorderStyle.Medium;
 
@@ -2421,7 +2416,6 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Autofit");
@@ -2877,7 +2871,6 @@ public class WorkSheetTest : TestBase
 		excelPackage.Save();
 		var s = stream.ToArray();
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void ColumnsTest()
 	{
@@ -2992,70 +2985,56 @@ public class WorkSheetTest : TestBase
 	#endregion
 
 	[TestMethod]
-	public void DateFunctionsWorkWithDifferentCultureDateFormats_US()
-	{
-		var currentCulture = CultureInfo.CurrentCulture;
-#if Core
-		var us = CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-#else
-            var us = CultureInfo.CreateSpecificCulture("en-US");
-            Thread.CurrentThread.CurrentCulture = us;
-#endif
-		double usEoMonth = 0d, usEdate = 0d;
-		var thread = new Thread(delegate ()
-		{
-			using var package = new ExcelPackage();
-			var ws = package.Workbook.Worksheets.Add("Sheet1");
-			ws.Cells[2, 2].Value = "1/15/2014";
-			ws.Cells[3, 3].Formula = "EOMONTH(C2, 0)";
-			ws.Cells[2, 3].Formula = "EDATE(B2, 0)";
-			ws.Calculate();
-			usEoMonth = Convert.ToDouble(ws.Cells[2, 3].Value);
-			usEdate = Convert.ToDouble(ws.Cells[3, 3].Value);
-		});
-		thread.Start();
-		thread.Join();
-		Assert.AreEqual(41654.0, usEoMonth);
-		Assert.AreEqual(41670.0, usEdate);
-#if Core
-		CultureInfo.DefaultThreadCurrentCulture = currentCulture;
-#else
-            Thread.CurrentThread.CurrentCulture = currentCulture;
-#endif
-	}
+	public void DateFunctionsWorkWithDifferentCultureDateFormats_US() => AssertDateFunctionsUnderCulture("en-US", "1/15/2014");
 
 	[TestMethod]
-	public void DateFunctionsWorkWithDifferentCultureDateFormats_GB()
-	{
-		var currentCulture = CultureInfo.CurrentCulture;
+	public void DateFunctionsWorkWithDifferentCultureDateFormats_GB() => AssertDateFunctionsUnderCulture("en-GB", "15/1/2014");
 
-#if Core
-		var gb = CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-GB");
-#else
-            var gb = CultureInfo.CreateSpecificCulture("en-GB");
-            Thread.CurrentThread.CurrentCulture = gb;
-#endif
-		double gbEoMonth = 0d, gbEdate = 0d;
-		var thread = new Thread(delegate ()
+	/// <summary>
+	/// Runs EDATE on a text date in the given culture on its own thread. Any failure on that thread
+	/// is captured and asserted on the test thread: an unhandled exception on a worker thread would
+	/// otherwise take the whole test host down. The culture is created without user overrides so
+	/// the result does not depend on the machine's regional settings.
+	/// </summary>
+	private static void AssertDateFunctionsUnderCulture(string cultureName, string textDate)
+	{
+		var culture = new CultureInfo(cultureName, false);
+		var previous = CultureInfo.DefaultThreadCurrentCulture;
+		CultureInfo.DefaultThreadCurrentCulture = culture;
+		double edate = 0d, eoMonth = 0d;
+		Exception failure = null;
+		try
 		{
-			using var package = new ExcelPackage();
-			var ws = package.Workbook.Worksheets.Add("Sheet1");
-			ws.Cells[2, 2].Value = "15/1/2014";
-			ws.Cells[3, 3].Formula = "EOMONTH(C2, 0)";
-			ws.Cells[2, 3].Formula = "EDATE(B2, 0)";
-			ws.Calculate();
-			gbEoMonth = Convert.ToDouble(ws.Cells[2, 3].Value);
-			gbEdate = Convert.ToDouble(ws.Cells[3, 3].Value);
-		});
-		thread.Start();
-		thread.Join();
-		Assert.AreEqual(41654.0, gbEoMonth);
-		Assert.AreEqual(41670.0, gbEdate);
-#if Core
-		CultureInfo.DefaultThreadCurrentCulture = currentCulture;
-#else
-            Thread.CurrentThread.CurrentCulture = currentCulture;
-#endif
+			var thread = new Thread(delegate ()
+			{
+				try
+				{
+					Thread.CurrentThread.CurrentCulture = culture;
+					using var package = new ExcelPackage();
+					var ws = package.Workbook.Worksheets.Add("Sheet1");
+					ws.Cells[2, 2].Value = textDate;
+					ws.Cells[3, 3].Formula = "EOMONTH(C2, 0)";
+					ws.Cells[2, 3].Formula = "EDATE(B2, 0)";
+					ws.Calculate();
+					edate = Convert.ToDouble(ws.Cells[2, 3].Value);
+					eoMonth = Convert.ToDouble(ws.Cells[3, 3].Value);
+				}
+				catch (Exception ex)
+				{
+					failure = ex;
+				}
+			});
+			thread.Start();
+			thread.Join();
+		}
+		finally
+		{
+			CultureInfo.DefaultThreadCurrentCulture = previous;
+		}
+
+		Assert.IsNull(failure, failure?.ToString());
+		Assert.AreEqual(41654.0, edate);
+		Assert.AreEqual(41670.0, eoMonth);
 	}
 	[TestMethod]
 	public void Text()
