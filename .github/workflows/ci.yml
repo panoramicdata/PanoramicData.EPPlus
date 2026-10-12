@@ -9,7 +9,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Windows: the suite exercises System.Drawing, which only works there. On Linux
+    # DTS_FailingTests.DeleteWorksheetWithReferencedImage hangs the test host.
+    runs-on: windows-latest
     env:
       CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
     steps:
