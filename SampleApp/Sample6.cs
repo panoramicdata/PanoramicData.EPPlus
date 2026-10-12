@@ -29,7 +29,6 @@
  *******************************************************************************
  * Jan Källman		Added		25-JAN-2010
  *******************************************************************************/
-using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -72,7 +71,6 @@ class Sample6
 	/// <param name="dir">Directory to scan</param>
 	/// <param name="depth">How many levels?</param>
 	/// <param name="skipIcons">Skip the icons in column A. A lot faster</param>
-	[SupportedOSPlatform("windows")]
 	public static string RunSample6(DirectoryInfo dir, int depth, bool skipIcons)
 	{
 		_maxLevels = depth;
@@ -212,7 +210,6 @@ class Sample6
 	/// <param name="pck">Package</param>
 	/// <param name="rows"></param>
 	/// <param name="header"></param>
-	[SupportedOSPlatform("windows")]
 	private static void AddGraphs(ExcelPackage pck, int rows, string dir)
 	{
 		var ws = pck.Workbook.Worksheets.Add("Statistics");
@@ -223,7 +220,8 @@ class Sample6
 		using (var r = ws.Cells["A1:O1"])
 		{
 			r.Merge = true;
-			r.Style.Font.SetFromFont(new Font("Arial", 22, FontStyle.Regular));
+			r.Style.Font.Name = "Arial";
+			r.Style.Font.Size = 22;
 			r.Style.Font.Color.SetColor(Color.White);
 			r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
 			r.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -311,7 +309,6 @@ class Sample6
 	/// <param name="header">Header text</param>
 	/// <param name="propertyName">Size or Count</param>
 	/// <returns></returns>
-	[SupportedOSPlatform("windows")]
 	private static int AddStatRows(ExcelWorksheet ws, List<StatItem> lst, int startRow, string header, string propertyName)
 	{
 		//Add Headers
@@ -322,7 +319,9 @@ class Sample6
 			using (var r = ws.Cells[row, 1, row, 2])
 			{
 				r.Merge = true;
-				r.Style.Font.SetFromFont(new Font("Arial", 16, FontStyle.Italic));
+				r.Style.Font.Name = "Arial";
+				r.Style.Font.Size = 16;
+				r.Style.Font.Italic = true;
 				r.Style.Font.Color.SetColor(Color.White);
 				r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
 				r.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -338,7 +337,9 @@ class Sample6
 		ws.Cells[row, 2].Value = propertyName;
 		using (var r = ws.Cells[row, 1, row, 2])
 		{
-			r.Style.Font.SetFromFont(new Font("Arial", 12, FontStyle.Bold));
+			r.Style.Font.Name = "Arial";
+			r.Style.Font.Size = 12;
+			r.Style.Font.Bold = true;
 		}
 
 		row++;
@@ -409,22 +410,12 @@ class Sample6
 		}
 	}
 
-	[SupportedOSPlatform("windows")]
 	private static int AddDirectory(ExcelWorksheet ws, DirectoryInfo dir, int row, double height, int level, bool skipIcons)
 	{
-		//Get the icon as a bitmap
 		Console.WriteLine("Directory " + dir.Name);
 		if (!skipIcons)
 		{
-			var icon = GetIcon(dir.FullName);
-
 			ws.Row(row).Height = height;
-			//Add the icon as a picture
-			if (icon != null)
-			{
-				var pic = ws.Drawings.AddPicture("pic" + row.ToString(), icon);
-				pic.SetPosition(20 * (row - 1) + 2, 0);
-			}
 		}
 
 		ws.Cells[row, 2].Value = dir.Name;
@@ -451,14 +442,7 @@ class Sample6
 		{
 			if (!skipIcons)
 			{
-				var fileIcon = GetIcon(file.FullName);
-
 				ws.Row(row).Height = height;
-				if (fileIcon != null)
-				{
-					var pic = ws.Drawings.AddPicture("pic" + row.ToString(), fileIcon);
-					pic.SetPosition(20 * (row - 1) + 2, 0);
-				}
 			}
 
 			ws.Cells[row, 2].Value = file.Name;
@@ -517,24 +501,6 @@ class Sample6
 			_fileSize.RemoveAt(0);
 			_fileSize.Add(new StatItem { Name = file.Name, Size = file.Length });
 			_fileSize.Sort();
-		}
-	}
-	/// <summary>
-	/// Gets the icon for a file or directory
-	/// </summary>
-	/// <param name="FileName"></param>
-	/// <returns></returns>
-	[SupportedOSPlatform("windows")]
-	private static Bitmap GetIcon(string FileName)
-	{
-		if (File.Exists(FileName))
-		{
-			var bmp = Icon.ExtractAssociatedIcon(FileName).ToBitmap();
-			return new Bitmap(bmp, new Size(16, 16));
-		}
-		else
-		{
-			return null;
 		}
 	}
 }

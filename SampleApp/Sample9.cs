@@ -29,7 +29,6 @@
  *******************************************************************************
  * Jan Källman		Added		28 Oct 2010
  *******************************************************************************/
-using System.Runtime.Versioning;
 using System;
 using OfficeOpenXml;
 using System.IO;
@@ -50,7 +49,6 @@ public static class Sample9
 	/// </summary>
 	/// <param name="outputDir"></param>
 	/// <returns></returns>
-	[SupportedOSPlatform("windows")]
 	public static string RunSample9()
 	{
 		var newFile = Utils.GetFileInfo(@"sample9.xlsx");
@@ -65,7 +63,6 @@ public static class Sample9
 
 		return newFile.FullName;
 	}
-	[SupportedOSPlatform("windows")]
 	private static void LoadFile1(ExcelPackage package)
 	{
 		//Create the Worksheet
@@ -132,7 +129,6 @@ public static class Sample9
 		sheet.Cells[sheet.Dimension.Address].AutoFitColumns();
 	}
 
-	[SupportedOSPlatform("windows")]
 	private static void LoadFile2(ExcelPackage package)
 	{
 		//Create the Worksheet

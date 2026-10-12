@@ -26,7 +26,6 @@
  * ******************************************************************************
  * Jan Källman                      Added       		        2011-04-18
  *******************************************************************************/
-using System.Runtime.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +53,6 @@ public static class Sample12
 		public decimal Freight { get; set; }
 		public decimal Total => SubTotal + Tax + Freight;
 	}
-	[SupportedOSPlatform("windows")]
 	public static string RunSample12(string connectionStr)
 	{
 		var list = new List<SalesDTO>();

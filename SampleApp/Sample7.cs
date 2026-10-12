@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
@@ -13,7 +12,6 @@ class Sample7
 	/// A password is set to protect locked cells. Column 3 and 4 will be editable, the rest will be locked.
 	/// </summary>
 	/// <param name="rows"></param>
-	[SupportedOSPlatform("windows")]
 	public static string RunSample7(int rows)
 	{
 		var newFile = Utils.GetFileInfo("sample7.xlsx");

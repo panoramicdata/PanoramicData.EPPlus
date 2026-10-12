@@ -26,7 +26,6 @@
  * ******************************************************************************
  * Jan Källman                      Added       		        2011-05-03
  *******************************************************************************/
-using System.Runtime.Versioning;
 using System;
 using System.Linq;
 using System.IO;
@@ -52,7 +51,6 @@ public static class Sample13
 
 		public override string ToString() => IsDirectory ? Name + "\t<Dir>" : Name + "\t" + Size.ToString("#,##0");
 	}
-	[SupportedOSPlatform("windows")]
 	public static void RunSample13()
 	{
 		var pck = new ExcelPackage();
