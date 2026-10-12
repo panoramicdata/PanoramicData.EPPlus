@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -73,7 +72,6 @@ public class Issues : TestBase
 		ws.Cells["A1"].Style.Numberformat.Format = "[t]:mm:ss";
 		ws.Dispose();
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void Issue15022()
 	{
@@ -435,7 +433,6 @@ public class Issues : TestBase
 
 		package.SaveAs(new FileInfo(@"C:\temp\bug\MyTemplate2.xlsx"));
 	}
-	[SupportedOSPlatform("windows")]
 	[Ignore]
 	[TestMethod]
 	public void PictureIssue()
@@ -693,7 +690,6 @@ public class Issues : TestBase
 	}
 	[TestMethod]
 	/**** Pivottable issue ****/
-	[SupportedOSPlatform("windows")]
 	public void Issue()
 	{
 		DirectoryInfo outputDir = new(@"c:\ExcelPivotTest");
@@ -703,7 +699,6 @@ public class Issues : TestBase
 		BuildPivotTable2(MyFile);
 	}
 
-	[SupportedOSPlatform("windows")]
 	private static void LoadData(FileInfo MyFile)
 	{
 		if (MyFile.Exists)
@@ -1479,7 +1474,6 @@ public class Issues : TestBase
 
 
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void Issuer27()
 	{
@@ -1745,7 +1739,6 @@ public class Issues : TestBase
 		workbook.SaveAs(new FileInfo(outputPath));
 	}
 
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void Issue100()
 	{
@@ -1754,7 +1747,7 @@ public class Issues : TestBase
 		using ExcelPackage package = new(templateFile);
 		var wb = package.Workbook;
 		var sh = wb.Worksheets[1];
-		var img_ = Image.FromFile(@"C:\temp\img\background.gif");
+		var img_ = File.ReadAllBytes(@"C:\temp\img\background.gif");
 		var pic = sh.Drawings.AddPicture("logo", img_);
 		pic.SetPosition(1, 1);
 
@@ -1859,7 +1852,6 @@ public class Issues : TestBase
 		var a = pck.Workbook.Properties.Author;
 		pck.SaveAs(new FileInfo($@"C:\temp\bug\issue181-saved.xlsx"));
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void Issue10()
 	{
@@ -1874,7 +1866,7 @@ public class Issues : TestBase
 		var row = 1;
 		foreach (var f in Directory.EnumerateFiles(@"c:\temp\addin_temp\Addin\img\open_icon_library-full\icons\ico\16x16\actions\"))
 		{
-			var b = new Bitmap(f);
+			var b = File.ReadAllBytes(f);
 			var pic = ws.Drawings.AddPicture($"Image{(row + 1) / 2}", b);
 			pic.SetPosition(row, 0, 0, 0);
 			row += 2;
@@ -2050,7 +2042,6 @@ public class Issues : TestBase
 		_pck.Workbook.Worksheets["Sheet1"].Cells[7, 10].AddComment("test", "Author");
 		SaveWorksheet("Issue236-Saved.xlsx");
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void Issue228()
 	{
@@ -2208,7 +2199,6 @@ public class Issues : TestBase
 
 		Assert.AreEqual("2019-03-07", ws.Cells["A1"].Text);
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void Issue445()
 	{

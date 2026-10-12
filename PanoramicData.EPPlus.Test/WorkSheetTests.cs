@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Runtime.Versioning;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
@@ -35,7 +34,6 @@ internal class InhItem : BaseItem
 [TestClass]
 public class WorkSheetTest : TestBase
 {
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void RunWorksheetTests()
 	{
@@ -404,7 +402,6 @@ public class WorkSheetTest : TestBase
 	// Use ClassCleanup to run code after all tests in a class have run
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void LoadData()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("newsheet");
@@ -1140,7 +1137,6 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void PictureURL()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Pic URL");
@@ -1879,7 +1875,6 @@ public class WorkSheetTest : TestBase
 		//  return pkg
 
 	}
-	[SupportedOSPlatform("windows")]
 	[Ignore]
 	[TestMethod]
 	public void CloseProblem()
@@ -1892,7 +1887,9 @@ public class WorkSheetTest : TestBase
 		using (var r = ws.Cells["A1:F1"])
 		{
 			r.Merge = true;
-			r.Style.Font.SetFromFont(new Font("Arial", 18, FontStyle.Italic));
+			r.Style.Font.Name = "Arial";
+			r.Style.Font.Size = 18;
+			r.Style.Font.Italic = true;
 			r.Style.Font.Color.SetColor(Color.DarkRed);
 			r.Style.HorizontalAlignment = ExcelHorizontalAlignment.CenterContinuous;
 			//r.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -2255,18 +2252,16 @@ public class WorkSheetTest : TestBase
 		pck.Save();
 	}
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void SetBackground()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("backimg");
 
-		ws.BackgroundImage.Image = EPPlusTest.Properties.Resources.Test1;
+		ws.BackgroundImage.ImageBytes = EPPlusTest.Properties.Resources.Test1;
 		ws = _pck.Workbook.Worksheets.Add("backimg2");
 		ws.BackgroundImage.SetFromFile(new FileInfo(Path.Combine(_clipartPath, "Vector Drawing.wmf")));
 	}
 	//[Ignore]
-	[SupportedOSPlatform("windows")]
 	[TestMethod]
 	public void SetHeaderFooterImage()
 	{
@@ -2300,7 +2295,6 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void NamedStyles()
 	{
 		var wsSheet = _pck.Workbook.Worksheets.Add("NamedStyles");
@@ -2317,7 +2311,8 @@ public class WorkSheetTest : TestBase
 
 		var secondNamedStyle = _pck.Workbook.Styles.CreateNamedStyle("first", firstNamedStyle.Style).Style;
 		secondNamedStyle.Font.Bold = true;
-		secondNamedStyle.Font.SetFromFont(new Font("Arial Black", 8));
+		secondNamedStyle.Font.Name = "Arial Black";
+		secondNamedStyle.Font.Size = 8;
 		secondNamedStyle.Border.Bottom.Style = ExcelBorderStyle.Medium;
 		secondNamedStyle.Border.Left.Style = ExcelBorderStyle.Medium;
 
@@ -2421,7 +2416,6 @@ public class WorkSheetTest : TestBase
 	}
 	//[Ignore]
 	//[TestMethod]
-	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Autofit");
@@ -2877,7 +2871,6 @@ public class WorkSheetTest : TestBase
 		excelPackage.Save();
 		var s = stream.ToArray();
 	}
-	[SupportedOSPlatform("windows")]
 	[TestMethod, Ignore]
 	public void ColumnsTest()
 	{
