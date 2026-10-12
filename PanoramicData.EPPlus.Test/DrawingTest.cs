@@ -899,7 +899,7 @@ public class DrawingTest : TestBase
 	[TestMethod]
 	public void AllDrawingsInsideMarkupCompatibility()
 	{
-		var workbooksDir = Path.Combine(AppContext.BaseDirectory, @"..\..\workbooks");
+		var workbooksDir = Path.Combine(AppContext.BaseDirectory, Path.Combine("..", "..", "workbooks"));
 
 		// This is codeplex issue 15028: Making an unrelated change to an Excel file that contains drawings that ALL exist
 		// inside MarkupCompatibility/Choice nodes causes the drawings.xml file to be incorrectly garbage collected

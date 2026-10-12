@@ -204,7 +204,7 @@ public class VBATests
 #else
                 AppDomain.CurrentDomain.BaseDirectory
 #endif
-			, @"..\..\workbooks");
+			, Path.Combine("..", "..", "workbooks"));
 		var path = Path.Combine(workbookDir, "VBADecompressBug.xlsm");
 		var f = new FileInfo(path);
 		if (f.Exists)

@@ -1509,8 +1509,8 @@ public class Issues : TestBase
 	public void Issue32()
 	{
 		var outputDir = new DirectoryInfo(@"c:\temp\sampleapp");
-		var existFile = new FileInfo(outputDir.FullName + @"\sample1.xlsx");
-		var newFileName = outputDir.FullName + @"\sample1_copied.xlsx";
+		var existFile = new FileInfo(Path.Combine(outputDir.FullName, "sample1.xlsx"));
+		var newFileName = Path.Combine(outputDir.FullName, "sample1_copied.xlsx");
 
 		File.Copy(existFile.FullName, newFileName, true);
 		var newFile = new FileInfo(newFileName);
@@ -2112,8 +2112,9 @@ public class Issues : TestBase
 		pkg = OpenPackage("issue246.xlsx");
 		ws = _pck.Workbook.Worksheets["DateFormat"];
 		var pCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
-		System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-Se");
-		Assert.AreEqual(ws.Cells["A1"].Text, "den 31 december 2018");
+		System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-SE", false);
+		var sv = new CultureInfo("sv-SE", false);
+		Assert.AreEqual(new DateTime(2018, 12, 31).ToString("D", sv), ws.Cells["A1"].Text);
 		Assert.AreEqual(ws.GetValue<DateTime>(1, 1), new DateTime(2018, 12, 31));
 		System.Threading.Thread.CurrentThread.CurrentCulture = pCulture;
 	}
@@ -2192,12 +2193,21 @@ public class Issues : TestBase
 	[TestMethod]
 	public void Issue333()
 	{
+		var previousCulture = CultureInfo.CurrentCulture;
+		CultureInfo.CurrentCulture = new CultureInfo("sv-SE", false); // the built-in mm-dd-yy format is the culture's short date, which is ISO in sv-SE
 		using var package = new ExcelPackage();
 		var ws = package.Workbook.Worksheets.Add("TextBug");
 		ws.Cells["A1"].Value = new DateTime(2019, 3, 7);
 		ws.Cells["A1"].Style.Numberformat.Format = "mm-dd-yy";
 
-		Assert.AreEqual("2019-03-07", ws.Cells["A1"].Text);
+		try
+		{
+			Assert.AreEqual("2019-03-07", ws.Cells["A1"].Text);
+		}
+		finally
+		{
+			CultureInfo.CurrentCulture = previousCulture;
+		}
 	}
 	[TestMethod]
 	public void Issue445()

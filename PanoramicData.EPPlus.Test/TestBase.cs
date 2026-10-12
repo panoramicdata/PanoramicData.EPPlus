@@ -11,8 +11,8 @@ public abstract class TestBase
 {
 	protected ExcelPackage _pck;
 	protected string _clipartPath = "";
-	protected string _worksheetPath = @"..\..\..\Test Output\";
-	protected string _testInputPath = @"..\..\..\Workbooks\";
+	protected string _worksheetPath = Path.Combine("..", "..", "..", "Test Output") + Path.DirectorySeparatorChar;
+	protected string _testInputPath = Path.Combine("..", "..", "..", "Workbooks") + Path.DirectorySeparatorChar;
 	public TestContext TestContext { get; set; }
 
 	[TestInitialize]
@@ -51,7 +51,7 @@ public abstract class TestBase
 			{
 				if (name.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
 				{
-					var fileName = name.Replace("EPPlusTest.Resources.", "");
+					var fileName = name[(name.IndexOf(".Resources.", StringComparison.Ordinal) + ".Resources.".Length)..];
 					using var stream = asm.GetManifestResourceStream(name);
 					using var file = File.Create(Path.Combine(_clipartPath, fileName));
 					stream.CopyTo(file);
@@ -67,7 +67,7 @@ public abstract class TestBase
 		//    Directory.CreateDirectory(_worksheetPath);
 		//}
 		var di = new DirectoryInfo(_worksheetPath);
-		_worksheetPath = di.FullName + "\\";
+		_worksheetPath = di.FullName + Path.DirectorySeparatorChar;
 
 		_pck = new ExcelPackage();
 	}
