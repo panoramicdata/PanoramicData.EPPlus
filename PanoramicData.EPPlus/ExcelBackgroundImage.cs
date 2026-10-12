@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * You may amend and distribute as you like, but don't remove this header!
  *
  * EPPlus provides server-side generation of Excel 2007/2010 spreadsheets.
@@ -33,9 +33,7 @@ using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Utils;
 using System;
-using System.Drawing;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Xml;
 
 namespace OfficeOpenXml;
@@ -60,11 +58,10 @@ public class ExcelBackgroundImage : XmlHelper
 
 	const string BACKGROUNDPIC_PATH = "d:picture/@r:id";
 	/// <summary>
-	/// The background image of the worksheet. 
-	/// The image will be saved internally as a jpg.
+	/// The background image file's bytes, exactly as stored in the package. Null when there is no background image.
+	/// Setting the property stores the bytes unchanged; set it to null to remove the background image.
 	/// </summary>
-	[SupportedOSPlatform("windows")]
-	public Image Image
+	public byte[] ImageBytes
 	{
 		get
 		{
@@ -73,7 +70,7 @@ public class ExcelBackgroundImage : XmlHelper
 			{
 				var rel = _workSheet.Part.GetRelationship(relID);
 				var imagePart = _workSheet.Part.Package.GetPart(UriHelper.ResolvePartUri(rel.SourceUri, rel.TargetUri));
-				return Image.FromStream(imagePart.GetStream());
+				return imagePart.GetStream().ToArray();
 			}
 
 			return null;
@@ -87,31 +84,41 @@ public class ExcelBackgroundImage : XmlHelper
 			}
 			else
 			{
-				var img = ImageCompat.GetImageAsByteArray(value);
-				var ii = _workSheet.Workbook._package.AddImage(img);
+				var contentType = ExcelPicture.GetContentTypeFromBytes(value);
+				var uri = GetNewUri(_workSheet._package.Package, "/xl/media/image{0}" + ExcelPicture.GetExtension(contentType));
+				var ii = _workSheet.Workbook._package.AddImage(value, uri, contentType);
 				var rel = _workSheet.Part.CreateRelationship(ii.Uri, Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 				SetXmlNodeString(BACKGROUNDPIC_PATH, rel.Id);
 			}
 		}
 	}
 	/// <summary>
+	/// Set the picture from a stream containing an image file. The stream is read to the end.
+	/// </summary>
+	/// <param name="PictureStream">The image file's stream.</param>
+	public void SetFromStream(Stream PictureStream)
+	{
+		ArgumentNullException.ThrowIfNull(PictureStream);
+		using var ms = new MemoryStream();
+		PictureStream.CopyTo(ms);
+		ImageBytes = ms.ToArray();
+	}
+	/// <summary>
 	/// Set the picture from an image file. 
 	/// The image file will be saved as a blob, so make sure Excel supports the image format.
 	/// </summary>
 	/// <param name="PictureFile">The image file.</param>
-	[SupportedOSPlatform("windows")]
 	public void SetFromFile(FileInfo PictureFile)
 	{
 		DeletePrevImage();
 
-		Image img;
 		byte[] fileBytes;
 		try
 		{
 			fileBytes = File.ReadAllBytes(PictureFile.FullName);
-			img = Image.FromFile(PictureFile.FullName);
+			ImageHeaderReader.Read(fileBytes);
 		}
-		catch (Exception ex)
+		catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
 		{
 			throw (new InvalidDataException("File is not a supported image-file or is corrupt", ex));
 		}
@@ -137,14 +144,13 @@ public class ExcelBackgroundImage : XmlHelper
 		var rel = _workSheet.Part.CreateRelationship(imageURI, Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 		SetXmlNodeString(BACKGROUNDPIC_PATH, rel.Id);
 	}
-	[SupportedOSPlatform("windows")]
 	private void DeletePrevImage()
 	{
 		var relID = GetXmlNodeString(BACKGROUNDPIC_PATH);
 		if (relID != "")
 		{
-			var img = ImageCompat.GetImageAsByteArray(Image);
-			var ii = _workSheet.Workbook._package.GetImageInfo(img);
+			var img = ImageBytes;
+			var ii = img == null ? null : _workSheet.Workbook._package.GetImageInfo(img);
 
 			//Delete the relation
 			_workSheet.Part.DeleteRelationship(relID);

@@ -31,7 +31,6 @@
  *******************************************************************************/
 using System;
 using System.Drawing;
-using System.Runtime.Versioning;
 
 namespace OfficeOpenXml.Style;
 
@@ -196,21 +195,6 @@ public sealed class ExcelFont : StyleBase
 		{
 			_ChangedEvent(this, new StyleChangeEventArgs(eStyleClass.Font, eStyleProperty.VerticalAlign, value, _positionID, _address));
 		}
-	}
-	/// <summary>
-	/// Set the font from a Font object
-	/// </summary>
-	/// <param name="Font"></param>
-	[SupportedOSPlatform("windows")]
-	public void SetFromFont(Font Font)
-	{
-		Name = Font.Name;
-		//Family=fnt.FontFamily.;
-		Size = (int)Font.Size;
-		Strike = Font.Strikeout;
-		Bold = Font.Bold;
-		UnderLine = Font.Underline;
-		Italic = Font.Italic;
 	}
 
 	internal override string Id => Name + Size.ToString() + Family.ToString() + Scheme.ToString() + Bold.ToString()[0] + Italic.ToString()[0] + Strike.ToString()[0] + UnderLine.ToString()[0] + VerticalAlign;

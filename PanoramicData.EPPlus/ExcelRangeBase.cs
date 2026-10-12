@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * You may amend and distribute as you like, but don't remove this header!
  *
  * EPPlus provides server-side generation of Excel 2007/2010 spreadsheets.
@@ -49,7 +49,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -746,7 +745,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// Note: Cells containing formulas must be calculated before autofit is called.
 	/// Wrapped and merged cells are also ignored.
 	/// </summary>
-	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns() => AutoFitColumns(_worksheet.DefaultColWidth);
 
 	/// <summary>
@@ -754,9 +752,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// Note: Cells containing formulas are ignored if no calculation is made.
 	///       Wrapped and merged cells are also ignored.
 	/// </summary>
-	/// <remarks>This method will not work if you run in an environment that does not support GDI</remarks>
 	/// <param name="MinimumWidth">Minimum column width</param>
-	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns(double MinimumWidth) => AutoFitColumns(MinimumWidth, double.MaxValue);
 
 	/// <summary>
@@ -767,7 +763,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// </summary>
 	/// <param name="MinimumWidth">Minimum column width</param>
 	/// <param name="MaximumWidth">Maximum column width</param>
-	[SupportedOSPlatform("windows")]
 	public void AutoFitColumns(double MinimumWidth, double MaximumWidth)
 	{
 		if (_worksheet.Dimension == null)
@@ -780,7 +775,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			SetToSelectedRange();
 		}
 
-		var fontCache = new Dictionary<int, Font>();
 
 		var doAdjust = _worksheet._package.DoAdjustDrawings;
 		_worksheet._package.DoAdjustDrawings = false;
@@ -833,45 +827,17 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		var styles = _worksheet.Workbook.Styles;
 		var nf = styles.Fonts[styles.CellXfs[0].FontId];
-		var fs = FontStyle.Regular;
-		if (nf.Bold)
-		{
-			fs |= FontStyle.Bold;
-		}
-
-		if (nf.UnderLine)
-		{
-			fs |= FontStyle.Underline;
-		}
-
-		if (nf.Italic)
-		{
-			fs |= FontStyle.Italic;
-		}
-
-		if (nf.Strike)
-		{
-			fs |= FontStyle.Strikeout;
-		}
-
-		var nfont = new Font(nf.Name, nf.Size, fs);
-
 		var normalSize = Convert.ToSingle(ExcelWorkbook.GetWidthPixels(nf.Name, nf.Size));
 
-		Bitmap b;
-		Graphics g = null;
-		try
+		if (!TextMeasurer.IsAvailable)
 		{
-			//Check for missing GDI+, then use WPF instead.
-			b = new Bitmap(1, 1);
-			g = Graphics.FromImage(b);
-			g.PageUnit = GraphicsUnit.Pixel;
-		}
-		catch
-		{
+			//No usable font engine (native SkiaSharp library missing): leave the widths as they are.
+			_worksheet.Drawings.AdjustWidth(drawWidths);
+			_worksheet._package.DoAdjustDrawings = doAdjust;
 			return;
 		}
 
+		using var measurer = new TextMeasurer();
 		foreach (var cell in this)
 		{
 			if (_worksheet.Column(cell.Start.Column).Hidden)    //Issue 15338
@@ -885,40 +851,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			}
 
 			var fntID = styles.CellXfs[cell.StyleID].FontId;
-			Font f;
-			if (fontCache.TryGetValue(fntID, out var value))
-			{
-				f = value;
-			}
-			else
-			{
-				var fnt = styles.Fonts[fntID];
-				fs = FontStyle.Regular;
-				if (fnt.Bold)
-				{
-					fs |= FontStyle.Bold;
-				}
-
-				if (fnt.UnderLine)
-				{
-					fs |= FontStyle.Underline;
-				}
-
-				if (fnt.Italic)
-				{
-					fs |= FontStyle.Italic;
-				}
-
-				if (fnt.Strike)
-				{
-					fs |= FontStyle.Strikeout;
-				}
-
-				f = new Font(fnt.Name, fnt.Size, fs);
-
-				fontCache.Add(fntID, f);
-			}
-
+			var fnt = styles.Fonts[fntID];
 			var ind = styles.CellXfs[cell.StyleID].Indent;
 			var textForWidth = cell.TextForWidth;
 			var t = textForWidth + (ind > 0 && !string.IsNullOrEmpty(textForWidth) ? new string('_', ind) : "");
@@ -927,7 +860,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				t = t[..32000]; //Issue
 			}
 
-			var size = g.MeasureString(t, f, 10000, StringFormat.GenericDefault);
+			var size = measurer.Measure(t, fnt.Name, fnt.Size, fnt.Bold, fnt.Italic);
 
 			double width;
 			double r = styles.CellXfs[cell.StyleID].TextRotation;

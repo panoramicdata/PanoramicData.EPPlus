@@ -30,9 +30,7 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
-using System.Drawing;
 using System.Globalization;
-using System.Runtime.Versioning;
 using System.Xml;
 
 
@@ -124,10 +122,9 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 		}
 	}
 	/// <summary>
-	/// The image
+	/// The image file's bytes
 	/// </summary>
-	[SupportedOSPlatform("windows")]
-	public Image Image
+	public byte[] ImageBytes
 	{
 		get
 		{
@@ -135,7 +132,7 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 			if (pck.PartExists(ImageUri))
 			{
 				var part = pck.GetPart(ImageUri);
-				return Image.FromStream(part.GetStream());
+				return part.GetStream().ToArray();
 			}
 			else
 			{

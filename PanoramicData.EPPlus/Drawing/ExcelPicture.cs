@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * You may amend and distribute as you like, but don't remove this header!
  *
  * EPPlus provides server-side generation of Excel 2007/2010 spreadsheets.
@@ -32,11 +32,8 @@
 using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.Utils;
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Versioning;
 using System.Text;
 using System.Xml;
 
@@ -61,19 +58,12 @@ public sealed class ExcelPicture : ExcelDrawing
 			Part = drawings.Part.Package.GetPart(UriPic);
 			FileInfo f = new(UriPic.OriginalString);
 			ContentType = GetContentType(f.Extension);
-			if (!OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-			{
-				throw new PlatformNotSupportedException("Loading a picture uses System.Drawing, which is only supported on Windows.");
-			}
 
-			_image = Image.FromStream(Part.GetStream());
-
-			var iby = ImageCompat.GetImageAsByteArray(_image);
+			// The bytes are hashed as stored. They are not retained: ImageBytes reads them from the package on demand.
+			var iby = Part.GetStream().ToArray();
 			var ii = _drawings._package.LoadImage(iby, UriPic, Part);
 			ImageHash = ii.Hash;
 
-			//_height = _image.Height;
-			//_width = _image.Width;
 			var relID = GetXmlNodeString("xdr:pic/xdr:nvPicPr/xdr:cNvPr/a:hlinkClick/@r:id");
 			if (!string.IsNullOrEmpty(relID))
 			{
@@ -91,79 +81,32 @@ public sealed class ExcelPicture : ExcelDrawing
 			}
 		}
 	}
-	[SupportedOSPlatform("windows")]
-	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, Image image, Uri hyperlink) :
+
+	/// <summary>
+	/// Creates a picture from an image file's bytes. The size and resolution are read from the image header.
+	/// The bytes are written into the package verbatim.
+	/// </summary>
+	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, byte[] imageBytes, string uriTemplate, Uri hyperlink) :
 		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
 	{
-		var picNode = node.OwnerDocument.CreateElement("xdr", "pic", ExcelPackage.schemaSheetDrawings);
-		node.InsertAfter(picNode, node.SelectSingleNode("xdr:to", NameSpaceManager));
-		Hyperlink = hyperlink;
-		picNode.InnerXml = PicStartXml();
-
-		node.InsertAfter(node.OwnerDocument.CreateElement("xdr", "clientData", ExcelPackage.schemaSheetDrawings), picNode);
-
-		var package = drawings.Worksheet._package.Package;
-		//Get the picture if it exists or save it if not.
-		_image = image;
-		var relID = SavePicture(image);
-
-		//Create relationship
-		node.SelectSingleNode("xdr:pic/xdr:blipFill/a:blip/@r:embed", NameSpaceManager).Value = relID;
-		_height = image.Height;
-		_width = image.Width;
-		SetPosDefaults(image);
-		Packaging.ZipPackage.Flush();
-	}
-	[SupportedOSPlatform("windows")]
-	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, FileInfo imageFile, Uri hyperlink) :
-		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
-	{
-		var picNode = node.OwnerDocument.CreateElement("xdr", "pic", ExcelPackage.schemaSheetDrawings);
-		node.InsertAfter(picNode, node.SelectSingleNode("xdr:to", NameSpaceManager));
-		Hyperlink = hyperlink;
-		picNode.InnerXml = PicStartXml();
-
-		node.InsertAfter(node.OwnerDocument.CreateElement("xdr", "clientData", ExcelPackage.schemaSheetDrawings), picNode);
-
-		//Changed to stream 2/4-13 (issue 14834). Thnx SClause
-		var package = drawings.Worksheet._package.Package;
-		ContentType = GetContentType(imageFile.Extension);
-		var imagestream = new FileStream(imageFile.FullName, FileMode.Open, FileAccess.Read);
-		_image = Image.FromStream(imagestream);
-
-		var img = ImageCompat.GetImageAsByteArray(_image);
-
-		imagestream.Close();
-		UriPic = GetNewUri(package, "/xl/media/{0}" + imageFile.Name);
-		var ii = _drawings._package.AddImage(img, UriPic, ContentType);
-		string relID;
-		if (!drawings._hashes.TryGetValue(ii.Hash, out var value))
-		{
-			Part = ii.Part;
-			RelPic = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, ii.Uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
-			relID = RelPic.Id;
-			_drawings._hashes.Add(ii.Hash, relID);
-			AddNewPicture(img, relID);
-		}
-		else
-		{
-			relID = value;
-			var rel = _drawings.Part.GetRelationship(relID);
-			UriPic = UriHelper.ResolvePartUri(rel.SourceUri, rel.TargetUri);
-		}
-
-		ImageHash = ii.Hash;
-		_height = Image.Height;
-		_width = Image.Width;
-		SetPosDefaults(Image);
-		//Create relationship
-		node.SelectSingleNode("xdr:pic/xdr:blipFill/a:blip/@r:embed", NameSpaceManager).Value = relID;
-		Packaging.ZipPackage.Flush();
+		var info = ImageHeaderReader.Read(imageBytes);
+		Create(node, imageBytes, info.ContentType, uriTemplate, info.Width, info.Height, info.HorizontalResolution, info.VerticalResolution, hyperlink);
 	}
 
+	/// <summary>
+	/// Creates a picture from an image file's bytes, with the display size supplied by the caller.
+	/// No header is read. The bytes are written into the package verbatim, with the content type
+	/// sniffed from the byte signature.
+	/// </summary>
 	internal ExcelPicture(ExcelDrawings drawings, XmlNode node, byte[] imageBytes, int widthPixels, int heightPixels, Uri hyperlink) :
 		base(drawings, node, "xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name")
 	{
+		var contentType = GetContentTypeFromBytes(imageBytes);
+		Create(node, imageBytes, contentType, "/xl/media/image{0}" + GetExtension(contentType), widthPixels, heightPixels, ImageHeaderInfo.DefaultDpi, ImageHeaderInfo.DefaultDpi, hyperlink);
+	}
+
+	private void Create(XmlNode node, byte[] imageBytes, string contentType, string uriTemplate, int widthPixels, int heightPixels, float horizontalDpi, float verticalDpi, Uri hyperlink)
+	{
 		var picNode = node.OwnerDocument.CreateElement("xdr", "pic", ExcelPackage.schemaSheetDrawings);
 		node.InsertAfter(picNode, node.SelectSingleNode("xdr:to", NameSpaceManager));
 		Hyperlink = hyperlink;
@@ -171,26 +114,24 @@ public sealed class ExcelPicture : ExcelDrawing
 
 		node.InsertAfter(node.OwnerDocument.CreateElement("xdr", "clientData", ExcelPackage.schemaSheetDrawings), picNode);
 
-		// MagicSuite MS-25871: the byte-based path touches System.Drawing nowhere, so it works on
-		// platforms where GDI+ is unavailable (System.Drawing.Common 7+ is Windows-only). The
-		// caller supplies the pixel size, so no decode is needed; the bytes are written into the
-		// package verbatim, with the content type sniffed from the byte signature.
+		var drawings = _drawings;
 		var package = drawings.Worksheet._package.Package;
-		ContentType = GetContentTypeFromBytes(imageBytes);
-		UriPic = GetNewUri(package, "/xl/media/image{0}" + GetExtension(ContentType));
-		var ii = _drawings._package.AddImage(imageBytes, UriPic, ContentType);
+		_imageBytes = imageBytes;
+		ContentType = contentType;
+		UriPic = GetNewUri(package, uriTemplate);
+		var ii = drawings._package.AddImage(imageBytes, UriPic, ContentType);
 		string relID;
 		if (!drawings._hashes.TryGetValue(ii.Hash, out var value))
 		{
 			Part = ii.Part;
 			RelPic = drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(drawings.UriDrawing, ii.Uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 			relID = RelPic.Id;
-			_drawings._hashes.Add(ii.Hash, relID);
+			drawings._hashes.Add(ii.Hash, relID);
 		}
 		else
 		{
 			relID = value;
-			var rel = _drawings.Part.GetRelationship(relID);
+			var rel = drawings.Part.GetRelationship(relID);
 			UriPic = UriHelper.ResolvePartUri(rel.SourceUri, rel.TargetUri);
 		}
 
@@ -198,47 +139,26 @@ public sealed class ExcelPicture : ExcelDrawing
 		_height = heightPixels;
 		_width = widthPixels;
 		EditAs = eEditAs.OneCell;
-		SetPixelWidth(widthPixels);
-		SetPixelHeight(heightPixels);
+		SetPixelWidth(widthPixels, horizontalDpi);
+		SetPixelHeight(heightPixels, verticalDpi);
 		//Create relationship
 		node.SelectSingleNode("xdr:pic/xdr:blipFill/a:blip/@r:embed", NameSpaceManager).Value = relID;
 		Packaging.ZipPackage.Flush();
 	}
 
 	/// <summary>
-	/// MagicSuite MS-25871: content type from the byte signature, so the byte-based AddPicture
-	/// needs no decode and no file extension.
+	/// Content type from the byte signature, so no decode and no file extension is needed.
 	/// </summary>
-	internal static string GetContentTypeFromBytes(byte[] imageBytes)
-	{
-		if (imageBytes.Length >= 4 && imageBytes[0] == 0x89 && imageBytes[1] == 0x50 && imageBytes[2] == 0x4E && imageBytes[3] == 0x47)
-		{
-			return "image/png";
-		}
-
-		if (imageBytes.Length >= 3 && imageBytes[0] == 0xFF && imageBytes[1] == 0xD8 && imageBytes[2] == 0xFF)
-		{
-			return "image/jpeg";
-		}
-
-		if (imageBytes.Length >= 3 && imageBytes[0] == 0x47 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46)
-		{
-			return "image/gif";
-		}
-
-		if (imageBytes.Length >= 2 && imageBytes[0] == 0x42 && imageBytes[1] == 0x4D)
-		{
-			return "image/bmp";
-		}
-
-		return "image/jpeg";
-	}
+	internal static string GetContentTypeFromBytes(byte[] imageBytes) => ImageHeaderReader.GetContentType(imageBytes);
 
 	internal static string GetExtension(string contentType) => contentType switch
 	{
 		"image/png" => ".png",
 		"image/gif" => ".gif",
 		"image/bmp" => ".bmp",
+		"image/x-tiff" => ".tif",
+		"image/x-emf" => ".emf",
+		"image/x-wmf" => ".wmf",
 		_ => ".jpg",
 	};
 
@@ -257,34 +177,11 @@ public sealed class ExcelPicture : ExcelDrawing
 		".wmf" => "image/x-wmf",
 		_ => "image/jpeg",
 	};
-	[SupportedOSPlatform("windows")]
-	internal static ImageFormat GetImageFormat(string contentType) => contentType.ToLower(CultureInfo.InvariantCulture) switch
-	{
-		"image/bmp" => ImageFormat.Bmp,
-		"image/jpeg" => ImageFormat.Jpeg,
-		"image/gif" => ImageFormat.Gif,
-		"image/png" => ImageFormat.Png,
-		"image/x-emf" => ImageFormat.Emf,
-		"image/x-tiff" => ImageFormat.Tiff,
-		"image/x-wmf" => ImageFormat.Wmf,
-		_ => ImageFormat.Jpeg,
-	};        //Add a new image to the compare collection
-	private static void AddNewPicture(byte[] img, string relID)
-	{
-		var newPic = new ExcelDrawings.ImageCompare
-		{
-			image = img,
-			relID = relID
-		};
-		//_drawings._pics.Add(newPic);
-	}
 	#endregion
-	[SupportedOSPlatform("windows")]
-	private string SavePicture(Image image)
+	private string SavePicture(byte[] imageBytes)
 	{
-		var img = ImageCompat.GetImageAsByteArray(image);
-		var ii = _drawings._package.AddImage(img);
-
+		var contentType = GetContentTypeFromBytes(imageBytes);
+		var ii = _drawings._package.AddImage(imageBytes, GetNewUri(_drawings.Worksheet._package.Package, "/xl/media/image{0}" + GetExtension(contentType)), contentType);
 
 		ImageHash = ii.Hash;
 		if (_drawings._hashes.TryGetValue(ii.Hash, out var relID))
@@ -299,20 +196,12 @@ public sealed class ExcelPicture : ExcelDrawing
 			ImageHash = ii.Hash;
 		}
 
-		//Set the Image and save it to the package.
+		ContentType = contentType;
 		RelPic = _drawings.Part.CreateRelationship(UriHelper.GetRelativeUri(_drawings.UriDrawing, UriPic), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 
-		//AddNewPicture(img, picRelation.Id);
 		_drawings._hashes.Add(ii.Hash, RelPic.Id);
 
 		return RelPic.Id;
-	}
-	[SupportedOSPlatform("windows")]
-	private void SetPosDefaults(Image image)
-	{
-		EditAs = eEditAs.OneCell;
-		SetPixelWidth(image.Width, image.HorizontalResolution);
-		SetPixelHeight(image.Height, image.VerticalResolution);
 	}
 
 	private string PicStartXml()
@@ -352,29 +241,33 @@ public sealed class ExcelPicture : ExcelDrawing
 	}
 
 	internal string ImageHash { get; set; }
-	Image _image = null;
+	byte[] _imageBytes = null;
 	/// <summary>
-	/// The Image
+	/// The image file's bytes, exactly as stored in the package (PNG, JPEG, GIF, BMP, TIFF, EMF or WMF).
+	/// Setting it replaces the picture; the bytes are written to the package verbatim.
 	/// </summary>
-	[SupportedOSPlatform("windows")]
-	public Image Image
+	public byte[] ImageBytes
 	{
 		get
 		{
-			return _image;
+			if (_imageBytes != null)
+			{
+				return _imageBytes;
+			}
+
+			return Part?.GetStream().ToArray();
 		}
 		set
 		{
 			if (value != null)
 			{
-				_image = value;
+				_imageBytes = value;
 				try
 				{
 					var relID = SavePicture(value);
 
 					//Create relationship
 					TopNode.SelectSingleNode("xdr:pic/xdr:blipFill/a:blip/@r:embed", NameSpaceManager).Value = relID;
-					//_image.Save(Part.GetStream(FileMode.Create, FileAccess.Write), _imageFormat);   //Always JPEG here at this point. 
 				}
 				catch (Exception ex)
 				{
@@ -383,27 +276,13 @@ public sealed class ExcelPicture : ExcelDrawing
 			}
 		}
 	}
-	ImageFormat _imageFormat;
 	/// <summary>
-	/// Image format
-	/// If the picture is created from an Image this type is always Jpeg
+	/// The image's MIME content type, for example image/png or image/jpeg.
 	/// </summary>
-	[SupportedOSPlatform("windows")]
-	public ImageFormat ImageFormat
-	{
-		get
-		{
-			return _imageFormat ?? ImageFormat.Jpeg;
-		}
-		internal set
-		{
-			_imageFormat = value;
-		}
-	}
-	internal string ContentType
+	public string ContentType
 	{
 		get;
-		set;
+		internal set;
 	}
 	/// <summary>
 	/// Set the size of the image in percent from the orginal size
@@ -412,21 +291,22 @@ public sealed class ExcelPicture : ExcelDrawing
 	/// <param name="Percent">Percent</param>
 	public override void SetSize(int Percent)
 	{
-		// Image is only ever set on Windows.
-		if (!OperatingSystem.IsWindowsVersionAtLeast(6, 1) || Image == null)
+		var bytes = ImageBytes;
+		if (bytes == null)
 		{
 			base.SetSize(Percent);
 		}
 		else
 		{
-			_width = Image.Width;
-			_height = Image.Height;
+			var info = ImageHeaderReader.Read(bytes);
+			_width = info.Width;
+			_height = info.Height;
 
 			_width = (int)(_width * ((decimal)Percent / 100));
 			_height = (int)(_height * ((decimal)Percent / 100));
 
-			SetPixelWidth(_width, Image.HorizontalResolution);
-			SetPixelHeight(_height, Image.VerticalResolution);
+			SetPixelWidth(_width, info.HorizontalResolution);
+			SetPixelHeight(_height, info.VerticalResolution);
 		}
 	}
 	internal Uri UriPic { get; set; }
@@ -476,11 +356,6 @@ public sealed class ExcelPicture : ExcelDrawing
 	{
 		base.Dispose();
 		Hyperlink = null;
-		// MagicSuite MS-25871: a picture created from raw bytes has no Image
-		if (OperatingSystem.IsWindowsVersionAtLeast(6, 1))
-		{
-			_image?.Dispose();
-		}
-		_image = null;
+		_imageBytes = null;
 	}
 }
