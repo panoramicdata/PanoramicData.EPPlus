@@ -316,7 +316,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 		if (ImageFile == null)
 		{
-			throw new Exception("AddPicture: ImageFile can't be null");
+			throw new ArgumentNullException(nameof(ImageFile), "AddPicture: ImageFile can't be null");
 		}
 
 		byte[] bytes;

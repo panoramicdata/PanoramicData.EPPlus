@@ -127,8 +127,10 @@ public class ExcelHeaderFooterText
 	public ExcelVmlDrawingPicture InsertPicture(byte[] Picture, PictureAlignment Alignment)
 	{
 		ArgumentNullException.ThrowIfNull(Picture);
-		var id = ValidateImage(Alignment);
+		// Read the header first: ValidateImage appends the picture placeholder to the section text,
+		// which must not happen for data that is rejected.
 		var header = ReadHeader(Picture);
+		var id = ValidateImage(Alignment);
 		var contentType = header.ContentType;
 		var uriPic = XmlHelper.GetNewUri(_ws._package.Package, "/xl/media/image{0}" + ExcelPicture.GetExtension(contentType));
 		var ii = _ws.Workbook._package.AddImage(Picture, uriPic, contentType);
@@ -154,8 +156,7 @@ public class ExcelHeaderFooterText
 	/// <param name="Alignment">Alignment. The image object will be inserted at the end of the Text.</param>
 	public ExcelVmlDrawingPicture InsertPicture(FileInfo PictureFile, PictureAlignment Alignment)
 	{
-		var id = ValidateImage(Alignment);
-
+		ArgumentNullException.ThrowIfNull(PictureFile);
 		byte[] imgBytes;
 		ImageHeaderInfo header;
 		try
@@ -173,6 +174,7 @@ public class ExcelHeaderFooterText
 			throw (new InvalidDataException("File is not a supported image-file or is corrupt", ex));
 		}
 
+		var id = ValidateImage(Alignment);
 		var contentType = ExcelPicture.GetContentType(PictureFile.Extension);
 		var uriPic = XmlHelper.GetNewUri(_ws._package.Package, "/xl/media/" + PictureFile.Name[..^PictureFile.Extension.Length] + "{0}" + PictureFile.Extension);
 

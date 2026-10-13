@@ -204,7 +204,9 @@ internal static class ImageHeaderReader
 		var little = b[0] == 0x49;
 		ushort U16(ReadOnlySpan<byte> s, int o) => little ? BinaryPrimitives.ReadUInt16LittleEndian(s[o..]) : BinaryPrimitives.ReadUInt16BigEndian(s[o..]);
 		uint U32(ReadOnlySpan<byte> s, int o) => little ? BinaryPrimitives.ReadUInt32LittleEndian(s[o..]) : BinaryPrimitives.ReadUInt32BigEndian(s[o..]);
-		double Value(ReadOnlySpan<byte> s, int entry)
+		// An unsupported field type is a hard error for the fields the size depends on, and is
+		// ignored (0) for the optional resolution fields, which then fall back to the default DPI.
+		double Value(ReadOnlySpan<byte> s, int entry, bool required)
 		{
 			var type = U16(s, entry + 2);
 			switch (type)
@@ -217,7 +219,9 @@ internal static class ImageHeaderReader
 					var at = (int)U32(s, entry + 8);
 					return (double)U32(s, at) / Math.Max(1U, U32(s, at + 4));
 				default:
-					return 0;
+					return required
+						? throw new InvalidDataException($"Unsupported TIFF field type {type} for a required field")
+						: 0;
 			}
 		}
 
@@ -231,21 +235,28 @@ internal static class ImageHeaderReader
 			switch (U16(b, entry))
 			{
 				case 256:
-					width = Value(b, entry);
+					width = Value(b, entry, required: true);
 					break;
 				case 257:
-					height = Value(b, entry);
+					height = Value(b, entry, required: true);
 					break;
 				case 282:
-					xres = Value(b, entry);
+					xres = Value(b, entry, required: false);
 					break;
 				case 283:
-					yres = Value(b, entry);
+					yres = Value(b, entry, required: false);
 					break;
 				case 296:
-					unit = (int)Value(b, entry);
+					unit = (int)Value(b, entry, required: false);
 					break;
+				default:
+					break; // every other tag is irrelevant to the size and resolution
 			}
+		}
+
+		if (width < 1 || height < 1)
+		{
+			throw new InvalidDataException("TIFF has no image width and height");
 		}
 
 		var scale = unit == 3 ? 2.54 : 1;
