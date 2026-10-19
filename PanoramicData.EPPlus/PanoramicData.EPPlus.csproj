@@ -4,8 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>icon.jpg</PackageIcon>
-    <PackageProjectUrl>https://github.com/rimland/EPPlus</PackageProjectUrl>
-    <Authors>Rimland, Panoramic Data Limited</Authors>
+    <PackageProjectUrl>https://github.com/panoramicdata/PanoramicData.EPPlus</PackageProjectUrl>
+    <Authors>Jan Källman, Mats Alm, Rimland, Panoramic Data Limited</Authors>
     <Company></Company>
     <Product>EPPlus Free Edition</Product>
     <Title>Panoramic Data's EPPlus Free Edition</Title>
@@ -14,7 +14,7 @@
     <RootNamespace>OfficeOpenXml</RootNamespace>
     <RepositoryUrl>https://github.com/panoramicdata/PanoramicData.EPPlus</RepositoryUrl>
     <PackageTags>EPPlus Excel Spreadsheet xlsx ooxml</PackageTags>
-    <Copyright>Rimland 2020, Panoramic Data Limited 2026</Copyright>
+    <Copyright>Copyright © 2009-2020 Jan Källman, Mats Alm and EPPlus contributors; Rimland 2020; Panoramic Data Limited 2024-2026</Copyright>
     <PackageReleaseNotes>
 			# Panoramic Data's EPPlus Free Edition
 			# LGPL License continue
@@ -42,7 +42,7 @@
     <PackageId>PanoramicData.EPPlus</PackageId>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>LGPL-2.1-or-later</PackageLicenseExpression>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\EPPlusFree.xml</DocumentationFile>
@@ -65,6 +65,8 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="..\LICENSE" Pack="true" PackagePath="" Visible="false" />
+    <None Include="..\NOTICE.md" Pack="true" PackagePath="" Visible="false" />
     <None Include="lgpl-3.0.txt">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
