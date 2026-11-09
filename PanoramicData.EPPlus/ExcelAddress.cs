@@ -31,6 +31,7 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -496,7 +497,7 @@ public class ExcelAddressBase : ExcelCellBase
 	internal protected List<ExcelAddress>? _addresses;
 	internal virtual List<ExcelAddress>? Addresses => _addresses;
 
-	private bool ExtractAddress(string fullAddress)
+	private void ExtractAddress(string fullAddress)
 	{
 		var brackPos = new Stack<int>();
 		var bracketParts = new List<string>();
@@ -507,12 +508,12 @@ public class ExcelAddressBase : ExcelCellBase
 			if (fullAddress == "#REF!")
 			{
 				SetAddress(ref fullAddress, ref second, ref hasSheet, false);
-				return true;
+				return;
 			}
 			else if (Utils.ConvertUtil._invariantCompareInfo.IsPrefix(fullAddress, "!"))
 			{
 				// invalid address!
-				return false;
+				return;
 			}
 
 			var isMulti = false;
@@ -552,13 +553,13 @@ public class ExcelAddressBase : ExcelCellBase
 
 								if (brackPos.Count == 0)
 								{
-									HandleBrackets(first, second, bracketParts);
+									HandleBrackets(first, bracketParts);
 								}
 							}
 							else
 							{
 								//Invalid address!
-								return false;
+								return;
 							}
 						}
 					}
@@ -571,7 +572,7 @@ public class ExcelAddressBase : ExcelCellBase
 						// the following is to handle addresses that specifies the
 						// same worksheet twice: Sheet1!A1:Sheet1:A3
 						// They will be converted to: Sheet1!A1:A3
-						if (hasSheet && second != null && second.ToLower().EndsWith(first.ToLower()))
+						if (hasSheet && second != null && second.ToLower(CultureInfo.CurrentCulture).EndsWith(first.ToLower(CultureInfo.CurrentCulture)))
 						{
 							second = Regex.Replace(second, $"{first}$", string.Empty);
 						}
@@ -601,16 +602,14 @@ public class ExcelAddressBase : ExcelCellBase
 			{
 				SetAddress(ref first, ref second, ref hasSheet, isMulti);
 			}
-
-			return true;
 		}
 		catch
 		{
-			return false;
+			// An unparsable address leaves the range unset, as before
 		}
 	}
 
-	private void HandleBrackets(string first, string second, List<string> bracketParts)
+	private void HandleBrackets(string first, List<string> bracketParts)
 	{
 		if (!string.IsNullOrEmpty(first))
 		{
@@ -748,39 +747,13 @@ public class ExcelAddressBase : ExcelCellBase
 				: new ExcelAddressBase(_fromRow, _fromCol, _toRow, (setFixed && _toColFixed ? _toCol : _toCol - cols < col ? col - 1 : _toCol - cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 	}
-	internal ExcelAddressBase Insert(ExcelAddressBase address, eShiftType Shift/*, out ExcelAddressBase topAddress, out ExcelAddressBase leftAddress, out ExcelAddressBase rightAddress, out ExcelAddressBase bottomAddress*/)
+	[SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "Signature kept for existing callers and tests that pass a shift type.")]
+	internal ExcelAddressBase Insert(ExcelAddressBase address, eShiftType Shift)
 	{
 		//Before or after, no change
 		if (_toRow < address._fromRow || _toCol < address._fromCol || (_fromRow > address._toRow && _fromCol > address._toCol))
 		{
 			return this;
-		}
-
-		var rows = address.Rows;
-		var cols = address.Columns;
-		var retAddress = "";
-		if (Shift == eShiftType.Right)
-		{
-			if (address._fromRow > _fromRow)
-			{
-				retAddress = GetAddress(_fromRow, _fromCol, address._fromRow, _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
-			}
-
-			if (address._fromCol > _fromCol)
-			{
-				retAddress = GetAddress(_fromRow < address._fromRow ? _fromRow : address._fromRow, _fromCol, address._fromRow, _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
-			}
-		}
-
-		if (_toRow < address._fromRow)
-		{
-			if (_fromRow < address._fromRow)
-			{
-
-			}
-			else
-			{
-			}
 		}
 
 		return null;
@@ -1155,7 +1128,6 @@ public class ExcelAddressBase : ExcelCellBase
 		{
 			return "";
 		}
-
 	}
 	internal static void SplitAddress(string fullAddress, out string wb, out string ws, out string address, string defaultWorksheet = "")
 	{
@@ -1180,12 +1152,10 @@ public class ExcelAddressBase : ExcelCellBase
 	}
 	private static string GetString(string address, int ix, out int endIx)
 	{
-		var strIx = address.IndexOf("''");
-		var prevStrIx = ix;
+		var strIx = address.IndexOf("''", StringComparison.CurrentCulture);
 		while (strIx > -1)
 		{
-			prevStrIx = strIx;
-			strIx = address.IndexOf("''");
+			strIx = address.IndexOf("''", StringComparison.CurrentCulture);
 		}
 
 		endIx = address.IndexOf('\'');
@@ -1205,9 +1175,7 @@ public class ExcelAddressBase : ExcelCellBase
 public class ExcelAddress : ExcelAddressBase
 {
 	internal ExcelAddress()
-		: base()
 	{
-
 	}
 
 	public ExcelAddress(int fromRow, int fromCol, int toRow, int toColumn)
@@ -1267,7 +1235,6 @@ public class ExcelAddress : ExcelAddressBase
 public class ExcelFormulaAddress : ExcelAddressBase
 {
 	internal ExcelFormulaAddress()
-		: base()
 	{
 	}
 
