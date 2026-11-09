@@ -8,13 +8,7 @@ public partial class CalculationTests
 	[TestMethod, Ignore]
 	public void CalulationValidationExcel()
 	{
-#if Core
-		var dir = AppContext.BaseDirectory;
-		dir = Directory.GetParent(dir).Parent.Parent.Parent.FullName;
-#else
-            var dir = AppDomain.CurrentDomain.BaseDirectory;
-#endif
-		var pck = new ExcelPackage(new FileInfo(Path.Combine(dir, "Workbooks", "FormulaTest.xlsx")));
+		var pck = new ExcelPackage(new FileInfo(GetFormulaTestPath()));
 
 		var ws = pck.Workbook.Worksheets["ValidateFormulas"];
 		var fr = new Dictionary<string, object>();

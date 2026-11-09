@@ -51,28 +51,10 @@ public partial class WorkSheetTest
 		ExcelPackage p = new(new FileInfo(@"c:\temp\FullProjecte.xlsx"));
 
 		var ws = p.Workbook.Worksheets.First();
-		ws.Cells[12, 1].Value = 0;
-		ws.Cells[12, 2].Value = new DateTime(2010, 9, 14);
-		ws.Cells[12, 3].Value = "Federico Lois";
-		ws.Cells[12, 4].Value = "Nakami";
-		ws.Cells[12, 5].Value = "Hores";
-		ws.Cells[12, 7].Value = 120;
-		ws.Cells[12, 8].Value = "A definir";
-		ws.Cells[12, 9].Value = new DateTime(2010, 9, 14);
-		ws.Cells[12, 10].Value = new DateTime(2010, 9, 14);
-		ws.Cells[12, 11].Value = "Transferència";
+		SetProjectRow(ws, 12);
 
 		ws.InsertRow(13, 1, 12);
-		ws.Cells[13, 1].Value = 0;
-		ws.Cells[13, 2].Value = new DateTime(2010, 9, 14);
-		ws.Cells[13, 3].Value = "Federico Lois";
-		ws.Cells[13, 4].Value = "Nakami";
-		ws.Cells[13, 5].Value = "Hores";
-		ws.Cells[13, 7].Value = 120;
-		ws.Cells[13, 8].Value = "A definir";
-		ws.Cells[13, 9].Value = new DateTime(2010, 9, 14);
-		ws.Cells[13, 10].Value = new DateTime(2010, 9, 14);
-		ws.Cells[13, 11].Value = "Transferència";
+		SetProjectRow(ws, 13);
 
 		ws.InsertRow(14, 1, 13);
 
@@ -195,5 +177,19 @@ public partial class WorkSheetTest
 		n.Style.TextRotation = 90;
 		ws.Cells["a1:c3"].StyleName = "Normal";
 		pck.SaveAs(new FileInfo(@"c:\temp\style.xlsx"));
+	}
+
+	private static void SetProjectRow(ExcelWorksheet ws, int row)
+	{
+		ws.Cells[row, 1].Value = 0;
+		ws.Cells[row, 2].Value = new DateTime(2010, 9, 14);
+		ws.Cells[row, 3].Value = "Federico Lois";
+		ws.Cells[row, 4].Value = "Nakami";
+		ws.Cells[row, 5].Value = "Hores";
+		ws.Cells[row, 7].Value = 120;
+		ws.Cells[row, 8].Value = "A definir";
+		ws.Cells[row, 9].Value = new DateTime(2010, 9, 14);
+		ws.Cells[row, 10].Value = new DateTime(2010, 9, 14);
+		ws.Cells[row, 11].Value = "Transferència";
 	}
 }

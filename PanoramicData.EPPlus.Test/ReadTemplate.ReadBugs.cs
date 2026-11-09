@@ -110,14 +110,7 @@ public partial class ReadTemplate
 	{
 		var package = new ExcelPackage();
 		var ws = package.Workbook.Worksheets.Add("test");
-		using (var rng = ws.Cells["A1"])
-		{
-			var rt1 = rng.RichText.Add("TEXT1\r\n");
-			rt1.Bold = true;
-			rng.Style.WrapText = true;
-			var rt2 = rng.RichText.Add("TEXT2");
-			rt2.Bold = false;
-		}
+		AddBoldThenPlainRichText(ws);
 
 		package.SaveAs(new FileInfo(@"c:\temp\2.9 bugs\error.xlsx"));
 	}
@@ -127,6 +120,13 @@ public partial class ReadTemplate
 	{
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\2.9 bugs\bug\Genband SO CrossRef Phoenix.xlsx"));
 		var ws = package.Workbook.Worksheets[1];
+		AddBoldThenPlainRichText(ws);
+
+		package.SaveAs(new FileInfo(@"c:\temp\2.9 bugs\billing_template.xlsx.error"));
+	}
+
+	private static void AddBoldThenPlainRichText(ExcelWorksheet ws)
+	{
 		using (var rng = ws.Cells["A1"])
 		{
 			var rt1 = rng.RichText.Add("TEXT1\r\n");
@@ -135,7 +135,5 @@ public partial class ReadTemplate
 			var rt2 = rng.RichText.Add("TEXT2");
 			rt2.Bold = false;
 		}
-
-		package.SaveAs(new FileInfo(@"c:\temp\2.9 bugs\billing_template.xlsx.error"));
 	}
 }

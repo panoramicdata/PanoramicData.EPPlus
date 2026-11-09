@@ -142,13 +142,7 @@ public partial class WorkSheetTest
 			Assert.IsInstanceOfType<FormatException>(GetValueException<TimeSpan?>(ws.Cells["Z20"]));
 			Assert.AreEqual("Text2", ws.Cells["Z20"].Text);
 
-			Assert.AreEqual("210", ws.Cells["X19"].GetValue<string>());
-			Assert.AreEqual(210, ws.Cells["X19"].GetValue<int>());
-			Assert.AreEqual(210, ws.Cells["X19"].GetValue<int?>());
-			Assert.AreEqual(210d, ws.Cells["X19"].GetValue<double>());
-			Assert.AreEqual(210d, ws.Cells["X19"].GetValue<double?>());
-			Assert.AreEqual(210m, ws.Cells["X19"].GetValue<decimal>());
-			Assert.AreEqual(210m, ws.Cells["X19"].GetValue<decimal?>());
+			AssertReads210AsNumber(ws.Cells["X19"]);
 			Assert.AreEqual(true, ws.Cells["X19"].GetValue<bool>());
 			Assert.AreEqual(true, ws.Cells["X19"].GetValue<bool?>());
 			// double is converted to DateTime and TimeSpan, but value is meaningless
@@ -159,13 +153,7 @@ public partial class WorkSheetTest
 			Assert.AreEqual("210", ws.Cells["X19"].Text);
 
 			Assert.IsInstanceOfType<string>(ws.Cells["AA19"].Value);
-			Assert.AreEqual("210", ws.Cells["AA19"].GetValue<string>());
-			Assert.AreEqual(210, ws.Cells["AA19"].GetValue<int>());
-			Assert.AreEqual(210, ws.Cells["AA19"].GetValue<int?>());
-			Assert.AreEqual(210d, ws.Cells["AA19"].GetValue<double>());
-			Assert.AreEqual(210d, ws.Cells["AA19"].GetValue<double?>());
-			Assert.AreEqual(210m, ws.Cells["AA19"].GetValue<decimal>());
-			Assert.AreEqual(210m, ws.Cells["AA19"].GetValue<decimal?>());
+			AssertReads210AsNumber(ws.Cells["AA19"]);
 			Assert.IsInstanceOfType<FormatException>(GetValueException<bool>(ws.Cells["AA19"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<bool?>(ws.Cells["AA19"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime>(ws.Cells["AA19"]));
@@ -287,5 +275,16 @@ public partial class WorkSheetTest
 		{
 			return exception;
 		}
+	}
+
+	private static void AssertReads210AsNumber(ExcelRange cell)
+	{
+		Assert.AreEqual("210", cell.GetValue<string>());
+		Assert.AreEqual(210, cell.GetValue<int>());
+		Assert.AreEqual(210, cell.GetValue<int?>());
+		Assert.AreEqual(210d, cell.GetValue<double>());
+		Assert.AreEqual(210d, cell.GetValue<double?>());
+		Assert.AreEqual(210m, cell.GetValue<decimal>());
+		Assert.AreEqual(210m, cell.GetValue<decimal?>());
 	}
 }

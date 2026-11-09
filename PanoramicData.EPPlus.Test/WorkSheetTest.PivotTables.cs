@@ -135,33 +135,13 @@ public partial class WorkSheetTest
 		pt.DataFields[0].Function = DataFieldFunctions.Average;
 		pt.DataOnRows = true;
 
-		pt = wsPivot3.PivotTables.Add(wsPivot3.Cells["A1"], ws.Cells["K1:N11"], "Pivottable3");
-		pt.ColumnFields.Add(pt.Fields[1]);
-		pt.ColumnFields.Add(pt.Fields[0]);
-		pt.DataFields.Add(pt.Fields[3]);
-		pt.DataFields.Add(pt.Fields[2]);
-		pt.DataOnRows = false;
+		pt = AddKToNPivot(wsPivot3, ws, "Pivottable3", true, false);
 
-		pt = wsPivot4.PivotTables.Add(wsPivot4.Cells["A1"], ws.Cells["K1:N11"], "Pivottable4");
-		pt.ColumnFields.Add(pt.Fields[1]);
-		pt.ColumnFields.Add(pt.Fields[0]);
-		pt.DataFields.Add(pt.Fields[3]);
-		pt.DataFields.Add(pt.Fields[2]);
-		pt.DataOnRows = true;
+		pt = AddKToNPivot(wsPivot4, ws, "Pivottable4", true, true);
 
-		pt = wsPivot5.PivotTables.Add(wsPivot5.Cells["A1"], ws.Cells["K1:N11"], "Pivottable5");
-		pt.ColumnFields.Add(pt.Fields[1]);
-		pt.RowFields.Add(pt.Fields[0]);
-		pt.DataFields.Add(pt.Fields[3]);
-		pt.DataFields.Add(pt.Fields[2]);
-		pt.DataOnRows = false;
+		pt = AddKToNPivot(wsPivot5, ws, "Pivottable5", false, false);
 
-		pt = wsPivot6.PivotTables.Add(wsPivot6.Cells["A1"], ws.Cells["K1:N11"], "Pivottable6");
-		pt.ColumnFields.Add(pt.Fields[1]);
-		pt.RowFields.Add(pt.Fields[0]);
-		pt.DataFields.Add(pt.Fields[3]);
-		pt.DataFields.Add(pt.Fields[2]);
-		pt.DataOnRows = true;
+		pt = AddKToNPivot(wsPivot6, ws, "Pivottable6", false, true);
 		wsPivot6.Drawings.AddChart("Pivotchart6", eChartType.BarStacked3D, pt);
 
 		pt = wsPivot7.PivotTables.Add(wsPivot7.Cells["A3"], ws.Cells["K1:N11"], "Pivottable7");
@@ -301,5 +281,24 @@ public partial class WorkSheetTest
 		df.Name = "DatA1_2";
 
 		pck.Save();
+	}
+
+	private static ExcelPivotTable AddKToNPivot(ExcelWorksheet pivotSheet, ExcelWorksheet ws, string name, bool secondFieldAsColumn, bool dataOnRows)
+	{
+		var pt = pivotSheet.PivotTables.Add(pivotSheet.Cells["A1"], ws.Cells["K1:N11"], name);
+		pt.ColumnFields.Add(pt.Fields[1]);
+		if (secondFieldAsColumn)
+		{
+			pt.ColumnFields.Add(pt.Fields[0]);
+		}
+		else
+		{
+			pt.RowFields.Add(pt.Fields[0]);
+		}
+
+		pt.DataFields.Add(pt.Fields[3]);
+		pt.DataFields.Add(pt.Fields[2]);
+		pt.DataOnRows = dataOnRows;
+		return pt;
 	}
 }

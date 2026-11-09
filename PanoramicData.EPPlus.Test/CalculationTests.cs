@@ -61,14 +61,19 @@ public partial class CalculationTests
 	[TestMethod, Ignore]
 	public void Calulation4()
 	{
+		var pck = new ExcelPackage(new FileInfo(GetFormulaTestPath()));
+		pck.Workbook.Calculate();
+		Assert.AreEqual(490D, pck.Workbook.Worksheets[1].Cells["D5"].Value);
+	}
+
+	private static string GetFormulaTestPath()
+	{
 #if Core
 		var dir = AppContext.BaseDirectory;
 		dir = Directory.GetParent(dir).Parent.Parent.Parent.FullName;
 #else
-            var dir = AppDomain.CurrentDomain.BaseDirectory;
+		var dir = AppDomain.CurrentDomain.BaseDirectory;
 #endif
-		var pck = new ExcelPackage(new FileInfo(Path.Combine(dir, "Workbooks", "FormulaTest.xlsx")));
-		pck.Workbook.Calculate();
-		Assert.AreEqual(490D, pck.Workbook.Worksheets[1].Cells["D5"].Value);
+		return Path.Combine(dir, "Workbooks", "FormulaTest.xlsx");
 	}
 }
