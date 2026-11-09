@@ -266,7 +266,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 				var attr = (XmlAttribute)pageSetup.Attributes.GetNamedItem("id", ExcelPackage.schemaRelationships);
 				if (attr != null)
 				{
-					relID = attr.Value;
 					// first delete the attribute from the XML
 					pageSetup.Attributes.Remove(attr);
 				}
@@ -512,8 +511,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		// Copy any images
 		if (Copy.HeaderFooter.Pictures.Count > 0)
 		{
-			var source = Copy.HeaderFooter.Pictures.Uri;
-			var dest = GetNewUri(_pck.Package, @"/xl/drawings/vmlDrawing{0}.vml");
 			added.DeleteNode("d:legacyDrawingHF");
 
 			foreach (ExcelVmlDrawingPicture pic in Copy.HeaderFooter.Pictures)
@@ -652,7 +649,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		streamDrawing.Flush();
 
 		//Add the relationship ID to the worksheet xml.
-		var commentRelation = workSheet.Part.CreateRelationship(UriHelper.GetRelativeUri(workSheet.WorksheetUri, uriComment), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/comments");
+		workSheet.Part.CreateRelationship(UriHelper.GetRelativeUri(workSheet.WorksheetUri, uriComment), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/comments");
 
 		xml = Copy.VmlDrawingsComments.VmlDrawingXml.InnerXml;
 
@@ -679,9 +676,8 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 
 		e.SetAttribute("id", ExcelPackage.schemaRelationships, newVmlRel.Id);
 	}
-	private void CopyDrawing(ExcelWorksheet Copy, ExcelWorksheet workSheet/*, PackageRelationship r*/)
+	private void CopyDrawing(ExcelWorksheet Copy, ExcelWorksheet workSheet)
 	{
-
 		//First copy the drawing XML                
 		var xml = Copy.Drawings.DrawingXml.OuterXml;
 		var uriDraw = new Uri(string.Format("/xl/drawings/drawing{0}.xml", workSheet.SheetID), UriKind.Relative);
@@ -701,9 +697,8 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			var draw = Copy.Drawings[i];
 			draw.AdjustPositionAndSize();       //Adjust position for any change in normal style font/row size etc.
-			if (draw is ExcelChart)
+			if (draw is ExcelChart chart)
 			{
-				var chart = draw as ExcelChart;
 				xml = chart.ChartXml.InnerXml;
 
 				var UriChart = GetNewUri(_pck.Package, "/xl/charts/chart{0}.xml");
@@ -717,9 +712,8 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 				var relAtt = drawXml.SelectSingleNode(string.Format("//c:chart/@r:id[.='{0}']", prevRelID), Copy.Drawings.NameSpaceManager) as XmlAttribute;
 				relAtt.Value = rel.Id;
 			}
-			else if (draw is ExcelPicture)
+			else if (draw is ExcelPicture pic)
 			{
-				var pic = draw as ExcelPicture;
 				var uri = pic.UriPic;
 				if (!workSheet.Workbook._package.Package.PartExists(uri))
 				{
@@ -945,7 +939,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
             */
 		foreach (var ws in _worksheets)
 		{
-			var drawings = ws.Value.Drawings;
+			_ = ws.Value.Drawings;
 		}
 
 		var worksheet = _worksheets[Index];
@@ -955,14 +949,13 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 
 		//Remove all comments
-		if (!(worksheet is ExcelChartsheet) && worksheet.Comments.Count > 0)
+		if (worksheet is not ExcelChartsheet && worksheet.Comments.Count > 0)
 		{
 			worksheet.Comments.Clear();
 		}
 
 		//Delete any parts still with relations to the Worksheet.
 		DeleteRelationsAndParts(worksheet.Part);
-
 
 		//Delete the worksheet part and relation from the package 
 		_pck.Workbook.Part.DeleteRelationship(worksheet.RelationshipID);
@@ -992,8 +985,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			_pck.Workbook.Worksheets[_pck._worksheetAdd].View.TabSelected = true;
 		}
-
-		worksheet = null;
 	}
 
 	private void DeleteRelationsAndParts(Packaging.ZipPackagePart part)
@@ -1315,7 +1306,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			foreach (var sheet in _worksheets.Values)
 			{
-				((IDisposable)sheet).Dispose();
+				sheet.Dispose();
 			}
 
 			_worksheets = null;
