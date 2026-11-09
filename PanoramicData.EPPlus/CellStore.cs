@@ -1487,9 +1487,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 			else
 			{
-				var r = GetNextCell(ref row, ref c, minColPos, maxRow, maxColPos);
-				col = _columnIndex[c].Index;
-				return r;
+				return GetNextCellInColumn(ref row, ref col, c, minColPos, maxRow, maxColPos);
 			}
 		}
 		else
@@ -1512,9 +1510,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 			else
 			{
-				var r = GetNextCell(ref row, ref c, minColPos, maxRow, maxColPos);
-				col = _columnIndex[c].Index;
-				return r;
+				return GetNextCellInColumn(ref row, ref col, c, minColPos, maxRow, maxColPos);
 			}
 		}
 	}
@@ -1614,48 +1610,24 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 		}
 	}
-	internal bool GetNextCell(ref int row, ref int colPos, int startColPos, int endRow, int endColPos, ref int[] pagePos, ref int[] cellPos)
+	private bool GetNextCellInColumn(ref int row, ref int col, int c, int minColPos, int maxRow, int maxColPos)
 	{
-		if (colPos == endColPos)
-		{
-			colPos = startColPos;
-			row++;
-		}
-		else
-		{
-			colPos++;
-		}
-
-		if (pagePos[colPos] < 0)
-		{
-			if (pagePos[colPos] == -1)
-			{
-				pagePos[colPos] = _columnIndex[colPos].GetPosition(row);
-			}
-		}
-		else if (_columnIndex[colPos]._pages[pagePos[colPos]].RowCount <= row)
-		{
-			if (_columnIndex[colPos].PageCount > pagePos[colPos])
-			{
-				pagePos[colPos]++;
-			}
-			else
-			{
-				pagePos[colPos] = -2;
-			}
-		}
-
-		var r = _columnIndex[colPos]._pages[pagePos[colPos]].IndexOffset + _columnIndex[colPos]._pages[pagePos[colPos]].Rows[cellPos[colPos]].Index;
-		if (r == row)
-		{
-			row = r;
-		}
-		else
-		{
-		}
-
-		return true;
+		var r = GetNextCell(ref row, ref c, minColPos, maxRow, maxColPos);
+		col = _columnIndex[c].Index;
+		return r;
 	}
+
+	private bool GetPrevCellInColumn(ref int row, ref int col, int c, int minRow, int minColPos, int maxColPos)
+	{
+		var ret = GetPrevCell(ref row, ref c, minRow, minColPos, maxColPos);
+		if (ret)
+		{
+			col = _columnIndex[c].Index;
+		}
+
+		return ret;
+	}
+
 	internal bool PrevCell(ref int row, ref int col) => PrevCell(ref row, ref col, 0, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
 	internal bool PrevCell(ref int row, ref int col, int minRow, int minColPos, int maxRow, int maxColPos)
 	{
@@ -1690,13 +1662,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 			else
 			{
-				var ret = GetPrevCell(ref row, ref c, minRow, minColPos, maxColPos);
-				if (ret)
-				{
-					col = _columnIndex[c].Index;
-				}
-
-				return ret;
+				return GetPrevCellInColumn(ref row, ref col, c, minRow, minColPos, maxColPos);
 			}
 		}
 		else
@@ -1715,13 +1681,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 			else
 			{
-				var ret = GetPrevCell(ref row, ref c, minRow, minColPos, maxColPos);
-				if (ret)
-				{
-					col = _columnIndex[c].Index;
-				}
-
-				return ret;
+				return GetPrevCellInColumn(ref row, ref col, c, minRow, minColPos, maxColPos);
 			}
 		}
 	}
