@@ -49,8 +49,6 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 	internal ZipPackagePart(ZipPackage package, Uri partUri, string contentType, CompressionLevel compressionLevel)
 	{
 		Package = package;
-		//Entry = new ZipEntry();
-		//Entry.FileName = partUri.OriginalString.Replace('/','\\');
 		Uri = partUri;
 		ContentType = contentType;
 		CompressionLevel = compressionLevel;
@@ -58,7 +56,7 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 	internal ZipPackage Package { get; set; }
 	internal ZipEntry Entry { get; set; }
 	internal CompressionLevel CompressionLevel;
-	MemoryStream _stream = null;
+	MemoryStream _stream;
 	internal MemoryStream Stream
 	{
 		get
@@ -143,19 +141,16 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 		}
 		else
 		{
-			SaveHandler(os, (CompressionLevel)CompressionLevel, Uri.OriginalString);
+			SaveHandler(os, CompressionLevel, Uri.OriginalString);
 		}
 
 		if (_rels.Count > 0)
 		{
 			var f = Uri.OriginalString;
 			var name = Path.GetFileName(f);
-			_rels.WriteZip(os, (string.Format("{0}_rels/{1}.rels", f[..^name.Length], name)));
+			_rels.WriteZip(os, string.Format("{0}_rels/{1}.rels", f[..^name.Length], name));
 		}
-
-		b = null;
 	}
-
 
 	public void Dispose()
 	{
