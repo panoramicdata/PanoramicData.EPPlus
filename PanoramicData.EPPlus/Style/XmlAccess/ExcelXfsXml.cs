@@ -493,11 +493,8 @@ public sealed class ExcelXfs : StyleXmlHelper
 						break;
 					default:
 						throw (new InvalidOperationException("Invalid property for class style."));
-
 				}
 
-				break;
-			default:
 				break;
 		}
 

@@ -113,8 +113,8 @@ public sealed class ExcelColor : StyleBase, IColor
 	/// <param name="blue">Blue component value</param>
 	public void SetColor(int alpha, int red, int green, int blue)
 	{
-		if (alpha < 0 || red < 0 || green < 0 || blue < 0 ||
-		   alpha > 255 || red > 255 || green > 255 || blue > 255)
+		// OR-ing the components is negative if any is negative and above 255 if any is above 255
+		if ((alpha | red | green | blue) is < 0 or > 255)
 		{
 			throw (new ArgumentException("Argument range must be from 0 to 255"));
 		}
