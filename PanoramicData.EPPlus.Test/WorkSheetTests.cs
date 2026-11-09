@@ -2782,7 +2782,7 @@ public class WorkSheetTest : TestBase
 		var excelPackage = new ExcelPackage(stream);
 		excelPackage.Workbook.Worksheets.Add("test");
 		excelPackage.Save();
-		stream.ToArray();
+		_ = stream.ToArray();
 	}
 	[TestMethod, Ignore]
 	public void ColumnsTest()
