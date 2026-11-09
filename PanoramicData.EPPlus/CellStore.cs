@@ -29,6 +29,7 @@
  * Jan Källman		    Added       		        2012-11-25
  *******************************************************************************/
 using OfficeOpenXml;
+using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// This is the store for all Rows, Columns and Cells.
@@ -63,6 +64,7 @@ internal partial class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnume
 
 		_columnIndex = null;
 	}
+	[SuppressMessage("Code Smell", "S2330:Array covariance should not be used", Justification = "BinarySearch only reads the array, so the covariant view as IndexBase[] cannot cause an ArrayTypeMismatchException.")]
 	internal int GetPosition(int Column)
 	{
 		if (Column < ColumnCount && _columnIndex[Column].Index == Column)      //Check if th column is lesser than

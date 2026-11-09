@@ -74,7 +74,13 @@ internal partial class RangeCollection
 			Delete(_cellIndex[index].RangeID);
 		}
 
-		var updIndex = IndexOf(rowID + rowAdd);
+		ShiftRangeIdsUp(rowID + rowAdd, rowAdd, updateCells);
+		return index;
+	}
+
+	private void ShiftRangeIdsUp(ulong fromRangeID, ulong rowAdd, bool updateCells)
+	{
+		var updIndex = IndexOf(fromRangeID);
 		if (updIndex < 0)
 		{
 			updIndex = ~updIndex; //No match found invert to get start cell
@@ -88,8 +94,6 @@ internal partial class RangeCollection
 				_cells[_cellIndex[i].ListPointer].RangeID -= rowAdd;    //Change the cell/row or column object
 			}
 		}
-
-		return index;
 	}
 	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal static void InsertColumn(ulong ColumnID, int columns) => throw new Exception("Working on it...");

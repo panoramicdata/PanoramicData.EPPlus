@@ -33,34 +33,38 @@ public sealed partial class OfficeProperties
 		var searchString = string.Format("ctp:Properties/ctp:property[@name='{0}']", propertyName);
 		if (CustomPropertiesXml.SelectSingleNode(searchString, NameSpaceManager) is XmlElement node)
 		{
-			var value = node.LastChild.InnerText;
-			switch (node.LastChild.LocalName)
-			{
-				case "filetime":
-					DateTime dt;
-					return DateTime.TryParse(value, out dt) ? dt : null;
-				case "i4":
-					int i;
-					return int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out i) ? i : null;
-				case "r8":
-					double d;
-					return double.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out d) ? d : null;
-				case "bool":
-					if (value == "true")
-					{
-						return true;
-					}
-					else
-					{
-						return value == "false" ? false : null;
-					}
-				default:
-					return value;
-			}
+			return ParseCustomPropertyValue(node.LastChild.LocalName, node.LastChild.InnerText);
 		}
 		else
 		{
 			return null;
+		}
+	}
+
+	private static object ParseCustomPropertyValue(string localName, string value)
+	{
+		switch (localName)
+		{
+			case "filetime":
+				DateTime dt;
+				return DateTime.TryParse(value, out dt) ? dt : null;
+			case "i4":
+				int i;
+				return int.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out i) ? i : null;
+			case "r8":
+				double d;
+				return double.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out d) ? d : null;
+			case "bool":
+				if (value == "true")
+				{
+					return true;
+				}
+				else
+				{
+					return value == "false" ? false : null;
+				}
+			default:
+				return value;
 		}
 	}
 
@@ -76,28 +80,7 @@ public sealed partial class OfficeProperties
 		var prop = string.Format("ctp:Properties/ctp:property[@name='{0}']", propertyName);
 		if (CustomPropertiesXml.SelectSingleNode(prop, NameSpaceManager) is not XmlElement node)
 		{
-			int pid;
-			var MaxNode = CustomPropertiesXml.SelectSingleNode("ctp:Properties/ctp:property[not(@pid <= preceding-sibling::ctp:property/@pid) and not(@pid <= following-sibling::ctp:property/@pid)]", NameSpaceManager);
-			if (MaxNode == null)
-			{
-				pid = 2;
-			}
-			else
-			{
-				if (!int.TryParse(MaxNode.Attributes["pid"].Value, out pid))
-				{
-					pid = 2;
-				}
-
-				pid++;
-			}
-
-			node = CustomPropertiesXml.CreateElement("property", ExcelPackage.schemaCustom);
-			node.SetAttribute("fmtid", "{D5CDD505-2E9C-101B-9397-08002B2CF9AE}");
-			node.SetAttribute("pid", pid.ToString());  // custom property pid
-			node.SetAttribute("name", propertyName);
-
-			allProps.AppendChild(node);
+			node = CreateCustomPropertyNode(allProps, propertyName);
 		}
 		else
 		{
@@ -107,6 +90,38 @@ public sealed partial class OfficeProperties
 			}
 		}
 
+		node.AppendChild(CreateCustomPropertyValueElement(value));
+	}
+
+	private XmlElement CreateCustomPropertyNode(XmlNode allProps, string propertyName)
+	{
+		int pid;
+		var MaxNode = CustomPropertiesXml.SelectSingleNode("ctp:Properties/ctp:property[not(@pid <= preceding-sibling::ctp:property/@pid) and not(@pid <= following-sibling::ctp:property/@pid)]", NameSpaceManager);
+		if (MaxNode == null)
+		{
+			pid = 2;
+		}
+		else
+		{
+			if (!int.TryParse(MaxNode.Attributes["pid"].Value, out pid))
+			{
+				pid = 2;
+			}
+
+			pid++;
+		}
+
+		var node = CustomPropertiesXml.CreateElement("property", ExcelPackage.schemaCustom);
+		node.SetAttribute("fmtid", "{D5CDD505-2E9C-101B-9397-08002B2CF9AE}");
+		node.SetAttribute("pid", pid.ToString());  // custom property pid
+		node.SetAttribute("name", propertyName);
+
+		allProps.AppendChild(node);
+		return node;
+	}
+
+	private XmlElement CreateCustomPropertyValueElement(object value)
+	{
 		XmlElement valueElem;
 		if (value is bool)
 		{
@@ -126,22 +141,7 @@ public sealed partial class OfficeProperties
 		else if (value is double or decimal or float or long)
 		{
 			valueElem = CustomPropertiesXml.CreateElement("vt", "r8", ExcelPackage.schemaVt);
-			if (value is double d)
-			{
-				valueElem.InnerText = d.ToString(CultureInfo.InvariantCulture);
-			}
-			else if (value is float f)
-			{
-				valueElem.InnerText = f.ToString(CultureInfo.InvariantCulture);
-			}
-			else if (value is decimal m)
-			{
-				valueElem.InnerText = m.ToString(CultureInfo.InvariantCulture);
-			}
-			else
-			{
-				valueElem.InnerText = value.ToString();
-			}
+			valueElem.InnerText = GetR8Text(value);
 		}
 		else
 		{
@@ -149,6 +149,26 @@ public sealed partial class OfficeProperties
 			valueElem.InnerText = value.ToString();
 		}
 
-		node.AppendChild(valueElem);
+		return valueElem;
+	}
+
+	private static string GetR8Text(object value)
+	{
+		if (value is double d)
+		{
+			return d.ToString(CultureInfo.InvariantCulture);
+		}
+		else if (value is float f)
+		{
+			return f.ToString(CultureInfo.InvariantCulture);
+		}
+		else if (value is decimal m)
+		{
+			return m.ToString(CultureInfo.InvariantCulture);
+		}
+		else
+		{
+			return value.ToString();
+		}
 	}
 }

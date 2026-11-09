@@ -77,7 +77,7 @@
 
 	private static bool IsWithinPage(int row, ColumnIndex column, int pagePos) => (row >= column._pages[pagePos].MinIndex && row <= column._pages[pagePos].MaxIndex);
 
-	private void SplitPageInsert(ColumnIndex column, int pagePos, int rowPos, int rows, int size, int addPages)
+	private void SplitPageInsert(ColumnIndex column, int pagePos, int rowPos, int rows, int addPages)
 	{
 		var page = column._pages[pagePos];
 

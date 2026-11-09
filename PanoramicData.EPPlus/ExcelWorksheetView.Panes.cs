@@ -47,6 +47,33 @@ public partial class ExcelWorksheetView
 
 		string sqRef = SelectedRange, activeCell = ActiveCell;
 
+		var paneNode = CreateFrozenPaneNode(Row, Column);
+
+		RemoveSelection();
+
+		if (Row > 1 && Column == 1)
+		{
+			paneNode.SetAttribute("activePane", "bottomLeft");
+			var sel = CreatePaneSelection("bottomLeft", activeCell, sqRef);
+			sel.SetAttribute("sqref", sqRef);
+			TopNode.InsertAfter(sel, paneNode);
+		}
+		else if (Column > 1 && Row == 1)
+		{
+			paneNode.SetAttribute("activePane", "topRight");
+			var sel = CreatePaneSelection("topRight", activeCell, sqRef);
+			TopNode.InsertAfter(sel, paneNode);
+		}
+		else
+		{
+			AddBottomRightPaneSelections(paneNode, Row, Column, activeCell, sqRef);
+		}
+
+		Panes = LoadPanes();
+	}
+
+	private XmlElement CreateFrozenPaneNode(int Row, int Column)
+	{
 		var paneNode = TopNode.SelectSingleNode(_paneNodePath, NameSpaceManager) as XmlElement;
 		if (paneNode == null)
 		{
@@ -67,79 +94,47 @@ public partial class ExcelWorksheetView
 
 		paneNode.SetAttribute("topLeftCell", ExcelCellBase.GetAddress(Row, Column));
 		paneNode.SetAttribute("state", "frozen");
-
-		RemoveSelection();
-
-		if (Row > 1 && Column == 1)
-		{
-			paneNode.SetAttribute("activePane", "bottomLeft");
-			var sel = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
-			sel.SetAttribute("pane", "bottomLeft");
-			if (activeCell != "")
-			{
-				sel.SetAttribute("activeCell", activeCell);
-			}
-
-			if (sqRef != "")
-			{
-				sel.SetAttribute("sqref", sqRef);
-			}
-
-			sel.SetAttribute("sqref", sqRef);
-			TopNode.InsertAfter(sel, paneNode);
-		}
-		else if (Column > 1 && Row == 1)
-		{
-			paneNode.SetAttribute("activePane", "topRight");
-			var sel = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
-			sel.SetAttribute("pane", "topRight");
-			if (activeCell != "")
-			{
-				sel.SetAttribute("activeCell", activeCell);
-			}
-
-			if (sqRef != "")
-			{
-				sel.SetAttribute("sqref", sqRef);
-			}
-
-			TopNode.InsertAfter(sel, paneNode);
-		}
-		else
-		{
-			paneNode.SetAttribute("activePane", "bottomRight");
-			var sel1 = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
-			sel1.SetAttribute("pane", "topRight");
-			var cell = ExcelCellBase.GetAddress(1, Column);
-			sel1.SetAttribute("activeCell", cell);
-			sel1.SetAttribute("sqref", cell);
-			paneNode.ParentNode.InsertAfter(sel1, paneNode);
-
-			var sel2 = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
-			cell = ExcelCellBase.GetAddress(Row, 1);
-			sel2.SetAttribute("pane", "bottomLeft");
-			sel2.SetAttribute("activeCell", cell);
-			sel2.SetAttribute("sqref", cell);
-			sel1.ParentNode.InsertAfter(sel2, sel1);
-
-			var sel3 = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
-			sel3.SetAttribute("pane", "bottomRight");
-			if (activeCell != "")
-			{
-				sel3.SetAttribute("activeCell", activeCell);
-			}
-
-			if (sqRef != "")
-			{
-				sel3.SetAttribute("sqref", sqRef);
-			}
-
-			sel2.ParentNode.InsertAfter(sel3, sel2);
-
-		}
-
-		Panes = LoadPanes();
+		return paneNode;
 	}
+
+	private XmlElement CreatePaneSelection(string pane, string activeCell, string sqRef)
+	{
+		var sel = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
+		sel.SetAttribute("pane", pane);
+		if (activeCell != "")
+		{
+			sel.SetAttribute("activeCell", activeCell);
+		}
+
+		if (sqRef != "")
+		{
+			sel.SetAttribute("sqref", sqRef);
+		}
+
+		return sel;
+	}
+
+	private void AddBottomRightPaneSelections(XmlElement paneNode, int Row, int Column, string activeCell, string sqRef)
+	{
+		paneNode.SetAttribute("activePane", "bottomRight");
+		var sel1 = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
+		sel1.SetAttribute("pane", "topRight");
+		var cell = ExcelCellBase.GetAddress(1, Column);
+		sel1.SetAttribute("activeCell", cell);
+		sel1.SetAttribute("sqref", cell);
+		paneNode.ParentNode.InsertAfter(sel1, paneNode);
+
+		var sel2 = TopNode.OwnerDocument.CreateElement("selection", ExcelPackage.schemaMain);
+		cell = ExcelCellBase.GetAddress(Row, 1);
+		sel2.SetAttribute("pane", "bottomLeft");
+		sel2.SetAttribute("activeCell", cell);
+		sel2.SetAttribute("sqref", cell);
+		sel1.ParentNode.InsertAfter(sel2, sel1);
+
+		var sel3 = CreatePaneSelection("bottomRight", activeCell, sqRef);
+		sel2.ParentNode.InsertAfter(sel3, sel2);
+	}
+
 	private void RemoveSelection()
 	{
 		//Find selection nodes and remove them            

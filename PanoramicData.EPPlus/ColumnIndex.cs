@@ -32,6 +32,7 @@ internal class ColumnIndex : IndexBase, IDisposable
 	{
 		_pages = null;
 	}
+	[SuppressMessage("Code Smell", "S2330:Array covariance should not be used", Justification = "BinarySearch only reads the array, so the covariant view as IndexBase[] cannot cause an ArrayTypeMismatchException.")]
 	internal int GetPosition(int Row)
 	{
 		var page = (short)(Row >> CellStore<int>.pageBits);
@@ -69,25 +70,37 @@ internal class ColumnIndex : IndexBase, IDisposable
 		{
 			if (res + 1 < PageCount && (_pages[res + 1].MinIndex <= Row))
 			{
-				do
-				{
-					res++;
-				}
-				while (res + 1 < PageCount && _pages[res + 1].MinIndex <= Row);
+				res = SkipPagesForward(Row, res);
 				return true;
 			}
 			else if (res - 1 >= 0 && _pages[res - 1].MaxIndex >= Row)
 			{
-				do
-				{
-					res--;
-				}
-				while (res - 1 > 0 && _pages[res - 1].MaxIndex >= Row);
+				res = SkipPagesBackward(Row, res);
 				return true;
 			}
 
 			return false;
 		}
+	}
+
+	private int SkipPagesForward(int Row, int res)
+	{
+		do
+		{
+			res++;
+		}
+		while (res + 1 < PageCount && _pages[res + 1].MinIndex <= Row);
+		return res;
+	}
+
+	private int SkipPagesBackward(int Row, int res)
+	{
+		do
+		{
+			res--;
+		}
+		while (res - 1 > 0 && _pages[res - 1].MaxIndex >= Row);
+		return res;
 	}
 	internal int GetNextRow(int row)
 	{

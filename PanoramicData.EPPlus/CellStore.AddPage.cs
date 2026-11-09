@@ -11,7 +11,7 @@
 		if (rows > PageSize)
 		{
 			var addPages = (short)(rows >> pageBits);
-			var offset = +(int)(rows - (PageSize * addPages));
+			var offset = +(rows - (PageSize * addPages));
 			for (var p = pagePos + 1; p < column.PageCount; p++)
 			{
 				if (column._pages[p].Offset + offset > PageSize)
@@ -48,7 +48,7 @@
 				{
 					if (column._pages[pagePos + 1].RowCount + size > PageSizeMax) //Split Page
 					{
-						SplitPageInsert(column, pagePos, rowPos, rows, size, addPages);
+						SplitPageInsert(column, pagePos, rowPos, rows, addPages);
 					}
 					else //Copy Page.
 					{
