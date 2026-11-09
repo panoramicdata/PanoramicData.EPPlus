@@ -135,7 +135,7 @@ public partial class ExcelAddressBase
 	{
 		if (hasSheet && second != null && second.ToLower(CultureInfo.CurrentCulture).EndsWith(first.ToLower(CultureInfo.CurrentCulture)))
 		{
-			second = Regex.Replace(second, $"{first}$", string.Empty);
+			return Regex.Replace(second, $"{first}$", string.Empty);
 		}
 
 		return second;

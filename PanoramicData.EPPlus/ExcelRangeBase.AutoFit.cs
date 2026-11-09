@@ -44,12 +44,44 @@ public partial class ExcelRangeBase
 		_worksheet._package.DoAdjustDrawings = false;
 		var drawWidths = _worksheet.Drawings.GetDrawingWidths();
 
-		var fromCol = _fromCol > _worksheet.Dimension._fromCol ? _fromCol : _worksheet.Dimension._fromCol;
-		var toCol = _toCol < _worksheet.Dimension._toCol ? _toCol : _worksheet.Dimension._toCol;
+		if (!SetMinWidths(MinimumWidth))
+		{
+			return; //Issue 15383
+		}
+
+		//Get any auto filter to widen these columns
+		var afAddr = GetAutoFilterAddresses();
+
+		var styles = _worksheet.Workbook.Styles;
+		var nf = styles.Fonts[styles.CellXfs[0].FontId];
+		var normalSize = Convert.ToSingle(ExcelWorkbook.GetWidthPixels(nf.Name, nf.Size));
+
+		if (!TextMeasurer.IsAvailable)
+		{
+			//No usable font engine (native SkiaSharp library missing): leave the widths as they are.
+			_worksheet.Drawings.AdjustWidth(drawWidths);
+			_worksheet._package.DoAdjustDrawings = doAdjust;
+			return;
+		}
+
+		using var measurer = new TextMeasurer();
+		foreach (var cell in this)
+		{
+			AutoFitCell(cell, measurer, styles, normalSize, afAddr, MaximumWidth);
+		}
+
+		_worksheet.Drawings.AdjustWidth(drawWidths);
+		_worksheet._package.DoAdjustDrawings = doAdjust;
+	}
+
+	private bool SetMinWidths(double MinimumWidth)
+	{
+		var fromCol = Math.Max(_fromCol, _worksheet.Dimension._fromCol);
+		var toCol = Math.Min(_toCol, _worksheet.Dimension._toCol);
 
 		if (fromCol > toCol)
 		{
-			return; //Issue 15383
+			return false;
 		}
 
 		if (Addresses == null)
@@ -60,13 +92,17 @@ public partial class ExcelRangeBase
 		{
 			foreach (var addr in Addresses)
 			{
-				fromCol = addr._fromCol > _worksheet.Dimension._fromCol ? addr._fromCol : _worksheet.Dimension._fromCol;
-				toCol = addr._toCol < _worksheet.Dimension._toCol ? addr._toCol : _worksheet.Dimension._toCol;
+				fromCol = Math.Max(addr._fromCol, _worksheet.Dimension._fromCol);
+				toCol = Math.Min(addr._toCol, _worksheet.Dimension._toCol);
 				SetMinWidth(MinimumWidth, fromCol, toCol);
 			}
 		}
 
-		//Get any auto filter to widen these columns
+		return true;
+	}
+
+	private List<ExcelAddressBase> GetAutoFilterAddresses()
+	{
 		var afAddr = new List<ExcelAddressBase>();
 		if (_worksheet.AutoFilterAddress != null)
 		{
@@ -89,74 +125,73 @@ public partial class ExcelRangeBase
 			}
 		}
 
-		var styles = _worksheet.Workbook.Styles;
-		var nf = styles.Fonts[styles.CellXfs[0].FontId];
-		var normalSize = Convert.ToSingle(ExcelWorkbook.GetWidthPixels(nf.Name, nf.Size));
+		return afAddr;
+	}
 
-		if (!TextMeasurer.IsAvailable)
+	private void AutoFitCell(ExcelRangeBase cell, TextMeasurer measurer, ExcelStyles styles, float normalSize, List<ExcelAddressBase> afAddr, double MaximumWidth)
+	{
+		if (IsSkippedByAutoFit(cell))
 		{
-			//No usable font engine (native SkiaSharp library missing): leave the widths as they are.
-			_worksheet.Drawings.AdjustWidth(drawWidths);
-			_worksheet._package.DoAdjustDrawings = doAdjust;
 			return;
 		}
 
-		using var measurer = new TextMeasurer();
-		foreach (var cell in this)
+		var width = MeasureCellWidth(cell, measurer, styles, normalSize, afAddr);
+		if (width > _worksheet.Column(cell._fromCol).Width)
 		{
-			if (_worksheet.Column(cell.Start.Column).Hidden)    //Issue 15338
-			{
-				continue;
-			}
+			_worksheet.Column(cell._fromCol).Width = width > MaximumWidth ? MaximumWidth : width;
+		}
+	}
 
-			if (cell.Merge == true || cell.Style.WrapText)
-			{
-				continue;
-			}
+	//Issue 15338: hidden columns are left hidden
+	private bool IsSkippedByAutoFit(ExcelRangeBase cell)
+		=> _worksheet.Column(cell.Start.Column).Hidden || cell.Merge == true || cell.Style.WrapText;
 
-			var fntID = styles.CellXfs[cell.StyleID].FontId;
-			var fnt = styles.Fonts[fntID];
-			var ind = styles.CellXfs[cell.StyleID].Indent;
-			var textForWidth = cell.TextForWidth;
-			var t = textForWidth + (ind > 0 && !string.IsNullOrEmpty(textForWidth) ? new string('_', ind) : "");
-			if (t.Length > 32000)
-			{
-				t = t[..32000]; //Issue
-			}
+	private static double MeasureCellWidth(ExcelRangeBase cell, TextMeasurer measurer, ExcelStyles styles, float normalSize, List<ExcelAddressBase> afAddr)
+	{
+		var fntID = styles.CellXfs[cell.StyleID].FontId;
+		var fnt = styles.Fonts[fntID];
+		var ind = styles.CellXfs[cell.StyleID].Indent;
+		var textForWidth = cell.TextForWidth;
+		var t = textForWidth + (ind > 0 && !string.IsNullOrEmpty(textForWidth) ? new string('_', ind) : "");
+		if (t.Length > 32000)
+		{
+			t = t[..32000]; //Issue
+		}
 
-			var size = measurer.Measure(t, fnt.Name, fnt.Size, fnt.Bold, fnt.Italic);
+		var size = measurer.Measure(t, fnt.Name, fnt.Size, fnt.Bold, fnt.Italic);
 
-			double width;
-			double r = styles.CellXfs[cell.StyleID].TextRotation;
-			if (r <= 0)
-			{
-				width = (size.Width + 5) / normalSize;
-			}
-			else
-			{
-				r = (r <= 90 ? r : r - 90);
-				width = (((size.Width - size.Height) * Math.Abs(Math.Cos(Math.PI * r / 180.0)) + size.Height) + 5) / normalSize;
-			}
+		double width;
+		double r = styles.CellXfs[cell.StyleID].TextRotation;
+		if (r <= 0)
+		{
+			width = (size.Width + 5) / normalSize;
+		}
+		else
+		{
+			r = (r <= 90 ? r : r - 90);
+			width = (((size.Width - size.Height) * Math.Abs(Math.Cos(Math.PI * r / 180.0)) + size.Height) + 5) / normalSize;
+		}
 
-			foreach (var a in afAddr)
-			{
-				if (a.Collide(cell) != eAddressCollition.No)
-				{
-					width += 2.25;
-					break;
-				}
-			}
+		if (CollidesWithAny(afAddr, cell))
+		{
+			width += 2.25;
+		}
 
-			if (width > _worksheet.Column(cell._fromCol).Width)
+		return width;
+	}
+
+	private static bool CollidesWithAny(List<ExcelAddressBase> addresses, ExcelRangeBase cell)
+	{
+		foreach (var a in addresses)
+		{
+			if (a.Collide(cell) != eAddressCollition.No)
 			{
-				_worksheet.Column(cell._fromCol).Width = width > MaximumWidth ? MaximumWidth : width;
+				return true;
 			}
 		}
 
-		_worksheet.Drawings.AdjustWidth(drawWidths);
-		_worksheet._package.DoAdjustDrawings = doAdjust;
+		return false;
 	}
-
 	private void SetMinWidth(double minimumWidth, int fromCol, int toCol)
 	{
 		var iterator = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, 0, fromCol, 0, toCol);

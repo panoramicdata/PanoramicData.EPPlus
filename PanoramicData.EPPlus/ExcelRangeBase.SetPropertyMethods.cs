@@ -55,11 +55,11 @@ public partial class ExcelRangeBase
 	/// <param name="IsArray">If the forumla is an array formula.</param>
 	private static void Set_SharedFormula(ExcelRangeBase range, string value, ExcelAddress address, bool IsArray)
 	{
-		if (range._fromRow == 1 && range._fromCol == 1 && range._toRow == ExcelPackage.MaxRows && range._toCol == ExcelPackage.MaxColumns)  //Full sheet (ex ws.Cells.Value=0). Set value for A1 only to avoid hanging 
+		if (range.IsWholeSheet())  //Full sheet (ex ws.Cells.Value=0). Set value for A1 only to avoid hanging 
 		{
 			throw new InvalidOperationException("Can't set a formula for the entire worksheet");
 		}
-		else if (address.Start.Row == address.End.Row && address.Start.Column == address.End.Column && !IsArray)             //is it really a shared formula? Arrayformulas can be one cell only
+		else if (IsSingleCellAddress(address) && !IsArray)             //is it really a shared formula? Arrayformulas can be one cell only
 		{
 			//Nope, single cell. Set the formula
 			Set_Formula(range, value, address.Start.Row, address.Start.Column);
@@ -89,6 +89,9 @@ public partial class ExcelRangeBase
 			}
 		}
 	}
+	private static bool IsSingleCellAddress(ExcelAddress address)
+		=> address.Start.Row == address.End.Row && address.Start.Column == address.End.Column;
+
 	private static void Set_HyperLink(ExcelRangeBase range, object value, int row, int col)
 	{
 		if (value is Uri uri)

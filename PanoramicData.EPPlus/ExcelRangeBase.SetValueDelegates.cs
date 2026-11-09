@@ -82,27 +82,32 @@ public partial class ExcelRangeBase
 	private void SetValueAddress(ExcelAddress address, _setValue valueMethod, object? value)
 	{
 		IsRangeValid("");
-		if (_fromRow == 1 && _fromCol == 1 && _toRow == ExcelPackage.MaxRows && _toCol == ExcelPackage.MaxColumns)  //Full sheet (ex ws.Cells.Value=0). Set value for A1 only to avoid hanging 
+		if (IsWholeSheet())  //Full sheet (ex ws.Cells.Value=0). Set value for A1 only to avoid hanging 
 		{
 			throw new ArgumentException("Can't reference all cells. Please use the indexer to set the range");
 		}
+		else if (value is object[,] v && valueMethod == Set_Value)
+		{
+			// only simple set value is supported for bulk copy
+			_worksheet.SetRangeValueInner(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column, v);
+		}
 		else
 		{
-			if (value is object[,] v && valueMethod == Set_Value)
+			SetValueForEachCell(address, valueMethod, value);
+		}
+	}
+
+	private void SetValueForEachCell(ExcelAddress address, _setValue valueMethod, object? value)
+	{
+		for (var col = address.Start.Column; col <= address.End.Column; col++)
+		{
+			for (var row = address.Start.Row; row <= address.End.Row; row++)
 			{
-				// only simple set value is supported for bulk copy
-				_worksheet.SetRangeValueInner(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column, v);
-			}
-			else
-			{
-				for (var col = address.Start.Column; col <= address.End.Column; col++)
-				{
-					for (var row = address.Start.Row; row <= address.End.Row; row++)
-					{
-						valueMethod(this, value, row, col);
-					}
-				}
+				valueMethod(this, value, row, col);
 			}
 		}
 	}
+
+	private bool IsWholeSheet()
+		=> _fromRow == 1 && _fromCol == 1 && _toRow == ExcelPackage.MaxRows && _toCol == ExcelPackage.MaxColumns;
 }

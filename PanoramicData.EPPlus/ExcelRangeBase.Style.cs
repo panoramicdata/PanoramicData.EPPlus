@@ -41,11 +41,11 @@ public partial class ExcelRangeBase
 		{
 			IsRangeValid("styling");
 			int xfId;
-			if (_fromRow == 1 && _toRow == ExcelPackage.MaxRows)
+			if (IsFullColumn())
 			{
 				xfId = GetColumnStyle(_fromCol);
 			}
-			else if (_fromCol == 1 && _toCol == ExcelPackage.MaxColumns)
+			else if (IsFullRow())
 			{
 				xfId = 0;
 				if (!_worksheet.ExistsStyleInner(_fromRow, 0, ref xfId))
@@ -65,97 +65,16 @@ public partial class ExcelRangeBase
 				}
 			}
 
-			int nsID;
-			if (xfId <= 0)
-			{
-				nsID = Style.Styles.CellXfs[0].XfId;
-			}
-			else
-			{
-				nsID = Style.Styles.CellXfs[xfId].XfId;
-			}
-
-			foreach (var ns in Style.Styles.NamedStyles)
-			{
-				if (ns.StyleXfId == nsID)
-				{
-					return ns.Name;
-				}
-			}
-
-			return "";
+			return GetNamedStyleName(xfId);
 		}
 		set
 		{
 			_styleID = _worksheet.Workbook.Styles.GetStyleIdFromName(value);
-			if (_fromRow == 1 && _toRow == ExcelPackage.MaxRows)    //Full column
+			if (IsFullColumn())    //Full column
 			{
-				ExcelColumn column;
-				var c = _worksheet.GetValue(0, _fromCol);
-				if (c == null)
-				{
-					column = _worksheet.Column(_fromCol);
-				}
-				else
-				{
-					column = (ExcelColumn)c;
-				}
-
-				column.StyleName = value;
-				column.StyleID = _styleID;
-
-				var cols = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, 0, _fromCol + 1, 0, _toCol);
-				if (cols.Next())
-				{
-					while (column.ColumnMin <= _toCol)
-					{
-						if (column.ColumnMax > _toCol)
-						{
-							_worksheet.CopyColumn(column, _toCol + 1, column.ColumnMax);
-							column.ColumnMax = _toCol;
-						}
-
-						column._styleName = value;
-						column.StyleID = _styleID;
-
-						if (cols.Value._value == null)
-						{
-							break;
-						}
-						else
-						{
-							var nextCol = (ExcelColumn)cols.Value._value;
-							if (column.ColumnMax < nextCol.ColumnMax - 1)
-							{
-								column.ColumnMax = nextCol.ColumnMax - 1;
-							}
-
-							column = nextCol;
-							cols.Next();
-						}
-					}
-				}
-
-				if (column.ColumnMax < _toCol)
-				{
-					column.ColumnMax = _toCol;
-				}
-
-				if (_fromCol == 1 && _toCol == ExcelPackage.MaxColumns) //FullRow
-				{
-					var rows = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, 1, 0, ExcelPackage.MaxRows, 0);
-					rows.Next();
-					while (rows.Value._value != null)
-					{
-						_worksheet.SetStyleInner(rows.Row, 0, _styleID);
-						if (!rows.Next())
-						{
-							break;
-						}
-					}
-				}
+				SetStyleNameOnColumns(value);
 			}
-			else if (_fromCol == 1 && _toCol == ExcelPackage.MaxColumns) //FullRow
+			else if (IsFullRow()) //FullRow
 			{
 				for (var r = _fromRow; r <= _toRow; r++)
 				{
@@ -164,15 +83,9 @@ public partial class ExcelRangeBase
 				}
 			}
 
-			if (!((_fromRow == 1 && _toRow == ExcelPackage.MaxRows) || (_fromCol == 1 && _toCol == ExcelPackage.MaxColumns))) //Cell specific
+			if (!(IsFullColumn() || IsFullRow())) //Cell specific
 			{
-				for (var c = _fromCol; c <= _toCol; c++)
-				{
-					for (var r = _fromRow; r <= _toRow; r++)
-					{
-						_worksheet.SetStyleInner(r, c, _styleID);
-					}
-				}
+				SetStyleIdOnEachCell();
 			}
 			else //Only set name on created cells. (uncreated cells is set on full row or full column).
 			{
@@ -185,6 +98,123 @@ public partial class ExcelRangeBase
 		}
 	}
 
+	private bool IsFullColumn() => _fromRow == 1 && _toRow == ExcelPackage.MaxRows;
+
+	private bool IsFullRow() => _fromCol == 1 && _toCol == ExcelPackage.MaxColumns;
+
+	private string GetNamedStyleName(int xfId)
+	{
+		int nsID;
+		if (xfId <= 0)
+		{
+			nsID = Style.Styles.CellXfs[0].XfId;
+		}
+		else
+		{
+			nsID = Style.Styles.CellXfs[xfId].XfId;
+		}
+
+		foreach (var ns in Style.Styles.NamedStyles)
+		{
+			if (ns.StyleXfId == nsID)
+			{
+				return ns.Name;
+			}
+		}
+
+		return "";
+	}
+
+	private void SetStyleNameOnColumns(string value)
+	{
+		ExcelColumn column;
+		var c = _worksheet.GetValue(0, _fromCol);
+		if (c == null)
+		{
+			column = _worksheet.Column(_fromCol);
+		}
+		else
+		{
+			column = (ExcelColumn)c;
+		}
+
+		column.StyleName = value;
+		column.StyleID = _styleID;
+
+		var cols = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, 0, _fromCol + 1, 0, _toCol);
+		if (cols.Next())
+		{
+			column = SetStyleNameOnFollowingColumns(column, cols, value);
+		}
+
+		if (column.ColumnMax < _toCol)
+		{
+			column.ColumnMax = _toCol;
+		}
+
+		if (IsFullRow()) //FullRow
+		{
+			SetStyleIdOnRowHeaders();
+		}
+	}
+
+	private ExcelColumn SetStyleNameOnFollowingColumns(ExcelColumn column, CellsStoreEnumerator<ExcelCoreValue> cols, string value)
+	{
+		while (column.ColumnMin <= _toCol)
+		{
+			if (column.ColumnMax > _toCol)
+			{
+				_worksheet.CopyColumn(column, _toCol + 1, column.ColumnMax);
+				column.ColumnMax = _toCol;
+			}
+
+			column._styleName = value;
+			column.StyleID = _styleID;
+
+			if (cols.Value._value == null)
+			{
+				break;
+			}
+			else
+			{
+				var nextCol = (ExcelColumn)cols.Value._value;
+				if (column.ColumnMax < nextCol.ColumnMax - 1)
+				{
+					column.ColumnMax = nextCol.ColumnMax - 1;
+				}
+
+				column = nextCol;
+				cols.Next();
+			}
+		}
+
+		return column;
+	}
+
+	private void SetStyleIdOnRowHeaders()
+	{
+		var rows = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, 1, 0, ExcelPackage.MaxRows, 0);
+		rows.Next();
+		while (rows.Value._value != null)
+		{
+			_worksheet.SetStyleInner(rows.Row, 0, _styleID);
+			if (!rows.Next())
+			{
+				break;
+			}
+		}
+	}
+
+	private void SetStyleIdOnEachCell()
+	{
+		for (var c = _fromCol; c <= _toCol; c++)
+		{
+			for (var r = _fromRow; r <= _toRow; r++)
+			{
+				_worksheet.SetStyleInner(r, c, _styleID);
+			}
+		}
+	}
 	private int GetColumnStyle(int col)
 	{
 		object c = null;

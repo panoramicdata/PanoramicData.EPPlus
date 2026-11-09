@@ -5,7 +5,7 @@ public partial class ExcelRangeBase
 	private object GetValueArray()
 	{
 		ExcelAddressBase addr;
-		if (_fromRow == 1 && _fromCol == 1 && _toRow == ExcelPackage.MaxRows && _toCol == ExcelPackage.MaxColumns)
+		if (IsWholeSheet())
 		{
 			addr = _worksheet.Dimension;
 			if (addr == null)
@@ -24,32 +24,32 @@ public partial class ExcelRangeBase
 		{
 			for (var row = addr._fromRow; row <= addr._toRow; row++)
 			{
-				object o = null;
-				if (_worksheet.ExistsValueInner(row, col, ref o))
-				{
-					if (_worksheet._flags.GetFlagValue(row, col, CellFlags.RichText))
-					{
-						v[row - addr._fromRow, col - addr._fromCol] = GetRichText(row, col).Text;
-					}
-					else
-					{
-						v[row - addr._fromRow, col - addr._fromCol] = o;
-					}
-				}
+				v[row - addr._fromRow, col - addr._fromCol] = GetArrayCellValue(row, col);
 			}
 		}
 
 		return v;
 	}
+
+	private object GetArrayCellValue(int row, int col)
+	{
+		object o = null;
+		if (!_worksheet.ExistsValueInner(row, col, ref o))
+		{
+			return null;
+		}
+
+		return _worksheet._flags.GetFlagValue(row, col, CellFlags.RichText) ? GetRichText(row, col).Text : o;
+	}
 	private ExcelAddressBase GetAddressDim(ExcelRangeBase addr)
 	{
 		int fromRow, fromCol, toRow, toCol;
 		var d = _worksheet.Dimension;
-		fromRow = addr._fromRow < d._fromRow ? d._fromRow : addr._fromRow;
-		fromCol = addr._fromCol < d._fromCol ? d._fromCol : addr._fromCol;
+		fromRow = Math.Max(addr._fromRow, d._fromRow);
+		fromCol = Math.Max(addr._fromCol, d._fromCol);
 
-		toRow = addr._toRow > d._toRow ? d._toRow : addr._toRow;
-		toCol = addr._toCol > d._toCol ? d._toCol : addr._toCol;
+		toRow = Math.Min(addr._toRow, d._toRow);
+		toCol = Math.Min(addr._toCol, d._toCol);
 
 		if (addr._fromRow == fromRow && addr._fromCol == fromCol && addr._toRow == toRow && addr._toCol == _toCol)
 		{
