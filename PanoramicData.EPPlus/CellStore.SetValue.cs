@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 
 internal partial class CellStore<T>
 {
@@ -57,9 +57,7 @@ internal partial class CellStore<T>
 					pageItem = _columnIndex[col]._pages[pos];
 				}
 
-				var ix = (short)(Row - ((pageItem.Index << pageBits) + pageItem.Offset));
-				_searchItem.Index = ix;
-				var cellPos = Array.BinarySearch(pageItem.Rows, 0, pageItem.RowCount, _searchItem);
+				var cellPos = FindCellPosition(pageItem, Row, out var ix);
 				if (cellPos < 0)
 				{
 					cellPos = ~cellPos;
@@ -87,7 +85,6 @@ internal partial class CellStore<T>
 	/// <param name="toColumn"></param>
 	/// <param name="Updater"></param>
 	/// <param name="Value"></param>
-	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void SetRangeValueSpecial(int fromRow, int fromColumn, int toRow, int toColumn, SetRangeValueDelegate Updater, object Value)
 	{
 		lock (_columnIndex)
@@ -117,32 +114,14 @@ internal partial class CellStore<T>
 						if (col >= 0)
 						{
 							var pos = GetOrAddPagePosition(col, rowIx, page);
-							var pageItem = _columnIndex[col]._pages[pos];
-							if (pageItem.IndexOffset > rowIx)
+							var startPos = pos;
+							var pageItem = GetPageForRow(col, ref pos, rowIx);
+							if (pos != startPos)
 							{
-								pos--;
 								page--;
-								if (pos < 0)
-								{
-									throw new Exception("Unexpected error when setting value");
-								}
-
-								pageItem = _columnIndex[col]._pages[pos];
 							}
 
-							var ix = (short)(rowIx - ((pageItem.Index << pageBits) + pageItem.Offset));
-							_searchItem.Index = ix;
-							var cellPos = Array.BinarySearch(pageItem.Rows, 0, pageItem.RowCount, _searchItem);
-							if (cellPos < 0)
-							{
-								cellPos = ~cellPos;
-								AddCell(_columnIndex[col], pos, cellPos, ix, default);
-								Updater(_values, pageItem.Rows[cellPos].IndexPointer, rowIx, colIx, Value);
-							}
-							else
-							{
-								Updater(_values, pageItem.Rows[cellPos].IndexPointer, rowIx, colIx, Value);
-							}
+							Updater(_values, GetOrAddCellPointer(col, pos, pageItem, rowIx), rowIx, colIx, Value);
 						}
 						else //Column does not exist
 						{
@@ -157,7 +136,6 @@ internal partial class CellStore<T>
 
 	internal delegate void SetValueDelegate(List<T> list, int index, object value);
 	// Set object's property atomically
-	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void SetValueSpecial(int Row, int Column, SetValueDelegate Updater, object? Value)
 	{
 		lock (_columnIndex)
@@ -167,31 +145,8 @@ internal partial class CellStore<T>
 			if (col >= 0)
 			{
 				var pos = GetOrAddPagePosition(col, Row, page);
-				var pageItem = _columnIndex[col]._pages[pos];
-				if (pageItem.IndexOffset > Row)
-				{
-					pos--;
-					if (pos < 0)
-					{
-						throw new Exception("Unexpected error when setting value");
-					}
-
-					pageItem = _columnIndex[col]._pages[pos];
-				}
-
-				var ix = (short)(Row - ((pageItem.Index << pageBits) + pageItem.Offset));
-				_searchItem.Index = ix;
-				var cellPos = Array.BinarySearch(pageItem.Rows, 0, pageItem.RowCount, _searchItem);
-				if (cellPos < 0)
-				{
-					cellPos = ~cellPos;
-					AddCell(_columnIndex[col], pos, cellPos, ix, default);
-					Updater(_values, pageItem.Rows[cellPos].IndexPointer, Value);
-				}
-				else
-				{
-					Updater(_values, pageItem.Rows[cellPos].IndexPointer, Value);
-				}
+				var pageItem = GetPageForRow(col, ref pos, Row);
+				Updater(_values, GetOrAddCellPointer(col, pos, pageItem, Row), Value);
 			}
 			else //Column does not exist
 			{
@@ -199,5 +154,42 @@ internal partial class CellStore<T>
 				Updater(_values, _columnIndex[col]._pages[0].Rows[0].IndexPointer, Value);
 			}
 		}
+	}
+
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
+	private PageIndex GetPageForRow(int col, ref int pos, int row)
+	{
+		var pageItem = _columnIndex[col]._pages[pos];
+		if (pageItem.IndexOffset > row)
+		{
+			pos--;
+			if (pos < 0)
+			{
+				throw new Exception("Unexpected error when setting value");
+			}
+
+			pageItem = _columnIndex[col]._pages[pos];
+		}
+
+		return pageItem;
+	}
+
+	private int GetOrAddCellPointer(int col, int pos, PageIndex pageItem, int row)
+	{
+		var cellPos = FindCellPosition(pageItem, row, out var ix);
+		if (cellPos < 0)
+		{
+			cellPos = ~cellPos;
+			AddCell(_columnIndex[col], pos, cellPos, ix, default);
+		}
+
+		return pageItem.Rows[cellPos].IndexPointer;
+	}
+
+	private int FindCellPosition(PageIndex pageItem, int row, out short ix)
+	{
+		ix = (short)(row - ((pageItem.Index << pageBits) + pageItem.Offset));
+		_searchItem.Index = ix;
+		return Array.BinarySearch(pageItem.Rows, 0, pageItem.RowCount, _searchItem);
 	}
 }

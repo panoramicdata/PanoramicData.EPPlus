@@ -1,4 +1,4 @@
-﻿using OfficeOpenXml;
+using OfficeOpenXml;
 using System.Diagnostics.CodeAnalysis;
 
 internal partial class CellStore<T>
@@ -17,14 +17,9 @@ internal partial class CellStore<T>
 	internal bool PrevCell(ref int row, ref int col) => PrevCell(ref row, ref col, 0, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
 	internal bool PrevCell(ref int row, ref int col, int minRow, int minColPos, int maxRow, int maxColPos)
 	{
-		if (minColPos >= ColumnCount)
+		if (!ClampColumnPositions(minColPos, ref maxColPos))
 		{
 			return false;
-		}
-
-		if (maxColPos >= ColumnCount)
-		{
-			maxColPos = ColumnCount - 1;
 		}
 
 		var c = GetPosition(col);
@@ -102,47 +97,18 @@ internal partial class CellStore<T>
 					}
 
 					var c = colPos - 1;
-					if (c >= startColPos)
+					if (c >= startColPos && FindRowInColumnsBackward(row, startRow, c, startColPos, ref colPos, ref minRow, ref minCol))
 					{
-						while (c >= startColPos)
-						{
-							r = _columnIndex[c].GetNextRow(row);
-							if (r == row) //Exists next Row
-							{
-								colPos = c;
-								return true;
-							}
-
-							if (r > row && r < minRow && r >= startRow)
-							{
-								minRow = r;
-								minCol = c;
-							}
-
-							c--;
-						}
+						return true;
 					}
 
 					if (row > startRow)
 					{
 						c = endColPos;
 						row--;
-						while (c > colPos)
+						if (FindRowInColumnsBackward(row, startRow, c, colPos + 1, ref colPos, ref minRow, ref minCol))
 						{
-							r = _columnIndex[c].GetNextRow(row);
-							if (r == row) //Exists next Row
-							{
-								colPos = c;
-								return true;
-							}
-
-							if (r > row && r < minRow && r >= startRow)
-							{
-								minRow = r;
-								minCol = c;
-							}
-
-							c--;
+							return true;
 						}
 					}
 
@@ -173,5 +139,28 @@ internal partial class CellStore<T>
 				}
 			}
 		}
+	}
+
+	private bool FindRowInColumnsBackward(int row, int startRow, int c, int lowestColPos, ref int colPos, ref int minRow, ref int minCol)
+	{
+		while (c >= lowestColPos)
+		{
+			var r = _columnIndex[c].GetNextRow(row);
+			if (r == row) //Exists next Row
+			{
+				colPos = c;
+				return true;
+			}
+
+			if (r > row && r < minRow && r >= startRow)
+			{
+				minRow = r;
+				minCol = c;
+			}
+
+			c--;
+		}
+
+		return false;
 	}
 }

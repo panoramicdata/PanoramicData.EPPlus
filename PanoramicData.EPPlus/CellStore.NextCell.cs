@@ -5,14 +5,9 @@ internal partial class CellStore<T>
 	internal bool NextCell(ref int row, ref int col) => NextCell(ref row, ref col, 0, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
 	internal bool NextCell(ref int row, ref int col, int minRow, int minColPos, int maxRow, int maxColPos)
 	{
-		if (minColPos >= ColumnCount)
+		if (!ClampColumnPositions(minColPos, ref maxColPos))
 		{
 			return false;
-		}
-
-		if (maxColPos >= ColumnCount)
-		{
-			maxColPos = ColumnCount - 1;
 		}
 
 		var c = GetPosition(col);
@@ -153,6 +148,22 @@ internal partial class CellStore<T>
 			}
 		}
 	}
+
+	private bool ClampColumnPositions(int minColPos, ref int maxColPos)
+	{
+		if (minColPos >= ColumnCount)
+		{
+			return false;
+		}
+
+		if (maxColPos >= ColumnCount)
+		{
+			maxColPos = ColumnCount - 1;
+		}
+
+		return true;
+	}
+
 	private bool GetNextCellInColumn(ref int row, ref int col, int c, int minColPos, int maxRow, int maxColPos)
 	{
 		var r = GetNextCell(ref row, ref c, minColPos, maxRow, maxColPos);
