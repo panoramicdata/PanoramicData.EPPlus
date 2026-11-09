@@ -1,6 +1,8 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing;
+using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;
@@ -28,4 +30,10 @@ public partial class DateTimeFunctionsTests
 
 	private object ExecuteWorkday(DateTime inputDate, int days)
 		=> new Workday().Execute(FunctionsHelper.CreateArgs(inputDate.ToOADate(), days), _parsingContext).Result;
+
+	private CompileResult ExecuteOnDates(ExcelFunction func, DateTime date1, DateTime date2, params object[] extraArgs)
+	{
+		object[] args = [date1.ToOADate(), date2.ToOADate(), .. extraArgs];
+		return func.Execute(FunctionsHelper.CreateArgs(args), _parsingContext);
+	}
 }

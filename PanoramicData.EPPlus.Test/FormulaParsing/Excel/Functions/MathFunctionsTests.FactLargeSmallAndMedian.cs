@@ -1,5 +1,6 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing;
+using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
@@ -39,9 +40,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void LargeShouldThrowIfIndexOutOfBounds()
 	{
-		var func = new Large();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4, 1, 2, 3), 6);
-		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
+		AssertIndexSixOfFourThrows(new Large());
 	}
 
 	[TestMethod]
@@ -53,9 +52,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void SmallShouldThrowIfIndexOutOfBounds()
 	{
-		var func = new Small();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4, 1, 2, 3), 6);
-		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
+		AssertIndexSixOfFourThrows(new Small());
 	}
 
 	[TestMethod]
@@ -146,5 +143,11 @@ public partial class MathFunctionsTests
 
 		Assert.AreEqual(5.5D, w.GetValue(5, 4));
 		Assert.AreEqual(1.5D, w.GetValue(5, 5));
+	}
+
+	private void AssertIndexSixOfFourThrows(ExcelFunction func)
+	{
+		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4, 1, 2, 3), 6);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
 	}
 }

@@ -10,11 +10,7 @@ public partial class DateTimeFunctionsTests
 	[TestMethod]
 	public void YearFracShouldReturnCorrectResultWithUsBasis()
 	{
-		var func = new Yearfrac();
-		var dt1arg = new DateTime(2013, 2, 28).ToOADate();
-		var dt2arg = new DateTime(2013, 3, 31).ToOADate();
-
-		var result = func.Execute(FunctionsHelper.CreateArgs(dt1arg, dt2arg), _parsingContext);
+		var result = ExecuteOnDates(new Yearfrac(), new DateTime(2013, 2, 28), new DateTime(2013, 3, 31));
 
 		var roundedResult = System.Math.Round((double)result.Result, 4);
 
@@ -24,11 +20,7 @@ public partial class DateTimeFunctionsTests
 	[TestMethod]
 	public void YearFracShouldReturnCorrectResultWithEuroBasis()
 	{
-		var func = new Yearfrac();
-		var dt1arg = new DateTime(2013, 2, 28).ToOADate();
-		var dt2arg = new DateTime(2013, 3, 31).ToOADate();
-
-		var result = func.Execute(FunctionsHelper.CreateArgs(dt1arg, dt2arg, 4), _parsingContext);
+		var result = ExecuteOnDates(new Yearfrac(), new DateTime(2013, 2, 28), new DateTime(2013, 3, 31), 4);
 
 		var roundedResult = System.Math.Round((double)result.Result, 4);
 
@@ -38,11 +30,7 @@ public partial class DateTimeFunctionsTests
 	[TestMethod]
 	public void YearFracActualActual()
 	{
-		var func = new Yearfrac();
-		var dt1arg = new DateTime(2012, 2, 28).ToOADate();
-		var dt2arg = new DateTime(2013, 3, 31).ToOADate();
-
-		var result = func.Execute(FunctionsHelper.CreateArgs(dt1arg, dt2arg, 1), _parsingContext);
+		var result = ExecuteOnDates(new Yearfrac(), new DateTime(2012, 2, 28), new DateTime(2013, 3, 31), 1);
 
 		var roundedResult = System.Math.Round((double)result.Result, 4);
 

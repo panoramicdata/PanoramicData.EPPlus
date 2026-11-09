@@ -1,5 +1,4 @@
-﻿using OfficeOpenXml.FormulaParsing.Excel;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+﻿using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;
@@ -19,13 +18,7 @@ public partial class MathFunctionsTests
 	[TestMethod, Ignore]
 	public void CountShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
 	{
-		var func = new Count
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(1d, FunctionsHelper.CreateArgs(12, 13));
-		args.ElementAt(0).SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new Count(), a => a.ElementAt(0), 1d, FunctionsHelper.CreateArgs(12, 13));
 		Assert.AreEqual(2d, result.Result);
 	}
 
@@ -38,13 +31,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void CountAShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
 	{
-		var func = new CountA
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(1d, FunctionsHelper.CreateArgs(12, 13));
-		args.ElementAt(0).SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new CountA(), a => a.ElementAt(0), 1d, FunctionsHelper.CreateArgs(12, 13));
 		Assert.AreEqual(2d, result.Result);
 	}
 
@@ -57,13 +44,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void ProductShouldIgnoreHiddenValuesIfIgnoreHiddenIsTrue()
 	{
-		var func = new Product
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(2d, 2d, FunctionsHelper.CreateArgs(4d, 2d));
-		args.ElementAt(1).SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new Product(), a => a.ElementAt(1), 2d, 2d, FunctionsHelper.CreateArgs(4d, 2d));
 		Assert.AreEqual(16d, result.Result);
 	}
 
@@ -82,13 +63,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void VarShouldIgnoreHiddenValuesIfIgnoreHiddenIsTrue()
 	{
-		var func = new Var
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(1, 2, 3, 4, 9);
-		args.Last().SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new Var(), a => a.Last(), 1, 2, 3, 4, 9);
 		Assert.AreEqual(1.6667d, System.Math.Round((double)result.Result, 4));
 	}
 
@@ -98,13 +73,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void VarPShouldIgnoreHiddenValuesIfIgnoreHiddenIsTrue()
 	{
-		var func = new VarP
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(1, 2, 3, 4, 9);
-		args.Last().SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new VarP(), a => a.Last(), 1, 2, 3, 4, 9);
 		Assert.AreEqual(1.25d, result.Result);
 	}
 }

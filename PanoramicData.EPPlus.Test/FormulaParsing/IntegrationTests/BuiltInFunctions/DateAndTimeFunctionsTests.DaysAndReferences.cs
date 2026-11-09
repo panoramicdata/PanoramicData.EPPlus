@@ -62,33 +62,28 @@ public partial class DateAndTimeFunctionsTests
 	[TestMethod]
 	public void HourWithExcelReference()
 	{
-		var pck = new ExcelPackage();
-		var ws = pck.Workbook.Worksheets.Add("Calc1");
-		ws.Cells["A1"].Value = new DateTime(2014, 1, 1, 10, 11, 12).ToOADate();
-		ws.Cells["B1"].Formula = "HOUR(A1)";
-		ws.Calculate();
-		Assert.AreEqual(10, ws.Cells["B1"].Value);
+		Assert.AreEqual(10, CalculateOnTenElevenTwelve("HOUR(A1)"));
 	}
 
 	[TestMethod]
 	public void MinuteWithExcelReference()
 	{
-		var pck = new ExcelPackage();
-		var ws = pck.Workbook.Worksheets.Add("Calc1");
-		ws.Cells["A1"].Value = new DateTime(2014, 1, 1, 10, 11, 12).ToOADate();
-		ws.Cells["B1"].Formula = "MINUTE(A1)";
-		ws.Calculate();
-		Assert.AreEqual(11, ws.Cells["B1"].Value);
+		Assert.AreEqual(11, CalculateOnTenElevenTwelve("MINUTE(A1)"));
 	}
 
 	[TestMethod]
 	public void SecondWithExcelReference()
 	{
+		Assert.AreEqual(12, CalculateOnTenElevenTwelve("SECOND(A1)"));
+	}
+
+	private static object CalculateOnTenElevenTwelve(string formula)
+	{
 		var pck = new ExcelPackage();
 		var ws = pck.Workbook.Worksheets.Add("Calc1");
 		ws.Cells["A1"].Value = new DateTime(2014, 1, 1, 10, 11, 12).ToOADate();
-		ws.Cells["B1"].Formula = "SECOND(A1)";
+		ws.Cells["B1"].Formula = formula;
 		ws.Calculate();
-		Assert.AreEqual(12, ws.Cells["B1"].Value);
+		return ws.Cells["B1"].Value;
 	}
 }

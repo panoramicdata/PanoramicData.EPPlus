@@ -1,5 +1,4 @@
 ﻿using OfficeOpenXml.FormulaParsing;
-using OfficeOpenXml.FormulaParsing.Excel;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using OfficeOpenXml.FormulaParsing.Exceptions;
@@ -15,13 +14,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void MaxShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
 	{
-		var func = new Max
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(4, 2, 5, 2);
-		args.ElementAt(2).SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new Max(), a => a.ElementAt(2), 4, 2, 5, 2);
 		Assert.AreEqual(4d, result.Result);
 	}
 
@@ -40,13 +33,7 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void MinShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
 	{
-		var func = new Min
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(4, 2, 5, 3);
-		args.ElementAt(1).SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new Min(), a => a.ElementAt(1), 4, 2, 5, 3);
 		Assert.AreEqual(3d, result.Result);
 	}
 
@@ -74,13 +61,7 @@ public partial class MathFunctionsTests
 	public void AverageShouldIgnoreHiddenFieldsIfIgnoreHiddenValuesIsTrue()
 	{
 		var expectedResult = (4d + 2d + 2d + 1d) / 4d;
-		var func = new Average
-		{
-			IgnoreHiddenValues = true
-		};
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4d, 2d), 5d, 2d, true);
-		args.ElementAt(1).SetExcelStateFlag(ExcelCellState.HiddenCell);
-		var result = func.Execute(args, _parsingContext);
+		var result = ExecuteWithHiddenArg(new Average(), a => a.ElementAt(1), FunctionsHelper.CreateArgs(4d, 2d), 5d, 2d, true);
 		Assert.AreEqual(expectedResult, result.Result);
 	}
 

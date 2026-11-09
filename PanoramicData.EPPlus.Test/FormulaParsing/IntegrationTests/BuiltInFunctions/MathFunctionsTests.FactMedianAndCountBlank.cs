@@ -29,25 +29,13 @@ public partial class MathFunctionsTests
 	[TestMethod]
 	public void CountBlankShouldCalculateEmptyCells()
 	{
-		using var pck = new ExcelPackage();
-		var sheet = pck.Workbook.Worksheets.Add("test");
-		sheet.Cells["A1"].Value = 1;
-		sheet.Cells["B2"].Value = string.Empty;
-		sheet.Cells["A5"].Formula = "COUNTBLANK(A1:B4)";
-		sheet.Calculate();
-		Assert.AreEqual(7, sheet.Cells["A5"].Value);
+		Assert.AreEqual(7, CalculateNextToBlankCells("COUNTBLANK(A1:B4)"));
 	}
 
 	[TestMethod]
 	public void CountBlankShouldCalculateResultOfOffset()
 	{
-		using var pck = new ExcelPackage();
-		var sheet = pck.Workbook.Worksheets.Add("test");
-		sheet.Cells["A1"].Value = 1;
-		sheet.Cells["B2"].Value = string.Empty;
-		sheet.Cells["A5"].Formula = "COUNTBLANK(OFFSET(A1, 0, 1))";
-		sheet.Calculate();
-		Assert.AreEqual(1, sheet.Cells["A5"].Value);
+		Assert.AreEqual(1, CalculateNextToBlankCells("COUNTBLANK(OFFSET(A1, 0, 1))"));
 	}
 
 	[TestMethod]
@@ -95,5 +83,16 @@ public partial class MathFunctionsTests
 		sheet.Calculate();
 
 		Assert.AreEqual(0d, sheet.Cells["A1"].Value);
+	}
+
+	private static object CalculateNextToBlankCells(string formula)
+	{
+		using var pck = new ExcelPackage();
+		var sheet = pck.Workbook.Worksheets.Add("test");
+		sheet.Cells["A1"].Value = 1;
+		sheet.Cells["B2"].Value = string.Empty;
+		sheet.Cells["A5"].Formula = formula;
+		sheet.Calculate();
+		return sheet.Cells["A5"].Value;
 	}
 }
