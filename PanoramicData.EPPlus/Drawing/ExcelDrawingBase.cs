@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Style.XmlAccess;
+using OfficeOpenXml.Utils;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -448,7 +449,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	private decimal GetColumnWidth(int col)
 	{
 		var ws = _drawings.Worksheet;
-		return ws.GetValueInner(0, col) is not ExcelColumn ? (decimal)ws.DefaultColWidth : (decimal)ws.Column(col).VisualWidth;
+		return ws.GetValueInner(0, col) is not ExcelColumn ? LegacyDecimal.FromDouble(ws.DefaultColWidth) : LegacyDecimal.FromDouble(ws.Column(col).VisualWidth);
 	}
 	private double GetRowHeight(int row)
 	{

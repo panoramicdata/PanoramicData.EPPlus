@@ -287,6 +287,19 @@ internal static class ConvertUtil
 			return (T)dateOrTime;
 		}
 
+		if (toType == typeof(decimal))
+		{
+			if (value is double doubleValue)
+			{
+				return (T)(object)LegacyDecimal.FromDouble(doubleValue);
+			}
+
+			if (value is float floatValue)
+			{
+				return (T)(object)LegacyDecimal.FromSingle(floatValue);
+			}
+		}
+
 		return (T)Convert.ChangeType(value, toType);
 	}
 
