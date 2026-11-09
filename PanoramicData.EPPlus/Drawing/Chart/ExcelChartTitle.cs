@@ -62,12 +62,10 @@ public class ExcelChartTitle : XmlHelper
 	{
 		get
 		{
-			//return GetXmlNode(titlePath);
 			return RichText.Text;
 		}
 		set
 		{
-			//SetXmlNode(titlePath, value);
 			RichText.Text = value;
 		}
 	}
@@ -97,7 +95,6 @@ public class ExcelChartTitle : XmlHelper
 			return _fill;
 		}
 	}
-	//ExcelTextFont _font = null;
 	/// <summary>
 	/// A reference to the font properties
 	/// </summary>
@@ -105,11 +102,6 @@ public class ExcelChartTitle : XmlHelper
 	{
 		get
 		{
-			//if (_font == null)
-			//{
-			//    _font = new ExcelTextFont(NameSpaceManager, TopNode, "c:tx/c:rich/a:p/a:r/a:rPr", new string[] { "rPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t" });
-			//}
-			//return _font;
 			if (_richText == null || _richText.Count == 0)
 			{
 				RichText.Add("");

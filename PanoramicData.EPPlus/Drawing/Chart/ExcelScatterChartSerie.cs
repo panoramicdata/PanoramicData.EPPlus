@@ -110,12 +110,6 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 		}
 		set
 		{
-			/* setting MarkerStyle seems to be working, so no need to throw an exception in this case
-                 if (_chartSeries.Chart.ChartType == eChartType.XYScatterLinesNoMarkers ||
-                    _chartSeries.Chart.ChartType == eChartType.XYScatterSmoothNoMarkers)
-                {
-                    throw (new InvalidOperationException("Can't set marker style for this charttype."));
-                }*/
 			SetXmlNodeString(markerPath, value.ToString().ToLower(CultureInfo.InvariantCulture));
 		}
 	}

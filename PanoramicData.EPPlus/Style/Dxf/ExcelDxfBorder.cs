@@ -42,30 +42,6 @@ public class ExcelDxfBorderBase : DxfStyleBase<ExcelDxfBorderBase>
 		get;
 		internal set;
 	}
-	///// <summary>
-	///// Diagonal border style
-	///// </summary>
-	//public ExcelDxfBorderItem Diagonal
-	//{
-	//    get;
-	//    private set;
-	//}
-	///// <summary>
-	///// A diagonal from the bottom left to top right of the cell
-	///// </summary>
-	//public bool DiagonalUp
-	//{
-	//    get;
-	//    set;
-	//}
-	///// <summary>
-	///// A diagonal from the top left to bottom right of the cell
-	///// </summary>
-	//public bool DiagonalDown
-	//{
-	//    get;
-	//    set;
-	//}
 
 	protected internal override string Id => Top.Id + Bottom.Id + Left.Id + Right.Id/* + Diagonal.Id + GetAsString(DiagonalUp) + GetAsString(DiagonalDown)*/;
 

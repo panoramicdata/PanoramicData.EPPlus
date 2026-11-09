@@ -41,7 +41,6 @@ public sealed class ExcelBubbleChartSeries : ExcelChartSeries
 	internal ExcelBubbleChartSeries(ExcelChart chart, XmlNamespaceManager ns, XmlNode node, bool isPivot)
 	   : base(chart, ns, node, isPivot)
 	{
-		//_chartSeries = new ExcelChartSeries(this, _drawings.NameSpaceManager, _chartNode, isPivot);
 	}
 	public ExcelChartSerie Add(ExcelRangeBase Serie, ExcelRangeBase XSerie, ExcelRangeBase BubbleSize) => AddSeries(Serie.FullAddressAbsolute, XSerie.FullAddressAbsolute, BubbleSize.FullAddressAbsolute);
 	public ExcelChartSerie Add(string SerieAddress, string XSerieAddress, string BubbleSizeAddress) => AddSeries(SerieAddress, XSerieAddress, BubbleSizeAddress);
@@ -333,7 +332,7 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 		   eChartType.PieExploded or
 			eChartType.DoughnutExploded)
 		{
-			return "<c:explosion val=\"25\" />"; //Default 25;
+			return "<c:explosion val=\"25\" />";
 		}
 		else
 		{
@@ -345,7 +344,7 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 		if (chartType is eChartType.XYScatterSmooth or
 		   eChartType.XYScatterSmoothNoMarkers)
 		{
-			return "<c:smooth val=\"1\" />"; //Default 25;
+			return "<c:smooth val=\"1\" />";
 		}
 		else
 		{

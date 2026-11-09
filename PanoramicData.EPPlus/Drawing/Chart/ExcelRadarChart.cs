@@ -92,22 +92,6 @@ public class ExcelRadarChart : ExcelChart
 		}
 	}
 
-	//string SMOOTH_PATH = "c:smooth/@val";
-	///// <summary>
-	///// If the series has smooth lines
-	///// </summary>
-	//public bool Smooth
-	//{
-	//    get
-	//    {
-	//        return _chartXmlHelper.GetXmlNodeBool(SMOOTH_PATH, false);
-	//    }
-	//    set
-	//    {
-	//        _chartXmlHelper.SetXmlNodeBool(SMOOTH_PATH, value);
-	//    }
-	//}
-	//string _chartTopPath = "c:chartSpace/c:chart/c:plotArea/{0}";
 	ExcelChartDataLabel _DataLabel;
 	/// <summary>
 	/// Access to datalabel properties

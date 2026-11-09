@@ -407,11 +407,6 @@ public sealed class ExcelShape : ExcelDrawing
 	{
 		get
 		{
-			//XmlNode node=TopNode.SelectSingleNode(PARAGRAPH_PATH, NameSpaceManager);
-			//if (node == null)
-			//{
-			//    CreateNode(PARAGRAPH_PATH);
-			//}
 			_richText ??= new ExcelParagraphCollection(NameSpaceManager, TopNode, PARAGRAPH_PATH, paragraphNodeOrder);
 
 			return _richText;

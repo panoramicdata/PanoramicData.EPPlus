@@ -123,7 +123,6 @@ internal class ExcelVmlDrawingCommentCollection : ExcelVmlDrawingBaseCollection,
 		node.SetAttribute("id", GetNewId());
 		node.SetAttribute("type", "#_x0000_t202");
 		node.SetAttribute("style", "position:absolute;z-index:1; visibility:hidden");
-		//node.SetAttribute("style", "position:absolute; margin-left:59.25pt;margin-top:1.5pt;width:108pt;height:59.25pt;z-index:1; visibility:hidden"); 
 		node.SetAttribute("fillcolor", "#ffffe1");
 		node.SetAttribute("insetmode", ExcelPackage.schemaMicrosoftOffice, "auto");
 

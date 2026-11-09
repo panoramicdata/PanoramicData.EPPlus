@@ -40,13 +40,11 @@ namespace OfficeOpenXml.Drawing;
 /// </summary>
 public sealed class ExcelDrawingFill : XmlHelper
 {
-	//ExcelShape _shp;                
 	readonly string _fillPath;
 	XmlNode _fillNode;
 	internal ExcelDrawingFill(XmlNamespaceManager nameSpaceManager, XmlNode topNode, string fillPath) :
 		base(nameSpaceManager, topNode)
 	{
-		//  _shp=shp;
 		_fillPath = fillPath;
 		_fillNode = topNode.SelectSingleNode(_fillPath, NameSpaceManager);
 		SchemaNodeOrder = ["tickLblPos", "spPr", "txPr", "dLblPos", "crossAx", "printSettings", "showVal", "prstGeom", "noFill", "solidFill", "blipFill", "gradFill", "noFill", "pattFill", "ln", "prstDash"];
@@ -173,7 +171,6 @@ public sealed class ExcelDrawingFill : XmlHelper
 			{
 				throw new Exception("FillStyle must be set to SolidFill");
 			}
-			//CreateNode(_fillPath, false);
 			SetXmlNodeString(_fillPath + alphaPath, ((100 - value) * 1000).ToString());
 		}
 	}

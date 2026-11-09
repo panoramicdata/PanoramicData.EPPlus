@@ -61,31 +61,15 @@ internal static class ExcelConditionalFormattingRuleType
 							nameSpaceManager),
 		  ExcelConditionalFormattingConstants.RuleType.CellIs => GetCellIs((XmlElement)topNode),
 		  ExcelConditionalFormattingConstants.RuleType.BeginsWith => eExcelConditionalFormattingRuleType.BeginsWith,
-		  //case ExcelConditionalFormattingConstants.RuleType.Between:
-		  //  return eExcelConditionalFormattingRuleType.Between;
 		  ExcelConditionalFormattingConstants.RuleType.ContainsBlanks => eExcelConditionalFormattingRuleType.ContainsBlanks,
 		  ExcelConditionalFormattingConstants.RuleType.ContainsErrors => eExcelConditionalFormattingRuleType.ContainsErrors,
 		  ExcelConditionalFormattingConstants.RuleType.ContainsText => eExcelConditionalFormattingRuleType.ContainsText,
 		  ExcelConditionalFormattingConstants.RuleType.DuplicateValues => eExcelConditionalFormattingRuleType.DuplicateValues,
 		  ExcelConditionalFormattingConstants.RuleType.EndsWith => eExcelConditionalFormattingRuleType.EndsWith,
-		  //case ExcelConditionalFormattingConstants.RuleType.Equal:
-		  //  return eExcelConditionalFormattingRuleType.Equal;
 		  ExcelConditionalFormattingConstants.RuleType.Expression => eExcelConditionalFormattingRuleType.Expression,
-		  //case ExcelConditionalFormattingConstants.RuleType.GreaterThan:
-		  //  return eExcelConditionalFormattingRuleType.GreaterThan;
-		  //case ExcelConditionalFormattingConstants.RuleType.GreaterThanOrEqual:
-		  //  return eExcelConditionalFormattingRuleType.GreaterThanOrEqual;
-		  //case ExcelConditionalFormattingConstants.RuleType.LessThan:
-		  //  return eExcelConditionalFormattingRuleType.LessThan;
-		  //case ExcelConditionalFormattingConstants.RuleType.LessThanOrEqual:
-		  //  return eExcelConditionalFormattingRuleType.LessThanOrEqual;
-		  //case ExcelConditionalFormattingConstants.RuleType.NotBetween:
-		  //  return eExcelConditionalFormattingRuleType.NotBetween;
 		  ExcelConditionalFormattingConstants.RuleType.NotContainsBlanks => eExcelConditionalFormattingRuleType.NotContainsBlanks,
 		  ExcelConditionalFormattingConstants.RuleType.NotContainsErrors => eExcelConditionalFormattingRuleType.NotContainsErrors,
 		  ExcelConditionalFormattingConstants.RuleType.NotContainsText => eExcelConditionalFormattingRuleType.NotContainsText,
-		  //case ExcelConditionalFormattingConstants.RuleType.NotEqual:
-		  //  return eExcelConditionalFormattingRuleType.NotEqual;
 		  ExcelConditionalFormattingConstants.RuleType.UniqueValues => eExcelConditionalFormattingRuleType.UniqueValues,
 		  ExcelConditionalFormattingConstants.RuleType.ColorScale => GetColorScaleType(
 							topNode,

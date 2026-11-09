@@ -114,18 +114,6 @@ public sealed class ExcelXfs : StyleXmlHelper
 			return ExcelVerticalAlignment.Bottom;
 		}
 	}
-	internal void Xf_ChangedEvent(object sender, EventArgs e)
-	{
-		//if (_cell != null)
-		//{
-		//    if (!Styles.ChangedCells.ContainsKey(_cell.Id))
-		//    {
-		//        //_cell.Style = "";
-		//        _cell.SetNewStyleID(int.MinValue.ToString());
-		//        Styles.ChangedCells.Add(_cell.Id, _cell);
-		//    }
-		//}
-	}
 	int _xfID;
 	/// <summary>
 	/// Style index
@@ -406,11 +394,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	#endregion
-	internal static void RegisterEvent(ExcelXfs xf)
-	{
-		//                RegisterEvent(xf, xf.Xf_ChangedEvent);
-	}
-	internal override string Id => XfId + "|" + NumberFormatId.ToString() + "|" + FontId.ToString() + "|" + FillId.ToString() + "|" + BorderId.ToString() + VerticalAlignment.ToString() + "|" + HorizontalAlignment.ToString() + "|" + WrapText.ToString() + "|" + ReadingOrder.ToString() + "|" + isBuildIn.ToString() + TextRotation.ToString() + Locked.ToString() + Hidden.ToString() + ShrinkToFit.ToString() + Indent.ToString() + QuotePrefix.ToString();//return Numberformat.Id + "|" + Font.Id + "|" + Fill.Id + "|" + Border.Id + VerticalAlignment.ToString() + "|" + HorizontalAlignment.ToString() + "|" + WrapText.ToString() + "|" + ReadingOrder.ToString(); 
+	internal override string Id => XfId + "|" + NumberFormatId.ToString() + "|" + FontId.ToString() + "|" + FillId.ToString() + "|" + BorderId.ToString() + VerticalAlignment.ToString() + "|" + HorizontalAlignment.ToString() + "|" + WrapText.ToString() + "|" + ReadingOrder.ToString() + "|" + isBuildIn.ToString() + TextRotation.ToString() + Locked.ToString() + Hidden.ToString() + ShrinkToFit.ToString() + Indent.ToString() + QuotePrefix.ToString();
 	internal ExcelXfs Copy() => Copy(_styles);
 	internal ExcelXfs Copy(ExcelStyles styles)
 	{

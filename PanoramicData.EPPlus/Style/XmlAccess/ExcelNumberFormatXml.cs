@@ -58,7 +58,6 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 	}
 	public bool BuildIn { get; private set; }
 	int _numFmtId;
-	//        const string idPath = "@numFmtId";
 	/// <summary>
 	/// Id for number format
 	/// 

@@ -179,7 +179,6 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 		{
 			_cells.Worksheet._flags.SetFlagValue(_cells._fromRow, _cells._fromCol, true, CellFlags.RichText);
 			var s = _cells.Worksheet.GetStyleInner(_cells._fromRow, _cells._fromCol);
-			//var fnt = cell.Style.Font;
 			var fnt = _cells.Worksheet.Workbook.Styles.GetStyleObject(s, _cells.Worksheet.PositionID, ExcelCellBase.GetAddress(_cells._fromRow, _cells._fromCol)).Font;
 			this[0].PreserveSpace = true;
 			this[0].Bold = fnt.Bold;
@@ -234,10 +233,6 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 			_cells.IsRichText = false;
 		}
 	}
-	//public void Insert(int index, string Text)
-	//{
-	//    _list.Insert(index, item);
-	//}
 
 	/// <summary>
 	/// The text

@@ -194,7 +194,6 @@ public class ExcelChartLegend : XmlHelper
 			return;
 		}
 
-		//XmlHelper xml = new XmlHelper(NameSpaceManager, _chart.ChartXml);
 		var xml = XmlHelperFactory.Create(NameSpaceManager, _chart.ChartXml);
 		xml.SchemaNodeOrder = _chart.SchemaNodeOrder;
 

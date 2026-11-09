@@ -171,7 +171,6 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 		{
 			var color = string.Concat("#", value.ToArgb().ToString("X").AsSpan(2, 6));
 			SetXmlNodeString(BACKGROUNDCOLOR_PATH, color);
-			//SetXmlNode(BACKGROUNDCOLOR2_PATH, color);
 		}
 	}
 	const string LINESTYLE_PATH = "v:stroke/@dashstyle";
@@ -278,62 +277,6 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 			SetXmlNodeString(LINEWIDTH_PATH, value.ToString(CultureInfo.InvariantCulture) + "pt");
 		}
 	}
-	///// <summary>
-	///// Width of the Comment 
-	///// </summary>
-	//public Single Width
-	//{
-	//    get
-	//    {
-	//        string v;
-	//        GetStyle("width", out v);
-	//        if(v.EndsWith("pt"))
-	//        {
-	//            v = v.Substring(0, v.Length - 2);
-	//        }
-	//        short ret;
-	//        if (short.TryParse(v,System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out ret))
-	//        {
-	//            return ret;
-	//        }
-	//        else
-	//        {
-	//            return 0;
-	//        }
-	//    }
-	//    set
-	//    {
-	//        SetStyle("width", value.ToString("N2",CultureInfo.InvariantCulture) + "pt");
-	//    }
-	//}
-	///// <summary>
-	///// Height of the Comment 
-	///// </summary>
-	//public Single Height
-	//{
-	//    get
-	//    {
-	//        string v;
-	//        GetStyle("height", out v);
-	//        if (v.EndsWith("pt"))
-	//        {
-	//            v = v.Substring(0, v.Length - 2);
-	//        }
-	//        short ret;
-	//        if (short.TryParse(v, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out ret))
-	//        {
-	//            return ret;
-	//        }
-	//        else
-	//        {
-	//            return 0;
-	//        }
-	//    }
-	//    set
-	//    {
-	//        SetStyle("height", value.ToString("N2", CultureInfo.InvariantCulture) + "pt");
-	//    }
-	//}
 	const string TEXTBOX_STYLE_PATH = "v:textbox/@style";
 	/// <summary>
 	/// Autofits the drawingobject 

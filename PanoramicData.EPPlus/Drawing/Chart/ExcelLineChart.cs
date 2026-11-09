@@ -87,7 +87,6 @@ public class ExcelLineChart : ExcelChart
 			_chartXmlHelper.SetXmlNodeBool(SMOOTH_PATH, value);
 		}
 	}
-	//string _chartTopPath = "c:chartSpace/c:chart/c:plotArea/{0}";
 	ExcelChartDataLabel _DataLabel;
 	/// <summary>
 	/// Access to datalabel properties

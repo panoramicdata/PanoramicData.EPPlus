@@ -123,8 +123,9 @@ public class ExcelDxfStyleConditionalFormatting : DxfStyleBase<ExcelDxfStyleCond
 	public ExcelDxfNumberFormat NumberFormat { get; set; }
 	public ExcelDxfFill Fill { get; set; }
 	public ExcelDxfBorderBase Border { get; set; }
+	// When AllowChange is false the DxfId keeps this style from being reused by conditional formatting updates.
 	protected internal override string Id => NumberFormat.Id + Font.Id + Border.Id + Fill.Id +
-				(AllowChange ? "" : DxfId.ToString());//If allowchange is false we add the dxfID to ensure it's not used when conditional formatting is updated);
+				(AllowChange ? "" : DxfId.ToString());
 	protected internal override ExcelDxfStyleConditionalFormatting Clone()
 	{
 		var s = new ExcelDxfStyleConditionalFormatting(_helper.NameSpaceManager, null, _styles)

@@ -42,18 +42,7 @@ namespace OfficeOpenXml.Drawing.Chart;
 public sealed class ExcelBarChart : ExcelChart
 {
 	#region "Constructors"
-	//internal ExcelBarChart(ExcelDrawings drawings, XmlNode node) :
-	//    base(drawings, node/*, 1*/)
-	//{
-	//    SetChartNodeText("");
-	//}
-	//internal ExcelBarChart(ExcelDrawings drawings, XmlNode node, eChartType type) :
-	//    base(drawings, node, type)
-	//{
-	//    SetChartNodeText("");
 
-	//    SetTypeProperties(drawings, type);
-	//}
 	internal ExcelBarChart(ExcelDrawings drawings, XmlNode node, eChartType type, ExcelChart topChart, ExcelPivotTable PivotTableSource) :
 		base(drawings, node, type, topChart, PivotTableSource)
 	{
@@ -75,16 +64,12 @@ public sealed class ExcelBarChart : ExcelChart
 	}
 	#endregion
 	#region "Private functions"
-	//string _chartTopPath="c:chartSpace/c:chart/c:plotArea/{0}";
 	private void SetChartNodeText(string chartNodeText)
 	{
 		if (string.IsNullOrEmpty(chartNodeText))
 		{
 			chartNodeText = GetChartNodeText();
 		}
-		//_chartTopPath = string.Format(_chartTopPath, chartNodeText);
-		//_directionPath = string.Format(_directionPath, _chartTopPath);
-		//_shapePath = string.Format(_shapePath, _chartTopPath);
 	}
 	private void SetTypeProperties(ExcelDrawings drawings, eChartType type)
 	{

@@ -340,7 +340,6 @@ public class ExcelDrawing : XmlHelper, IDisposable
 		{
 			return new ExcelShape(drawings, node);
 		}
-		//}
 		else if (node.SelectSingleNode("xdr:pic", drawings.NameSpaceManager) != null)
 		{
 			return new ExcelPicture(drawings, node);
@@ -557,7 +556,6 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	{
 		_doNotAdjust = true;
 		var ws = _drawings.Worksheet;
-		//decimal mdw = ws.Workbook.MaxFontWidth;
 		pixels = (int)(pixels / (dpi / STANDARD_DPI) + .5);
 		var pixOff = pixels - ((int)(GetRowHeight(From.Row + 1) / 0.75) - (int)(From.RowOff / EMU_PER_PIXEL));
 		var prevPixOff = pixels;

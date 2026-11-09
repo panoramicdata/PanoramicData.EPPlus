@@ -108,8 +108,6 @@ public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, I
 		node.SetAttribute("id", id);
 		node.SetAttribute("o:type", "#_x0000_t75");
 		node.SetAttribute("style", string.Format("position:absolute;margin-left:0;margin-top:0;width:{0}pt;height:{1}pt;z-index:1", width.ToString(CultureInfo.InvariantCulture), height.ToString(CultureInfo.InvariantCulture)));
-		//node.SetAttribute("fillcolor", "#ffffe1");
-		//node.SetAttribute("insetmode", ExcelPackage.schemaMicrosoftOffice, "auto");
 
 		node.InnerXml = string.Format("<v:imagedata o:relid=\"\" o:title=\"{0}\"/><o:lock v:ext=\"edit\" rotation=\"t\"/>", Name);
 		return node;

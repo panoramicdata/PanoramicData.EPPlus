@@ -47,7 +47,6 @@ public class ExcelChartDataLabel : XmlHelper
 		if (topNode == null)
 		{
 			topNode = node.OwnerDocument.CreateElement("c", "dLbls", ExcelPackage.schemaChart);
-			//node.InsertAfter(_topNode, node.SelectSingleNode("c:order", NameSpaceManager));
 			InserAfter(node, "c:marker,c:tx,c:order,c:ser", topNode);
 			SchemaNodeOrder = ["spPr", "txPr", "dLblPos", "showLegendKey", "showVal", "showCatName", "showSerName", "showPercent", "showBubbleSize", "separator", "showLeaderLines"];
 			topNode.InnerXml = "<c:showLegendKey val=\"0\" /><c:showVal val=\"0\" /><c:showCatName val=\"0\" /><c:showSerName val=\"0\" /><c:showPercent val=\"0\" /><c:showBubbleSize val=\"0\" /> <c:separator>\r\n</c:separator><c:showLeaderLines val=\"0\" />";

@@ -73,7 +73,6 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			return true; //Equal
 		}
 	}
-	//internal List<ImageCompare> _pics = new List<ImageCompare>();
 	internal Dictionary<string, string> _hashes = [];
 	internal ExcelPackage _package;
 	internal Packaging.ZipPackageRelationship _drawingRelation;
@@ -493,10 +492,8 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 			_drawingRelation = Worksheet.Part.CreateRelationship(UriHelper.GetRelativeUri(Worksheet.WorksheetUri, _uriDrawing), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/drawing");
 			var e = (XmlElement)Worksheet.CreateNode("d:drawing");
-			//XmlElement e = Worksheet.WorksheetXml.SelectSingleNode("d:drawing", );
 			e.SetAttribute("id", ExcelPackage.schemaRelationships, _drawingRelation.Id);
 
-			//Worksheet.WorksheetXml.DocumentElement.AppendChild(e);
 			Packaging.ZipPackage.Flush();
 		}
 
@@ -519,12 +516,10 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		{
 			drawNode = _drawingsXml.CreateElement("xdr", "twoCellAnchor", ExcelPackage.schemaSheetDrawings);
 			colNode.AppendChild(drawNode);
-			//Add from position Element;
 			var fromNode = _drawingsXml.CreateElement("xdr", "from", ExcelPackage.schemaSheetDrawings);
 			drawNode.AppendChild(fromNode);
 			fromNode.InnerXml = "<xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>0</xdr:rowOff>";
 
-			//Add to position Element;
 			var toNode = _drawingsXml.CreateElement("xdr", "to", ExcelPackage.schemaSheetDrawings);
 			drawNode.AppendChild(toNode);
 			toNode.InnerXml = "<xdr:col>10</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>10</xdr:row><xdr:rowOff>0</xdr:rowOff>";

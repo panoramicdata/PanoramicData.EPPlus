@@ -166,7 +166,6 @@ public sealed class ExcelFont : StyleBase
 			{
 				UnderLineType = ExcelUnderLineType.None;
 			}
-			//_ChangedEvent(this, new StyleChangeEventArgs(eStyleClass.Font, eStyleProperty.UnderlineType, value, _positionID, _address));
 		}
 	}
 	public ExcelUnderLineType UnderLineType

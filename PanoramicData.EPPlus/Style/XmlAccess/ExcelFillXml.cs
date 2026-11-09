@@ -124,11 +124,6 @@ public class ExcelFillXml : StyleXmlHelper
 	#endregion
 
 
-	//internal Fill Copy()
-	//{
-	//    Fill newFill = new Fill(NameSpaceManager, TopNode.Clone());
-	//    return newFill;
-	//}
 
 	internal virtual ExcelFillXml Copy()
 	{

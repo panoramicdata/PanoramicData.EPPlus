@@ -125,11 +125,6 @@ public sealed class ExcelBubbleChartSerie : ExcelChartSerie
 				cache?.ParentNode.RemoveChild(cache);
 
 				DeleteNode(string.Format("{0}/c:numLit", BUBBLESIZE_TOPPATH));
-				//XmlNode lit = TopNode.SelectSingleNode(string.Format("{0}/c:numLit", _xSeriesTopPath), _ns);
-				//if (lit != null)
-				//{
-				//    lit.ParentNode.RemoveChild(lit);
-				//}
 			}
 		}
 	}

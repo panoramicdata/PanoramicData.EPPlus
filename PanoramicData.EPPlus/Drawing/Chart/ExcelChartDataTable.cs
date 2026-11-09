@@ -46,7 +46,6 @@ public class ExcelChartDataTable : XmlHelper
 		if (topNode == null)
 		{
 			topNode = node.OwnerDocument.CreateElement("c", "dTable", ExcelPackage.schemaChart);
-			//node.InsertAfter(_topNode, node.SelectSingleNode("c:order", NameSpaceManager));
 			InserAfter(node, "c:valAx,c:catAx", topNode);
 			SchemaNodeOrder = ["dTable", "showHorzBorder", "showVertBorder", "showOutline", "showKeys", "spPr", "txPr"];
 			topNode.InnerXml = "<c:showHorzBorder val=\"1\"/><c:showVertBorder val=\"1\"/><c:showOutline val=\"1\"/><c:showKeys val=\"1\"/>";

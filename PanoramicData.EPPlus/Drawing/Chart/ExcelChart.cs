@@ -353,7 +353,6 @@ public enum eSizeRepresents
 public class ExcelChart : ExcelDrawing
 {
 	const string rootPath = "c:chartSpace/c:chart/c:plotArea";
-	//string _chartPath;
 	protected internal ExcelChartSeries _chartSeries;
 	internal ExcelChartAxis[] _axis;
 	protected XmlHelper _chartXmlHelper;
@@ -423,16 +422,14 @@ public class ExcelChart : ExcelDrawing
 	}
 	private void InitChartLoad(ExcelDrawings drawings, XmlNode chartNode)
 	{
-		//SetChartType();
 		var isPivot = false;
 		Init(drawings, chartNode);
-		_chartSeries = new ExcelChartSeries(this, drawings.NameSpaceManager, _chartNode, isPivot /*ChartXml.SelectSingleNode(_chartPath, drawings.NameSpaceManager)*/);
+		_chartSeries = new ExcelChartSeries(this, drawings.NameSpaceManager, _chartNode, isPivot);
 		LoadAxis();
 	}
 
 	private void Init(ExcelDrawings drawings, XmlNode chartNode)
 	{
-		//_chartXmlHelper = new XmlHelper(drawings.NameSpaceManager, chartNode);
 		_chartXmlHelper = XmlHelperFactory.Create(drawings.NameSpaceManager, chartNode);
 		_chartXmlHelper.SchemaNodeOrder = ["ofPieType", "title", "pivotFmt", "autoTitleDeleted", "view3D", "floor", "sideWall", "backWall", "plotArea", "wireframe", "barDir", "grouping", "scatterStyle", "radarStyle", "varyColors", "ser", "dLbls", "bubbleScale", "showNegBubbles", "dropLines", "upDownBars", "marker", "smooth", "shape", "legend", "plotVisOnly", "dispBlanksAs", "gapWidth", "showDLblsOverMax", "overlap", "bandFmts", "axId", "spPr", "printSettings"];
 		WorkSheet = drawings.Worksheet;
@@ -559,35 +556,6 @@ public class ExcelChart : ExcelDrawing
 			YAxis = _axis[1];
 		}
 	}
-	//private void SetChartType()
-	//{
-	//    ChartType = 0;
-	//    //_plotArea = new ExcelChartPlotArea(NameSpaceManager, ChartXml.SelectSingleNode("c:chartSpace/c:chart/c:plotArea", NameSpaceManager));
-	//    int pos=0;
-	//    foreach (XmlElement n in ChartXml.SelectSingleNode(rootPath, _drawings.NameSpaceManager).ChildNodes)
-	//    {
-	//        if (pos == 0)
-	//        {
-	//            ChartType = GetChartType(n.Name);
-	//            if (ChartType != 0)
-	//            {
-	//                //_chartPath = rootPath + "/" + n.Name;
-	//                PlotArea.ChartTypes.Add(this);
-	//            }
-	//        }
-	//        else
-	//        {
-	//            var chartSerieType = GetChart(_drawings, TopNode/*, n*/);
-	//            chartSerieType = GetChart(n, _drawings, TopNode, UriChart, Part, ChartXml, null, isPivot);
-	//            PlotArea.ChartTypes.Add(chartSerieType);
-	//            //var chartType = GetChartType(n.Name);
-	//        }
-	//        if (ChartType != 0)
-	//        {
-	//            pos++;
-	//        }
-	//    }
-	//}
 	internal virtual eChartType GetChartType(string name)
 	{
 
@@ -734,7 +702,6 @@ public class ExcelChart : ExcelDrawing
 			? "<c:radarStyle val=\"\" />"
 			: "";
 	private string AddGrouping() =>
-		//IsTypeClustered() || IsTypePercentStacked() || IsTypeStacked() || 
 		IsTypeShape() || IsTypeLine() ? "<c:grouping val=\"standard\"/>" : "";
 	private static string AddHoleSize(eChartType type) => type is eChartType.Doughnut or
 			eChartType.DoughnutExploded
@@ -850,7 +817,7 @@ public class ExcelChart : ExcelDrawing
 				eChartType.PyramidCol or
 				eChartType.PyramidColClustered or
 				eChartType.PyramidColStacked or
-				eChartType.PyramidColStacked100; //||//ChartType == eChartType.Doughnut ||//ChartType == eChartType.DoughnutExploded;
+				eChartType.PyramidColStacked100;
 	protected internal bool IsTypePercentStacked() => ChartType is eChartType.AreaStacked100 or
 					   eChartType.BarStacked100 or
 					   eChartType.BarStacked1003D or
@@ -1198,63 +1165,6 @@ public class ExcelChart : ExcelDrawing
 
 		return false;
 	}
-	///// <summary>
-	///// Sets position of the axis of a chart-serie
-	///// </summary>
-	///// <param name="XAxis">Left or Right</param>
-	///// <param name="YAxis">Top or Bottom</param>
-	//internal void SetAxis(eXAxisPosition XAxis, eYAxisPosition YAxis)
-	//{
-	//    bool xAxisExists = false, yAxisExists = false;
-	//    foreach (var axis in _axis)
-	//    {
-	//        if (axis.AxisPosition == (eAxisPosition)XAxis)
-	//        {
-	//            //Found
-	//            xAxisExists=true;
-	//            if (axis != this.XAxis)
-	//            {
-	//                CheckRemoveAxis(this.XAxis);
-	//                this.XAxis = axis;
-	//            }
-	//        }
-	//        else if (axis.AxisPosition == (eAxisPosition)YAxis)
-	//        {
-	//            yAxisExists = true;
-	//            if (axis != this.YAxis)
-	//            {
-	//                CheckRemoveAxis(this.YAxis);
-	//                this.YAxis = axis;
-	//            }
-	//        }
-	//    }
-
-	//    if (!xAxisExists)
-	//    {
-	//        if (ExistsAxis(this.XAxis))
-	//        {
-	//            AddAxis((eAxisPosition)XAxis);
-	//            this.XAxis = Axis[Axis.Length - 1];
-	//        }
-	//        else
-	//        {
-	//            this.XAxis.AxisPosition = (eAxisPosition)XAxis;
-	//        }
-	//    }
-	//    if (!yAxisExists)
-	//    {
-	//        if (ExistsAxis(this.XAxis))
-	//        {
-	//            AddAxis((eAxisPosition)YAxis);
-	//            this.YAxis = Axis[Axis.Length - 1];
-	//        }
-	//        else
-	//        {
-	//            this.YAxis.AxisPosition = (eAxisPosition)YAxis;
-	//        }
-	//    }
-	//}
-
 	/// <summary>
 	/// Remove all axis that are not used any more
 	/// </summary>
@@ -1358,7 +1268,6 @@ public class ExcelChart : ExcelDrawing
 	public ExcelView3D View3D => IsType3D()
 				? new ExcelView3D(NameSpaceManager, ChartXml.SelectSingleNode("//c:view3D", NameSpaceManager))
 				: throw (new Exception("Charttype does not support 3D"));
-	//string _groupingPath = "c:chartSpace/c:chart/c:plotArea/{0}/c:grouping/@val";
 	readonly string _groupingPath = "c:grouping/@val";
 	public eGrouping Grouping
 	{
@@ -1371,7 +1280,6 @@ public class ExcelChart : ExcelDrawing
 			_chartXmlHelper.SetXmlNodeString(_groupingPath, GetGroupingText(value));
 		}
 	}
-	//string _varyColorsPath = "c:chartSpace/c:chart/c:plotArea/{0}/c:varyColors/@val";
 	readonly string _varyColorsPath = "c:varyColors/@val";
 	/// <summary>
 	/// If the chart has only one serie this varies the colors for each point.

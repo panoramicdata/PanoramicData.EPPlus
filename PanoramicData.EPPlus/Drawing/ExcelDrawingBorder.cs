@@ -170,13 +170,4 @@ public sealed class ExcelDrawingBorder : XmlHelper
 		_ => eLineCap.Flat,
 	};
 	#endregion
-
-
-	//public ExcelDrawingFont Font
-	//{
-	//    get
-	//    { 
-
-	//    }
-	//}
 }
