@@ -94,14 +94,7 @@ public partial class OperatorsTests
 		Assert.IsTrue((bool)operatorResult.Result);
 		operatorResult = Operator.Eq.Apply(result1, new CompileResult(number1.ToString("n0"), DataType.String));
 		Assert.IsFalse((bool)operatorResult.Result);
-		operatorResult = Operator.GreaterThan.Apply(result1, result2);
-		Assert.IsTrue((bool)operatorResult.Result);
-		operatorResult = Operator.GreaterThanOrEqual.Apply(result1, result2);
-		Assert.IsTrue((bool)operatorResult.Result);
-		operatorResult = Operator.LessThan.Apply(result1, result2);
-		Assert.IsFalse((bool)operatorResult.Result);
-		operatorResult = Operator.LessThanOrEqual.Apply(result1, result2);
-		Assert.IsFalse((bool)operatorResult.Result);
+		AssertFirstIsGreater(result1, result2);
 	}
 
 	[TestMethod]
@@ -133,7 +126,12 @@ public partial class OperatorsTests
 		Assert.IsFalse((bool)operatorResult.Result);
 		operatorResult = Operator.NotEqualsTo.Apply(result1, new CompileResult(date1.ToString("f"), DataType.String));
 		Assert.IsTrue((bool)operatorResult.Result);
-		operatorResult = Operator.GreaterThan.Apply(result1, result2);
+		AssertFirstIsGreater(result1, result2);
+	}
+
+	private static void AssertFirstIsGreater(CompileResult result1, CompileResult result2)
+	{
+		var operatorResult = Operator.GreaterThan.Apply(result1, result2);
 		Assert.IsTrue((bool)operatorResult.Result);
 		operatorResult = Operator.GreaterThanOrEqual.Apply(result1, result2);
 		Assert.IsTrue((bool)operatorResult.Result);

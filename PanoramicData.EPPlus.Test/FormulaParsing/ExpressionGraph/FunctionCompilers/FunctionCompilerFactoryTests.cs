@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing;
+﻿using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
+
+using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
@@ -89,31 +87,6 @@ public class FunctionCompilerFactoryTests
 		var function = new MyFunction();
 		var functionCompiler = functionCompilerFactory.Create(function);
 		Assert.IsInstanceOfType<MyFunctionCompiler>(functionCompiler);
-	}
-	#endregion
-
-	#region Nested Classes
-	public class TestFunctionModule : FunctionsModule
-	{
-		public TestFunctionModule(ParsingContext context)
-		{
-			var myFunction = new MyFunction();
-			var customCompiler = new MyFunctionCompiler(myFunction, context);
-			Functions.Add(MyFunction.Name, myFunction);
-			CustomCompilers.Add(typeof(MyFunction), customCompiler);
-		}
-	}
-
-	public class MyFunction : ExcelFunction
-	{
-		public static string Name => "MyFunction";
-		public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context) => throw new NotImplementedException();
-	}
-
-	public class MyFunctionCompiler : FunctionCompiler
-	{
-		public MyFunctionCompiler(MyFunction function, ParsingContext context) : base(function, context) { }
-		public override CompileResult Compile(IEnumerable<Expression> children) => throw new NotImplementedException();
 	}
 	#endregion
 }

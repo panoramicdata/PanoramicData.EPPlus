@@ -1,16 +1,19 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 using OfficeOpenXml.FormulaParsing;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions.RefAndLookup;
 
 public partial class RefAndLookupTests
 {
+	private static CompileResult MatchInFirstRow(object value, int matchType, int a1, int b1, int c1)
+		=> ExecuteOnFakeCells(new Match(), [value, "A1:C1", matchType], false, (1, 1, a1), (1, 2, b1), (1, 3, c1));
+
 	[TestMethod]
 	public void MatchShouldReturnIndexOfMatchingValHorizontal_MatchTypeExact()
 	{
-		var result = ExecuteOnFakeCells(new Match(), [3, "A1:C1", 0], false,
-			(1, 1, 1), (1, 2, 3), (1, 3, 5));
+		var result = MatchInFirstRow(3, 0, 1, 3, 5);
 		Assert.AreEqual(2, result.Result);
 	}
 
@@ -25,24 +28,21 @@ public partial class RefAndLookupTests
 	[TestMethod]
 	public void MatchShouldReturnIndexOfMatchingValHorizontal_MatchTypeClosestBelow()
 	{
-		var result = ExecuteOnFakeCells(new Match(), [4, "A1:C1", 1], false,
-			(1, 1, 1), (1, 2, 3), (1, 3, 5));
+		var result = MatchInFirstRow(4, 1, 1, 3, 5);
 		Assert.AreEqual(2, result.Result);
 	}
 
 	[TestMethod]
 	public void MatchShouldReturnIndexOfMatchingValHorizontal_MatchTypeClosestAbove()
 	{
-		var result = ExecuteOnFakeCells(new Match(), [6, "A1:C1", -1], false,
-			(1, 1, 10), (1, 2, 8), (1, 3, 5));
+		var result = MatchInFirstRow(6, -1, 10, 8, 5);
 		Assert.AreEqual(2, result.Result);
 	}
 
 	[TestMethod]
 	public void MatchShouldReturnFirstItemWhenExactMatch_MatchTypeClosestAbove()
 	{
-		var result = ExecuteOnFakeCells(new Match(), [10, "A1:C1", -1], false,
-			(1, 1, 10), (1, 2, 8), (1, 3, 5));
+		var result = MatchInFirstRow(10, -1, 10, 8, 5);
 		Assert.AreEqual(1, result.Result);
 	}
 

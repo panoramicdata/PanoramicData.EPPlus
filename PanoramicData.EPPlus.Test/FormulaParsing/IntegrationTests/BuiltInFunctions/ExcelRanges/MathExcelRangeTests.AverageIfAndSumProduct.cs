@@ -1,4 +1,6 @@
 ﻿
+using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
+
 namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.BuiltInFunctions.ExcelRanges;
 
 public partial class MathExcelRangeTests
@@ -22,17 +24,9 @@ public partial class MathExcelRangeTests
 	[TestMethod]
 	public void AverageIfShouldHandleLookupRangeStringMatch()
 	{
-		_worksheet.Cells["A1"].Value = "abc";
-		_worksheet.Cells["A2"].Value = "abc";
-		_worksheet.Cells["A3"].Value = "def";
-		_worksheet.Cells["A4"].Value = "def";
-		_worksheet.Cells["A5"].Value = "abd";
+		OneThreeSixSheet.SetColumn(_worksheet, "A", "abc", "abc", "def", "def", "abd");
 
-		_worksheet.Cells["B1"].Value = 1;
-		_worksheet.Cells["B2"].Value = 3;
-		_worksheet.Cells["B3"].Value = 5;
-		_worksheet.Cells["B4"].Value = 6;
-		_worksheet.Cells["B5"].Value = 7;
+		OneThreeSixSheet.SetColumn(_worksheet, "B", 1, 3, 5, 6, 7);
 
 		Assert.AreEqual(2d, Calculate("A6", "AverageIf(A1:A5,\"abc\",B1:B5)"));
 	}
@@ -40,17 +34,9 @@ public partial class MathExcelRangeTests
 	[TestMethod]
 	public void AverageIfShouldHandleLookupRangeStringNumericMatch()
 	{
-		_worksheet.Cells["A1"].Value = 1;
-		_worksheet.Cells["A2"].Value = 3;
-		_worksheet.Cells["A3"].Value = 3;
-		_worksheet.Cells["A4"].Value = 5;
-		_worksheet.Cells["A5"].Value = 2;
+		OneThreeSixSheet.SetColumn(_worksheet, "A", 1, 3, 3, 5, 2);
 
-		_worksheet.Cells["B1"].Value = 3;
-		_worksheet.Cells["B2"].Value = 3;
-		_worksheet.Cells["B3"].Value = 2;
-		_worksheet.Cells["B4"].Value = 1;
-		_worksheet.Cells["B5"].Value = 8;
+		OneThreeSixSheet.SetColumn(_worksheet, "B", 3, 3, 2, 1, 8);
 
 		Assert.AreEqual(2d, Calculate("A6", "AverageIf(A1:A5,\">2\",B1:B5)"));
 	}
@@ -58,17 +44,9 @@ public partial class MathExcelRangeTests
 	[TestMethod]
 	public void AverageIfShouldHandleLookupRangeStringWildCardMatch()
 	{
-		_worksheet.Cells["A1"].Value = "abc";
-		_worksheet.Cells["A2"].Value = "abc";
-		_worksheet.Cells["A3"].Value = "def";
-		_worksheet.Cells["A4"].Value = "def";
-		_worksheet.Cells["A5"].Value = "abd";
+		OneThreeSixSheet.SetColumn(_worksheet, "A", "abc", "abc", "def", "def", "abd");
 
-		_worksheet.Cells["B1"].Value = 1;
-		_worksheet.Cells["B2"].Value = 3;
-		_worksheet.Cells["B3"].Value = 5;
-		_worksheet.Cells["B4"].Value = 6;
-		_worksheet.Cells["B5"].Value = 8;
+		OneThreeSixSheet.SetColumn(_worksheet, "B", 1, 3, 5, 6, 8);
 
 		Assert.AreEqual(4d, Calculate("A6", "AverageIf(A1:A5, \"ab*\",B1:B5)"));
 	}
@@ -76,12 +54,8 @@ public partial class MathExcelRangeTests
 	[TestMethod]
 	public void SumProductWithRange()
 	{
-		_worksheet.Cells["A1"].Value = 1;
-		_worksheet.Cells["A2"].Value = 2;
-		_worksheet.Cells["A3"].Value = 3;
-		_worksheet.Cells["B1"].Value = 5;
-		_worksheet.Cells["B2"].Value = 6;
-		_worksheet.Cells["B3"].Value = 4;
+		OneThreeSixSheet.SetColumn(_worksheet, "A", 1, 2, 3);
+		OneThreeSixSheet.SetColumn(_worksheet, "B", 5, 6, 4);
 		var result = Calculate("A4", "SUMPRODUCT(A1:A3,B1:B3)");
 		Assert.AreEqual(29d, result);
 	}
@@ -89,12 +63,8 @@ public partial class MathExcelRangeTests
 	[TestMethod]
 	public void SumProductWithRangeAndValues()
 	{
-		_worksheet.Cells["A1"].Value = 1;
-		_worksheet.Cells["A2"].Value = 2;
-		_worksheet.Cells["A3"].Value = 3;
-		_worksheet.Cells["B1"].Value = 5;
-		_worksheet.Cells["B2"].Value = 6;
-		_worksheet.Cells["B3"].Value = 4;
+		OneThreeSixSheet.SetColumn(_worksheet, "A", 1, 2, 3);
+		OneThreeSixSheet.SetColumn(_worksheet, "B", 5, 6, 4);
 		var result = Calculate("A4", "SUMPRODUCT(A1:A3,B1:B3,{2,4,1})");
 		Assert.AreEqual(70d, result);
 	}
