@@ -44,6 +44,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -242,7 +243,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	private static readonly _setValue _setCommentDelegate = Set_Comment;
 
 	private static void Set_StyleID(ExcelRangeBase range, object value, int row, int col) => range._worksheet.SetStyleInner(row, col, (int)value);
-	private static void Set_StyleName(ExcelRangeBase range, object value, int row, int col) => range._worksheet.SetStyleInner(row, col, range._styleID);
 	private static void Set_Value(ExcelRangeBase range, object value, int row, int col)
 	{
 		var sfi = range._worksheet._formulas.GetValue(row, col);
@@ -266,18 +266,13 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			range.SplitFormulas(range._worksheet.Cells[row, col]);
 		}
 
-		var formula = (value == null ? string.Empty : value.ToString());
+		var formula = value == null ? string.Empty : value.ToString();
 		if (formula == string.Empty)
 		{
 			range._worksheet._formulas.SetValue(row, col, string.Empty);
 		}
 		else
 		{
-			if (formula[0] == '=')
-			{
-				value = formula[1..]; // remove any starting equalsign.
-			}
-
 			range._worksheet._formulas.SetValue(row, col, formula);
 			range._worksheet.SetValueInner(row, col, null);
 		}
@@ -484,7 +479,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		set
 		{
 			_styleID = _worksheet.Workbook.Styles.GetStyleIdFromName(value);
-			var col = _fromCol;
 			if (_fromRow == 1 && _toRow == ExcelPackage.MaxRows)    //Full column
 			{
 				ExcelColumn column;
@@ -504,12 +498,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				var cols = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, 0, _fromCol + 1, 0, _toCol);
 				if (cols.Next())
 				{
-					col = _fromCol;
 					while (column.ColumnMin <= _toCol)
 					{
 						if (column.ColumnMax > _toCol)
 						{
-							var newCol = _worksheet.CopyColumn(column, _toCol + 1, column.ColumnMax);
+							_worksheet.CopyColumn(column, _toCol + 1, column.ColumnMax);
 							column.ColumnMax = _toCol;
 						}
 
@@ -1040,13 +1033,13 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			return d.Minute.ToString();
 		}
-		else if (format.ToLower() is "y" or "yy")
+		else if (format.ToLower(CultureInfo.CurrentCulture) is "y" or "yy")
 		{
 			return d.ToString("yy", nf.Culture);
 		}
 		else
 		{
-			return format.ToLower() is "yyy" or "yyyy" ? d.ToString("yyy", nf.Culture) : d.ToString(format, nf.Culture);
+			return format.ToLower(CultureInfo.CurrentCulture) is "yyy" or "yyyy" ? d.ToString("yyy", nf.Culture) : d.ToString(format, nf.Culture);
 		}
 
 	}
@@ -1200,7 +1193,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				{
 					foreach (var address in Addresses)
 					{
-						_worksheet.MergedCells.Clear(address); ;
+						_worksheet.MergedCells.Clear(address);
 					}
 				}
 
@@ -1355,21 +1348,18 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		get
 		{
-			var fullAddress = string.Empty;
 			if (Addresses?.Count > 0) //Contains multiple range.
 			{
-				fullAddress = GetFullAddress(_worksheet.Name, Addresses[0].Address);
+				var fullAddress = new StringBuilder(GetFullAddress(_worksheet.Name, Addresses[0].Address));
 				for (var i = 1; i < Addresses.Count; i++)
 				{
-					fullAddress += "," + GetFullAddress(_worksheet.Name, Addresses[i].Address);
+					fullAddress.Append(',').Append(GetFullAddress(_worksheet.Name, Addresses[i].Address));
 				}
-			}
-			else
-			{
-				fullAddress = GetFullAddress(_worksheet.Name, _address);
+
+				return fullAddress.ToString();
 			}
 
-			return fullAddress;
+			return GetFullAddress(_worksheet.Name, _address);
 		}
 	}
 	/// <summary>
@@ -1380,33 +1370,30 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		get
 		{
 			var wbwsRef = string.IsNullOrEmpty(_wb) ? _ws : "[" + _wb.Replace("'", "''") + "]" + _ws;
-			string fullAddress;
 			if (Addresses == null)
 			{
-				fullAddress = GetFullAddress(wbwsRef, GetAddress(_fromRow, _fromCol, _toRow, _toCol, true));
+				return GetFullAddress(wbwsRef, GetAddress(_fromRow, _fromCol, _toRow, _toCol, true));
 			}
-			else
-			{
-				fullAddress = "";
-				foreach (var a in Addresses)
-				{
-					if (fullAddress != "")
-					{
-						fullAddress += ",";
-					}
 
-					if (a.Address == "#REF!")
-					{
-						fullAddress += GetFullAddress(wbwsRef, "#REF!");
-					}
-					else
-					{
-						fullAddress += GetFullAddress(wbwsRef, GetAddress(a.Start.Row, a.Start.Column, a.End.Row, a.End.Column, true));
-					}
+			var fullAddress = new StringBuilder();
+			foreach (var a in Addresses)
+			{
+				if (fullAddress.Length > 0)
+				{
+					fullAddress.Append(',');
+				}
+
+				if (a.Address == "#REF!")
+				{
+					fullAddress.Append(GetFullAddress(wbwsRef, "#REF!"));
+				}
+				else
+				{
+					fullAddress.Append(GetFullAddress(wbwsRef, GetAddress(a.Start.Row, a.Start.Column, a.End.Row, a.End.Column, true)));
 				}
 			}
 
-			return fullAddress;
+			return fullAddress.ToString();
 		}
 	}
 	/// <summary>
@@ -1417,26 +1404,23 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		get
 		{
 			var wbwsRef = string.IsNullOrEmpty(_wb) ? _ws : "[" + _wb.Replace("'", "''") + "]" + _ws;
-			string fullAddress;
 			if (Addresses == null)
 			{
-				fullAddress = GetFullAddress(wbwsRef, GetAddress(_fromRow, _fromCol, _toRow, _toCol, true), false);
+				return GetFullAddress(wbwsRef, GetAddress(_fromRow, _fromCol, _toRow, _toCol, true), false);
 			}
-			else
+
+			var fullAddress = new StringBuilder();
+			foreach (var a in Addresses)
 			{
-				fullAddress = "";
-				foreach (var a in Addresses)
+				if (fullAddress.Length > 0)
 				{
-					if (fullAddress != "")
-					{
-						fullAddress += ",";
-					}
-
-					fullAddress += GetFullAddress(wbwsRef, GetAddress(a.Start.Row, a.Start.Column, a.End.Row, a.End.Column, true), false); ;
+					fullAddress.Append(',');
 				}
+
+				fullAddress.Append(GetFullAddress(wbwsRef, GetAddress(a.Start.Row, a.Start.Column, a.End.Row, a.End.Column, true), false));
 			}
 
-			return fullAddress;
+			return fullAddress.ToString();
 		}
 	}
 	#endregion
@@ -1674,7 +1658,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			}
 			else
 			{
-				return string.IsNullOrEmpty(v) ? null : v; ;
+				return string.IsNullOrEmpty(v) ? null : v;
 			}
 		}
 		else
@@ -1719,6 +1703,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="TableName">The name of the table</param>
 	/// <param name="TableStyle">The table style to apply to the data</param>
 	/// <returns>The filled range</returns>
+	[SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads would break binary compatibility.")]
 	public ExcelRangeBase LoadFromDataReader(IDataReader Reader, bool PrintHeaders, string TableName, TableStyles TableStyle = TableStyles.None)
 	{
 		var r = LoadFromDataReader(Reader, PrintHeaders);
@@ -1875,7 +1860,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				rowIx -= _fromRow;
 				columnIx -= _fromCol;
 
-				var values = ((List<object[]>)value);
+				var values = (List<object[]>)value;
 				if (values.Count <= rowIx)
 				{
 					return;
@@ -1964,14 +1949,14 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		}
 
 		// create buffer
-		var values = new object[(PrintHeaders ? Collection.Count() + 1 : Collection.Count()), Members.Length];
+		var values = new object[PrintHeaders ? Collection.Count() + 1 : Collection.Count(), Members.Length];
 
 		int col = 0, row = 0;
 		if (Members.Length > 0 && PrintHeaders)
 		{
 			foreach (var t in Members)
 			{
-				var header = string.Empty;
+				string header;
 				if (t.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() is DescriptionAttribute descriptionAttribute)
 				{
 					header = descriptionAttribute.Description;
@@ -2011,8 +1996,8 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				{
 					if (isSameType == false && item.GetType().GetMember(t.Name, memberFlags).Length == 0)
 					{
+						// The member does not exist on this inherited type
 						col++;
-						continue; //Check if the property exists if and inherited class is used
 					}
 					else if (t is PropertyInfo info)
 					{
@@ -2077,7 +2062,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		Format ??= new ExcelTextFormat();
 
-
 		string[] lines;
 		if (Format.TextQualifier == 0)
 		{
@@ -2101,7 +2085,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			if (lineNo > Format.SkipLinesBeginning && lineNo <= lines.Length - Format.SkipLinesEnd)
 			{
 				col = 0;
-				var v = "";
+				var v = new StringBuilder();
 				bool isText = false, isQualifier = false;
 				var QCount = 0;
 				var lineQCount = 0;
@@ -2109,7 +2093,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				{
 					if (Format.TextQualifier != 0 && c == Format.TextQualifier)
 					{
-						if (!isText && v != "")
+						if (!isText && v.Length != 0)
 						{
 							throw new Exception(string.Format("Invalid Text Qualifier in line : {0}", line));
 						}
@@ -2121,36 +2105,36 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 					}
 					else
 					{
-						if (QCount > 1 && !string.IsNullOrEmpty(v))
+						if (QCount > 1 && v.Length != 0)
 						{
-							v += new string(Format.TextQualifier, QCount / 2);
+							v.Append(Format.TextQualifier, QCount / 2);
 						}
-						else if (QCount > 2 && string.IsNullOrEmpty(v))
+						else if (QCount > 2 && v.Length == 0)
 						{
-							v += new string(Format.TextQualifier, (QCount - 1) / 2);
+							v.Append(Format.TextQualifier, (QCount - 1) / 2);
 						}
 
 						if (isQualifier)
 						{
-							v += c;
+							v.Append(c);
 						}
 						else
 						{
 							if (c == Format.Delimiter)
 							{
-								items.Add(ConvertData(Format, v, col, isText));
-								v = "";
+								items.Add(ConvertData(Format, v.ToString(), col, isText));
+								v.Clear();
 								isText = false;
 								col++;
 							}
 							else
 							{
-								if (QCount % 2 == 1)
+								if (QCount % 2 != 0)
 								{
 									throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
 								}
 
-								v += c;
+								v.Append(c);
 							}
 						}
 
@@ -2158,17 +2142,17 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 					}
 				}
 
-				if (QCount > 1 && (v != "" && QCount == 2))
+				if (QCount > 1 && v.Length != 0 && QCount == 2)
 				{
-					v += new string(Format.TextQualifier, QCount / 2);
+					v.Append(Format.TextQualifier, QCount / 2);
 				}
 
-				if (lineQCount % 2 == 1)
+				if (lineQCount % 2 != 0)
 				{
 					throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
 				}
 
-				items.Add(ConvertData(Format, v, col, isText));
+				items.Add(ConvertData(Format, v.ToString(), col, isText));
 				if (col > maxCol)
 				{
 					maxCol = col;
@@ -2181,7 +2165,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		}
 		// flush
 		_worksheet._values.SetRangeValueSpecial(_fromRow, _fromCol, _fromRow + values.Length - 1, _fromCol + maxCol,
-			(List<ExcelCoreValue> list, int index, int rowIx, int columnIx, object value) =>
+			(List<ExcelCoreValue> list, int index, int rowIx, int columnIx, object _) =>
 			{
 				rowIx -= _fromRow;
 				columnIx -= _fromCol;
@@ -2208,21 +2192,21 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		var list = new List<string>();
 		var inTQ = false;
 		var prevLineStart = 0;
-		for (var i = 0; i < text.Length; i++)
+		var i = 0;
+		while (i < text.Length)
 		{
 			if (text[i] == Format.TextQualifier)
 			{
 				inTQ = !inTQ;
 			}
-			else if (!inTQ)
+			else if (!inTQ && IsEOL(text, i, eol))
 			{
-				if (IsEOL(text, i, eol))
-				{
-					list.Add(text[prevLineStart..i]);
-					i += eol.Length - 1;
-					prevLineStart = i + 1;
-				}
+				list.Add(text[prevLineStart..i]);
+				i += eol.Length - 1;
+				prevLineStart = i + 1;
 			}
+
+			i++;
 		}
 
 		if (inTQ)
@@ -2381,7 +2365,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		//Check if any comments exists in the range and throw an exception
 		_changePropMethod(this, _setExistsCommentDelegate, null);
 		//Create the comments
-		_changePropMethod(this, _setCommentDelegate, new string[] { Text, Author });
+		_changePropMethod(this, _setCommentDelegate, new[] { Text, Author });
 
 		return _worksheet.Comments[new ExcelCellAddress(_fromRow, _fromCol)];
 	}
@@ -2771,6 +2755,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		_cellEnum = new CellsStoreEnumerator<ExcelCoreValue>(_worksheet._values, _fromRow, _fromCol, _toRow, _toCol);
 	}
 	#endregion
+	[SuppressMessage("Minor Code Smell", "S3898:Value types should implement IEquatable<T>", Justification = "Private sort buffer item; never compared for equality.")]
 	private struct SortItem<T>
 	{
 		internal int Row { get; set; }
@@ -2784,7 +2769,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		public CompareOptions compareOptions = CompareOptions.None;
 		public int Compare(SortItem<ExcelCoreValue> x, SortItem<ExcelCoreValue> y)
 		{
-			var ret = 0;
+			int ret;
 			for (var i = 0; i < columns.Length; i++)
 			{
 				var x1 = x.Items[columns[i]]._value;
@@ -2805,7 +2790,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 						d2 = double.MaxValue;
 					}
 
-					ret = d1 < d2 ? -1 : (d1 > d2 ? 1 : 0);
+					ret = d1 < d2 ? -1 : d1 > d2 ? 1 : 0;
 				}
 				else if (isNumX == false && isNumY == false)   //String Compare
 				{
@@ -2836,6 +2821,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="column">The column to sort by within the range. Zerobased</param>
 	/// <param name="descending">Descending if true, otherwise Ascending. Default Ascending. Zerobased</param>
 	/// </summary>
+	[SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads would break binary compatibility.")]
 	public void Sort(int column, bool descending = false) => Sort([column], [descending]);
 	/// <summary>
 	/// Sort the range by value
@@ -2844,6 +2830,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="descending">Descending if true, otherwise Ascending. Default Ascending. Zerobased</param>
 	/// <param name="culture">The CultureInfo used to compare values. A null value means CurrentCulture</param>
 	/// <param name="compareOptions">String compare option</param>
+	[SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads would break binary compatibility.")]
 	public void Sort(int[] columns, bool[]? descending = null, CultureInfo? culture = null, CompareOptions compareOptions = CompareOptions.None)
 	{
 		columns ??= [0];
