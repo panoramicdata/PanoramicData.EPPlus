@@ -86,7 +86,7 @@ internal class EncryptionHeader
 		bw.Write(SizeExtra);
 		bw.Write((int)AlgID);
 		bw.Write((int)AlgIDHash);
-		bw.Write((int)KeySize);
+		bw.Write(KeySize);
 		bw.Write((int)ProviderType);
 		bw.Write(Reserved1);
 		bw.Write(Reserved2);

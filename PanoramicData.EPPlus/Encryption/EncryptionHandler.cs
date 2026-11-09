@@ -63,20 +63,6 @@ internal class EncryptedPackageHandler
 			throw (new InvalidDataException(string.Format("File {0} is not an encrypted package", fi.FullName)));
 		}
 	}
-	//Helpmethod to output the streams in the storage
-	//private void WriteDoc(CompoundDocument.StoragePart storagePart, string p)
-	//{
-	//    foreach (var store in storagePart.SubStorage)
-	//    {
-	//        string sdir=p + store.Key.Replace((char)6,'x') + "\\";
-	//        Directory.CreateDirectory(sdir);
-	//        WriteDoc(store.Value, sdir);
-	//    }
-	//    foreach (var str in storagePart.DataStreams)
-	//    {
-	//        File.WriteAllBytes(p + str.Key.Replace((char)6, 'x') + ".bin", str.Value);
-	//    }
-	//}
 	/// <summary>
 	/// Read the package from the OLE document and decrypt it using the supplied password
 	/// </summary>
@@ -85,23 +71,15 @@ internal class EncryptedPackageHandler
 	/// <returns></returns>
 	internal MemoryStream DecryptPackage(MemoryStream stream, ExcelEncryption encryption)
 	{
-		try
+		if (CompoundDocument.IsCompoundDocument(stream))
 		{
-			if (CompoundDocument.IsCompoundDocument(stream))
-			{
-				var doc = new CompoundDocument(stream);
-				return GetStreamFromPackage(doc, encryption);
-			}
-			else
-			{
-				throw (new InvalidDataException("The stream is not an valid/supported encrypted document."));
-			}
+			var doc = new CompoundDocument(stream);
+			return GetStreamFromPackage(doc, encryption);
 		}
-		catch// (Exception ex)
+		else
 		{
-			throw;
+			throw (new InvalidDataException("The stream is not an valid/supported encrypted document."));
 		}
-
 	}
 	/// <summary>
 	/// Encrypts a package
@@ -151,10 +129,8 @@ internal class EncryptedPackageHandler
 		//Get the password key.
 		var hashProvider = GetHashProvider(encryptionInfo.KeyEncryptors[0]);
 		var baseHash = GetPasswordHash(hashProvider, encr.SaltValue, encryption.Password, encr.SpinCount, encr.HashSize);
-		var hashFinal = GetFinalHash(hashProvider, _blockKey_KeyValue, baseHash);
-		hashFinal = FixHashSize(hashFinal, encr.KeyBits / 8);
 
-		var encrData = EncryptDataAgile(package, encryptionInfo, hashProvider);
+		var encrData= EncryptDataAgile(package, encryptionInfo, hashProvider);
 
 		/**** Data Integrity ****/
 		var saltHMAC = new byte[64];
@@ -162,7 +138,24 @@ internal class EncryptedPackageHandler
 
 		SetHMAC(encryptionInfo, hashProvider, saltHMAC, encrData);
 
-		/**** Verifier ****/
+		SetVerifier(encr, hashProvider, baseHash, rnd);
+
+		var doc = new CompoundDocument();
+
+		//Add the dataspace streams
+		CreateDataSpaces(doc);
+		//EncryptionInfo...
+		doc.Storage.DataStreams.Add("EncryptionInfo", CreateAgileEncryptionInfoStream(encryptionInfo.Xml.OuterXml));
+		//...and the encrypted package
+		doc.Storage.DataStreams.Add("EncryptedPackage", encrData);
+
+		var ms = new MemoryStream();
+		doc.Save(ms);
+		return ms;
+	}
+
+	private void SetVerifier(EncryptionInfoAgile.EncryptionKeyEncryptor encr, HashAlgorithm hashProvider, byte[] baseHash, RandomNumberGenerator rnd)
+	{
 		encr.VerifierHashInput = new byte[16];
 		rnd.GetBytes(encr.VerifierHashInput);
 
@@ -183,30 +176,26 @@ internal class EncryptedPackageHandler
 		ms = new MemoryStream();
 		EncryptAgileFromKey(encr, KeyValueKey, encr.KeyValue, 0, encr.KeyValue.Length, encr.SaltValue, ms);
 		encr.EncryptedKeyValue = ms.ToArray();
+	}
 
-		xml = encryptionInfo.Xml.OuterXml;
-
+	private static byte[] CreateAgileEncryptionInfoStream(string xml)
+	{
 		var byXml = Encoding.UTF8.GetBytes(xml);
 
-		ms = new MemoryStream();
+		var ms = new MemoryStream();
 		ms.Write(BitConverter.GetBytes((ushort)4), 0, 2); //Major Version
 		ms.Write(BitConverter.GetBytes((ushort)4), 0, 2); //Minor Version
 		ms.Write(BitConverter.GetBytes((uint)0x40), 0, 4); //Reserved
 		ms.Write(byXml, 0, byXml.Length);
+		return ms.ToArray();
+	}
 
-		var doc = new CompoundDocument();
-
-		//Add the dataspace streams
-		CreateDataSpaces(doc);
-		//EncryptionInfo...
-		doc.Storage.DataStreams.Add("EncryptionInfo", ms.ToArray());
-		//...and the encrypted package
-		doc.Storage.DataStreams.Add("EncryptedPackage", encrData);
-
-		ms = new MemoryStream();
-		doc.Save(ms);
-		//ms.Write(e,0,e.Length);
-		return ms;
+	private static byte[] GetSegmentIv(HashAlgorithm hashProvider, EncryptionInfoAgile.EncryptionKeyData keyData, byte[] segmentBytes)
+	{
+		var ivTmp = new byte[4 + keyData.SaltSize];
+		Array.Copy(keyData.SaltValue, 0, ivTmp, 0, keyData.SaltSize);
+		Array.Copy(segmentBytes, 0, ivTmp, keyData.SaltSize, 4);
+		return hashProvider.ComputeHash(ivTmp);
 	}
 
 	private byte[] EncryptDataAgile(byte[] data, EncryptionInfoAgile encryptionInfo, HashAlgorithm hashProvider)
@@ -214,7 +203,7 @@ internal class EncryptedPackageHandler
 		var ke = encryptionInfo.KeyEncryptors[0];
 		var aes = Aes.Create();
 		aes.KeySize = ke.KeyBits;
-		aes.Mode = CipherMode.CBC;
+		aes.Mode = CipherMode.CBC; // nosemgrep: CBC is mandated by MS-OFFCRYPTO agile encryption
 		aes.Padding = PaddingMode.Zeros;
 
 		var pos = 0;
@@ -225,12 +214,8 @@ internal class EncryptedPackageHandler
 		ms.Write(BitConverter.GetBytes((ulong)data.Length), 0, 8);
 		while (pos < data.Length)
 		{
-			var segmentSize = (int)(data.Length - pos > 4096 ? 4096 : data.Length - pos);
-
-			var ivTmp = new byte[4 + encryptionInfo.KeyData.SaltSize];
-			Array.Copy(encryptionInfo.KeyData.SaltValue, 0, ivTmp, 0, encryptionInfo.KeyData.SaltSize);
-			Array.Copy(BitConverter.GetBytes(segment), 0, ivTmp, encryptionInfo.KeyData.SaltSize, 4);
-			var iv = hashProvider.ComputeHash(ivTmp);
+			var segmentSize = data.Length - pos > 4096 ? 4096 : data.Length - pos;
+			var iv = GetSegmentIv(hashProvider, encryptionInfo.KeyData, BitConverter.GetBytes(segment));
 
 			EncryptAgileFromKey(ke, ke.KeyValue, data, pos, segmentSize, iv, ms);
 			pos += segmentSize;
@@ -277,13 +262,7 @@ internal class EncryptedPackageHandler
 					AlgorithmID.AES192 :
 					AlgorithmID.AES256, out var encryptionKey);
 
-		//ILockBytes lb;
-		//var iret = CreateILockBytesOnHGlobal(IntPtr.Zero, true, out lb);
-
-		//IStorage storage = null;
-		//MemoryStream ret = null;
-
-		var doc = new CompoundDocument();
+		var doc= new CompoundDocument();
 		CreateDataSpaces(doc);
 
 		doc.Storage.DataStreams.Add("EncryptionInfo", encryptionInfo.WriteBinary());
@@ -305,7 +284,6 @@ internal class EncryptedPackageHandler
 	{
 		var ds = new CompoundDocument.StoragePart();
 		doc.Storage.SubStorage.Add("\x06" + "DataSpaces", ds);
-		var ver = new CompoundDocument.StoragePart();
 		ds.DataStreams.Add("Version", CreateVersionStream());
 		ds.DataStreams.Add("DataSpaceMap", CreateDataSpaceMap());
 
@@ -326,11 +304,11 @@ internal class EncryptedPackageHandler
 		MemoryStream ms = new();
 		BinaryWriter bw = new(ms);
 
-		bw.Write((int)8);       //HeaderLength
-		bw.Write((int)1);       //EntryCount
+		bw.Write(8);       //HeaderLength
+		bw.Write(1);       //EntryCount
 
 		var tr = "StrongEncryptionTransform";
-		bw.Write((int)tr.Length * 2);
+		bw.Write(tr.Length * 2);
 		bw.Write(Encoding.Unicode.GetBytes(tr + "\0")); // end \0 is for padding
 
 		bw.Flush();
@@ -344,9 +322,9 @@ internal class EncryptedPackageHandler
 		bw.Write((short)0x3C);  //Major
 		bw.Write((short)0);     //Minor
 		bw.Write(Encoding.Unicode.GetBytes("Microsoft.Container.DataSpaces"));
-		bw.Write((int)1);       //ReaderVersion
-		bw.Write((int)1);       //UpdaterVersion
-		bw.Write((int)1);       //WriterVersion
+		bw.Write(1);       //ReaderVersion
+		bw.Write(1);       //UpdaterVersion
+		bw.Write(1);       //WriterVersion
 
 		bw.Flush();
 		return ms.ToArray();
@@ -356,16 +334,16 @@ internal class EncryptedPackageHandler
 		MemoryStream ms = new();
 		BinaryWriter bw = new(ms);
 
-		bw.Write((int)8);       //HeaderLength
-		bw.Write((int)1);       //EntryCount
+		bw.Write(8);       //HeaderLength
+		bw.Write(1);       //EntryCount
 		var s1 = "EncryptedPackage";
 		var s2 = "StrongEncryptionDataSpace";
-		bw.Write((int)(s1.Length + s2.Length) * 2 + 0x16);
-		bw.Write((int)1);       //ReferenceComponentCount
-		bw.Write((int)0);       //Stream=0
-		bw.Write((int)s1.Length * 2); //Length s1
+		bw.Write((s1.Length + s2.Length) * 2 + 0x16);
+		bw.Write(1);       //ReferenceComponentCount
+		bw.Write(0);       //Stream=0
+		bw.Write(s1.Length * 2); //Length s1
 		bw.Write(Encoding.Unicode.GetBytes(s1));
-		bw.Write((int)(s2.Length * 2));   //Length s2
+		bw.Write(s2.Length * 2);   //Length s2
 		bw.Write(Encoding.Unicode.GetBytes(s2 + "\0"));   // end \0 is for padding
 
 		bw.Flush();
@@ -378,19 +356,19 @@ internal class EncryptedPackageHandler
 		var TransformID = "{FF9A3F03-56EF-4613-BDD5-5A41C1D07246}";
 		var TransformName = "Microsoft.Container.EncryptionTransform";
 		bw.Write(TransformID.Length * 2 + 12);
-		bw.Write((int)1);
+		bw.Write(1);
 		bw.Write(TransformID.Length * 2);
 		bw.Write(Encoding.Unicode.GetBytes(TransformID));
 		bw.Write(TransformName.Length * 2);
 		bw.Write(Encoding.Unicode.GetBytes(TransformName + "\0"));
-		bw.Write((int)1);   //ReaderVersion
-		bw.Write((int)1);   //UpdaterVersion
-		bw.Write((int)1);   //WriterVersion
+		bw.Write(1);   //ReaderVersion
+		bw.Write(1);   //UpdaterVersion
+		bw.Write(1);   //WriterVersion
 
-		bw.Write((int)0);
-		bw.Write((int)0);
-		bw.Write((int)0);       //CipherMode
-		bw.Write((int)4);       //Reserved
+		bw.Write(0);
+		bw.Write(0);
+		bw.Write(0);       //CipherMode
+		bw.Write(4);       //Reserved
 
 		bw.Flush();
 		return ms.ToArray();
@@ -460,7 +438,7 @@ internal class EncryptedPackageHandler
 	{
 		var aes = Aes.Create();
 		aes.KeySize = key.Length * 8;
-		aes.Mode = CipherMode.ECB;
+		aes.Mode = CipherMode.ECB; // nosemgrep: ECB is mandated by MS-OFFCRYPTO standard encryption
 		aes.Padding = PaddingMode.Zeros;
 
 		//Encrypt the data
@@ -476,7 +454,7 @@ internal class EncryptedPackageHandler
 		{
 			ret = new byte[data.Length];
 			ms.Seek(0, SeekOrigin.Begin);
-			ms.Read(ret, 0, data.Length);  //Truncate any padded Zeros
+			ms.ReadExactly(ret, 0, data.Length);  //Truncate any padded Zeros
 			return ret;
 		}
 		else
@@ -486,8 +464,7 @@ internal class EncryptedPackageHandler
 	}
 	private MemoryStream GetStreamFromPackage(CompoundDocument doc, ExcelEncryption encryption)
 	{
-		var ret = new MemoryStream();
-		if (doc.Storage.DataStreams.ContainsKey("EncryptionInfo") ||
+		if(doc.Storage.DataStreams.ContainsKey("EncryptionInfo") ||
 		   doc.Storage.DataStreams.ContainsKey("EncryptedPackage"))
 		{
 			var encryptionInfo = EncryptionInfo.ReadBinary(doc.Storage.DataStreams["EncryptionInfo"]);
@@ -549,42 +526,8 @@ internal class EncryptedPackageHandler
 
 			if (IsPasswordValid(hashProvider, encr))
 			{
-				var ivhmac = GetFinalHash(hashProviderDataKey, _blockKey_HmacKey, encryptionInfo.KeyData.SaltValue);
-				var key = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity.EncryptedHmacKey, encryptionInfo.KeyData.HashSize, ivhmac);
-
-				ivhmac = GetFinalHash(hashProviderDataKey, _blockKey_HmacValue, encryptionInfo.KeyData.SaltValue);
-				var value = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity.EncryptedHmacValue, encryptionInfo.KeyData.HashSize, ivhmac);
-
-				var hmca = GetHmacProvider(encryptionInfo.KeyData, key);
-				var v2 = hmca.ComputeHash(data);
-
-				for (var i = 0; i < v2.Length; i++)
-				{
-					if (value[i] != v2[i])
-					{
-						throw (new Exception("Dataintegrity key mismatch"));
-					}
-				}
-
-				var pos = 0;
-				uint segment = 0;
-				while (pos < size)
-				{
-					var segmentSize = (int)(size - pos > 4096 ? 4096 : size - pos);
-					var bufferSize = (int)(encryptedData.Length - pos > 4096 ? 4096 : encryptedData.Length - pos);
-					var ivTmp = new byte[4 + encryptionInfo.KeyData.SaltSize];
-					Array.Copy(encryptionInfo.KeyData.SaltValue, 0, ivTmp, 0, encryptionInfo.KeyData.SaltSize);
-					Array.Copy(BitConverter.GetBytes(segment), 0, ivTmp, encryptionInfo.KeyData.SaltSize, 4);
-					var iv = hashProviderDataKey.ComputeHash(ivTmp);
-					var buffer = new byte[bufferSize];
-					Array.Copy(encryptedData, pos, buffer, 0, bufferSize);
-
-					var b = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, buffer, segmentSize, iv);
-					doc.Write(b, 0, b.Length);
-					pos += segmentSize;
-					segment++;
-				}
-
+				VerifyDataIntegrity(encryptionInfo, encr, hashProviderDataKey, data);
+				DecryptAgileSegments(encryptionInfo, encr, hashProviderDataKey, size, encryptedData, doc);
 				doc.Flush();
 				return doc;
 			}
@@ -596,11 +539,48 @@ internal class EncryptedPackageHandler
 
 		return null;
 	}
+
+	private void VerifyDataIntegrity(EncryptionInfoAgile encryptionInfo, EncryptionInfoAgile.EncryptionKeyEncryptor encr, HashAlgorithm hashProviderDataKey, byte[] data)
+	{
+		var ivhmac = GetFinalHash(hashProviderDataKey, _blockKey_HmacKey, encryptionInfo.KeyData.SaltValue);
+		var key = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity.EncryptedHmacKey, encryptionInfo.KeyData.HashSize, ivhmac);
+
+		ivhmac = GetFinalHash(hashProviderDataKey, _blockKey_HmacValue, encryptionInfo.KeyData.SaltValue);
+		var value = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, encryptionInfo.DataIntegrity.EncryptedHmacValue, encryptionInfo.KeyData.HashSize, ivhmac);
+
+		var hmca = GetHmacProvider(encryptionInfo.KeyData, key);
+		var v2 = hmca.ComputeHash(data);
+
+		for (var i = 0; i < v2.Length; i++)
+		{
+			if (value[i] != v2[i])
+			{
+				throw (new Exception("Dataintegrity key mismatch"));
+			}
+		}
+	}
+
+	private static void DecryptAgileSegments(EncryptionInfoAgile encryptionInfo, EncryptionInfoAgile.EncryptionKeyEncryptor encr, HashAlgorithm hashProviderDataKey, long size, byte[] encryptedData, MemoryStream doc)
+	{
+		var pos = 0;
+		uint segment = 0;
+		while (pos < size)
+		{
+			var segmentSize = (int)(size - pos > 4096 ? 4096 : size - pos);
+			var bufferSize = encryptedData.Length - pos > 4096 ? 4096 : encryptedData.Length - pos;
+			var iv = GetSegmentIv(hashProviderDataKey, encryptionInfo.KeyData, BitConverter.GetBytes(segment));
+			var buffer = new byte[bufferSize];
+			Array.Copy(encryptedData, pos, buffer, 0, bufferSize);
+
+			var b = DecryptAgileFromKey(encryptionInfo.KeyData, encr.KeyValue, buffer, segmentSize, iv);
+			doc.Write(b, 0, b.Length);
+			pos += segmentSize;
+			segment++;
+		}
+	}
 	private static HashAlgorithm GetHashProvider(EncryptionInfoAgile.EncryptionKeyData encr) => encr.HashAlgorithm switch
 	{
 		eHashAlogorithm.MD5 => MD5.Create(),
-		//case eHashAlogorithm.RIPEMD160:
-		//    return new RIPEMD160Managed();                    
 		eHashAlogorithm.SHA1 => SHA1.Create(),
 		eHashAlogorithm.SHA256 => SHA256.Create(),
 		eHashAlogorithm.SHA384 => SHA384.Create(),
@@ -620,7 +600,7 @@ internal class EncryptedPackageHandler
 		{
 			var decryptKey = Aes.Create();
 			decryptKey.KeySize = encryptionInfo.Header.KeySize;
-			decryptKey.Mode = CipherMode.ECB;
+			decryptKey.Mode = CipherMode.ECB; // nosemgrep: ECB is mandated by MS-OFFCRYPTO standard encryption
 			decryptKey.Padding = PaddingMode.None;
 
 			var key = GetPasswordHashBinary(password, encryptionInfo);
@@ -725,7 +705,7 @@ internal class EncryptedPackageHandler
 		var decryptKey = GetEncryptionAlgorithm(encr);
 		decryptKey.BlockSize = encr.BlockSize << 3;
 		decryptKey.KeySize = encr.KeyBits;
-		decryptKey.Mode = CipherMode.CBC;
+		decryptKey.Mode = CipherMode.CBC; // nosemgrep: CBC is mandated by MS-OFFCRYPTO agile encryption
 		decryptKey.Padding = PaddingMode.Zeros;
 
 		var decryptor = decryptKey.CreateDecryptor(
@@ -748,12 +728,8 @@ internal class EncryptedPackageHandler
 	private static SymmetricAlgorithm GetEncryptionAlgorithm(EncryptionInfoAgile.EncryptionKeyData encr) => encr.CipherAlgorithm switch
 	{
 		eCipherAlgorithm.AES => Aes.Create(),
-		//case eCipherAlgorithm.DES:
-		//    return new DESCryptoServiceProvider();
 		eCipherAlgorithm.TRIPLE_DES or eCipherAlgorithm.TRIPLE_DES_112 => TripleDES.Create(),
-		//case eCipherAlgorithm.RC2:
-		//    return new RC2CryptoServiceProvider();                    
-		_ => throw (new NotSupportedException(string.Format("Unsupported Cipher Algorithm: {0}", encr.CipherAlgorithm.ToString()))),
+		_ =>throw (new NotSupportedException(string.Format("Unsupported Cipher Algorithm: {0}", encr.CipherAlgorithm.ToString()))),
 	};
 
 	private static void EncryptAgileFromKey(EncryptionInfoAgile.EncryptionKeyEncryptor encr, byte[] key, byte[] data, long pos, long size, byte[] iv, MemoryStream ms)
@@ -761,7 +737,7 @@ internal class EncryptedPackageHandler
 		var encryptKey = GetEncryptionAlgorithm(encr);
 		encryptKey.BlockSize = encr.BlockSize << 3;
 		encryptKey.KeySize = encr.KeyBits;
-		encryptKey.Mode = CipherMode.CBC;
+		encryptKey.Mode = CipherMode.CBC; // nosemgrep: CBC is mandated by MS-OFFCRYPTO agile encryption
 		encryptKey.Padding = PaddingMode.Zeros;
 
 		var encryptor = encryptKey.CreateEncryptor(
@@ -773,8 +749,7 @@ internal class EncryptedPackageHandler
 													 encryptor,
 													 CryptoStreamMode.Write);
 
-		var cryptoSize = size % encr.BlockSize == 0 ? size : (size + (encr.BlockSize - (size % encr.BlockSize)));
-		var buffer = new byte[size];
+		var buffer= new byte[size];
 		Array.Copy(data, (int)pos, buffer, 0, (int)size);
 		cryptoStream.Write(buffer, 0, (int)size);
 		while (size % encr.BlockSize != 0)
@@ -793,70 +768,76 @@ internal class EncryptedPackageHandler
 	/// <returns>The hash to encrypt the document</returns>
 	private byte[] GetPasswordHashBinary(string password, EncryptionInfoBinary encryptionInfo)
 	{
-		byte[] hash = null;
 		var tempHash = new byte[4 + 20];    //Iterator + prev. hash
 		try
 		{
-			HashAlgorithm hashProvider;
-			if (encryptionInfo.Header.AlgIDHash == AlgorithmHashID.SHA1 || encryptionInfo.Header.AlgIDHash == AlgorithmHashID.App && (encryptionInfo.Flags & Flags.fExternal) == 0)
-			{
-				hashProvider = SHA1.Create();
-			}
-			else if (encryptionInfo.Header.KeySize is > 0 and < 80)
-			{
-				throw new NotSupportedException("RC4 Hash provider is not supported. Must be SHA1(AlgIDHash == 0x8004)");
-			}
-			else
-			{
-				throw new NotSupportedException("Hash provider is invalid. Must be SHA1(AlgIDHash == 0x8004)");
-			}
-
-			hash = GetPasswordHash(hashProvider, encryptionInfo.Verifier.Salt, password, 50000, 20);
+			var hashProvider = GetBinaryHashProvider(encryptionInfo);
+			var hash = GetPasswordHash(hashProvider, encryptionInfo.Verifier.Salt, password, 50000, 20);
 
 			// Append "block" (0)
 			Array.Copy(hash, tempHash, hash.Length);
 			Array.Copy(BitConverter.GetBytes(0), 0, tempHash, hash.Length, 4);
 			hash = hashProvider.ComputeHash(tempHash);
 
-			/***** Now use the derived key algorithm *****/
-			var derivedKey = new byte[64];
-			var keySizeBytes = encryptionInfo.Header.KeySize / 8;
-
-			//First XOR hash bytes with 0x36 and fill the rest with 0x36
-			for (var i = 0; i < derivedKey.Length; i++)
-			{
-				derivedKey[i] = (byte)(i < hash.Length ? 0x36 ^ hash[i] : 0x36);
-			}
-
-			var X1 = hashProvider.ComputeHash(derivedKey);
-
-			//if verifier size is bigger than the key size we can return X1
-			if ((int)encryptionInfo.Verifier.VerifierHashSize > keySizeBytes)
-			{
-				return FixHashSize(X1, keySizeBytes);
-			}
-
-			//Else XOR hash bytes with 0x5C and fill the rest with 0x5C
-			for (var i = 0; i < derivedKey.Length; i++)
-			{
-				derivedKey[i] = (byte)(i < hash.Length ? 0x5C ^ hash[i] : 0x5C);
-			}
-
-			var X2 = hashProvider.ComputeHash(derivedKey);
-
-			//Join the two and return 
-			var join = new byte[X1.Length + X2.Length];
-
-			Array.Copy(X1, 0, join, 0, X1.Length);
-			Array.Copy(X2, 0, join, X1.Length, X2.Length);
-
-
-			return FixHashSize(join, keySizeBytes);
+			return DeriveBinaryKey(hashProvider, hash, encryptionInfo);
 		}
 		catch (Exception ex)
 		{
 			throw (new Exception("An error occured when the encryptionkey was created", ex));
 		}
+	}
+
+	private static HashAlgorithm GetBinaryHashProvider(EncryptionInfoBinary encryptionInfo)
+	{
+		if (encryptionInfo.Header.AlgIDHash == AlgorithmHashID.SHA1 || encryptionInfo.Header.AlgIDHash == AlgorithmHashID.App && (encryptionInfo.Flags & Flags.fExternal) == 0)
+		{
+			return SHA1.Create();
+		}
+		else if (encryptionInfo.Header.KeySize is > 0 and < 80)
+		{
+			throw new NotSupportedException("RC4 Hash provider is not supported. Must be SHA1(AlgIDHash == 0x8004)");
+		}
+		else
+		{
+			throw new NotSupportedException("Hash provider is invalid. Must be SHA1(AlgIDHash == 0x8004)");
+		}
+	}
+
+	private static byte[] DeriveBinaryKey(HashAlgorithm hashProvider, byte[] hash, EncryptionInfoBinary encryptionInfo)
+	{
+		/***** Now use the derived key algorithm *****/
+		var derivedKey = new byte[64];
+		var keySizeBytes = encryptionInfo.Header.KeySize / 8;
+
+		//First XOR hash bytes with 0x36 and fill the rest with 0x36
+		for (var i = 0; i < derivedKey.Length; i++)
+		{
+			derivedKey[i] = (byte)(i < hash.Length ? 0x36 ^ hash[i] : 0x36);
+		}
+
+		var X1 = hashProvider.ComputeHash(derivedKey);
+
+		//if verifier size is bigger than the key size we can return X1
+		if ((int)encryptionInfo.Verifier.VerifierHashSize > keySizeBytes)
+		{
+			return FixHashSize(X1, keySizeBytes);
+		}
+
+		//Else XOR hash bytes with 0x5C and fill the rest with 0x5C
+		for (var i = 0; i < derivedKey.Length; i++)
+		{
+			derivedKey[i] = (byte)(i < hash.Length ? 0x5C ^ hash[i] : 0x5C);
+		}
+
+		var X2 = hashProvider.ComputeHash(derivedKey);
+
+		//Join the two and return
+		var join = new byte[X1.Length + X2.Length];
+
+		Array.Copy(X1, 0, join, 0, X1.Length);
+		Array.Copy(X2, 0, join, X1.Length, X2.Length);
+
+		return FixHashSize(join, keySizeBytes);
 	}
 
 	/// <summary>
