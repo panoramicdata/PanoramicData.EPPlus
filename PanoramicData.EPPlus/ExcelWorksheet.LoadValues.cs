@@ -8,43 +8,6 @@ namespace OfficeOpenXml;
 public partial class ExcelWorksheet
 {
 	/// <summary>
-	/// Load merged cells
-	/// </summary>
-	/// <param name="xr"></param>
-	private void LoadMergeCells(XmlReader xr)
-	{
-		if (ReadUntil(xr, "mergeCells", "hyperlinks", "rowBreaks", "colBreaks") && !xr.EOF)
-		{
-			while (xr.Read())
-			{
-				if (xr.LocalName != "mergeCell")
-				{
-					break;
-				}
-
-				if (xr.NodeType == XmlNodeType.Element)
-				{
-					var address = xr.GetAttribute("ref");
-					_mergedCells.Add(new ExcelAddress(address), false);
-				}
-			}
-		}
-	}
-	/// <summary>
-	/// Update merged cells
-	/// </summary>
-	/// <param name="sw">The writer</param>
-	private void UpdateMergedCells(StreamWriter sw)
-	{
-		sw.Write("<mergeCells>");
-		foreach (var address in _mergedCells)
-		{
-			sw.Write("<mergeCell ref=\"{0}\" />", address);
-		}
-
-		sw.Write("</mergeCells>");
-	}
-	/// <summary>
 	/// Reads a row from the XML reader
 	/// </summary>
 	/// <param name="xr">The reader</param>
