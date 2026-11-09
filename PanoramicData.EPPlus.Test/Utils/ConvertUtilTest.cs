@@ -99,7 +99,7 @@ public class ConvertUtilTest
 		var decimalSign = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 		var result = ConvertUtil.GetTypedCellValue<decimal>($"1{decimalSign}4");
 
-		Assert.AreEqual((decimal)1.4, result);
+		Assert.AreEqual(1.4m, result);
 	}
 
 	[TestMethod]

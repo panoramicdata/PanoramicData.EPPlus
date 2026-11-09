@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using OfficeOpenXml.Utils;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OfficeOpenXml;
 
@@ -57,7 +58,7 @@ public sealed partial class ExcelWorkbook
 
 		if (font.TryGetValue(fontSize, out var value2))
 		{
-			return Convert.ToDecimal(value2.Width);
+			return LegacyDecimal.FromSingle(value2.Width);
 		}
 		else
 		{
@@ -76,8 +77,8 @@ public sealed partial class ExcelWorkbook
 			}
 
 			return min == max
-				? Convert.ToDecimal(font[min].Width)
-				: Convert.ToDecimal(font[min].Height + (font[max].Height - font[min].Height) * ((fontSize - min) / (max - min)));
+				? LegacyDecimal.FromSingle(font[min].Width)
+				: LegacyDecimal.FromSingle(font[min].Height + (font[max].Height - font[min].Height) * ((fontSize - min) / (max - min)));
 		}
 	}
 }
