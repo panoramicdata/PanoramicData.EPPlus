@@ -39,7 +39,7 @@ public class MathFunctionsTests : FormulaParserTestBase
 	[TestMethod]
 	public void PiShouldReturnCorrectResult()
 	{
-		var expectedValue = (double)Math.Round(Math.PI, 14);
+		var expectedValue = Math.Round(Math.PI, 14);
 		var result = _parser.Parse("Pi()");
 		Assert.AreEqual(expectedValue, result);
 	}

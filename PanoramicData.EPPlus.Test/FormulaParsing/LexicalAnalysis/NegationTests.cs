@@ -19,12 +19,6 @@ public class NegationTests
 		_tokenizer = new SourceCodeTokenizer(context.Configuration.FunctionRepository, null);
 	}
 
-	[TestCleanup]
-	public void Cleanup()
-	{
-
-	}
-
 	[TestMethod]
 	public void ShouldSetNegatorOnFirstTokenIfFirstCharIsMinus()
 	{

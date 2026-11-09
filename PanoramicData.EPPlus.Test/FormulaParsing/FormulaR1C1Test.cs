@@ -136,8 +136,6 @@ public class FormulaR1C1Tests
 		Assert.AreEqual("SUM($I5:L5)", f);
 		_sheet.Cells[5, 13].Formula = f;
 		Assert.AreEqual(fR1C1, _sheet.Cells[5, 13].FormulaR1C1);
-
-		//"RC{colShort} - SUM(RC21:RC12)";
 	}
 	[TestMethod]
 	public void RCFixToABToR1C1_2()
@@ -208,7 +206,8 @@ public class FormulaR1C1Tests
 		var c = _sheet.Cells["D3"];
 		c.Formula = formula;
 		Assert.AreEqual("VLOOKUP(RC[-1],R[-2],1,0)", c.FormulaR1C1);
-		c.FormulaR1C1 = c.FormulaR1C1;
+		var r1c1 = c.FormulaR1C1;
+		c.FormulaR1C1 = r1c1;
 		Assert.AreEqual(c.Formula, formula);
 	}
 

@@ -104,7 +104,7 @@ public class RefAndLookupTests
 		var parsingContext = ParsingContext.Create();
 		parsingContext.Scopes.NewScope(RangeAddress.Empty);
 
-		var provider = A.Fake<ExcelDataProvider>(); ;
+		var provider = A.Fake<ExcelDataProvider>();
 
 		A.CallTo(() => provider.GetCellValue(WorksheetName, 1, 1)).Returns("A");
 		A.CallTo(() => provider.GetCellValue(WorksheetName, 1, 2)).Returns(1);

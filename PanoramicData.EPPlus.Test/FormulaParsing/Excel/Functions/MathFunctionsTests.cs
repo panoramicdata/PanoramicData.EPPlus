@@ -28,7 +28,7 @@ public class MathFunctionsTests
 	[TestMethod]
 	public void PiShouldReturnPIConstant()
 	{
-		var expectedValue = (double)System.Math.Round(System.Math.PI, 14);
+		var expectedValue = System.Math.Round(System.Math.PI, 14);
 		var func = new Pi();
 		var args = FunctionsHelper.CreateArgs(0);
 		var result = func.Execute(args, _parsingContext);

@@ -34,7 +34,6 @@ public class DateTimeFormulaTests : ValidationTestBase
 	public void DateTimeFormula_FormulasFormulaIsSetFromXmlNodeInConstructor()
 	{
 		// Arrange
-		var date = DateTime.Parse("2011-01-08");
 		LoadXmlTestData("A1", "decimal", "A1");
 
 		// Act

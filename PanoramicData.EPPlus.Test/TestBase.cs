@@ -67,7 +67,9 @@ public abstract class TestBase
 		_pck = new ExcelPackage();
 	}
 
-	protected ExcelPackage OpenPackage(string name, bool delete = false)
+	protected ExcelPackage OpenPackage(string name) => OpenPackage(name, false);
+
+	protected ExcelPackage OpenPackage(string name, bool delete)
 	{
 		var fi = new FileInfo(_worksheetPath + name);
 		if (delete && fi.Exists)

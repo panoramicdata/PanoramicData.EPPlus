@@ -124,7 +124,6 @@ public class DateTimeFunctionsTests
 	[TestMethod]
 	public void YearShouldReturnCorrectYearWithStringParam()
 	{
-		var date = new DateTime(2012, 3, 12);
 		var func = new Year();
 		var result = func.Execute(FunctionsHelper.CreateArgs("2012-03-12"), _parsingContext);
 		Assert.AreEqual(2012, result.Result);

@@ -26,21 +26,6 @@ public class LookupNavigatorTests
 		return ctx;
 	}
 
-	//[TestMethod]
-	//public void NavigatorShouldEvaluateFormula()
-	//{
-	//    var provider = MockRepository.GenerateStub<ExcelDataProvider>();
-	//    provider.Stub(x => x.GetCellValue(WorksheetName,0, 0)).Return(new ExcelCell(3);
-	//    provider.Stub(x => x.GetCellValue(WorksheetName,1, 0)).Return("B5");
-	//    var args = GetArgs(4, "A1:B2", 1);
-	//    var context = GetContext(provider);
-	//    var parser = MockRepository.GenerateMock<FormulaParser>(provider);
-	//    context.Parser = parser;
-	//    var navigator = new LookupNavigator(LookupDirection.Vertical, args, context);
-	//    navigator.MoveNext();
-	//    parser.AssertWasCalled(x => x.Parse("B5"));
-	//}
-
 	[TestMethod]
 	public void CurrentValueShouldBeFirstCell()
 	{
