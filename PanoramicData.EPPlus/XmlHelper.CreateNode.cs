@@ -1,4 +1,4 @@
-﻿using System.Xml;
+using System.Xml;
 
 namespace OfficeOpenXml;
 
@@ -17,6 +17,7 @@ public abstract partial class XmlHelper
 	{
 		var node = TopNode;
 		XmlNode prependNode = null;
+		var first = insertFirst;
 		if (path.StartsWith('/'))
 		{
 			path = path[1..];
@@ -29,36 +30,13 @@ public abstract partial class XmlHelper
 			var subNode = node.SelectSingleNode(subPath, NameSpaceManager);
 			if (subNode == null || (i == subPath.Length - 1 && addNew))
 			{
-				string nodeName;
-				string nodePrefix;
-
-				var nameSpaceURI = "";
-				var nameSplit = subPath.Split(':');
-
 				if (SchemaNodeOrder != null && subPath[0] != '@')
 				{
-					insertFirst = false;
+					first = false;
 					prependNode = GetPrependNode(subPath, node);
 				}
 
-				if (nameSplit.Length > 1)
-				{
-					nodePrefix = nameSplit[0];
-					if (nodePrefix[0] == '@')
-					{
-						nodePrefix = nodePrefix[1..];
-					}
-
-					nameSpaceURI = NameSpaceManager.LookupNamespace(nodePrefix);
-					nodeName = nameSplit[1];
-				}
-				else
-				{
-					nodePrefix = "";
-					nameSpaceURI = "";
-					nodeName = nameSplit[0];
-				}
-
+				SplitNodeName(subPath, out var nodePrefix, out var nodeName, out var nameSpaceURI);
 				if (subPath.StartsWith('@'))
 				{
 					var addedAtt = node.OwnerDocument.CreateAttribute(subPath[1..], nameSpaceURI);  //nameSpaceURI
@@ -66,29 +44,13 @@ public abstract partial class XmlHelper
 				}
 				else
 				{
-					if (nodePrefix == "")
-					{
-						subNode = node.OwnerDocument.CreateElement(nodeName, nameSpaceURI);
-					}
-					else
-					{
-						if (nodePrefix == "" || (node.OwnerDocument != null && node.OwnerDocument.DocumentElement != null && node.OwnerDocument.DocumentElement.NamespaceURI == nameSpaceURI &&
-								node.OwnerDocument.DocumentElement.Prefix == ""))
-						{
-							subNode = node.OwnerDocument.CreateElement(nodeName, nameSpaceURI);
-						}
-						else
-						{
-							subNode = node.OwnerDocument.CreateElement(nodePrefix, nodeName, nameSpaceURI);
-						}
-					}
-
+					subNode = CreateNodeElement(node, nodePrefix, nodeName, nameSpaceURI);
 					if (prependNode != null)
 					{
 						node.InsertBefore(subNode, prependNode);
 						prependNode = null;
 					}
-					else if (insertFirst)
+					else if (first)
 					{
 						node.PrependChild(subNode);
 					}
@@ -105,6 +67,43 @@ public abstract partial class XmlHelper
 		return node;
 	}
 
+	private void SplitNodeName(string subPath, out string nodePrefix, out string nodeName, out string nameSpaceURI)
+	{
+		var nameSplit = subPath.Split(':');
+		if (nameSplit.Length > 1)
+		{
+			nodePrefix = nameSplit[0];
+			if (nodePrefix[0] == '@')
+			{
+				nodePrefix = nodePrefix[1..];
+			}
+
+			nameSpaceURI = NameSpaceManager.LookupNamespace(nodePrefix);
+			nodeName = nameSplit[1];
+		}
+		else
+		{
+			nodePrefix = "";
+			nameSpaceURI = "";
+			nodeName = nameSplit[0];
+		}
+	}
+
+	private static XmlNode CreateNodeElement(XmlNode node, string nodePrefix, string nodeName, string nameSpaceURI)
+	{
+		if (nodePrefix == "")
+		{
+			return node.OwnerDocument.CreateElement(nodeName, nameSpaceURI);
+		}
+
+		if (nodePrefix == "" || (node.OwnerDocument != null && node.OwnerDocument.DocumentElement != null && node.OwnerDocument.DocumentElement.NamespaceURI == nameSpaceURI &&
+				node.OwnerDocument.DocumentElement.Prefix == ""))
+		{
+			return node.OwnerDocument.CreateElement(nodeName, nameSpaceURI);
+		}
+
+		return node.OwnerDocument.CreateElement(nodePrefix, nodeName, nameSpaceURI);
+	}
 	/// <summary>
 	/// return Prepend node
 	/// </summary>
