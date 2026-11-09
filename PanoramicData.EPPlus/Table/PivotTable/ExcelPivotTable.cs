@@ -60,34 +60,28 @@ public class ExcelPivotTable : XmlHelper
 		_cacheDefinition = new ExcelPivotCacheDefinition(sheet.NameSpaceManager, this);
 		LoadFields();
 
-		//Add row fields.
-		foreach (XmlElement rowElem in TopNode.SelectNodes("d:rowFields/d:field", NameSpaceManager))
+		LoadRowColumnFields("d:rowFields/d:field", RowFields);
+		LoadRowColumnFields("d:colFields/d:field", ColumnFields);
+		LoadPageAndDataFields();
+	}
+
+	private void LoadRowColumnFields(string path, ExcelPivotTableRowColumnFieldCollection collection)
+	{
+		foreach (XmlElement elem in TopNode.SelectNodes(path, NameSpaceManager))
 		{
-			if (int.TryParse(rowElem.GetAttribute("x"), out var x) && x >= 0)
+			if (int.TryParse(elem.GetAttribute("x"), out var x) && x >= 0)
 			{
-				RowFields.AddInternal(Fields[x]);
+				collection.AddInternal(Fields[x]);
 			}
 			else
 			{
-				rowElem.ParentNode.RemoveChild(rowElem);
+				elem.ParentNode.RemoveChild(elem);
 			}
 		}
+	}
 
-		////Add column fields.
-		foreach (XmlElement colElem in TopNode.SelectNodes("d:colFields/d:field", NameSpaceManager))
-		{
-			if (int.TryParse(colElem.GetAttribute("x"), out var x) && x >= 0)
-			{
-				ColumnFields.AddInternal(Fields[x]);
-			}
-			else
-			{
-				colElem.ParentNode.RemoveChild(colElem);
-			}
-		}
-
-		//Add Page elements
-		//int index = 0;
+	private void LoadPageAndDataFields()
+	{
 		foreach (XmlElement pageElem in TopNode.SelectNodes("d:pageFields/d:pageField", NameSpaceManager))
 		{
 			if (int.TryParse(pageElem.GetAttribute("fld"), out var fld) && fld >= 0)
@@ -98,9 +92,7 @@ public class ExcelPivotTable : XmlHelper
 			}
 		}
 
-		//Add data elements
-		//index = 0;
-		foreach (XmlElement dataElem in TopNode.SelectNodes("d:dataFields/d:dataField", NameSpaceManager))
+		foreach(XmlElement dataElem in TopNode.SelectNodes("d:dataFields/d:dataField", NameSpaceManager))
 		{
 			if (int.TryParse(dataElem.GetAttribute("fld"), out var fld) && fld >= 0)
 			{
@@ -150,13 +142,6 @@ public class ExcelPivotTable : XmlHelper
 	private void init() => SchemaNodeOrder = ["location", "pivotFields", "rowFields", "rowItems", "colFields", "colItems", "pageFields", "pageItems", "dataFields", "dataItems", "formats", "pivotTableStyleInfo"];
 	private void LoadFields()
 	{
-		//Fields.Clear();
-		//int ix=0;
-		//foreach(XmlElement fieldNode in PivotXml.SelectNodes("//d:pivotFields/d:pivotField",NameSpaceManager))
-		//{
-		//    Fields.AddInternal(new ExcelPivotTableField(NameSpaceManager, fieldNode, this, ix++));
-		//}
-
 		var index = 0;
 		//Add fields.
 		foreach (XmlElement fieldElem in TopNode.SelectNodes("d:pivotFields/d:pivotField", NameSpaceManager))
@@ -172,24 +157,23 @@ public class ExcelPivotTable : XmlHelper
 			var fld = Fields[index++];
 			fld.SetCacheFieldNode(fieldElem);
 		}
-
-
 	}
 	private static string GetStartXml(string name, int id, ExcelAddressBase address, ExcelAddressBase sourceAddress)
 	{
-		var xml = string.Format("<pivotTableDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" name=\"{0}\" cacheId=\"{1}\" dataOnRows=\"1\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"0\" applyPatternFormats=\"0\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"1\" dataCaption=\"Data\"  createdVersion=\"4\" showMemberPropertyTips=\"0\" useAutoFormatting=\"1\" itemPrintTitles=\"1\" indent=\"0\" compact=\"0\" compactData=\"0\" gridDropZones=\"1\">", ConvertUtil.ExcelEscapeString(name), id);
+		var xml = new StringBuilder();
+		xml.AppendFormat("<pivotTableDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" name=\"{0}\" cacheId=\"{1}\" dataOnRows=\"1\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"0\" applyPatternFormats=\"0\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"1\" dataCaption=\"Data\"  createdVersion=\"4\" showMemberPropertyTips=\"0\" useAutoFormatting=\"1\" itemPrintTitles=\"1\" indent=\"0\" compact=\"0\" compactData=\"0\" gridDropZones=\"1\">", ConvertUtil.ExcelEscapeString(name), id);
 
-		xml += string.Format("<location ref=\"{0}\" firstHeaderRow=\"1\" firstDataRow=\"1\" firstDataCol=\"1\" /> ", address.FirstAddress);
-		xml += string.Format("<pivotFields count=\"{0}\">", sourceAddress._toCol - sourceAddress._fromCol + 1);
+		xml.AppendFormat("<location ref=\"{0}\" firstHeaderRow=\"1\" firstDataRow=\"1\" firstDataCol=\"1\" /> ", address.FirstAddress);
+		xml.AppendFormat("<pivotFields count=\"{0}\">", sourceAddress._toCol - sourceAddress._fromCol + 1);
 		for (var col = sourceAddress._fromCol; col <= sourceAddress._toCol; col++)
 		{
-			xml += "<pivotField showAll=\"0\" />"; //compact=\"0\" outline=\"0\" subtotalTop=\"0\" includeNewItemsInFilter=\"1\"     
+			xml.Append("<pivotField showAll=\"0\" />");
 		}
 
-		xml += "</pivotFields>";
-		xml += "<pivotTableStyleInfo name=\"PivotStyleMedium9\" showRowHeaders=\"1\" showColHeaders=\"1\" showRowStripes=\"0\" showColStripes=\"0\" showLastColumn=\"1\" />";
-		xml += "</pivotTableDefinition>";
-		return xml;
+		xml.Append("</pivotFields>");
+		xml.Append("<pivotTableStyleInfo name=\"PivotStyleMedium9\" showRowHeaders=\"1\" showColHeaders=\"1\" showRowStripes=\"0\" showColStripes=\"0\" showLastColumn=\"1\" />");
+		xml.Append("</pivotTableDefinition>");
+		return xml.ToString();
 	}
 	internal Packaging.ZipPackagePart Part
 	{
@@ -213,18 +197,6 @@ public class ExcelPivotTable : XmlHelper
 		get;
 		set;
 	}
-	//const string ID_PATH = "@id";
-	//internal int Id
-	//{
-	//    get
-	//    {
-	//        return GetXmlNodeInt(ID_PATH);
-	//    }
-	//    set
-	//    {
-	//        SetXmlNodeString(ID_PATH, value.ToString());
-	//    }
-	//}
 	const string NAME_PATH = "@name";
 	const string DISPLAY_NAME_PATH = "@displayName";
 	/// <summary>
@@ -243,18 +215,12 @@ public class ExcelPivotTable : XmlHelper
 				throw (new ArgumentException("PivotTable name is not unique"));
 			}
 
-			var prevName = Name;
-			if (WorkSheet.Tables._tableNames.TryGetValue(prevName, out var ix))
-			{
-				WorkSheet.Tables._tableNames.Remove(prevName);
-				WorkSheet.Tables._tableNames.Add(value, ix);
-			}
-
+			TableNameHelper.RenameTable(WorkSheet, Name, value);
 			SetXmlNodeString(NAME_PATH, value);
 			SetXmlNodeString(DISPLAY_NAME_PATH, cleanDisplayName(value));
 		}
 	}
-	ExcelPivotCacheDefinition _cacheDefinition = null;
+	ExcelPivotCacheDefinition _cacheDefinition;
 	/// <summary>
 	/// Reference to the pivot table cache definition object
 	/// </summary>
@@ -585,6 +551,7 @@ public class ExcelPivotTable : XmlHelper
 	/// <summary>
 	/// The number of page fields to display before starting another row or column
 	/// </summary>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Public API: callers may catch Exception from this setter, so the exception type is kept.")]
 	public int PageWrap
 	{
 		get
@@ -814,7 +781,7 @@ public class ExcelPivotTable : XmlHelper
 			SetXmlNodeString(FIRSTDATACOL_PATH, value.ToString());
 		}
 	}
-	ExcelPivotTableFieldCollection _fields = null;
+	ExcelPivotTableFieldCollection _fields;
 	/// <summary>
 	/// The fields in the table 
 	/// </summary>
@@ -827,7 +794,7 @@ public class ExcelPivotTable : XmlHelper
 			return _fields;
 		}
 	}
-	ExcelPivotTableRowColumnFieldCollection _rowFields = null;
+	ExcelPivotTableRowColumnFieldCollection _rowFields;
 	/// <summary>
 	/// Row label fields 
 	/// </summary>
@@ -840,7 +807,7 @@ public class ExcelPivotTable : XmlHelper
 			return _rowFields;
 		}
 	}
-	ExcelPivotTableRowColumnFieldCollection _columnFields = null;
+	ExcelPivotTableRowColumnFieldCollection _columnFields;
 	/// <summary>
 	/// Column label fields 
 	/// </summary>
@@ -853,7 +820,7 @@ public class ExcelPivotTable : XmlHelper
 			return _columnFields;
 		}
 	}
-	ExcelPivotTableDataFieldCollection _dataFields = null;
+	ExcelPivotTableDataFieldCollection _dataFields;
 	/// <summary>
 	/// Value fields 
 	/// </summary>
@@ -866,7 +833,7 @@ public class ExcelPivotTable : XmlHelper
 			return _dataFields;
 		}
 	}
-	ExcelPivotTableRowColumnFieldCollection _pageFields = null;
+	ExcelPivotTableRowColumnFieldCollection _pageFields;
 	/// <summary>
 	/// Report filter fields
 	/// </summary>
@@ -891,27 +858,7 @@ public class ExcelPivotTable : XmlHelper
 		}
 		set
 		{
-			if (value.StartsWith("PivotStyle"))
-			{
-				try
-				{
-					_tableStyle = Enum.Parse<TableStyles>(value[10..], true);
-				}
-				catch
-				{
-					_tableStyle = TableStyles.Custom;
-				}
-			}
-			else if (value == "None")
-			{
-				_tableStyle = TableStyles.None;
-				value = "";
-			}
-			else
-			{
-				_tableStyle = TableStyles.Custom;
-			}
-
+			(_tableStyle, value) = TableNameHelper.ParseStyleName(value, "PivotStyle");
 			SetXmlNodeString(STYLENAME_PATH, value, true);
 		}
 	}
