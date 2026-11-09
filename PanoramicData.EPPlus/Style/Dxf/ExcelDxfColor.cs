@@ -15,7 +15,7 @@ public class ExcelDxfColor : DxfStyleBase<ExcelDxfColor>
 	public bool? Auto { get; set; }
 	public double? Tint { get; set; }
 	public Color? Color { get; set; }
-	protected internal override string Id => GetAsString(Theme) + "|" + GetAsString(Index) + "|" + GetAsString(Auto) + "|" + GetAsString(Tint) + "|" + GetAsString(Color == null ? "" : ((Color)Color.Value).ToArgb().ToString("x"));
+	protected internal override string Id => GetAsString(Theme) + "|" + GetAsString(Index) + "|" + GetAsString(Auto) + "|" + GetAsString(Tint) + "|" + GetAsString(Color == null ? "" : Color.Value.ToArgb().ToString("x"));
 	protected internal override ExcelDxfColor Clone() => new(_styles) { Theme = Theme, Index = Index, Color = Color, Auto = Auto, Tint = Tint };
 	protected internal override bool HasValue => Theme != null ||
 				   Index != null ||
