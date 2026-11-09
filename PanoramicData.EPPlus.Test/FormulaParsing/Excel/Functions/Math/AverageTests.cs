@@ -98,15 +98,14 @@ public class AverageTests
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(ExcelErrorValueException))]
 	public void AverageUnparsableLiteral()
 	{
 		// In the case of literals, any unparsable string literal results in a #VALUE.
 		Average average = new();
-		var result = average.Execute(
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => average.Execute(
 		[
 			new(1000),
 			new("Test")
-		], ParsingContext.Create());
+		], ParsingContext.Create()));
 	}
 }

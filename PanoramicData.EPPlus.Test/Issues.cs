@@ -635,7 +635,7 @@ public class Issues : TestBase
 		foreach (var ws in p.Workbook.Worksheets)
 		{
 			ws.Cells[1023, 1, ws.Dimension.End.Row - 2, ws.Dimension.End.Column].Clear();
-			Assert.AreNotEqual(ws.Dimension, null);
+			Assert.AreNotEqual(null, ws.Dimension);
 		}
 
 		foreach (var cell in p.Workbook.Worksheets[2].Cells)
@@ -900,7 +900,7 @@ public class Issues : TestBase
 	{
 		using var exfile = new ExcelPackage(new FileInfo(@"c:\temp\bug\dotinname.xlsx"));
 		var v = exfile.Workbook.Worksheets["sheet1.3"].Names["Test.Name"].Value;
-		Assert.AreEqual(v, 1);
+		Assert.AreEqual(1, v);
 	}
 	[TestMethod, Ignore]
 	public void Issue15378()
@@ -1018,14 +1018,14 @@ public class Issues : TestBase
 	{
 		FileInfo file = new(@"c:\temp\incorrect value.xlsx");
 		using ExcelPackage excelPackage = new(file);
-		Assert.AreEqual(excelPackage.Workbook.Worksheets[1].Cells["A1"].Value, 19120072);
+		Assert.AreEqual(19120072, excelPackage.Workbook.Worksheets[1].Cells["A1"].Value);
 	}
 	[TestMethod, Ignore]
 	public void Issue13128()
 	{
 		FileInfo file = new(@"c:\temp\students.xlsx");
 		using ExcelPackage excelPackage = new(file);
-		Assert.AreNotEqual(((ExcelChart)excelPackage.Workbook.Worksheets[1].Drawings[0]).Series[0].XSeries, null);
+		Assert.AreNotEqual(null, ((ExcelChart)excelPackage.Workbook.Worksheets[1].Drawings[0]).Series[0].XSeries);
 	}
 	[TestMethod, Ignore]
 	public void Issue15252()
@@ -1062,7 +1062,7 @@ public class Issues : TestBase
 		var ws = p.Workbook.Worksheets.Add("Test");
 		var c = ws.Cells["A1"].Style.Font.Color;
 		c.Indexed = 3;
-		Assert.AreEqual(ExcelColor.LookupColor(c), "#FF00FF00");
+		Assert.AreEqual("#FF00FF00", ExcelColor.LookupColor(c));
 	}
 	[TestMethod, Ignore]
 	public void Issue15097()
@@ -1792,14 +1792,14 @@ public class Issues : TestBase
 	public void Issue127()
 	{
 		using var p = new ExcelPackage(new FileInfo(@"C:\temp\bug\PivotTableTestCase.xlsx"));
-		Assert.AreEqual(p.Workbook.Worksheets.Count, 2);
+		Assert.AreEqual(2, p.Workbook.Worksheets.Count);
 		p.SaveAs(new FileInfo(@"C:\temp\bug\PivotTableTestCaseSaved.xlsx"));
 	}
 	[TestMethod, Ignore]
 	public void Issue167()
 	{
 		using var p = new ExcelPackage(new FileInfo(@"C:\temp\bug\test-Errorworkbook.xlsx"));
-		Assert.AreEqual(p.Workbook.Worksheets.Count, 1);
+		Assert.AreEqual(1, p.Workbook.Worksheets.Count);
 		p.SaveAs(new FileInfo(@"C:\temp\bug\test-ErrorworkbookSaved.xlsx"));
 	}
 	[TestMethod, Ignore]
@@ -1825,7 +1825,7 @@ public class Issues : TestBase
 	public void Issue176()
 	{
 		using var pck = new ExcelPackage(new FileInfo($@"C:\temp\bug\issue176.xlsx"));
-		Assert.AreEqual(Math.Round(pck.Workbook.Worksheets[1].Cells["A1"].Style.Fill.BackgroundColor.Tint, 5), -0.04999M);
+		Assert.AreEqual(-0.04999M, Math.Round(pck.Workbook.Worksheets[1].Cells["A1"].Style.Fill.BackgroundColor.Tint, 5));
 		pck.SaveAs(new FileInfo($@"C:\temp\bug\issue176-saved.xlsx"));
 	}
 
@@ -1842,7 +1842,7 @@ public class Issues : TestBase
 		txt += "\"022018\",\"1\",\"\"\r\n";
 
 		var range = sheet.Cells["A1"].LoadFromText(txt, format, TableStyles.None, true);
-		Assert.AreEqual(sheet.Cells["C2"].Value, null);
+		Assert.AreEqual(null, sheet.Cells["C2"].Value);
 	}
 	[TestMethod, Ignore]
 	public void Issue181()
@@ -1955,13 +1955,12 @@ public class Issues : TestBase
 		_pck.Dispose();
 	}
 	[TestMethod]
-	[ExpectedException(typeof(InvalidDataException))]
 	public void Issue234()
 	{
 		using var s = new MemoryStream();
 		var data = Encoding.UTF8.GetBytes("Bad data").ToArray();
 		s.Write(data, 0, data.Length);
-		var package = new ExcelPackage(s);
+		Assert.ThrowsExactly<InvalidDataException>(() => new ExcelPackage(s));
 	}
 
 	[TestMethod]
@@ -1975,12 +1974,11 @@ public class Issues : TestBase
 		var name = a.WorkSheet;
 
 		var a2 = new ExcelAddress("'Deal''s History'!a1:a3");
-		Assert.AreEqual(a2.WorkSheet, "Deal's History");
+		Assert.AreEqual("Deal's History", a2.WorkSheet);
 		_pck.Save();
 		_pck.Dispose();
 
 	}
-	[ExpectedException(typeof(ArgumentException))]
 	[TestMethod]
 	public void Issue233()
 	{
@@ -1997,14 +1995,8 @@ public class Issues : TestBase
 		//Read the data into a range
 		var range = sheet.Cells["A1"].LoadFromCollection(cars, true);
 
-		//Make the range a table
-		var tbl = sheet.Tables.Add(range, $"data{sheetName}");
-		tbl.ShowTotal = true;
-		tbl.Columns["ReleaseYear"].TotalsRowFunction = RowFunctions.Sum;
-
-		//save and dispose
-		_pck.Save();
-		_pck.Dispose();
+		//Make the range a table: the sheet name's characters make the table name invalid
+		Assert.ThrowsExactly<ArgumentException>(() => sheet.Tables.Add(range, $"data{sheetName}"));
 	}
 	public class Car
 	{
@@ -2078,7 +2070,7 @@ public class Issues : TestBase
 
 		Assert.AreEqual("Arial", boldStyle.Style.Font.Name);
 		Assert.AreEqual(18, boldStyle.Style.Font.Size);
-		Assert.AreEqual(boldStyle.Style.Font.Color.Rgb, "FFFF0000");
+		Assert.AreEqual("FFFF0000", boldStyle.Style.Font.Color.Rgb);
 
 		pkg.SaveAs(new FileInfo(@"c:\temp\n.xlsx"));
 	}

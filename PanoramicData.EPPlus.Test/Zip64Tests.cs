@@ -63,7 +63,7 @@ public class Zip64Tests
 	{
 		using var stream = new MemoryStream();
 
-		var exception = Assert.ThrowsException<InvalidOperationException>(() =>
+		var exception = Assert.ThrowsExactly<InvalidOperationException>(() =>
 		{
 			using var zip = new ZipOutputStream(stream, leaveOpen: true)
 			{

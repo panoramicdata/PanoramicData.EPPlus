@@ -21,12 +21,12 @@ public class SubtotalTests
 		_context.Scopes.NewScope(RangeAddress.Empty);
 	}
 
-	[TestMethod, ExpectedException(typeof(ExcelErrorValueException))]
+	[TestMethod]
 	public void ShouldThrowIfInvalidFuncNumber()
 	{
 		var func = new Subtotal();
 		var args = FunctionsHelper.CreateArgs(139, 1);
-		func.Execute(args, _context);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _context));
 	}
 
 	[TestMethod]

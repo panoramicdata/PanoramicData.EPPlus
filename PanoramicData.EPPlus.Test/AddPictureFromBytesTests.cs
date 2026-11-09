@@ -61,10 +61,10 @@ public class AddPictureFromBytesTests
 		using var package = new ExcelPackage();
 		var worksheet = package.Workbook.Worksheets.Add("Pictures");
 
-		Assert.ThrowsException<ArgumentException>(() => worksheet.Drawings.AddPicture("P", null, 10, 10));
-		Assert.ThrowsException<ArgumentException>(() => worksheet.Drawings.AddPicture("P", Array.Empty<byte>(), 10, 10));
-		Assert.ThrowsException<ArgumentOutOfRangeException>(() => worksheet.Drawings.AddPicture("P", OnePixelPng, 0, 10));
-		Assert.ThrowsException<ArgumentOutOfRangeException>(() => worksheet.Drawings.AddPicture("P", OnePixelPng, 10, -1));
+		Assert.ThrowsExactly<ArgumentException>(() => worksheet.Drawings.AddPicture("P", null, 10, 10));
+		Assert.ThrowsExactly<ArgumentException>(() => worksheet.Drawings.AddPicture("P", Array.Empty<byte>(), 10, 10));
+		Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => worksheet.Drawings.AddPicture("P", OnePixelPng, 0, 10));
+		Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => worksheet.Drawings.AddPicture("P", OnePixelPng, 10, -1));
 	}
 
 	[TestMethod]
@@ -156,6 +156,6 @@ public class AddPictureFromBytesTests
 	[TestMethod]
 	public void ImageHeaderReader_RejectsTruncatedData()
 	{
-		Assert.ThrowsException<InvalidDataException>(() => OfficeOpenXml.Compatibility.ImageHeaderReader.Read([0x89, 0x50, 0x4E, 0x47]));
+		Assert.ThrowsExactly<InvalidDataException>(() => OfficeOpenXml.Compatibility.ImageHeaderReader.Read([0x89, 0x50, 0x4E, 0x47]));
 	}
 }

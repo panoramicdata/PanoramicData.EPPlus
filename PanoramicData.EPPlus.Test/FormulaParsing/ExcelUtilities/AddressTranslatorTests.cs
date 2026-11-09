@@ -21,8 +21,8 @@ public class AddressTranslatorTests
 		_addressTranslator = new AddressTranslator(_excelDataProvider);
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentNullException))]
-	public void ConstructorShouldThrowIfProviderIsNull() => new AddressTranslator(null);
+	[TestMethod]
+	public void ConstructorShouldThrowIfProviderIsNull() => Assert.ThrowsExactly<ArgumentNullException>(() => new AddressTranslator(null));
 
 	[TestMethod]
 	public void ShouldTranslateRowNumber()

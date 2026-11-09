@@ -61,13 +61,13 @@ public class AddressTests
 	{
 		var addr = new ExcelAddressBase("A1:B3");
 
-		Assert.AreEqual(addr.AddRow(2, 4).Address, "A1:B7");
-		Assert.AreEqual(addr.AddColumn(2, 4).Address, "A1:F3");
-		Assert.AreEqual(addr.DeleteColumn(2, 1).Address, "A1:A3");
-		Assert.AreEqual(addr.DeleteRow(2, 2).Address, "A1:B1");
+		Assert.AreEqual("A1:B7", addr.AddRow(2, 4).Address);
+		Assert.AreEqual("A1:F3", addr.AddColumn(2, 4).Address);
+		Assert.AreEqual("A1:A3", addr.DeleteColumn(2, 1).Address);
+		Assert.AreEqual("A1:B1", addr.DeleteRow(2, 2).Address);
 
-		Assert.AreEqual(addr.DeleteRow(1, 3), null);
-		Assert.AreEqual(addr.DeleteColumn(1, 2), null);
+		Assert.AreEqual(null, addr.DeleteRow(1, 3));
+		Assert.AreEqual(null, addr.DeleteColumn(1, 2));
 	}
 	[TestMethod]
 	public void SplitAddress()

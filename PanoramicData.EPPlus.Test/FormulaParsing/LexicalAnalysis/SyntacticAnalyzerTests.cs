@@ -28,7 +28,7 @@ public class SyntacticAnalyzerTests
 		_analyser.Analyze(input);
 	}
 
-	[TestMethod, ExpectedException(typeof(FormatException))]
+	[TestMethod]
 	public void ShouldThrowExceptionIfParenthesesAreNotWellformed()
 	{
 		var input = new List<Token>
@@ -38,7 +38,7 @@ public class SyntacticAnalyzerTests
 			new("+", TokenType.Operator),
 			new("2", TokenType.Integer)
 		};
-		_analyser.Analyze(input);
+		Assert.ThrowsExactly<FormatException>(() => _analyser.Analyze(input));
 	}
 
 	[TestMethod]
@@ -53,7 +53,7 @@ public class SyntacticAnalyzerTests
 		_analyser.Analyze(input);
 	}
 
-	[TestMethod, ExpectedException(typeof(FormatException))]
+	[TestMethod]
 	public void ShouldThrowExceptionIfStringHasNotClosing()
 	{
 		var input = new List<Token>
@@ -61,17 +61,17 @@ public class SyntacticAnalyzerTests
 			new("'", TokenType.String),
 			new("abc123", TokenType.StringContent)
 		};
-		_analyser.Analyze(input);
+		Assert.ThrowsExactly<FormatException>(() => _analyser.Analyze(input));
 	}
 
 
-	[TestMethod, ExpectedException(typeof(UnrecognizedTokenException))]
+	[TestMethod]
 	public void ShouldThrowExceptionIfThereIsAnUnrecognizedToken()
 	{
 		var input = new List<Token>
 		{
 			new("abc123", TokenType.Unrecognized)
 		};
-		_analyser.Analyze(input);
+		Assert.ThrowsExactly<UnrecognizedTokenException>(() => _analyser.Analyze(input));
 	}
 }

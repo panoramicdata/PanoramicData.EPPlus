@@ -7,8 +7,8 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.ExcelUtilities;
 [TestClass]
 public class ExcelAddressInfoTests
 {
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
-	public void ParseShouldThrowIfAddressIsNull() => ExcelAddressInfo.Parse(null);
+	[TestMethod]
+	public void ParseShouldThrowIfAddressIsNull() => Assert.ThrowsExactly<ArgumentException>(() => ExcelAddressInfo.Parse(null));
 
 	[TestMethod]
 	public void ParseShouldSetWorksheet()

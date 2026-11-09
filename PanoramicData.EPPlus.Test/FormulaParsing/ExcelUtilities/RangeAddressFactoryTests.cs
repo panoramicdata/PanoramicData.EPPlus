@@ -20,8 +20,8 @@ public class RangeAddressFactoryTests
 		_factory = new RangeAddressFactory(provider);
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
-	public void CreateShouldThrowIfSuppliedAddressIsNull() => _factory.Create(null);
+	[TestMethod]
+	public void CreateShouldThrowIfSuppliedAddressIsNull() => Assert.ThrowsExactly<ArgumentException>(() => _factory.Create(null));
 
 	[TestMethod]
 	public void CreateShouldReturnAndInstanceWithColPropertiesSet()

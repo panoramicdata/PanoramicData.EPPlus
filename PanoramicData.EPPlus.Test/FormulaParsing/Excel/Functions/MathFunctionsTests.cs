@@ -136,14 +136,12 @@ public class MathFunctionsTests
 		Assert.AreEqual(expectedValue, result.Result);
 	}
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
+	[TestMethod]
 	public void CeilingShouldThrowExceptionIfNumberIsPositiveAndSignificanceIsNegative()
 	{
-		var expectedValue = 30d;
 		var func = new Ceiling();
 		var args = FunctionsHelper.CreateArgs(22.35d, -1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
+		Assert.ThrowsExactly<InvalidOperationException>(() => func.Execute(args, _parsingContext));
 	}
 
 	[TestMethod]
@@ -401,12 +399,12 @@ public class MathFunctionsTests
 		Assert.AreEqual(expectedResult, result.Result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ExcelErrorValueException))]
+	[TestMethod]
 	public void AverageAShouldThrowValueExceptionIfNonNumericTextIsSupplied()
 	{
 		var func = new AverageA();
 		var args = FunctionsHelper.CreateArgs(4d, 2d, 5d, 2d, "ABC");
-		var result = func.Execute(args, _parsingContext);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
 	}
 
 	[TestMethod]
@@ -952,12 +950,12 @@ public class MathFunctionsTests
 		Assert.AreEqual(120d, result.Result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ExcelErrorValueException))]
+	[TestMethod]
 	public void FactShouldThrowWhenNegativeNumber()
 	{
 		var func = new Fact();
 		var args = FunctionsHelper.CreateArgs(-1);
-		func.Execute(args, _parsingContext);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
 	}
 
 	[TestMethod]
@@ -969,12 +967,12 @@ public class MathFunctionsTests
 		Assert.AreEqual(2, result.Result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ExcelErrorValueException))]
+	[TestMethod]
 	public void QuotientShouldThrowWhenDenomIs0()
 	{
 		var func = new Quotient();
 		var args = FunctionsHelper.CreateArgs(1, 0);
-		func.Execute(args, _parsingContext);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
 	}
 
 	[TestMethod]
@@ -995,12 +993,12 @@ public class MathFunctionsTests
 		Assert.AreEqual(3d, result.Result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ExcelErrorValueException))]
+	[TestMethod]
 	public void LargeShouldThrowIfIndexOutOfBounds()
 	{
 		var func = new Large();
 		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4, 1, 2, 3), 6);
-		var result = func.Execute(args, _parsingContext);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
 	}
 
 	[TestMethod]
@@ -1021,20 +1019,20 @@ public class MathFunctionsTests
 		Assert.AreEqual(2d, result.Result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ExcelErrorValueException))]
+	[TestMethod]
 	public void SmallShouldThrowIfIndexOutOfBounds()
 	{
 		var func = new Small();
 		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4, 1, 2, 3), 6);
-		var result = func.Execute(args, _parsingContext);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
 	}
 
-	[TestMethod, ExpectedException(typeof(ExcelErrorValueException))]
+	[TestMethod]
 	public void MedianShouldThrowIfNoArgs()
 	{
 		var func = new Median();
 		var args = FunctionsHelper.Empty();
-		func.Execute(args, _parsingContext);
+		Assert.ThrowsExactly<ExcelErrorValueException>(() => func.Execute(args, _parsingContext));
 	}
 
 	[TestMethod]
@@ -1113,27 +1111,27 @@ public class MathFunctionsTests
 
 		w.Calculate();
 
-		Assert.AreEqual(w.GetValue(1, 2), 4D);
-		Assert.AreEqual(w.GetValue(1, 3), 1D);
-		Assert.AreEqual(w.GetValue(1, 4), 4.5D);
-		Assert.AreEqual(w.GetValue(1, 5), 1.5D);
+		Assert.AreEqual(4D, w.GetValue(1, 2));
+		Assert.AreEqual(1D, w.GetValue(1, 3));
+		Assert.AreEqual(4.5D, w.GetValue(1, 4));
+		Assert.AreEqual(1.5D, w.GetValue(1, 5));
 
-		Assert.AreEqual(w.GetValue(2, 2), 2D);
-		Assert.AreEqual(w.GetValue(2, 3), 3D);
-		Assert.AreEqual(w.GetValue(2, 4), 3.5D);
-		Assert.AreEqual(w.GetValue(2, 5), 2.5D);
+		Assert.AreEqual(2D, w.GetValue(2, 2));
+		Assert.AreEqual(3D, w.GetValue(2, 3));
+		Assert.AreEqual(3.5D, w.GetValue(2, 4));
+		Assert.AreEqual(2.5D, w.GetValue(2, 5));
 
 		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 2));
 		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 3));
 		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 4));
 		Assert.IsInstanceOfType<ExcelErrorValue>(w.GetValue(3, 5));
 
-		Assert.AreEqual(w.GetValue(4, 2), 1D);
-		Assert.AreEqual(w.GetValue(4, 3), 5D);
-		Assert.AreEqual(w.GetValue(4, 4), 5D);
-		Assert.AreEqual(w.GetValue(4, 5), 1D);
+		Assert.AreEqual(1D, w.GetValue(4, 2));
+		Assert.AreEqual(5D, w.GetValue(4, 3));
+		Assert.AreEqual(5D, w.GetValue(4, 4));
+		Assert.AreEqual(1D, w.GetValue(4, 5));
 
-		Assert.AreEqual(w.GetValue(5, 4), 5.5D);
-		Assert.AreEqual(w.GetValue(5, 5), 1.5D);
+		Assert.AreEqual(5.5D, w.GetValue(5, 4));
+		Assert.AreEqual(1.5D, w.GetValue(5, 5));
 	}
 }

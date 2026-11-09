@@ -25,12 +25,12 @@ public class DataValidationTests : ValidationTestBase
 		Assert.AreEqual(ExcelDataValidationOperator.greaterThanOrEqual, validation.Operator);
 	}
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
+	[TestMethod]
 	public void DataValidations_ShouldThrowIfOperatorIsEqualAndFormula1IsEmpty()
 	{
 		var validations = _sheet.DataValidations.AddIntegerValidation("A1");
 		validations.Operator = ExcelDataValidationOperator.equal;
-		validations.Validate();
+		Assert.ThrowsExactly<InvalidOperationException>(() => validations.Validate());
 	}
 
 	[TestMethod]
@@ -99,13 +99,13 @@ public class DataValidationTests : ValidationTestBase
 		Assert.AreEqual("ErrorTitle", validation.ErrorTitle);
 	}
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
+	[TestMethod]
 	public void DataValidations_ShouldThrowIfOperatorIsBetweenAndFormula2IsEmpty()
 	{
 		var validation = _sheet.DataValidations.AddIntegerValidation("A1");
 		validation.Formula.Value = 1;
 		validation.Operator = ExcelDataValidationOperator.between;
-		validation.Validate();
+		Assert.ThrowsExactly<InvalidOperationException>(() => validation.Validate());
 	}
 
 	[TestMethod]

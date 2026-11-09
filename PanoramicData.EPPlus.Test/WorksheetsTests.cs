@@ -42,11 +42,11 @@ public class WorksheetsTests
 		workbook.Worksheets.Delete("NEW2");
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
+	[TestMethod]
 	public void DeleteByNameWhereWorkSheetDoesNotExist()
 	{
 		workbook.Worksheets.Add("NEW2");
-		workbook.Worksheets.Delete("NEW3");
+		Assert.ThrowsExactly<ArgumentException>(() => workbook.Worksheets.Delete("NEW3"));
 	}
 
 	[TestMethod]
@@ -180,7 +180,6 @@ public class WorksheetsTests
 	}
 
 	[TestMethod, Ignore]
-	[ExpectedException(typeof(ArgumentException))]
 	public void DeleteColumnBeforeRangeMimitThrowsArgumentException()
 	{
 		// Arrange
@@ -194,16 +193,11 @@ public class WorksheetsTests
 
 		var wsData = pck.Workbook.Worksheets[1];
 
-		// Act
-		wsData.DeleteColumn(0);
-
-		// Assert
-		Assert.Fail();
-
+		// Act and assert
+		Assert.ThrowsExactly<ArgumentException>(() => wsData.DeleteColumn(0));
 	}
 
 	[TestMethod, Ignore]
-	[ExpectedException(typeof(ArgumentException))]
 	public void DeleteColumnAfterRangeLimitThrowsArgumentException()
 	{
 		// Arrange
@@ -217,12 +211,8 @@ public class WorksheetsTests
 
 		var wsData = pck.Workbook.Worksheets[1];
 
-		// Act
-		wsData.DeleteColumn(16385);
-
-		// Assert
-		Assert.Fail();
-
+		// Act and assert
+		Assert.ThrowsExactly<ArgumentException>(() => wsData.DeleteColumn(16385));
 	}
 
 	[TestMethod, Ignore]

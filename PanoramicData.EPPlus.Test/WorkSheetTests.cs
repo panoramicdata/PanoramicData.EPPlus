@@ -155,18 +155,18 @@ public class WorkSheetTest : TestBase
 		using (ExcelPackage pck = new(instream))
 		{
 			var ws = pck.Workbook.Worksheets["Perf"];
-			Assert.AreEqual(ws.Cells["H6"].Formula, "B5+B6");
+			Assert.AreEqual("B5+B6", ws.Cells["H6"].Formula);
 
 			ws = pck.Workbook.Worksheets["Comment"];
 			var comment = ws.Cells["B2"].Comment;
 
-			Assert.AreNotEqual(comment, null);
-			Assert.AreEqual(comment.Author, "Jan Källman");
+			Assert.AreNotEqual(null, comment);
+			Assert.AreEqual("Jan Källman", comment.Author);
 			ws = pck.Workbook.Worksheets["Hidden"];
-			Assert.AreEqual(ws.Hidden, eWorkSheetHidden.Hidden);
+			Assert.AreEqual(eWorkSheetHidden.Hidden, ws.Hidden);
 
 			ws = pck.Workbook.Worksheets["VeryHidden"];
-			Assert.AreEqual(ws.Hidden, eWorkSheetHidden.VeryHidden);
+			Assert.AreEqual(eWorkSheetHidden.VeryHidden, ws.Hidden);
 
 			ws = pck.Workbook.Worksheets["RichText"];
 			Assert.AreEqual("Room 02 & 03", ws.Cells["G1"].RichText.Text);
@@ -175,100 +175,100 @@ public class WorkSheetTest : TestBase
 			//Assert.AreEqual(ws.HeaderFooter.Pictures.Count, 3);
 
 			ws = pck.Workbook.Worksheets["newsheet"];
-			Assert.AreEqual(ws.Cells["F2"].Style.Font.UnderLine, true);
-			Assert.AreEqual(ws.Cells["F2"].Style.Font.UnderLineType, ExcelUnderLineType.Double);
-			Assert.AreEqual(ws.Cells["F3"].Style.Font.UnderLineType, ExcelUnderLineType.SingleAccounting);
-			Assert.AreEqual(ws.Cells["F5"].Style.Font.UnderLineType, ExcelUnderLineType.None);
-			Assert.AreEqual(ws.Cells["F5"].Style.Font.UnderLine, false);
+			Assert.AreEqual(true, ws.Cells["F2"].Style.Font.UnderLine);
+			Assert.AreEqual(ExcelUnderLineType.Double, ws.Cells["F2"].Style.Font.UnderLineType);
+			Assert.AreEqual(ExcelUnderLineType.SingleAccounting, ws.Cells["F3"].Style.Font.UnderLineType);
+			Assert.AreEqual(ExcelUnderLineType.None, ws.Cells["F5"].Style.Font.UnderLineType);
+			Assert.AreEqual(false, ws.Cells["F5"].Style.Font.UnderLine);
 
 			Assert.AreEqual(ws.Cells["T20"].GetValue<string>(), 0.39618055555555554d.ToString(CultureInfo.CurrentCulture));
-			Assert.AreEqual(ws.Cells["T20"].GetValue<int>(), 0);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<int?>(), 0);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<double>(), 0.39618055555555554d);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<double?>(), 0.39618055555555554d);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<decimal>(), 0.396180555555556m);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<decimal?>(), 0.396180555555556m);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<bool>(), true);
-			Assert.AreEqual(ws.Cells["T20"].GetValue<bool?>(), true);
+			Assert.AreEqual(0, ws.Cells["T20"].GetValue<int>());
+			Assert.AreEqual(0, ws.Cells["T20"].GetValue<int?>());
+			Assert.AreEqual(0.39618055555555554d, ws.Cells["T20"].GetValue<double>());
+			Assert.AreEqual(0.39618055555555554d, ws.Cells["T20"].GetValue<double?>());
+			Assert.AreEqual(0.396180555555556m, ws.Cells["T20"].GetValue<decimal>());
+			Assert.AreEqual(0.396180555555556m, ws.Cells["T20"].GetValue<decimal?>());
+			Assert.AreEqual(true, ws.Cells["T20"].GetValue<bool>());
+			Assert.AreEqual(true, ws.Cells["T20"].GetValue<bool?>());
 			Assert.AreEqual(ws.Cells["T20"].GetValue<DateTime>(), new DateTime(1899, 12, 30, 9, 30, 30));
 			Assert.AreEqual(ws.Cells["T20"].GetValue<DateTime?>(), new DateTime(1899, 12, 30, 9, 30, 30));
 			Assert.AreEqual(ws.Cells["T20"].GetValue<TimeSpan>(), new TimeSpan(693593, 9, 30, 30));
 			Assert.AreEqual(ws.Cells["T20"].GetValue<TimeSpan?>(), new TimeSpan(693593, 9, 30, 30));
-			Assert.AreEqual(ws.Cells["T20"].Text, "09:30:30");
+			Assert.AreEqual("09:30:30", ws.Cells["T20"].Text);
 
 			Assert.AreEqual(ws.Cells["T24"].GetValue<string>(), 1.3961805555555555d.ToString(CultureInfo.CurrentCulture));
-			Assert.AreEqual(ws.Cells["T24"].GetValue<int>(), 1);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<int?>(), 1);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<double>(), 1.3961805555555555d);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<double?>(), 1.3961805555555555d);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<decimal>(), 1.39618055555556m);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<decimal?>(), 1.39618055555556m);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<bool>(), true);
-			Assert.AreEqual(ws.Cells["T24"].GetValue<bool?>(), true);
+			Assert.AreEqual(1, ws.Cells["T24"].GetValue<int>());
+			Assert.AreEqual(1, ws.Cells["T24"].GetValue<int?>());
+			Assert.AreEqual(1.3961805555555555d, ws.Cells["T24"].GetValue<double>());
+			Assert.AreEqual(1.3961805555555555d, ws.Cells["T24"].GetValue<double?>());
+			Assert.AreEqual(1.39618055555556m, ws.Cells["T24"].GetValue<decimal>());
+			Assert.AreEqual(1.39618055555556m, ws.Cells["T24"].GetValue<decimal?>());
+			Assert.AreEqual(true, ws.Cells["T24"].GetValue<bool>());
+			Assert.AreEqual(true, ws.Cells["T24"].GetValue<bool?>());
 			Assert.AreEqual(ws.Cells["T24"].GetValue<DateTime>(), new DateTime(1899, 12, 31, 9, 30, 30));
 			Assert.AreEqual(ws.Cells["T24"].GetValue<DateTime?>(), new DateTime(1899, 12, 31, 9, 30, 30));
 			Assert.AreEqual(ws.Cells["T24"].GetValue<TimeSpan>(), new TimeSpan(693593, 33, 30, 30));
 			Assert.AreEqual(ws.Cells["T24"].GetValue<TimeSpan?>(), new TimeSpan(693593, 33, 30, 30));
-			Assert.AreEqual(ws.Cells["T24"].Text, "09:30:30");
+			Assert.AreEqual("09:30:30", ws.Cells["T24"].Text);
 
-			Assert.AreEqual(ws.Cells["U20"].GetValue<string>(), "40179");
-			Assert.AreEqual(ws.Cells["U20"].GetValue<int>(), 40179);
-			Assert.AreEqual(ws.Cells["U20"].GetValue<int?>(), 40179);
-			Assert.AreEqual(ws.Cells["U20"].GetValue<double>(), 40179d);
-			Assert.AreEqual(ws.Cells["U20"].GetValue<double?>(), 40179d);
-			Assert.AreEqual(ws.Cells["U20"].GetValue<decimal>(), 40179m);
-			Assert.AreEqual(ws.Cells["U20"].GetValue<decimal?>(), 40179m);
-			Assert.AreEqual(ws.Cells["U20"].GetValue<bool>(), true);
-			Assert.AreEqual(ws.Cells["U20"].GetValue<bool?>(), true);
+			Assert.AreEqual("40179", ws.Cells["U20"].GetValue<string>());
+			Assert.AreEqual(40179, ws.Cells["U20"].GetValue<int>());
+			Assert.AreEqual(40179, ws.Cells["U20"].GetValue<int?>());
+			Assert.AreEqual(40179d, ws.Cells["U20"].GetValue<double>());
+			Assert.AreEqual(40179d, ws.Cells["U20"].GetValue<double?>());
+			Assert.AreEqual(40179m, ws.Cells["U20"].GetValue<decimal>());
+			Assert.AreEqual(40179m, ws.Cells["U20"].GetValue<decimal?>());
+			Assert.AreEqual(true, ws.Cells["U20"].GetValue<bool>());
+			Assert.AreEqual(true, ws.Cells["U20"].GetValue<bool?>());
 			Assert.AreEqual(ws.Cells["U20"].GetValue<DateTime>(), new DateTime(2010, 1, 1));
 			Assert.AreEqual(ws.Cells["U20"].GetValue<DateTime?>(), new DateTime(2010, 1, 1));
-			Assert.AreEqual(ws.Cells["U20"].Text, "2010-01-01");
+			Assert.AreEqual("2010-01-01", ws.Cells["U20"].Text);
 
-			Assert.AreEqual(ws.Cells["V20"].GetValue<string>(), "102");
-			Assert.AreEqual(ws.Cells["V20"].GetValue<int>(), 102);
-			Assert.AreEqual(ws.Cells["V20"].GetValue<int?>(), 102);
-			Assert.AreEqual(ws.Cells["V20"].GetValue<double>(), 102d);
-			Assert.AreEqual(ws.Cells["V20"].GetValue<double?>(), 102d);
-			Assert.AreEqual(ws.Cells["V20"].GetValue<decimal>(), 102m);
-			Assert.AreEqual(ws.Cells["V20"].GetValue<decimal?>(), 102m);
-			Assert.AreEqual(ws.Cells["V20"].GetValue<bool>(), true);
-			Assert.AreEqual(ws.Cells["V20"].GetValue<bool?>(), true);
+			Assert.AreEqual("102", ws.Cells["V20"].GetValue<string>());
+			Assert.AreEqual(102, ws.Cells["V20"].GetValue<int>());
+			Assert.AreEqual(102, ws.Cells["V20"].GetValue<int?>());
+			Assert.AreEqual(102d, ws.Cells["V20"].GetValue<double>());
+			Assert.AreEqual(102d, ws.Cells["V20"].GetValue<double?>());
+			Assert.AreEqual(102m, ws.Cells["V20"].GetValue<decimal>());
+			Assert.AreEqual(102m, ws.Cells["V20"].GetValue<decimal?>());
+			Assert.AreEqual(true, ws.Cells["V20"].GetValue<bool>());
+			Assert.AreEqual(true, ws.Cells["V20"].GetValue<bool?>());
 			Assert.AreEqual(ws.Cells["V20"].GetValue<DateTime>(), new DateTime(1900, 4, 11));
 			Assert.AreEqual(ws.Cells["V20"].GetValue<DateTime?>(), new DateTime(1900, 4, 11));
 			Assert.AreEqual(ws.Cells["V20"].Text,
 				$"$102{CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator}00");
 
-			Assert.AreEqual(ws.Cells["W20"].GetValue<string>(), null);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<int>(), 0);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<int?>(), null);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<double>(), 0d);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<double?>(), null);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<decimal>(), 0m);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<decimal?>(), null);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<bool>(), false);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<bool?>(), null);
+			Assert.AreEqual(null, ws.Cells["W20"].GetValue<string>());
+			Assert.AreEqual(0, ws.Cells["W20"].GetValue<int>());
+			Assert.AreEqual(null, ws.Cells["W20"].GetValue<int?>());
+			Assert.AreEqual(0d, ws.Cells["W20"].GetValue<double>());
+			Assert.AreEqual(null, ws.Cells["W20"].GetValue<double?>());
+			Assert.AreEqual(0m, ws.Cells["W20"].GetValue<decimal>());
+			Assert.AreEqual(null, ws.Cells["W20"].GetValue<decimal?>());
+			Assert.AreEqual(false, ws.Cells["W20"].GetValue<bool>());
+			Assert.AreEqual(null, ws.Cells["W20"].GetValue<bool?>());
 			Assert.AreEqual(ws.Cells["W20"].GetValue<DateTime>(), DateTime.MinValue);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<DateTime?>(), null);
+			Assert.AreEqual(null, ws.Cells["W20"].GetValue<DateTime?>());
 			Assert.AreEqual(ws.Cells["W20"].GetValue<TimeSpan>(), TimeSpan.Zero);
-			Assert.AreEqual(ws.Cells["W20"].GetValue<TimeSpan?>(), null);
+			Assert.AreEqual(null, ws.Cells["W20"].GetValue<TimeSpan?>());
 			Assert.AreEqual(ws.Cells["W20"].Text, string.Empty);
 
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<string>(), "True");
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<int>(), 1);
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<int?>(), 1);
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<double>(), 1d);
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<double?>(), 1d);
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<decimal>(), 1m);
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<decimal?>(), 1m);
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<bool>(), true);
-			Assert.AreEqual(ws.Cells["Y20"].GetValue<bool?>(), true);
+			Assert.AreEqual("True", ws.Cells["Y20"].GetValue<string>());
+			Assert.AreEqual(1, ws.Cells["Y20"].GetValue<int>());
+			Assert.AreEqual(1, ws.Cells["Y20"].GetValue<int?>());
+			Assert.AreEqual(1d, ws.Cells["Y20"].GetValue<double>());
+			Assert.AreEqual(1d, ws.Cells["Y20"].GetValue<double?>());
+			Assert.AreEqual(1m, ws.Cells["Y20"].GetValue<decimal>());
+			Assert.AreEqual(1m, ws.Cells["Y20"].GetValue<decimal?>());
+			Assert.AreEqual(true, ws.Cells["Y20"].GetValue<bool>());
+			Assert.AreEqual(true, ws.Cells["Y20"].GetValue<bool?>());
 
 			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<DateTime>(ws.Cells["Y20"]));
 			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<DateTime?>(ws.Cells["Y20"]));
 			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<TimeSpan>(ws.Cells["Y20"]));
 			Assert.IsInstanceOfType<InvalidCastException>(GetValueException<TimeSpan?>(ws.Cells["Y20"]));
 
-			Assert.AreEqual(ws.Cells["Z20"].GetValue<string>(), "Text2");
+			Assert.AreEqual("Text2", ws.Cells["Z20"].GetValue<string>());
 			Assert.IsInstanceOfType<FormatException>(GetValueException<int>(ws.Cells["Z20"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<int?>(ws.Cells["Z20"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<double>(ws.Cells["Z20"]));
@@ -281,41 +281,41 @@ public class WorkSheetTest : TestBase
 			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime?>(ws.Cells["Z20"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<TimeSpan>(ws.Cells["Z20"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<TimeSpan?>(ws.Cells["Z20"]));
-			Assert.AreEqual(ws.Cells["Z20"].Text, "Text2");
+			Assert.AreEqual("Text2", ws.Cells["Z20"].Text);
 
 			// even though value is set as integer, it is stored/exposed by EPPlust as double; feature?
 			//Assert.IsInstanceOfType(ws.Cells["X19"].Value, typeof(int));
-			Assert.AreEqual(ws.Cells["X19"].GetValue<string>(), "210");
-			Assert.AreEqual(ws.Cells["X19"].GetValue<int>(), 210);
-			Assert.AreEqual(ws.Cells["X19"].GetValue<int?>(), 210);
-			Assert.AreEqual(ws.Cells["X19"].GetValue<double>(), 210d);
-			Assert.AreEqual(ws.Cells["X19"].GetValue<double?>(), 210d);
-			Assert.AreEqual(ws.Cells["X19"].GetValue<decimal>(), 210m);
-			Assert.AreEqual(ws.Cells["X19"].GetValue<decimal?>(), 210m);
-			Assert.AreEqual(ws.Cells["X19"].GetValue<bool>(), true);
-			Assert.AreEqual(ws.Cells["X19"].GetValue<bool?>(), true);
+			Assert.AreEqual("210", ws.Cells["X19"].GetValue<string>());
+			Assert.AreEqual(210, ws.Cells["X19"].GetValue<int>());
+			Assert.AreEqual(210, ws.Cells["X19"].GetValue<int?>());
+			Assert.AreEqual(210d, ws.Cells["X19"].GetValue<double>());
+			Assert.AreEqual(210d, ws.Cells["X19"].GetValue<double?>());
+			Assert.AreEqual(210m, ws.Cells["X19"].GetValue<decimal>());
+			Assert.AreEqual(210m, ws.Cells["X19"].GetValue<decimal?>());
+			Assert.AreEqual(true, ws.Cells["X19"].GetValue<bool>());
+			Assert.AreEqual(true, ws.Cells["X19"].GetValue<bool?>());
 			// double is converted to DateTime and TimeSpan, but value is meaningless
 			Assert.IsNull(GetValueException<DateTime>(ws.Cells["X19"]));
 			Assert.IsNull(GetValueException<DateTime?>(ws.Cells["X19"]));
 			Assert.IsNull(GetValueException<TimeSpan>(ws.Cells["X19"]));
 			Assert.IsNull(GetValueException<TimeSpan?>(ws.Cells["X19"]));
-			Assert.AreEqual(ws.Cells["X19"].Text, "210");
+			Assert.AreEqual("210", ws.Cells["X19"].Text);
 
 			Assert.IsInstanceOfType<string>(ws.Cells["AA19"].Value);
-			Assert.AreEqual(ws.Cells["AA19"].GetValue<string>(), "210");
-			Assert.AreEqual(ws.Cells["AA19"].GetValue<int>(), 210);
-			Assert.AreEqual(ws.Cells["AA19"].GetValue<int?>(), 210);
-			Assert.AreEqual(ws.Cells["AA19"].GetValue<double>(), 210d);
-			Assert.AreEqual(ws.Cells["AA19"].GetValue<double?>(), 210d);
-			Assert.AreEqual(ws.Cells["AA19"].GetValue<decimal>(), 210m);
-			Assert.AreEqual(ws.Cells["AA19"].GetValue<decimal?>(), 210m);
+			Assert.AreEqual("210", ws.Cells["AA19"].GetValue<string>());
+			Assert.AreEqual(210, ws.Cells["AA19"].GetValue<int>());
+			Assert.AreEqual(210, ws.Cells["AA19"].GetValue<int?>());
+			Assert.AreEqual(210d, ws.Cells["AA19"].GetValue<double>());
+			Assert.AreEqual(210d, ws.Cells["AA19"].GetValue<double?>());
+			Assert.AreEqual(210m, ws.Cells["AA19"].GetValue<decimal>());
+			Assert.AreEqual(210m, ws.Cells["AA19"].GetValue<decimal?>());
 			Assert.IsInstanceOfType<FormatException>(GetValueException<bool>(ws.Cells["AA19"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<bool?>(ws.Cells["AA19"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime>(ws.Cells["AA19"]));
 			Assert.IsInstanceOfType<FormatException>(GetValueException<DateTime?>(ws.Cells["AA19"]));
 			Assert.AreEqual(TimeSpan.FromDays(210), ws.Cells["AA19"].GetValue<TimeSpan>());
 			Assert.AreEqual(TimeSpan.FromDays(210), ws.Cells["AA19"].GetValue<TimeSpan?>());
-			Assert.AreEqual(ws.Cells["AA19"].Text, "210");
+			Assert.AreEqual("210", ws.Cells["AA19"].Text);
 
 			// blank string produces null for nullable primitive types and conversion to non-nullable types throws FormatException
 			Assert.IsInstanceOfType<string>(ws.Cells["AA18"].Value);
@@ -332,7 +332,7 @@ public class WorkSheetTest : TestBase
 			Assert.IsNull(GetValueException<bool?>(ws.Cells["AA18"]));
 			Assert.IsNull(GetValueException<DateTime?>(ws.Cells["AA18"]));
 			Assert.IsNull(GetValueException<TimeSpan?>(ws.Cells["AA18"]));
-			Assert.AreEqual(ws.Cells["AA18"].Text, " ");
+			Assert.AreEqual(" ", ws.Cells["AA18"].Text);
 		}
 
 		instream.Close();
@@ -347,27 +347,27 @@ public class WorkSheetTest : TestBase
 		using (ExcelPackage pck = new(stream, instream))
 		{
 			var ws = pck.Workbook.Worksheets["Perf"];
-			Assert.AreEqual(ws.Cells["H6"].Formula, "B5+B6");
+			Assert.AreEqual("B5+B6", ws.Cells["H6"].Formula);
 
 			ws = pck.Workbook.Worksheets["newsheet"];
 			Assert.AreEqual(ws.GetValue<DateTime>(20, 21), new DateTime(2010, 1, 1));
 
 			ws = pck.Workbook.Worksheets["Loaded DataTable"];
-			Assert.AreEqual(ws.GetValue<string>(2, 1), "Row1");
-			Assert.AreEqual(ws.GetValue<int>(2, 2), 1);
-			Assert.AreEqual(ws.GetValue<bool>(2, 3), true);
-			Assert.AreEqual(ws.GetValue<double>(2, 4), 1.5);
+			Assert.AreEqual("Row1", ws.GetValue<string>(2, 1));
+			Assert.AreEqual(1, ws.GetValue<int>(2, 2));
+			Assert.AreEqual(true, ws.GetValue<bool>(2, 3));
+			Assert.AreEqual(1.5, ws.GetValue<double>(2, 4));
 
 			ws = pck.Workbook.Worksheets["RichText"];
 
 			var r1 = ws.Cells["A1"].RichText[0];
-			Assert.AreEqual(r1.Text, "Test");
-			Assert.AreEqual(r1.Bold, true);
+			Assert.AreEqual("Test", r1.Text);
+			Assert.AreEqual(true, r1.Bold);
 
 			ws = pck.Workbook.Worksheets["Pic URL"];
-			Assert.AreEqual(((ExcelPicture)ws.Drawings["Pic URI"]).Hyperlink.ToString(), "http://epplus.codeplex.com");
+			Assert.AreEqual("http://epplus.codeplex.com", ((ExcelPicture)ws.Drawings["Pic URI"]).Hyperlink.ToString());
 
-			Assert.AreEqual(pck.Workbook.Worksheets["Address"].GetValue<string>(40, 1), "\b\t");
+			Assert.AreEqual("\b\t", pck.Workbook.Worksheets["Address"].GetValue<string>(40, 1));
 
 			pck.SaveAs(new FileInfo(Path.Combine("Test", "Worksheet2.xlsx")));
 		}
@@ -388,8 +388,8 @@ public class WorkSheetTest : TestBase
 		using (ExcelPackage pck = new(instream))
 		{
 			var ws = pck.Workbook.Worksheets["Names"];
-			Assert.AreEqual(ws.Names["FullCol"].Start.Row, 1);
-			Assert.AreEqual(ws.Names["FullCol"].End.Row, ExcelPackage.MaxRows);
+			Assert.AreEqual(1, ws.Names["FullCol"].Start.Row);
+			Assert.AreEqual(ExcelPackage.MaxRows, ws.Names["FullCol"].End.Row);
 			pck.SaveAs(stream);
 		}
 
@@ -519,7 +519,7 @@ public class WorkSheetTest : TestBase
 		ws.Cells["F7"].Style.Font.UnderLine = false;
 
 		ws.Cells["E24"].Value = 0;
-		Assert.AreEqual(ws.Cells["E24"].Text, "0");
+		Assert.AreEqual("0", ws.Cells["E24"].Text);
 		ws.Cells["F7"].Style.Font.UnderLine = false;
 		ws.Names.Add("SheetName", ws.Cells["A1:A2"]);
 		ws.View.FreezePanes(3, 5);
@@ -634,7 +634,7 @@ public class WorkSheetTest : TestBase
 		var ws = _pck.Workbook.Worksheets.Add("InsertDelete");
 		//ws.Cells.Value = 0;
 		ws.Cells["A1:C5"].Value = 1;
-		Assert.AreEqual(((object[,])ws.Cells["A1:C5"].Value)[1, 1], 1);
+		Assert.AreEqual(1, ((object[,])ws.Cells["A1:C5"].Value)[1, 1]);
 		ws.Cells["A1:B3"].Merge = true;
 		ws.Cells["D3"].Formula = "A2+C5";
 		ws.InsertRow(2, 1);
@@ -662,20 +662,20 @@ public class WorkSheetTest : TestBase
 		ws.Row(200).Height = 50;
 		ws.Workbook.CalcMode = ExcelCalcMode.Automatic;
 
-		Assert.AreEqual(range.Start.Column, 2);
-		Assert.AreEqual(range.Start.Row, 2);
-		Assert.AreEqual(range.Start.Address, "B2");
+		Assert.AreEqual(2, range.Start.Column);
+		Assert.AreEqual(2, range.Start.Row);
+		Assert.AreEqual("B2", range.Start.Address);
 
-		Assert.AreEqual(range.End.Column, 4);
-		Assert.AreEqual(range.End.Row, 100);
-		Assert.AreEqual(range.End.Address, "D100");
+		Assert.AreEqual(4, range.End.Column);
+		Assert.AreEqual(100, range.End.Row);
+		Assert.AreEqual("D100", range.End.Address);
 
 		ExcelAddress addr = new("B1:D3");
 
-		Assert.AreEqual(addr.Start.Column, 2);
-		Assert.AreEqual(addr.Start.Row, 1);
-		Assert.AreEqual(addr.End.Column, 4);
-		Assert.AreEqual(addr.End.Row, 3);
+		Assert.AreEqual(2, addr.Start.Column);
+		Assert.AreEqual(1, addr.Start.Row);
+		Assert.AreEqual(4, addr.End.Column);
+		Assert.AreEqual(3, addr.End.Row);
 	}
 	//[Ignore]
 	//[TestMethod]
@@ -688,7 +688,7 @@ public class WorkSheetTest : TestBase
 		ws.Cells["A3:C3"].Value = 3;
 		ws.Cells["A4:C4"].Value = 4;
 		ws.Cells["A5:C5"].Value = 5;
-		Assert.AreEqual(((object[,])ws.Cells["A1:C5"].Value)[1, 1], 2);
+		Assert.AreEqual(2, ((object[,])ws.Cells["A1:C5"].Value)[1, 1]);
 		ws.Cells["A1:B3"].Merge = true;
 		ws.Cells["D3"].Formula = "A2+C5";
 		ws.InsertColumn(1, 1);
@@ -1172,19 +1172,17 @@ public class WorkSheetTest : TestBase
 
 
 	[TestMethod]
-	[ExpectedException(typeof(ArgumentException))]
 	public void TestTableNameCanNotStartsWithNumber()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Table");
-		var tbl = ws.Tables.Add(ws.Cells["A1"], "5TestTable");
+		Assert.ThrowsExactly<ArgumentException>(() => ws.Tables.Add(ws.Cells["A1"], "5TestTable"));
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(ArgumentException))]
 	public void TestTableNameCanNotContainWhiteSpaces()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Table");
-		var tbl = ws.Tables.Add(ws.Cells["A1"], "Test Table");
+		Assert.ThrowsExactly<ArgumentException>(() => ws.Tables.Add(ws.Cells["A1"], "Test Table"));
 	}
 
 	[TestMethod]
@@ -1330,7 +1328,7 @@ public class WorkSheetTest : TestBase
 		tbl.ShowHeader = true;
 		tbl.ShowLastColumn = true;
 		tbl.ShowFilter = false;
-		Assert.AreEqual(tbl.ShowFilter, false);
+		Assert.AreEqual(false, tbl.ShowFilter);
 		ws.Cells["K2"].Value = 5;
 		ws.Cells["J3"].Value = 4;
 
@@ -1359,7 +1357,7 @@ public class WorkSheetTest : TestBase
 		tbl.ShowFirstColumn = true;
 		tbl.ShowLastColumn = true;
 		tbl.ShowColumnStripes = true;
-		Assert.AreEqual(tbl.ShowFilter, true);
+		Assert.AreEqual(true, tbl.ShowFilter);
 		tbl.Columns[2].Name = "Test Column Name";
 
 		ws.Cells["G50"].Value = "Timespan";
@@ -2118,16 +2116,16 @@ public class WorkSheetTest : TestBase
 		pt.DataOnRows = false;
 
 		pt.Fields[0].SubTotalFunctions = eSubTotalFunctions.Sum | eSubTotalFunctions.Max;
-		Assert.AreEqual(pt.Fields[0].SubTotalFunctions, eSubTotalFunctions.Sum | eSubTotalFunctions.Max);
+		Assert.AreEqual(eSubTotalFunctions.Sum | eSubTotalFunctions.Max, pt.Fields[0].SubTotalFunctions);
 
 		pt.Fields[0].SubTotalFunctions = eSubTotalFunctions.Sum | eSubTotalFunctions.Product | eSubTotalFunctions.StdDevP;
-		Assert.AreEqual(pt.Fields[0].SubTotalFunctions, eSubTotalFunctions.Sum | eSubTotalFunctions.Product | eSubTotalFunctions.StdDevP);
+		Assert.AreEqual(eSubTotalFunctions.Sum | eSubTotalFunctions.Product | eSubTotalFunctions.StdDevP, pt.Fields[0].SubTotalFunctions);
 
 		pt.Fields[0].SubTotalFunctions = eSubTotalFunctions.None;
-		Assert.AreEqual(pt.Fields[0].SubTotalFunctions, eSubTotalFunctions.None);
+		Assert.AreEqual(eSubTotalFunctions.None, pt.Fields[0].SubTotalFunctions);
 
 		pt.Fields[0].SubTotalFunctions = eSubTotalFunctions.Default;
-		Assert.AreEqual(pt.Fields[0].SubTotalFunctions, eSubTotalFunctions.Default);
+		Assert.AreEqual(eSubTotalFunctions.Default, pt.Fields[0].SubTotalFunctions);
 
 		pt.Fields[0].Sort = eSortType.Descending;
 		pt.TableStyle = TableStyles.Medium14;
@@ -2191,15 +2189,15 @@ public class WorkSheetTest : TestBase
 
 		var pivot1 = pck.Workbook.Worksheets[2].PivotTables[0];
 
-		Assert.AreEqual(pivot1.Fields.Count, 24);
-		Assert.AreEqual(pivot1.RowFields.Count, 3);
-		Assert.AreEqual(pivot1.DataFields.Count, 7);
-		Assert.AreEqual(pivot1.ColumnFields.Count, 0);
+		Assert.AreEqual(24, pivot1.Fields.Count);
+		Assert.AreEqual(3, pivot1.RowFields.Count);
+		Assert.AreEqual(7, pivot1.DataFields.Count);
+		Assert.AreEqual(0, pivot1.ColumnFields.Count);
 
-		Assert.AreEqual(pivot1.DataFields[1].Name, "Sum of n3");
-		Assert.AreEqual(pivot1.Fields[2].Sort, eSortType.Ascending);
+		Assert.AreEqual("Sum of n3", pivot1.DataFields[1].Name);
+		Assert.AreEqual(eSortType.Ascending, pivot1.Fields[2].Sort);
 
-		Assert.AreEqual(pivot1.DataOnRows, false);
+		Assert.AreEqual(false, pivot1.DataOnRows);
 
 		var pivot2 = pck.Workbook.Worksheets[2].PivotTables[0];
 		var pivot3 = pck.Workbook.Worksheets[3].PivotTables[0];
@@ -2275,12 +2273,12 @@ public class WorkSheetTest : TestBase
 		//img.Gain = .5;
 		//img.Gamma = .35;
 
-		Assert.AreEqual(img.Width, 426);
+		Assert.AreEqual(426, img.Width);
 		img.Width /= 4;
-		Assert.AreEqual(img.Height, 49.5);
+		Assert.AreEqual(49.5, img.Height);
 		img.Height /= 4;
-		Assert.AreEqual(img.Left, 0);
-		Assert.AreEqual(img.Top, 0);
+		Assert.AreEqual(0, img.Left);
+		Assert.AreEqual(0, img.Top);
 		ws.HeaderFooter.OddHeader.CenteredText += " After";
 
 
@@ -2343,7 +2341,7 @@ public class WorkSheetTest : TestBase
 		Assert.AreEqual("Arial", defaultStyle.Style.Font.Name);
 		Assert.AreEqual(18, defaultStyle.Style.Font.Size);
 
-		Assert.AreEqual(boldStyle.Style.Font.Color.Rgb, "FFFF0000");
+		Assert.AreEqual("FFFF0000", boldStyle.Style.Font.Color.Rgb);
 
 	}
 	//[Ignore]
@@ -2387,7 +2385,7 @@ public class WorkSheetTest : TestBase
 		ws.Cells["A1"].Value = "test";
 		ws.Cells["A1"].RichText.Add("Test rt");
 		ws.Cells.AutoFilter = true;
-		Assert.AreNotEqual(ws.Cells["A1:D5"].Value, null);
+		Assert.AreNotEqual(null, ws.Cells["A1:D5"].Value);
 	}
 	[Ignore]
 	[TestMethod]
@@ -2719,21 +2717,19 @@ public class WorkSheetTest : TestBase
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(ArgumentException))]
 	public void ExcelWorksheetRenameWithStartApostropheThrowsException()
 	{
 		using var package = new ExcelPackage();
 		var sheet1 = package.Workbook.Worksheets.Add("Sheet1");
-		sheet1.Name = "'New Name";
+		Assert.ThrowsExactly<ArgumentException>(() => sheet1.Name = "'New Name");
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(ArgumentException))]
 	public void ExcelWorksheetRenameWithEndApostropheThrowsException()
 	{
 		using var package = new ExcelPackage();
 		var sheet1 = package.Workbook.Worksheets.Add("Sheet1");
-		sheet1.Name = "New Name'";
+		Assert.ThrowsExactly<ArgumentException>(() => sheet1.Name = "New Name'");
 	}
 
 	#region Date1904 Test Cases

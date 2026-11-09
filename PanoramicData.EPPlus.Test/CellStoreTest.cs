@@ -18,23 +18,23 @@ public class CellStoreTest : TestBase
 		LoadData(ws);
 
 		ws.InsertRow(2, 1000);
-		Assert.AreEqual(ws.GetValue(1002, 1), "1,0");
+		Assert.AreEqual("1,0", ws.GetValue(1002, 1));
 		ws.InsertRow(1003, 1000);
-		Assert.AreEqual(ws.GetValue(2003, 1), "2,0");
+		Assert.AreEqual("2,0", ws.GetValue(2003, 1));
 		ws.InsertRow(2004, 1000);
-		Assert.AreEqual(ws.GetValue(3004, 1), "3,0");
+		Assert.AreEqual("3,0", ws.GetValue(3004, 1));
 		ws.InsertRow(2006, 1000);
-		Assert.AreEqual(ws.GetValue(4005, 1), "4,0");
+		Assert.AreEqual("4,0", ws.GetValue(4005, 1));
 		ws.InsertRow(4500, 500);
-		Assert.AreEqual(ws.GetValue(5000, 1), "499,0");
+		Assert.AreEqual("499,0", ws.GetValue(5000, 1));
 
 		ws.InsertRow(1, 1);
-		Assert.AreEqual(ws.GetValue(1003, 1), "1,0");
-		Assert.AreEqual(ws.GetValue(5001, 1), "499,0");
+		Assert.AreEqual("1,0", ws.GetValue(1003, 1));
+		Assert.AreEqual("499,0", ws.GetValue(5001, 1));
 
 		ws.InsertRow(1, 15);
-		Assert.AreEqual(ws.GetValue(4020, 1), "3,0");
-		Assert.AreEqual(ws.GetValue(5016, 1), "499,0");
+		Assert.AreEqual("3,0", ws.GetValue(4020, 1));
+		Assert.AreEqual("499,0", ws.GetValue(5016, 1));
 
 	}
 	[TestMethod]
@@ -48,7 +48,7 @@ public class CellStoreTest : TestBase
 			ws.InsertRow(1, 1);
 		}
 
-		Assert.AreEqual(ws.GetValue(33, 1), "0,0");
+		Assert.AreEqual("0,0", ws.GetValue(33, 1));
 
 		ws = _pck.Workbook.Worksheets.Add("Insert2-2");
 		LoadData(ws);
@@ -58,8 +58,8 @@ public class CellStoreTest : TestBase
 			ws.InsertRow(15, 1);
 		}
 
-		Assert.AreEqual(ws.GetValue(1, 1), "0,0");
-		Assert.AreEqual(ws.GetValue(47, 1), "14,0");
+		Assert.AreEqual("0,0", ws.GetValue(1, 1));
+		Assert.AreEqual("14,0", ws.GetValue(47, 1));
 	}
 	[TestMethod]
 	public void Insert3()
