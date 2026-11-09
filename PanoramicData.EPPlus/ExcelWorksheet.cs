@@ -896,51 +896,26 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	}
 	private void LoadRowPageBreakes(XmlReader xr)
 	{
-		if (!ReadUntil(xr, "rowBreaks", "colBreaks"))
+		if (ReadUntil(xr, "rowBreaks", "colBreaks"))
 		{
-			return;
-		}
-
-		while (xr.Read())
-		{
-			if (xr.LocalName == "brk")
-			{
-				if (xr.NodeType == XmlNodeType.Element)
-				{
-					if (int.TryParse(xr.GetAttribute("id"), NumberStyles.Number, CultureInfo.InvariantCulture, out var id))
-					{
-						Row(id).PageBreak = true;
-					}
-				}
-			}
-			else
-			{
-				break;
-			}
+			ReadPageBreaks(xr, id => Row(id).PageBreak = true);
 		}
 	}
 	private void LoadColPageBreakes(XmlReader xr)
 	{
-		if (!ReadUntil(xr, "colBreaks"))
+		if (ReadUntil(xr, "colBreaks"))
 		{
-			return;
+			ReadPageBreaks(xr, id => Column(id).PageBreak = true);
 		}
+	}
 
-		while (xr.Read())
+	private static void ReadPageBreaks(XmlReader xr, Action<int> setPageBreak)
+	{
+		while (xr.Read() && xr.LocalName == "brk")
 		{
-			if (xr.LocalName == "brk")
+			if (xr.NodeType == XmlNodeType.Element && int.TryParse(xr.GetAttribute("id"), NumberStyles.Number, CultureInfo.InvariantCulture, out var id))
 			{
-				if (xr.NodeType == XmlNodeType.Element)
-				{
-					if (int.TryParse(xr.GetAttribute("id"), NumberStyles.Number, CultureInfo.InvariantCulture, out var id))
-					{
-						Column(id).PageBreak = true;
-					}
-				}
-			}
-			else
-			{
-				break;
+				setPageBreak(id);
 			}
 		}
 	}
@@ -2139,41 +2114,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			_mergedCells._cells.Insert(row, 0, rows, 0);
 		}
 
-		List<int> removeIndex = [];
-		for (var i = 0; i < _mergedCells.Count; i++)
-		{
-			if (!string.IsNullOrEmpty(_mergedCells[i]))
-			{
-				ExcelAddressBase addr = new(_mergedCells[i]), newAddr;
-				if (delete)
-				{
-					newAddr = addr.DeleteRow(row, rows);
-					if (newAddr == null)
-					{
-						removeIndex.Add(i);
-						continue;
-					}
-				}
-				else
-				{
-					newAddr = addr.AddRow(row, rows);
-					if (newAddr.Address != addr.Address)
-					{
-						_mergedCells.SetIndex(newAddr, i);
-					}
-				}
-
-				if (newAddr.Address != addr.Address)
-				{
-					_mergedCells.List[i] = newAddr._address;
-				}
-			}
-		}
-
-		for (var i = removeIndex.Count - 1; i >= 0; i--)
-		{
-			_mergedCells.List.RemoveAt(removeIndex[i]);
-		}
+		FixMergedCellAddresses(delete, addr => delete ? addr.DeleteRow(row, rows) : addr.AddRow(row, rows));
 	}
 	/// <summary>
 	/// Adds a value to the row of merged cells to fix for inserts or deletes
@@ -2192,28 +2133,29 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			_mergedCells._cells.Insert(0, column, 0, columns);
 		}
 
+		FixMergedCellAddresses(delete, addr => delete ? addr.DeleteColumn(column, columns) : addr.AddColumn(column, columns));
+	}
+
+	private void FixMergedCellAddresses(bool delete, Func<ExcelAddressBase, ExcelAddressBase> shift)
+	{
 		List<int> removeIndex = [];
 		for (var i = 0; i < _mergedCells.Count; i++)
 		{
 			if (!string.IsNullOrEmpty(_mergedCells[i]))
 			{
-				ExcelAddressBase addr = new(_mergedCells[i]), newAddr;
+				ExcelAddressBase addr = new(_mergedCells[i]);
+				var newAddr = shift(addr);
 				if (delete)
 				{
-					newAddr = addr.DeleteColumn(column, columns);
 					if (newAddr == null)
 					{
 						removeIndex.Add(i);
 						continue;
 					}
 				}
-				else
+				else if (newAddr.Address != addr.Address)
 				{
-					newAddr = addr.AddColumn(column, columns);
-					if (newAddr.Address != addr.Address)
-					{
-						_mergedCells.SetIndex(newAddr, i);
-					}
+					_mergedCells.SetIndex(newAddr, i);
 				}
 
 				if (newAddr.Address != addr.Address)
@@ -3762,7 +3704,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		cache.AppendFormat("<row r=\"{0}\"", row);
 		if (GetValueInner(row, 0) is RowInternal currRow)
 		{
-
 			// if hidden, add hidden attribute and preserve ht/customHeight (Excel compatible)
 			if (currRow.Hidden == true)
 			{
@@ -3771,7 +3712,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 			if (currRow.Height >= 0)
 			{
-				cache.AppendFormat(string.Format(CultureInfo.InvariantCulture, " ht=\"{0}\"", currRow.Height));
+				cache.Append(string.Format(CultureInfo.InvariantCulture, " ht=\"{0}\"", currRow.Height));
 				if (currRow.CustomHeight)
 				{
 					cache.Append(" customHeight=\"1\"");
@@ -3807,61 +3748,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 
 		cache.Append('>');
-	}
-	private void WriteRow(StreamWriter sw, ExcelStyleCollection<ExcelXfs> cellXfs, int prevRow, int row)
-	{
-		if (prevRow != -1)
-		{
-			sw.Write("</row>");
-		}
-		sw.Write("<row r=\"{0}\"", row);
-		if (GetValueInner(row, 0) is RowInternal currRow)
-		{
-
-			// if hidden, add hidden attribute and preserve ht/customHeight (Excel compatible)
-			if (currRow.Hidden == true)
-			{
-				sw.Write(" hidden=\"1\"");
-			}
-
-			if (currRow.Height >= 0)
-			{
-				sw.Write(string.Format(CultureInfo.InvariantCulture, " ht=\"{0}\"", currRow.Height));
-				if (currRow.CustomHeight)
-				{
-					sw.Write(" customHeight=\"1\"");
-				}
-			}
-
-			if (currRow.OutlineLevel > 0)
-			{
-				sw.Write(" outlineLevel =\"{0}\"", currRow.OutlineLevel);
-				if (currRow.Collapsed)
-				{
-					if (currRow.Hidden)
-					{
-						sw.Write(" collapsed=\"1\"");
-					}
-					else
-					{
-						sw.Write(" collapsed=\"1\" hidden=\"1\""); //Always hidden
-					}
-				}
-			}
-
-			if (currRow.Phonetic)
-			{
-				sw.Write(" ph=\"1\"");
-			}
-		}
-
-		var s = GetStyleInner(row, 0);
-		if (s > 0)
-		{
-			sw.Write(" s=\"{0}\" customFormat=\"1\"", cellXfs[s].newID);
-		}
-
-		sw.Write(">");
 	}
 
 	/// <summary>
