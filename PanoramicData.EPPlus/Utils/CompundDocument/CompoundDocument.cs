@@ -39,14 +39,10 @@ internal class CompoundDocument
 {
 	internal class StoragePart
 	{
-		public StoragePart()
-		{
-
-		}
 		internal Dictionary<string, StoragePart> SubStorage = [];
 		internal Dictionary<string, byte[]> DataStreams = [];
 	}
-	internal StoragePart Storage = null;
+	internal StoragePart Storage;
 	internal CompoundDocument()
 	{
 		Storage = new StoragePart();
@@ -107,14 +103,14 @@ internal class CompoundDocument
 	{
 		foreach (var item in storage.SubStorage)
 		{
-			var c = new CompoundDocumentItem() { Name = item.Key, ObjectType = 1, Stream = null, StreamSize = 0, Parent = parent };
+			var c = new CompoundDocumentItem { Name = item.Key, ObjectType = 1, Stream = null, StreamSize = 0, Parent = parent };
 			parent.Children.Add(c);
 			WriteStorageAndStreams(item.Value, c);
 		}
 
 		foreach (var item in storage.DataStreams)
 		{
-			var c = new CompoundDocumentItem() { Name = item.Key, ObjectType = 2, Stream = item.Value, StreamSize = (item.Value == null ? 0 : item.Value.Length), Parent = parent };
+			var c = new CompoundDocumentItem { Name = item.Key, ObjectType = 2, Stream = item.Value, StreamSize = (item.Value == null ? 0 : item.Value.Length), Parent = parent };
 			parent.Children.Add(c);
 		}
 	}

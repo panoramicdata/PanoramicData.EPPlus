@@ -41,13 +41,13 @@ internal class CompoundDocumentFile : IDisposable
 {
 	public CompoundDocumentFile()
 	{
-		RootItem = new CompoundDocumentItem() { Name = "<Root>", Children = [], ObjectType = 5 };
+		RootItem = new CompoundDocumentItem { Name = "<Root>", Children = [], ObjectType = 5 };
 		minorVersion = 0x3E;
 		majorVersion = 3;
-		sectorShif = 9;
+		const short sectorShift = 9;
 		minSectorShift = 6;
 
-		_sectorSize = 1 << sectorShif;
+		_sectorSize = 1 << sectorShift;
 		_miniSectorSize = 1 << minSectorShift;
 		_sectorSizeInt = _sectorSize / 4;
 	}
@@ -63,7 +63,7 @@ internal class CompoundDocumentFile : IDisposable
 		ms.Seek(0, SeekOrigin.Begin);   //Fixes issue #60
 		Read(new BinaryReader(ms));
 	}
-	private struct DocWriteInfo
+	private sealed class DocWriteInfo
 	{
 		internal List<int> DIFAT, FAT, miniFAT;
 	}
@@ -72,10 +72,10 @@ internal class CompoundDocumentFile : IDisposable
 	const int FATSectorSizeV3 = 512;
 	const int FATSectorSizeV4 = 4096;
 
-	const int DIFAT_SECTOR = -4; //0xFFFFFFFC;
-	const int FAT_SECTOR = -3;   //0xFFFFFFFD;
-	const int END_OF_CHAIN = -2; //0xFFFFFFFE;
-	const int FREE_SECTOR = -1;  //0xFFFFFFFF;
+	const int DIFAT_SECTOR = -4; // 0xFFFFFFFC
+	const int FAT_SECTOR = -3;   // 0xFFFFFFFD
+	const int END_OF_CHAIN = -2; // 0xFFFFFFFE
+	const int FREE_SECTOR = -1;  // 0xFFFFFFFF
 
 	static readonly byte[] header = [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1];
 	#endregion
@@ -83,7 +83,7 @@ internal class CompoundDocumentFile : IDisposable
 	short minorVersion;
 	short majorVersion;
 	int numberOfDirectorySector;
-	short sectorShif, minSectorShift;       //Bits for sector size
+	short minSectorShift;       //Bits for sector size
 
 	int _numberOfFATSectors;            // (4 bytes): This integer field contains the count of the number of FAT sectors in the compound file.
 	int _firstDirectorySectorLocation;  // (4 bytes): This integer field contains the starting sector number for the directory stream.            
@@ -126,7 +126,7 @@ internal class CompoundDocumentFile : IDisposable
 		var pos = ms.Position;
 		ms.Position = 0;
 		var b = new byte[8];
-		ms.Read(b, 0, 8);
+		ms.ReadAtLeast(b.AsSpan(0, 8), 8, throwOnEndOfStream: false);
 		ms.Position = pos;
 		return IsCompoundDocument(b);
 	}
@@ -150,28 +150,8 @@ internal class CompoundDocumentFile : IDisposable
 	#region Read
 	internal void Read(BinaryReader br)
 	{
-		br.ReadBytes(8);    //Read header
-		br.ReadBytes(16);   //Header CLSID (16 bytes): Reserved and unused class ID that MUST be set to all zeroes (CLSID_NULL). 
-		minorVersion = br.ReadInt16();
-		majorVersion = br.ReadInt16();
-		br.ReadInt16(); //Byte order
-		sectorShif = br.ReadInt16();
-		minSectorShift = br.ReadInt16();
-
-		_sectorSize = 1 << sectorShif;
-		_miniSectorSize = 1 << minSectorShift;
-		_sectorSizeInt = _sectorSize / 4;
-		br.ReadBytes(6);    //Reserved
-		numberOfDirectorySector = br.ReadInt32();
-		_numberOfFATSectors = br.ReadInt32();
-		_firstDirectorySectorLocation = br.ReadInt32();
-		_transactionSignatureNumber = br.ReadInt32();
-		_miniStreamCutoffSize = br.ReadInt32();
-		_firstMiniFATSectorLocation = br.ReadInt32();
-		_numberofMiniFATSectors = br.ReadInt32();
-		_firstDIFATSectorLocation = br.ReadInt32();
-		_numberofDIFATSectors = br.ReadInt32();
-		var dwi = new DocWriteInfo() { DIFAT = [], FAT = [], miniFAT = [] };
+		ReadHeader(br);
+		var dwi = new DocWriteInfo { DIFAT = [], FAT = [], miniFAT = [] };
 
 		for (var i = 0; i < 109; i++)
 		{
@@ -191,7 +171,14 @@ internal class CompoundDocumentFile : IDisposable
 		dwi.FAT = ReadFAT(_sectors, dwi);
 		var dir = ReadDirectories(_sectors, dwi);
 
-		LoadMinSectors(ref dwi, dir);
+		LoadMinSectors(dwi, dir);
+		LoadStreams(dir, dwi);
+
+		AddChildTree(dir[0], dir);
+	}
+
+	private void LoadStreams(List<CompoundDocumentItem> dir, DocWriteInfo dwi)
+	{
 		foreach (var d in dir)
 		{
 			if (d.Stream == null && d.StreamSize > 0)
@@ -206,8 +193,31 @@ internal class CompoundDocumentFile : IDisposable
 				}
 			}
 		}
+	}
 
-		AddChildTree(dir[0], dir);
+	private void ReadHeader(BinaryReader br)
+	{
+		br.ReadBytes(8);    //Read header
+		br.ReadBytes(16);   //Header CLSID (16 bytes): Reserved and unused class ID that MUST be set to all zeroes (CLSID_NULL).
+		minorVersion = br.ReadInt16();
+		majorVersion = br.ReadInt16();
+		br.ReadInt16(); //Byte order
+		var sectorShift = br.ReadInt16();
+		minSectorShift = br.ReadInt16();
+
+		_sectorSize = 1 << sectorShift;
+		_miniSectorSize = 1 << minSectorShift;
+		_sectorSizeInt = _sectorSize / 4;
+		br.ReadBytes(6);    //Reserved
+		numberOfDirectorySector = br.ReadInt32();
+		_numberOfFATSectors = br.ReadInt32();
+		_firstDirectorySectorLocation = br.ReadInt32();
+		_transactionSignatureNumber = br.ReadInt32();
+		_miniStreamCutoffSize = br.ReadInt32();
+		_firstMiniFATSectorLocation = br.ReadInt32();
+		_numberofMiniFATSectors = br.ReadInt32();
+		_firstDIFATSectorLocation = br.ReadInt32();
+		_numberofDIFATSectors = br.ReadInt32();
 	}
 	private void LoadDIFATSectors(DocWriteInfo dwi)
 	{
@@ -237,7 +247,7 @@ internal class CompoundDocumentFile : IDisposable
 			_sectors.Add(br.ReadBytes(_sectorSize));
 		}
 	}
-	private void LoadMinSectors(ref DocWriteInfo dwi, List<CompoundDocumentItem> dir)
+	private void LoadMinSectors(DocWriteInfo dwi, List<CompoundDocumentItem> dir)
 	{
 		dwi.miniFAT = ReadMiniFAT(_sectors, dwi);
 		dir[0].Stream = GetStream(dir[0].StartingSectorLocation, dir[0].StreamSize, dwi.FAT, _sectors);
@@ -411,7 +421,6 @@ internal class CompoundDocumentFile : IDisposable
 		//InitValues
 		minorVersion = 62;
 		majorVersion = 3;
-		sectorShif = 9;                 //2^9=512 bytes for version 3 documents 
 		minSectorShift = 6;             //2^6=64 bytes
 		_miniStreamCutoffSize = 4096;
 		_transactionSignatureNumber = 0;
@@ -480,32 +489,9 @@ internal class CompoundDocumentFile : IDisposable
 		return childId;
 	}
 
-	private static void SetUnhandled(int listAdd, List<CompoundDocumentItem> children)
-	{
-		for (var i = 0; i < children.Count; i++)
-		{
-			if (children[i]._handled == false)
-			{
-				if (i > 0 && children[i - 1].RightSibling == -1 && children[i].LeftSibling != i + listAdd - 1)
-				{
-					children[i - 1].RightSibling = i + listAdd;
-				}
-				else if (i < children.Count - 1 && children[i + 1].LeftSibling == -1 && children[i].RightSibling != i + listAdd + 1)
-				{
-					children[i + 1].LeftSibling = i + listAdd;
-				}
-				else
-				{
-					throw (new InvalidOperationException("Invalid sibling handling in Document"));
-				}
-			}
-		}
-	}
-
 	private static int SetSiblings(int listAdd, List<CompoundDocumentItem> children, int fromPos, int toPos, int currSibl)
 	{
-		int pos, div;
-		pos = GetPos(fromPos, toPos);
+		var pos = GetPos(fromPos, toPos);
 
 		var item = children[pos];
 		if (item._handled)
@@ -519,15 +505,11 @@ internal class CompoundDocumentFile : IDisposable
 			return fromPos + listAdd;
 		}
 
-		div = pos / 2;
-		if (div <= 0)
-		{
-			div = 1;
-		}
+		var div = Math.Max(pos / 2, 1);
 
 		var lPos = GetPos(fromPos, pos - 1);
 		var rPos = GetPos(pos + 1, toPos);
-		if (div == 1 && children[lPos]._handled && children[rPos]._handled)
+		if (div == 1 && BothHandled(children, lPos, rPos))
 		{
 			return pos + listAdd;
 		}
@@ -545,58 +527,12 @@ internal class CompoundDocumentFile : IDisposable
 		return pos + listAdd;
 	}
 
+	private static bool BothHandled(List<CompoundDocumentItem> children, int lPos, int rPos) => children[lPos]._handled && children[rPos]._handled;
+
 	private static int GetPos(int fromPos, int toPos)
 	{
 		var div = (toPos - fromPos) / 2;
 		return fromPos + div;
-	}
-
-	private static bool NoGreater(List<CompoundDocumentItem> children, int pos, int lPos, int listAdd)
-	{
-		if (pos - lPos <= 1)
-		{
-			return true;
-		}
-
-		for (var i = lPos + 1; i <= pos; i++)
-		{
-			if (children[i].RightSibling != -1 && children[i].RightSibling > lPos + listAdd)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-	private static bool NoLess(List<CompoundDocumentItem> children, int pos, int rPos, int listAdd)
-	{
-		if (rPos - pos <= 1)
-		{
-			return true;
-		}
-
-		for (var i = pos + 1; i <= rPos; i++)
-		{
-			if (children[i].LeftSibling != -1 && children[i].LeftSibling < rPos + listAdd)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private static int GetLevels(int c)
-	{
-		c--;
-		var i = 0;
-		while (c > 0)
-		{
-			c >>= 1;
-			i++;
-		}
-
-		return i;
 	}
 
 	private void FillDIFAT(BinaryWriter bw)
@@ -661,20 +597,18 @@ internal class CompoundDocumentFile : IDisposable
 		WriteDirStream(bw, dirs);
 	}
 
-	private int WriteDirStream(BinaryWriter bw, List<CompoundDocumentItem> dirs)
+	private void WriteDirStream(BinaryWriter bw, List<CompoundDocumentItem> dirs)
 	{
-		if (dirs.Count > 0)
+		if (dirs.Count == 0)
 		{
-			//First dirtory sector goes into sector 2
-			bw.Seek((_firstDirectorySectorLocation + 1) * _sectorSize, SeekOrigin.Begin);
-			for (var i = 0; i < Math.Min(_sectorSize / 128, dirs.Count); i++)
-			{
-				dirs[i].Write(bw);
-			}
+			return;
 		}
-		else
+
+		//First dirtory sector goes into sector 2
+		bw.Seek((_firstDirectorySectorLocation + 1) * _sectorSize, SeekOrigin.Begin);
+		for (var i = 0; i < Math.Min(_sectorSize / 128, dirs.Count); i++)
 		{
-			return -1;
+			dirs[i].Write(bw);
 		}
 
 		bw.Seek(0, SeekOrigin.End);
@@ -690,8 +624,6 @@ internal class CompoundDocumentFile : IDisposable
 
 		WriteStreamFullSector(bw, _sectorSize);
 		WriteFAT(bw, start, streamLength);
-		return start;
-
 	}
 
 	private void WriteMiniFAT(BinaryWriter bw, byte[] miniFAT)
@@ -762,33 +694,36 @@ internal class CompoundDocumentFile : IDisposable
 			_numberOfFATSectors++;
 			if (_currentDIFATSectorPos == _sectorSize || ((_currentDIFATSectorPos + 4) % _sectorSize == 0 && _currentDIFATSectorPos > _sectorSize))
 			{
-				bw.Write(new byte[_sectorSize]); //Write pre FAT sector
-				if (_currentDIFATSectorPos > _sectorSize)                       //Write link to next DIFAT sector
-				{
-					WritePosition(bw, FATSector + 1, ref _currentDIFATSectorPos, false);
-				}
-				else
-				{
-					_firstDIFATSectorLocation = FATSector + 1;                    //Current sector
-				}
-
-				_currentDIFATSectorPos = (int)bw.BaseStream.Position;
-				//Fill sector
-				for (var i = 0; i < _sectorSize; i++)
-				{
-					bw.Write((byte)0xFF);
-				}
-
-				bw.Seek(-(_sectorSize * 2), SeekOrigin.Current);
+				AddDIFATSector(bw, FATSector);
 			}
 		}
 	}
 
-	private void AllocateFAT(BinaryWriter bw, int miniFatLength, List<CompoundDocumentItem> dirs)
+	private void AddDIFATSector(BinaryWriter bw, int FATSector)
 	{
-		/*** First calculate full size ***/
+		bw.Write(new byte[_sectorSize]); //Write pre FAT sector
+		if (_currentDIFATSectorPos > _sectorSize)                       //Write link to next DIFAT sector
+		{
+			WritePosition(bw, FATSector + 1, ref _currentDIFATSectorPos, false);
+		}
+		else
+		{
+			_firstDIFATSectorLocation = FATSector + 1;                    //Current sector
+		}
+
+		_currentDIFATSectorPos = (int)bw.BaseStream.Position;
+		//Fill sector
+		for (var i = 0; i < _sectorSize; i++)
+		{
+			bw.Write((byte)0xFF);
+		}
+
+		bw.Seek(-(_sectorSize * 2), SeekOrigin.Current);
+	}
+
+	private long GetFullStreamSize(int miniFatLength, List<CompoundDocumentItem> dirs)
+	{
 		var fullStreamSize = (long)miniFatLength - _sectorSize; //MiniFAT starts from sector 2, by default.
-																//StreamSize
 		foreach (var entity in dirs)
 		{
 			if (entity.ObjectType == 5 || entity.StreamSize > _miniStreamCutoffSize)
@@ -802,15 +737,19 @@ internal class CompoundDocumentFile : IDisposable
 			}
 		}
 
-		var noOfSectors = fullStreamSize / _sectorSize;
+		return fullStreamSize;
+	}
+
+	private void AllocateFAT(BinaryWriter bw, int miniFatLength, List<CompoundDocumentItem> dirs)
+	{
+		/*** First calculate full size ***/
+		var noOfSectors = GetFullStreamSize(miniFatLength, dirs) / _sectorSize;
 
 		//Directory Size
 		var dirsPerSector = _sectorSize / 128;
-		var dirSectors = 0;
-		var firstFATSectorPos = _currentFATSectorPos;
 		if (dirs.Count > dirsPerSector)
 		{
-			dirSectors = GetSectors(dirs.Count, dirsPerSector);
+			var dirSectors = GetSectors(dirs.Count, dirsPerSector);
 			noOfSectors += dirSectors - 1; //Four item per sector. Sector two is fixed for directories
 		}
 
@@ -828,6 +767,12 @@ internal class CompoundDocumentFile : IDisposable
 
 		//Move to FAT Second sector (4).
 		bw.Seek(_currentFATSectorPos, SeekOrigin.Begin);
+		WriteFATAndDIFATEntries(bw, numberOfFATSectors);
+		bw.Seek(0, SeekOrigin.End);
+	}
+
+	private void WriteFATAndDIFATEntries(BinaryWriter bw, int numberOfFATSectors)
+	{
 		var sectorPos = 1;
 		for (var i = 1; i < 109; i++)     //We have 1 FAT sector to start with at sector 0
 		{
@@ -866,8 +811,6 @@ internal class CompoundDocumentFile : IDisposable
 				break;
 			}
 		}
-
-		bw.Seek(0, SeekOrigin.End);
 	}
 
 	private int GetDIFatSectors(int FATSectors) => FATSectors > 109 ? GetSectors((FATSectors - 109), _sectorSizeInt - 1) : 0;
@@ -942,63 +885,6 @@ internal class CompoundDocumentFile : IDisposable
 		bw.Write(_numberofMiniFATSectors);   //Number of MiniFAT sectors
 		bw.Write(_firstDIFATSectorLocation); //First DIFAT Sector Location
 		bw.Write(_numberofDIFATSectors);     //Number of DIFAT Sectors
-	}
-
-	private void CreateFATStreams(CompoundDocumentItem item, BinaryWriter bw, BinaryWriter bwMini, DocWriteInfo dwi)
-	{
-		if (item.ObjectType != 5)   //Root, we must have the miniStream first.
-		{
-			if (item.StreamSize > 0)
-			{
-				item.StreamSize = item.Stream.Length;
-				if (item.StreamSize < _miniStreamCutoffSize)
-				{
-					item.StartingSectorLocation = WriteStream(bwMini, dwi.miniFAT, item.Stream, miniFATSectorSize);
-				}
-				else
-				{
-					item.StartingSectorLocation = WriteStream(bw, dwi.FAT, item.Stream, FATSectorSizeV3);
-				}
-			}
-		}
-
-		foreach (var c in item.Children)
-		{
-			CreateFATStreams(c, bw, bwMini, dwi);
-		}
-	}
-
-	private static int WriteStream(BinaryWriter bw, List<int> fat, byte[] stream, int FATSectorSize)
-	{
-		var rest = FATSectorSize - (stream.Length % FATSectorSize);
-		bw.Write(stream);
-		if (rest > 0 && rest < FATSectorSize)
-		{
-			bw.Write(new byte[rest]);
-		}
-
-		var ret = fat.Count;
-		AddFAT(fat, stream.Length, FATSectorSize, 0);
-
-		return ret; //Returns the start sector
-	}
-
-	private static void AddFAT(List<int> fat, long streamSize, int sectorSize, int addPos)
-	{
-		var size = 0;
-		while (size < streamSize)
-		{
-			if (size + sectorSize < streamSize)
-			{
-				fat.Add(fat.Count + 1);
-			}
-			else
-			{
-				fat.Add(END_OF_CHAIN);
-			}
-
-			size += sectorSize;
-		}
 	}
 
 	public void Dispose()

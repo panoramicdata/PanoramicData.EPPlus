@@ -35,6 +35,7 @@ using System.Text;
 
 namespace OfficeOpenXml.Utils.CompundDocument;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1210:Equals and the comparison operators should be overridden when implementing IComparable", Justification = "Only used to sort directory entries; reference equality is relied on by list lookups such as IndexOf.")]
 internal class CompoundDocumentItem : IComparable<CompoundDocumentItem>
 {
 	public CompoundDocumentItem()
@@ -135,7 +136,7 @@ internal class CompoundDocumentItem : IComparable<CompoundDocumentItem>
 		get;
 		set;
 	}
-	internal bool _handled = false;
+	internal bool _handled;
 	internal void Read(BinaryReader br)
 	{
 		var s = br.ReadBytes(0x40);
@@ -151,7 +152,7 @@ internal class CompoundDocumentItem : IComparable<CompoundDocumentItem>
 		RightSibling = br.ReadInt32();
 		ChildID = br.ReadInt32();
 
-		//Clsid;
+		// Class ID
 		ClsID = new Guid(br.ReadBytes(16));
 
 		StatBits = br.ReadInt32();
