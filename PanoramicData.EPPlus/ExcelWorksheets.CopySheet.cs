@@ -42,20 +42,7 @@ public partial class ExcelWorksheets
 		foreach (var tbl in Copy.Tables)
 		{
 			var xml = tbl.TableXml.OuterXml;
-			string name;
-			if (prevName == "")
-			{
-				name = Copy.Tables.GetNewTableName();
-			}
-			else
-			{
-				var ix = int.Parse(prevName[5..]) + 1;
-				name = string.Format("Table{0}", ix);
-				while (_pck.Workbook.ExistsPivotTableName(name))
-				{
-					name = string.Format("Table{0}", ++ix);
-				}
-			}
+			var name = GetCopiedTableName(Copy, prevName);
 			//ensure the _nextTableID value has been initialized - Pull request by WillR
 			_pck.Workbook.ReadAllTables();
 
@@ -82,25 +69,50 @@ public partial class ExcelWorksheets
 			//create the relationship and add the ID to the worksheet xml.
 			var rel = added.Part.CreateRelationship(UriHelper.GetRelativeUri(added.WorksheetUri, uriTbl), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/table");
 
-			if (tbl.RelationshipID == null)
-			{
-				var topNode = added.WorksheetXml.SelectSingleNode("//d:tableParts", tbl.NameSpaceManager);
-				if (topNode == null)
-				{
-					added.CreateNode("d:tableParts");
-					topNode = added.WorksheetXml.SelectSingleNode("//d:tableParts", tbl.NameSpaceManager);
-				}
+			SetTablePartRelation(added, tbl, rel);
+		}
+	}
 
-				var elem = added.WorksheetXml.CreateElement("tablePart", ExcelPackage.schemaMain);
-				topNode.AppendChild(elem);
-				elem.SetAttribute("id", ExcelPackage.schemaRelationships, rel.Id);
-			}
-			else
+	private string GetCopiedTableName(ExcelWorksheet Copy, string prevName)
+	{
+		string name;
+		if (prevName == "")
+		{
+			name = Copy.Tables.GetNewTableName();
+		}
+		else
+		{
+			var ix = int.Parse(prevName[5..]) + 1;
+			name = string.Format("Table{0}", ix);
+			while (_pck.Workbook.ExistsPivotTableName(name))
 			{
-				XmlAttribute relAtt;
-				relAtt = added.WorksheetXml.SelectSingleNode(string.Format("//d:tableParts/d:tablePart/@r:id[.='{0}']", tbl.RelationshipID), tbl.NameSpaceManager) as XmlAttribute;
-				relAtt.Value = rel.Id;
+				name = string.Format("Table{0}", ++ix);
 			}
+		}
+
+		return name;
+	}
+
+	private static void SetTablePartRelation(ExcelWorksheet added, Table.ExcelTable tbl, Packaging.ZipPackageRelationship rel)
+	{
+		if (tbl.RelationshipID == null)
+		{
+			var topNode = added.WorksheetXml.SelectSingleNode("//d:tableParts", tbl.NameSpaceManager);
+			if (topNode == null)
+			{
+				added.CreateNode("d:tableParts");
+				topNode = added.WorksheetXml.SelectSingleNode("//d:tableParts", tbl.NameSpaceManager);
+			}
+
+			var elem = added.WorksheetXml.CreateElement("tablePart", ExcelPackage.schemaMain);
+			topNode.AppendChild(elem);
+			elem.SetAttribute("id", ExcelPackage.schemaRelationships, rel.Id);
+		}
+		else
+		{
+			XmlAttribute relAtt;
+			relAtt = added.WorksheetXml.SelectSingleNode(string.Format("//d:tableParts/d:tablePart/@r:id[.='{0}']", tbl.RelationshipID), tbl.NameSpaceManager) as XmlAttribute;
+			relAtt.Value = rel.Id;
 		}
 	}
 	private void CopyPivotTable(ExcelWorksheet Copy, ExcelWorksheet added)
@@ -110,28 +122,7 @@ public partial class ExcelWorksheets
 		{
 			var xml = tbl.PivotTableXml.OuterXml;
 
-			string name;
-			if (Copy.Workbook == added.Workbook || added.PivotTables._pivotTableNames.ContainsKey(tbl.Name))
-			{
-				if (prevName == "")
-				{
-					name = added.PivotTables.GetNewTableName();
-				}
-				else
-				{
-					var ix = int.Parse(prevName[10..]) + 1;
-					name = string.Format("PivotTable{0}", ix);
-					while (_pck.Workbook.ExistsPivotTableName(name))
-					{
-						name = string.Format("PivotTable{0}", ++ix);
-					}
-				}
-			}
-			else
-			{
-				name = tbl.Name;
-			}
-
+			var name = GetCopiedPivotTableName(Copy, added, tbl, prevName);
 			prevName = name;
 			XmlDocument xmlDoc = new();
 			//TODO: Fix save pivottable here
@@ -167,17 +158,7 @@ public partial class ExcelWorksheets
 
 			added.Workbook.AddPivotTable(cacheId.ToString(), uriCd);
 
-			xml = "<pivotCacheRecords xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" count=\"0\" />";
-			var uriRec = new Uri(string.Format("/xl/pivotCache/pivotCacheRecords{0}.xml", Id), UriKind.Relative);
-			while (_pck.Package.PartExists(uriRec))
-			{
-				uriRec = new Uri(string.Format("/xl/pivotCache/pivotCacheRecords{0}.xml", ++Id), UriKind.Relative);
-			}
-
-			var partRec = _pck.Package.CreatePart(uriRec, ExcelPackage.schemaPivotCacheRecords, _pck.Compression);
-			StreamWriter streamRec = new(partRec.GetStream(FileMode.Create, FileAccess.Write));
-			streamRec.Write(xml);
-			streamRec.Flush();
+			var uriRec = CreateEmptyPivotCacheRecordsPart(Id);
 
 			//create the relationship and add the ID to the worksheet xml.
 			added.Part.CreateRelationship(UriHelper.ResolvePartUri(added.WorksheetUri, uriTbl), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/pivotTable");
@@ -188,12 +169,77 @@ public partial class ExcelWorksheets
 
 		added._pivotTables = null;   //Reset collection so it's reloaded when accessing the collection next time.
 	}
+
+	private string GetCopiedPivotTableName(ExcelWorksheet Copy, ExcelWorksheet added, Table.PivotTable.ExcelPivotTable tbl, string prevName)
+	{
+		string name;
+		if (Copy.Workbook == added.Workbook || added.PivotTables._pivotTableNames.ContainsKey(tbl.Name))
+		{
+			if (prevName == "")
+			{
+				name = added.PivotTables.GetNewTableName();
+			}
+			else
+			{
+				var ix = int.Parse(prevName[10..]) + 1;
+				name = string.Format("PivotTable{0}", ix);
+				while (_pck.Workbook.ExistsPivotTableName(name))
+				{
+					name = string.Format("PivotTable{0}", ++ix);
+				}
+			}
+		}
+		else
+		{
+			name = tbl.Name;
+		}
+
+		return name;
+	}
+
+	private Uri CreateEmptyPivotCacheRecordsPart(int Id)
+	{
+		var xml = "<pivotCacheRecords xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" count=\"0\" />";
+		var uriRec = new Uri(string.Format("/xl/pivotCache/pivotCacheRecords{0}.xml", Id), UriKind.Relative);
+		while (_pck.Package.PartExists(uriRec))
+		{
+			uriRec = new Uri(string.Format("/xl/pivotCache/pivotCacheRecords{0}.xml", ++Id), UriKind.Relative);
+		}
+
+		var partRec = _pck.Package.CreatePart(uriRec, ExcelPackage.schemaPivotCacheRecords, _pck.Compression);
+		StreamWriter streamRec = new(partRec.GetStream(FileMode.Create, FileAccess.Write));
+		streamRec.Write(xml);
+		streamRec.Flush();
+		return uriRec;
+	}
 	private void CopyHeaderFooterPictures(ExcelWorksheet Copy, ExcelWorksheet added)
 	{
 		if (Copy.TopNode != null && Copy.TopNode.SelectSingleNode("d:headerFooter", NameSpaceManager) == null)
 		{
 			return;
 		}
+		CopyHeaderFooterTexts(Copy, added);
+
+		// Copy any images
+		if (Copy.HeaderFooter.Pictures.Count > 0)
+		{
+			added.DeleteNode("d:legacyDrawingHF");
+
+			foreach (ExcelVmlDrawingPicture pic in Copy.HeaderFooter.Pictures)
+			{
+				var item = added.HeaderFooter.Pictures.Add(pic.Id, pic.ImageUri, pic.Title, pic.Width, pic.Height);
+				foreach (XmlAttribute att in pic.TopNode.Attributes)
+				{
+					(item.TopNode as XmlElement).SetAttribute(att.Name, att.Value);
+				}
+
+				item.TopNode.InnerXml = pic.TopNode.InnerXml;
+			}
+		}
+	}
+
+	private static void CopyHeaderFooterTexts(ExcelWorksheet Copy, ExcelWorksheet added)
+	{
 		//Copy the texts
 		if (Copy.HeaderFooter._oddHeader != null)
 		{
@@ -223,23 +269,6 @@ public partial class ExcelWorksheets
 		if (Copy.HeaderFooter._firstFooter != null)
 		{
 			CopyText(Copy.HeaderFooter._firstFooter, added.HeaderFooter.FirstFooter);
-		}
-
-		// Copy any images
-		if (Copy.HeaderFooter.Pictures.Count > 0)
-		{
-			added.DeleteNode("d:legacyDrawingHF");
-
-			foreach (ExcelVmlDrawingPicture pic in Copy.HeaderFooter.Pictures)
-			{
-				var item = added.HeaderFooter.Pictures.Add(pic.Id, pic.ImageUri, pic.Title, pic.Width, pic.Height);
-				foreach (XmlAttribute att in pic.TopNode.Attributes)
-				{
-					(item.TopNode as XmlElement).SetAttribute(att.Name, att.Value);
-				}
-
-				item.TopNode.InnerXml = pic.TopNode.InnerXml;
-			}
 		}
 	}
 

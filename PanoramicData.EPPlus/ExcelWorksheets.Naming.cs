@@ -49,35 +49,7 @@ public partial class ExcelWorksheets
 		//remove invalid characters
 		if (ValidateName(Name))
 		{
-			if (Name.IndexOf(':') > -1)
-			{
-				Name = Name.Replace(":", " ");
-			}
-
-			if (Name.IndexOf('/') > -1)
-			{
-				Name = Name.Replace("/", " ");
-			}
-
-			if (Name.IndexOf('\\') > -1)
-			{
-				Name = Name.Replace("\\", " ");
-			}
-
-			if (Name.IndexOf('?') > -1)
-			{
-				Name = Name.Replace("?", " ");
-			}
-
-			if (Name.IndexOf('[') > -1)
-			{
-				Name = Name.Replace("[", " ");
-			}
-
-			if (Name.IndexOf(']') > -1)
-			{
-				Name = Name.Replace("]", " ");
-			}
+			Name = ReplaceInvalidSheetNameChars(Name);
 		}
 
 		if (Name.Trim() == "")
@@ -93,6 +65,41 @@ public partial class ExcelWorksheets
 		if (Name.Length > 31)
 		{
 			Name = Name[..31];   //A sheet can have max 31 char's            
+		}
+
+		return Name;
+	}
+
+	private static string ReplaceInvalidSheetNameChars(string Name)
+	{
+		if (Name.IndexOf(':') > -1)
+		{
+			Name = Name.Replace(":", " ");
+		}
+
+		if (Name.IndexOf('/') > -1)
+		{
+			Name = Name.Replace("/", " ");
+		}
+
+		if (Name.IndexOf('\\') > -1)
+		{
+			Name = Name.Replace("\\", " ");
+		}
+
+		if (Name.IndexOf('?') > -1)
+		{
+			Name = Name.Replace("?", " ");
+		}
+
+		if (Name.IndexOf('[') > -1)
+		{
+			Name = Name.Replace("[", " ");
+		}
+
+		if (Name.IndexOf(']') > -1)
+		{
+			Name = Name.Replace("]", " ");
 		}
 
 		return Name;

@@ -94,38 +94,7 @@ public partial class ExcelWorksheets
 			var relID = CreateWorkbookRel(Name, sheetID, uriWorksheet, false);
 			ExcelWorksheet added = new(_namespaceManager, _pck, relID, uriWorksheet, Name, sheetID, _worksheets.Count + _pck._worksheetAdd, eWorkSheetHidden.Visible);
 
-			//Copy comments
-			if (Copy.Comments.Count > 0)
-			{
-				CopyComment(Copy, added);
-			}
-			else if (Copy.VmlDrawingsComments.Count > 0)    //Vml drawings are copied as part of the comments. 
-			{
-				CopyVmlDrawing(Copy, added);
-			}
-
-			//Copy HeaderFooter
-			CopyHeaderFooterPictures(Copy, added);
-
-			if (Copy.Drawings.Count > 0)
-			{
-				CopyDrawing(Copy, added);
-			}
-
-			if (Copy.Tables.Count > 0)
-			{
-				CopyTable(Copy, added);
-			}
-
-			if (Copy.PivotTables.Count > 0)
-			{
-				CopyPivotTable(Copy, added);
-			}
-
-			if (Copy.Names.Count > 0)
-			{
-				CopySheetNames(Copy, added);
-			}
+			CopyWorksheetParts(Copy, added);
 
 			//Copy all cells
 			CloneCells(Copy, added);
@@ -140,19 +109,60 @@ public partial class ExcelWorksheets
 
 			_worksheets.Add(_worksheets.Count + _pck._worksheetAdd, added);
 
-			//Remove any relation to printersettings.
-			var pageSetup = added.WorksheetXml.SelectSingleNode("//d:pageSetup", _namespaceManager);
-			if (pageSetup != null)
-			{
-				var attr = (XmlAttribute)pageSetup.Attributes.GetNamedItem("id", ExcelPackage.schemaRelationships);
-				if (attr != null)
-				{
-					// first delete the attribute from the XML
-					pageSetup.Attributes.Remove(attr);
-				}
-			}
+			RemovePrinterSettingsRelation(added);
 
 			return added;
+		}
+	}
+
+	private void CopyWorksheetParts(ExcelWorksheet Copy, ExcelWorksheet added)
+	{
+		//Copy comments
+		if (Copy.Comments.Count > 0)
+		{
+			CopyComment(Copy, added);
+		}
+		else if (Copy.VmlDrawingsComments.Count > 0)    //Vml drawings are copied as part of the comments. 
+		{
+			CopyVmlDrawing(Copy, added);
+		}
+
+		//Copy HeaderFooter
+		CopyHeaderFooterPictures(Copy, added);
+
+		if (Copy.Drawings.Count > 0)
+		{
+			CopyDrawing(Copy, added);
+		}
+
+		if (Copy.Tables.Count > 0)
+		{
+			CopyTable(Copy, added);
+		}
+
+		if (Copy.PivotTables.Count > 0)
+		{
+			CopyPivotTable(Copy, added);
+		}
+
+		if (Copy.Names.Count > 0)
+		{
+			CopySheetNames(Copy, added);
+		}
+	}
+
+	private void RemovePrinterSettingsRelation(ExcelWorksheet added)
+	{
+		//Remove any relation to printersettings.
+		var pageSetup = added.WorksheetXml.SelectSingleNode("//d:pageSetup", _namespaceManager);
+		if (pageSetup != null)
+		{
+			var attr = (XmlAttribute)pageSetup.Attributes.GetNamedItem("id", ExcelPackage.schemaRelationships);
+			if (attr != null)
+			{
+				// first delete the attribute from the XML
+				pageSetup.Attributes.Remove(attr);
+			}
 		}
 	}
 	/// <summary>

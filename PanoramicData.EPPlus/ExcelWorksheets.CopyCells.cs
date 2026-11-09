@@ -33,31 +33,7 @@ public partial class ExcelWorksheets
 		{
 			row = val.Row;
 			col = val.Column;
-			var styleID = 0;
-			if (row == 0) //Column
-			{
-				if (Copy.GetValueInner(row, col) is ExcelColumn c)
-				{
-					var clone = c.Clone(added, c.ColumnMin);
-					clone.StyleID = c.StyleID;
-					added.SetValueInner(row, col, clone);
-					styleID = c.StyleID;
-				}
-			}
-			else if (col == 0) //Row
-			{
-				var r = Copy.Row(row);
-				if (r != null)
-				{
-					r.Clone(added);
-					styleID = r.StyleID;
-				}
-
-			}
-			else
-			{
-				styleID = CopyValues(Copy, added, row, col);
-			}
+			var styleID = CloneCell(Copy, added, row, col);
 
 			if (!sameWorkbook)
 			{
@@ -75,6 +51,37 @@ public partial class ExcelWorksheets
 		}
 
 		added._package.DoAdjustDrawings = doAdjust;
+	}
+
+	private static int CloneCell(ExcelWorksheet Copy, ExcelWorksheet added, int row, int col)
+	{
+		var styleID = 0;
+		if (row == 0) //Column
+		{
+			if (Copy.GetValueInner(row, col) is ExcelColumn c)
+			{
+				var clone = c.Clone(added, c.ColumnMin);
+				clone.StyleID = c.StyleID;
+				added.SetValueInner(row, col, clone);
+				styleID = c.StyleID;
+			}
+		}
+		else if (col == 0) //Row
+		{
+			var r = Copy.Row(row);
+			if (r != null)
+			{
+				r.Clone(added);
+				styleID = r.StyleID;
+			}
+
+		}
+		else
+		{
+			styleID = CopyValues(Copy, added, row, col);
+		}
+
+		return styleID;
 	}
 
 	private static int CopyValues(ExcelWorksheet Copy, ExcelWorksheet added, int row, int col)
@@ -174,45 +181,11 @@ public partial class ExcelWorksheets
 			draw.AdjustPositionAndSize();       //Adjust position for any change in normal style font/row size etc.
 			if (draw is ExcelChart chart)
 			{
-				xml = chart.ChartXml.InnerXml;
-
-				var UriChart = GetNewUri(_pck.Package, "/xl/charts/chart{0}.xml");
-				var chartPart = _pck.Package.CreatePart(UriChart, "application/vnd.openxmlformats-officedocument.drawingml.chart+xml", _pck.Compression);
-				StreamWriter streamChart = new(chartPart.GetStream(FileMode.Create, FileAccess.Write));
-				streamChart.Write(xml);
-				streamChart.Flush();
-				//Now create the new relationship to the copied chart xml
-				var prevRelID = draw.TopNode.SelectSingleNode("xdr:graphicFrame/a:graphic/a:graphicData/c:chart/@r:id", Copy.Drawings.NameSpaceManager).Value;
-				var rel = part.CreateRelationship(UriHelper.GetRelativeUri(uriDraw, UriChart), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/chart");
-				var relAtt = drawXml.SelectSingleNode(string.Format("//c:chart/@r:id[.='{0}']", prevRelID), Copy.Drawings.NameSpaceManager) as XmlAttribute;
-				relAtt.Value = rel.Id;
+				CopyChartPart(Copy, part, uriDraw, drawXml, chart);
 			}
 			else if (draw is ExcelPicture pic)
 			{
-				var uri = pic.UriPic;
-				if (!workSheet.Workbook._package.Package.PartExists(uri))
-				{
-					var picPart = workSheet.Workbook._package.Package.CreatePart(uri, pic.ContentType, CompressionLevel.None);
-					var imageBytes = pic.ImageBytes;
-					picPart.GetStream(FileMode.Create, FileAccess.Write).Write(imageBytes, 0, imageBytes.Length);
-				}
-
-				var rel = part.CreateRelationship(UriHelper.GetRelativeUri(workSheet.WorksheetUri, uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
-				//Fixes problem with invalid image when the same image is used more than once.
-				var relAtt =
-					drawXml.SelectSingleNode(
-						string.Format(
-							"//xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name[.='{0}']/../../../xdr:blipFill/a:blip/@r:embed",
-							pic.Name), Copy.Drawings.NameSpaceManager);
-				if (relAtt != null)
-				{
-					relAtt.Value = rel.Id;
-				}
-
-				if (_pck._images.TryGetValue(pic.ImageHash, out var value))
-				{
-					value.RefCount++;
-				}
+				CopyPicturePart(Copy, workSheet, part, drawXml, pic);
 			}
 		}
 		//rewrite the drawing xml with the new relID's
@@ -232,6 +205,50 @@ public partial class ExcelWorksheets
 				c._height = draw._height;
 				c._width = draw._width;
 			}
+		}
+	}
+
+	private void CopyChartPart(ExcelWorksheet Copy, Packaging.ZipPackagePart part, Uri uriDraw, XmlDocument drawXml, ExcelChart chart)
+	{
+		var xml = chart.ChartXml.InnerXml;
+
+		var UriChart = GetNewUri(_pck.Package, "/xl/charts/chart{0}.xml");
+		var chartPart = _pck.Package.CreatePart(UriChart, "application/vnd.openxmlformats-officedocument.drawingml.chart+xml", _pck.Compression);
+		StreamWriter streamChart = new(chartPart.GetStream(FileMode.Create, FileAccess.Write));
+		streamChart.Write(xml);
+		streamChart.Flush();
+		//Now create the new relationship to the copied chart xml
+		var prevRelID = chart.TopNode.SelectSingleNode("xdr:graphicFrame/a:graphic/a:graphicData/c:chart/@r:id", Copy.Drawings.NameSpaceManager).Value;
+		var rel = part.CreateRelationship(UriHelper.GetRelativeUri(uriDraw, UriChart), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/chart");
+		var relAtt = drawXml.SelectSingleNode(string.Format("//c:chart/@r:id[.='{0}']", prevRelID), Copy.Drawings.NameSpaceManager) as XmlAttribute;
+		relAtt.Value = rel.Id;
+	}
+
+	private void CopyPicturePart(ExcelWorksheet Copy, ExcelWorksheet workSheet, Packaging.ZipPackagePart part, XmlDocument drawXml, ExcelPicture pic)
+	{
+		var uri = pic.UriPic;
+		if (!workSheet.Workbook._package.Package.PartExists(uri))
+		{
+			var picPart = workSheet.Workbook._package.Package.CreatePart(uri, pic.ContentType, CompressionLevel.None);
+			var imageBytes = pic.ImageBytes;
+			picPart.GetStream(FileMode.Create, FileAccess.Write).Write(imageBytes, 0, imageBytes.Length);
+		}
+
+		var rel = part.CreateRelationship(UriHelper.GetRelativeUri(workSheet.WorksheetUri, uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
+		//Fixes problem with invalid image when the same image is used more than once.
+		var relAtt =
+			drawXml.SelectSingleNode(
+				string.Format(
+					"//xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name[.='{0}']/../../../xdr:blipFill/a:blip/@r:embed",
+					pic.Name), Copy.Drawings.NameSpaceManager);
+		if (relAtt != null)
+		{
+			relAtt.Value = rel.Id;
+		}
+
+		if (_pck._images.TryGetValue(pic.ImageHash, out var value))
+		{
+			value.RefCount++;
 		}
 	}
 

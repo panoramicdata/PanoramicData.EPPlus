@@ -123,42 +123,47 @@ public partial class ExcelWorksheets
 				return;     //--- no reason to attempt to re-arrange a single item with itself
 			}
 
-			var index = _pck._worksheetAdd;
-			var newOrder = new Dictionary<int, ExcelWorksheet>();
-			foreach (var entry in _worksheets)
-			{
-				if (entry.Key == targetPositionId)
-				{
-					if (!placeAfter)
-					{
-						sourceSheet.PositionID = index;
-						newOrder.Add(index++, sourceSheet);
-					}
-
-					entry.Value.PositionID = index;
-					newOrder.Add(index++, entry.Value);
-
-					if (placeAfter)
-					{
-						sourceSheet.PositionID = index;
-						newOrder.Add(index++, sourceSheet);
-					}
-				}
-				else if (entry.Key == sourcePositionId)
-				{
-					//--- do nothing
-				}
-				else
-				{
-					entry.Value.PositionID = index;
-					newOrder.Add(index++, entry.Value);
-				}
-			}
-
-			_worksheets = newOrder;
+			_worksheets = GetMovedOrder(sourcePositionId, targetPositionId, placeAfter, sourceSheet);
 
 			MoveSheetXmlNode(sourceSheet, targetSheet, placeAfter);
 		}
+	}
+
+	private Dictionary<int, ExcelWorksheet> GetMovedOrder(int sourcePositionId, int targetPositionId, bool placeAfter, ExcelWorksheet sourceSheet)
+	{
+		var index = _pck._worksheetAdd;
+		var newOrder = new Dictionary<int, ExcelWorksheet>();
+		foreach (var entry in _worksheets)
+		{
+			if (entry.Key == targetPositionId)
+			{
+				if (!placeAfter)
+				{
+					sourceSheet.PositionID = index;
+					newOrder.Add(index++, sourceSheet);
+				}
+
+				entry.Value.PositionID = index;
+				newOrder.Add(index++, entry.Value);
+
+				if (placeAfter)
+				{
+					sourceSheet.PositionID = index;
+					newOrder.Add(index++, sourceSheet);
+				}
+			}
+			else if (entry.Key == sourcePositionId)
+			{
+				//--- do nothing
+			}
+			else
+			{
+				entry.Value.PositionID = index;
+				newOrder.Add(index++, entry.Value);
+			}
+		}
+
+		return newOrder;
 	}
 
 	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
