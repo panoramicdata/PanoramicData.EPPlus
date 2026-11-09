@@ -71,7 +71,7 @@ public sealed class ExcelPieChartSerie : ExcelChartSerie
 			SetXmlNodeString(explosionPath, value.ToString());
 		}
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// DataLabels
 	/// </summary>

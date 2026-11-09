@@ -55,7 +55,7 @@ public sealed class ExcelRadarChartSerie : ExcelChartSerie
 			Marker = eMarkerStyle.None;
 		}
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabel
 	/// </summary>

@@ -49,7 +49,7 @@ public sealed class ExcelBarChartSerie : ExcelChartSerie
 		base(chartSeries, ns, node, isPivot)
 	{
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabel
 	/// </summary>

@@ -145,7 +145,7 @@ internal class ExcelVmlDrawingCommentCollection : ExcelVmlDrawingBaseCollection,
 		node.InnerXml = vml;
 		return node;
 	}
-	int _nextID = 0;
+	int _nextID;
 	/// <summary>
 	/// returns the next drawing id.
 	/// </summary>

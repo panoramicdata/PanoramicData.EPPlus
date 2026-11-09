@@ -149,7 +149,7 @@ public class ExcelGradientFill : StyleBase
 			_ChangedEvent(this, new StyleChangeEventArgs(eStyleClass.GradientFill, eStyleProperty.GradientRight, value, _positionID, _address));
 		}
 	}
-	ExcelColor _gradientColor1 = null;
+	ExcelColor _gradientColor1;
 	/// <summary>
 	/// Gradient Color 1
 	/// </summary>
@@ -163,7 +163,7 @@ public class ExcelGradientFill : StyleBase
 
 		}
 	}
-	ExcelColor _gradientColor2 = null;
+	ExcelColor _gradientColor2;
 	/// <summary>
 	/// Gradient Color 2
 	/// </summary>

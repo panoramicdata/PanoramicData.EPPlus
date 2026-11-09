@@ -44,7 +44,7 @@ namespace OfficeOpenXml.Style;
 public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 {
 	readonly List<ExcelRichText> _list = [];
-	readonly ExcelRangeBase _cells = null;
+	readonly ExcelRangeBase _cells;
 	internal ExcelRichTextCollection(XmlNamespaceManager ns, XmlNode topNode) :
 		base(ns, topNode)
 	{

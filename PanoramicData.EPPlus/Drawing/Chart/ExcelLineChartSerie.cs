@@ -52,7 +52,7 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 		base(chartSeries, ns, node, isPivot)
 	{
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabels
 	/// </summary>

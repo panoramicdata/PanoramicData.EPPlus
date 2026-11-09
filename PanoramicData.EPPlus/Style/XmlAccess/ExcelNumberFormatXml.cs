@@ -178,7 +178,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 		Number = 1,
 		DateTime = 2,
 	}
-	ExcelFormatTranslator _translator = null;
+	ExcelFormatTranslator _translator;
 	internal ExcelFormatTranslator FormatTranslator
 	{
 		get
@@ -222,7 +222,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 		}
 		internal string NetTextFormat { get; private set; }
 		internal string NetFormat { get; private set; }
-		CultureInfo _ci = null;
+		CultureInfo _ci;
 		internal CultureInfo Culture
 		{
 			get

@@ -183,7 +183,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	const float STANDARD_DPI = 96;
 	public const int EMU_PER_PIXEL = 9525;
 	protected internal int _width = int.MinValue, _height = int.MinValue, _top = int.MinValue, _left = int.MinValue;
-	bool _doNotAdjust = false;
+	bool _doNotAdjust;
 	internal ExcelDrawing(ExcelDrawings drawings, XmlNode node, string nameXPath) :
 		base(drawings.NameSpaceManager, node)
 	{
@@ -307,7 +307,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	/// <summary>
 	/// Bottom right position
 	/// </summary>
-	ExcelPosition _to = null;
+	ExcelPosition _to;
 	public ExcelPosition To
 	{
 		get

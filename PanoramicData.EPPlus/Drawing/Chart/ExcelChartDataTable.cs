@@ -115,7 +115,7 @@ public class ExcelChartDataTable : XmlHelper
 			SetXmlNodeString(showKeysPath, value ? "1" : "0");
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Access fill properties
 	/// </summary>
@@ -128,7 +128,7 @@ public class ExcelChartDataTable : XmlHelper
 			return _fill;
 		}
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access border properties
 	/// </summary>
@@ -142,7 +142,7 @@ public class ExcelChartDataTable : XmlHelper
 		}
 	}
 	readonly string[] _paragraphSchemaOrder = ["spPr", "txPr", "dLblPos", "showVal", "showCatName", "showSerName", "showPercent", "separator", "showLeaderLines", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
-	ExcelTextFont _font = null;
+	ExcelTextFont _font;
 	/// <summary>
 	/// Access font properties
 	/// </summary>

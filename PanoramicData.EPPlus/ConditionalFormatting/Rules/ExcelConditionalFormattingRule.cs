@@ -53,7 +53,7 @@ public abstract class ExcelConditionalFormattingRule
 	/// Sinalize that we are in a Cnaging Priorities opeartion so that we won't enter
 	/// a recursive loop.
 	/// </summary>
-	private static bool _changingPriority = false;
+	private static bool _changingPriority;
 	#endregion Private Properties
 
 	/****************************************************************************************/
@@ -344,7 +344,7 @@ public abstract class ExcelConditionalFormattingRule
 			  true);
 		}
 	}
-	internal ExcelDxfStyleConditionalFormatting _style = null;
+	internal ExcelDxfStyleConditionalFormatting _style;
 	public ExcelDxfStyleConditionalFormatting Style
 	{
 		get

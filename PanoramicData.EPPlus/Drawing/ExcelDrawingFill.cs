@@ -61,7 +61,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 		}
 	}
 	eFillStyle _style;
-	readonly XmlNode _fillTypeNode = null;
+	readonly XmlNode _fillTypeNode;
 	/// <summary>
 	/// Fill style
 	/// </summary>

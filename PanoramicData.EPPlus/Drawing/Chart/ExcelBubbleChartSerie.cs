@@ -51,7 +51,7 @@ public sealed class ExcelBubbleChartSerie : ExcelChartSerie
 	{
 
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabel
 	/// </summary>

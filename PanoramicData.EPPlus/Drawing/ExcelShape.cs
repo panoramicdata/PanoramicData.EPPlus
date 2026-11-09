@@ -333,7 +333,7 @@ public sealed class ExcelShape : ExcelDrawing
 			return _border;
 		}
 	}
-	ExcelDrawingLineEnd _ends = null;
+	ExcelDrawingLineEnd _ends;
 	/// <summary>
 	/// Line Ends
 	/// </summary>
@@ -348,7 +348,7 @@ public sealed class ExcelShape : ExcelDrawing
 	}
 	readonly string[] paragraphNodeOrder = ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
 	const string PARAGRAPH_PATH = "xdr:sp/xdr:txBody/a:p";
-	ExcelTextFont _font = null;
+	ExcelTextFont _font;
 	public ExcelTextFont Font
 	{
 		get

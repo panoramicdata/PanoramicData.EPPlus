@@ -61,7 +61,7 @@ public sealed class ExcelChartSerieDataLabel : ExcelChartDataLabel
 			SetXmlNodeString(positionPath, GetPosText(value));
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Access fill properties
 	/// </summary>
@@ -74,7 +74,7 @@ public sealed class ExcelChartSerieDataLabel : ExcelChartDataLabel
 			return _fill;
 		}
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access border properties
 	/// </summary>
@@ -87,7 +87,7 @@ public sealed class ExcelChartSerieDataLabel : ExcelChartDataLabel
 			return _border;
 		}
 	}
-	ExcelTextFont _font = null;
+	ExcelTextFont _font;
 	/// <summary>
 	/// Access font properties
 	/// </summary>

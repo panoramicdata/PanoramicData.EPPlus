@@ -76,7 +76,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	//internal List<ImageCompare> _pics = new List<ImageCompare>();
 	internal Dictionary<string, string> _hashes = [];
 	internal ExcelPackage _package;
-	internal Packaging.ZipPackageRelationship _drawingRelation = null;
+	internal Packaging.ZipPackageRelationship _drawingRelation;
 	internal ExcelDrawings(ExcelPackage xlPackage, ExcelWorksheet sheet)
 	{
 		_drawingsXml = new XmlDocument
@@ -154,7 +154,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <summary>
 	/// Provides access to a namespace manager instance to allow XPath searching
 	/// </summary>
-	XmlNamespaceManager _nsManager = null;
+	XmlNamespaceManager _nsManager;
 	public XmlNamespaceManager NameSpaceManager => _nsManager;
 	#endregion
 	#region IEnumerable Members
@@ -192,9 +192,9 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		}
 	}
 	public int Count => _drawings == null ? 0 : _drawings.Count;
-	Packaging.ZipPackagePart _part = null;
+	Packaging.ZipPackagePart _part;
 	internal Packaging.ZipPackagePart Part => _part;
-	Uri _uriDrawing = null;
+	Uri _uriDrawing;
 	public Uri UriDrawing => _uriDrawing;
 	#endregion
 	

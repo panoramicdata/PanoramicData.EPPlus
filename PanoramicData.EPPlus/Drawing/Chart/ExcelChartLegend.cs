@@ -123,7 +123,7 @@ public class ExcelChartLegend : XmlHelper
 			SetXmlNodeBool(OVERLAY_PATH, value);
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Fill style
 	/// </summary>
@@ -136,7 +136,7 @@ public class ExcelChartLegend : XmlHelper
 			return _fill;
 		}
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Border style
 	/// </summary>
@@ -149,7 +149,7 @@ public class ExcelChartLegend : XmlHelper
 			return _border;
 		}
 	}
-	ExcelTextFont _font = null;
+	ExcelTextFont _font;
 	/// <summary>
 	/// Font properties
 	/// </summary>

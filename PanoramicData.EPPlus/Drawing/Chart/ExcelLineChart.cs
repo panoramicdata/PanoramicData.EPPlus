@@ -88,7 +88,7 @@ public class ExcelLineChart : ExcelChart
 		}
 	}
 	//string _chartTopPath = "c:chartSpace/c:chart/c:plotArea/{0}";
-	ExcelChartDataLabel _DataLabel = null;
+	ExcelChartDataLabel _DataLabel;
 	/// <summary>
 	/// Access to datalabel properties
 	/// </summary>

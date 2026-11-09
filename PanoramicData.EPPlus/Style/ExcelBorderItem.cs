@@ -61,7 +61,7 @@ public sealed class ExcelBorderItem : StyleBase
 			_ChangedEvent(this, new StyleChangeEventArgs(_cls, eStyleProperty.Style, value, _positionID, _address));
 		}
 	}
-	ExcelColor _color = null;
+	ExcelColor _color;
 	/// <summary>
 	/// The color of the border
 	/// </summary>

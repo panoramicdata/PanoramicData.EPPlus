@@ -134,7 +134,7 @@ public sealed class ExcelFontXml : StyleXmlHelper
 			_family = value;
 		}
 	}
-	ExcelColorXml _color = null;
+	ExcelColorXml _color;
 	const string _colorPath = "d:color";
 	/// <summary>
 	/// Text color

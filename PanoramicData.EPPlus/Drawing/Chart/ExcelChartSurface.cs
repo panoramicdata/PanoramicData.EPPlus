@@ -65,7 +65,7 @@ public class ExcelChartSurface : XmlHelper
 			SetXmlNodeString(THICKNESS_PATH, value.ToString());
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Access fill properties
 	/// </summary>
@@ -78,7 +78,7 @@ public class ExcelChartSurface : XmlHelper
 			return _fill;
 		}
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access border properties
 	/// </summary>

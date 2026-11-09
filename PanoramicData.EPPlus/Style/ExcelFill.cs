@@ -61,7 +61,7 @@ public class ExcelFill : StyleBase
 			_ChangedEvent(this, new StyleChangeEventArgs(eStyleClass.Fill, eStyleProperty.PatternType, value, _positionID, _address));
 		}
 	}
-	ExcelColor _patternColor = null;
+	ExcelColor _patternColor;
 	/// <summary>
 	/// The color of the pattern
 	/// </summary>
@@ -81,7 +81,7 @@ public class ExcelFill : StyleBase
 			return _patternColor;
 		}
 	}
-	ExcelColor _backgroundColor = null;
+	ExcelColor _backgroundColor;
 	/// <summary>
 	/// The background color
 	/// </summary>
@@ -102,7 +102,7 @@ public class ExcelFill : StyleBase
 
 		}
 	}
-	ExcelGradientFill _gradient = null;
+	ExcelGradientFill _gradient;
 	/// <summary>
 	/// Access to properties for gradient fill.
 	/// </summary>

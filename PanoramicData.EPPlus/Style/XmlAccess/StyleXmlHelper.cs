@@ -49,7 +49,7 @@ public abstract class StyleXmlHelper : XmlHelper
 	{
 		get;
 	}
-	internal long useCnt = 0;
+	internal long useCnt;
 	internal int newID = int.MinValue;
 	protected bool GetBoolValue(XmlNode topNode, string path)
 	{

@@ -380,7 +380,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 			SetXmlNodeBool(LOCK_TEXT_PATH, value, false);
 		}
 	}
-	ExcelVmlDrawingPosition _from = null;
+	ExcelVmlDrawingPosition _from;
 	/// <summary>
 	/// From position. For comments only when Visible=true.
 	/// </summary>
@@ -393,7 +393,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 			return _from;
 		}
 	}
-	ExcelVmlDrawingPosition _to = null;
+	ExcelVmlDrawingPosition _to;
 	/// <summary>
 	/// To position. For comments only when Visible=true.
 	/// </summary>

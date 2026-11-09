@@ -72,7 +72,7 @@ public class ExcelConditionalFormattingCollection
 
 	#region Private Properties
 	private readonly List<IExcelConditionalFormattingRule> _rules = [];
-	private readonly ExcelWorksheet _worksheet = null;
+	private readonly ExcelWorksheet _worksheet;
 	#endregion Private Properties
 
 	/****************************************************************************************/

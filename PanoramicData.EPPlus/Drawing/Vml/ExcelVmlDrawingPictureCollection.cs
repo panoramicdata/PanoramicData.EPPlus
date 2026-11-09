@@ -128,7 +128,7 @@ public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, I
 	}
 	public int Count => _images.Count;
 
-	int _nextID = 0;
+	int _nextID;
 	/// <summary>
 	/// returns the next drawing id.
 	/// </summary>

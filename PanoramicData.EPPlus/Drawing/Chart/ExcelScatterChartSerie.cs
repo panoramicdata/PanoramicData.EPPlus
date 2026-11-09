@@ -69,7 +69,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 			Smooth = 0;
 		}
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabel
 	/// </summary>

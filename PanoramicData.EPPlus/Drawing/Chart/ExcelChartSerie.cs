@@ -203,7 +203,7 @@ public class ExcelChartSerie : XmlHelper
 			}
 		}
 	}
-	ExcelChartTrendlineCollection _trendLines = null;
+	ExcelChartTrendlineCollection _trendLines;
 	/// <summary>
 	/// Access to the trendline collection
 	/// </summary>
@@ -216,7 +216,7 @@ public class ExcelChartSerie : XmlHelper
 			return _trendLines;
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	public ExcelDrawingFill Fill
 	{
 		get
@@ -226,7 +226,7 @@ public class ExcelChartSerie : XmlHelper
 			return _fill;
 		}
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	public ExcelDrawingBorder Border
 	{
 		get

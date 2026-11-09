@@ -77,7 +77,7 @@ public sealed class ExcelDrawingBorder : XmlHelper
 		_lineWidth = string.Format(_lineWidth, linePath);
 	}
 	#region "Public properties"
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Fill
 	/// </summary>

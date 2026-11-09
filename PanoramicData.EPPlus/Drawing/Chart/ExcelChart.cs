@@ -986,7 +986,7 @@ public class ExcelChart : ExcelDrawing
 	/// Type of chart
 	/// </summary>
 	public eChartType ChartType { get; internal set; }
-	internal protected XmlNode _chartNode = null;
+	internal protected XmlNode _chartNode;
 	internal XmlNode ChartNode => _chartNode;
 	/// <summary>
 	/// Titel of the chart
@@ -1024,7 +1024,7 @@ public class ExcelChart : ExcelDrawing
 		get;
 		private set;
 	}
-	bool _secondaryAxis = false;
+	bool _secondaryAxis;
 	/// <summary>
 	/// If true the charttype will use the secondary axis.
 	/// The chart must contain a least one other charttype that uses the primary axis.
@@ -1299,7 +1299,7 @@ public class ExcelChart : ExcelDrawing
 
 		return false;
 	}
-	ExcelChartPlotArea _plotArea = null;
+	ExcelChartPlotArea _plotArea;
 	/// <summary>
 	/// Plotarea
 	/// </summary>
@@ -1312,7 +1312,7 @@ public class ExcelChart : ExcelDrawing
 			return _plotArea;
 		}
 	}
-	ExcelChartLegend _legend = null;
+	ExcelChartLegend _legend;
 	/// <summary>
 	/// Legend
 	/// </summary>
@@ -1326,7 +1326,7 @@ public class ExcelChart : ExcelDrawing
 		}
 
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Border
 	/// </summary>
@@ -1339,7 +1339,7 @@ public class ExcelChart : ExcelDrawing
 			return _border;
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Fill
 	/// </summary>
@@ -1400,7 +1400,7 @@ public class ExcelChart : ExcelDrawing
 	/// </summary>
 	internal Uri UriChart { get; set; }
 	internal new static string Id => "";
-	ExcelChartTitle _title = null;
+	ExcelChartTitle _title;
 	#endregion
 	#region "Grouping Enum Translation"
 	private static string GetGroupingText(eGrouping grouping) => grouping switch

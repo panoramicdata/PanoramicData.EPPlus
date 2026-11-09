@@ -278,7 +278,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string wrapTextPath = "d:alignment/@wrapText";
-	bool _wrapText = false;
+	bool _wrapText;
 	/// <summary>
 	/// Wraped text
 	/// </summary>
@@ -294,7 +294,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	readonly string textRotationPath = "d:alignment/@textRotation";
-	int _textRotation = 0;
+	int _textRotation;
 	/// <summary>
 	/// Text rotation angle
 	/// </summary>
@@ -326,7 +326,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string hiddenPath = "d:protection/@hidden";
-	bool _hidden = false;
+	bool _hidden;
 	/// <summary>
 	/// Hide formulas when sheet is protected
 	/// </summary>
@@ -342,7 +342,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string quotePrefixPath = "@quotePrefix";
-	bool _quotePrefix = false;
+	bool _quotePrefix;
 	/// <summary>
 	/// Prefix the formula with a quote.
 	/// </summary>
@@ -374,7 +374,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string shrinkToFitPath = "d:alignment/@shrinkToFit";
-	bool _shrinkToFit = false;
+	bool _shrinkToFit;
 	/// <summary>
 	/// Shrink to fit
 	/// </summary>
@@ -390,7 +390,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string indentPath = "d:alignment/@indent";
-	int _indent = 0;
+	int _indent;
 	/// <summary>
 	/// Indentation
 	/// </summary>

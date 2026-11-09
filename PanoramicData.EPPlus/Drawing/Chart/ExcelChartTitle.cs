@@ -71,7 +71,7 @@ public class ExcelChartTitle : XmlHelper
 			RichText.Text = value;
 		}
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// A reference to the border properties
 	/// </summary>
@@ -84,7 +84,7 @@ public class ExcelChartTitle : XmlHelper
 			return _border;
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// A reference to the fill properties
 	/// </summary>
@@ -119,7 +119,7 @@ public class ExcelChartTitle : XmlHelper
 		}
 	}
 	readonly string[] paragraphNodeOrder = ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
-	ExcelParagraphCollection _richText = null;
+	ExcelParagraphCollection _richText;
 	/// <summary>
 	/// Richtext
 	/// </summary>

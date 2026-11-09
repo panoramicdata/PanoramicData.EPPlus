@@ -423,7 +423,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			SetXmlNodeString(_lblPos, lp[..1].ToLower(CultureInfo.InvariantCulture) + lp[1..]);
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Access to fill properties
 	/// </summary>
@@ -436,7 +436,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			return _fill;
 		}
 	}
-	ExcelDrawingBorder _border = null;
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access to border properties
 	/// </summary>
@@ -449,7 +449,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			return _border;
 		}
 	}
-	ExcelTextFont _font = null;
+	ExcelTextFont _font;
 	/// <summary>
 	/// Access to font properties
 	/// </summary>
@@ -549,7 +549,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			}
 		}
 	}
-	ExcelChartTitle _title = null;
+	ExcelChartTitle _title;
 	/// <summary>
 	/// Chart axis title
 	/// </summary>
@@ -794,7 +794,7 @@ public sealed class ExcelChartAxis : XmlHelper
 	#region GridLines 
 	//Pull request from aesalazar
 	const string _majorGridlinesPath = "c:majorGridlines";
-	ExcelDrawingBorder _majorGridlines = null;
+	ExcelDrawingBorder _majorGridlines;
 
 	/// <summary> 
 	        /// Major Gridlines for the Axis 
@@ -819,7 +819,7 @@ public sealed class ExcelChartAxis : XmlHelper
 	}
 
 	const string _minorGridlinesPath = "c:minorGridlines";
-	ExcelDrawingBorder _minorGridlines = null;
+	ExcelDrawingBorder _minorGridlines;
 
 	/// <summary> 
 	        /// Minor Gridlines for the Axis 
