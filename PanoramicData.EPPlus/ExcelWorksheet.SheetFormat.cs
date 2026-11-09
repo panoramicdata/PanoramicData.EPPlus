@@ -1,4 +1,5 @@
 ﻿using OfficeOpenXml.Style.XmlAccess;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 
@@ -70,6 +71,7 @@ public partial class ExcelWorksheet
 	/// <summary>
 	/// Get/set the default width of all columns in the worksheet
 	/// </summary>
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Behaviour-preserving: a tolerance in place of the exact modulo test would change the computed default width.")]
 	public double DefaultColWidth
 	{
 		get

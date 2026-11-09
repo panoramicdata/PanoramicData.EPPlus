@@ -47,6 +47,7 @@ public partial class ExcelWorksheet
 				}
 				catch
 				{
+					// A date outside the OLE Automation range is left unchanged.
 				}
 			}
 		}

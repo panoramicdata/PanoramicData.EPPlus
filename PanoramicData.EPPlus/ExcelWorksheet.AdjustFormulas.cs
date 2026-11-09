@@ -1,4 +1,6 @@
-﻿namespace OfficeOpenXml;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace OfficeOpenXml;
 
 public partial class ExcelWorksheet
 {
@@ -69,6 +71,7 @@ public partial class ExcelWorksheet
 	}
 
 
+	[SuppressMessage("Blocker Bug", "S2551:Shared resources should not be used for locking", Justification = "Behaviour-preserving: the worksheet instance is the lock used by the other structural edits, so changing it would break their mutual exclusion.")]
 	private void UpdateCrossSheetReferences(string sheetWhoseReferencesShouldBeUpdated, int rowFrom, int rows, int columnFrom, int columns)
 	{
 		lock (this)

@@ -48,12 +48,12 @@ public partial class ExcelWorksheet
 		var rowBound = values.GetUpperBound(0);
 		var colBound = values.GetUpperBound(1);
 		_values.SetRangeValueSpecial(fromRow, fromColumn, toRow, toColumn,
-			(List<ExcelCoreValue> list, int index, int row, int column, object value) =>
+			(List<ExcelCoreValue> list, int index, int row, int column, object _) =>
 			{
 				object val = null;
 				if (rowBound >= row - fromRow && colBound >= column - fromColumn)
 				{
-					val = ((object[,])values)[row - fromRow, column - fromColumn];
+					val = values[row - fromRow, column - fromColumn];
 				}
 
 				list[index] = new ExcelCoreValue { _value = val, _styleId = list[index]._styleId };
