@@ -45,7 +45,6 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 	readonly ExcelWorksheet _ws;
 	internal ExcelTableCollection(ExcelWorksheet ws)
 	{
-		var pck = ws._package.Package;
 		_ws = ws;
 		foreach (XmlElement node in ws.WorksheetXml.SelectNodes("//d:tableParts/d:tablePart", ws.NameSpaceManager))
 		{
@@ -129,8 +128,10 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 		}
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads changes the published signature.")]
 	public void Delete(int Index, bool ClearRange = false) => Delete(this[Index], ClearRange);
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads changes the published signature.")]
 	public void Delete(string Name, bool ClearRange = false)
 	{
 		if (this[Name] == null)
@@ -141,7 +142,8 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 		Delete(this[Name], ClearRange);
 	}
 
-
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads changes the published signature.")]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Blocker Bug", "S2551:Shared resources should not be used for locking", Justification = "Callers may already synchronise on the collection, so the lock target is kept.")]
 	public void Delete(ExcelTable Table, bool ClearRange = false)
 	{
 		if (!_tables.Contains(Table))
@@ -172,7 +174,6 @@ public class ExcelTableCollection : IEnumerable<ExcelTable>
 				range.Clear();
 			}
 		}
-
 	}
 
 	internal string GetNewTableName()

@@ -164,6 +164,7 @@ public class ExcelDataValidationType
 	/// Overrides GetHashCode()
 	/// </summary>
 	/// <returns></returns>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S3249:Classes directly extending object should not call base in GetHashCode or Equals", Justification = "Public API: changing the hash would change how existing instances behave in hashed collections.")]
 	public override int GetHashCode() => base.GetHashCode();
 
 	/// <summary>

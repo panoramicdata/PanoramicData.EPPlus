@@ -43,6 +43,7 @@ public abstract class ZipPackageRelationshipBase
 		_rels.Remove(id);
 		UpdateMaxRId(id, ref maxRId);
 	}
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3874:Out and ref parameters should not be used", Justification = "Protected member of a public type: changing the signature would break derived classes.")]
 	protected static void UpdateMaxRId(string id, ref int maxRId)
 	{
 		if (id.StartsWith("rId"))

@@ -29,6 +29,8 @@
  * Mats Alm   		                Added       		        2011-01-08
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  *******************************************************************************/
+using System;
+using System.Globalization;
 using System.Xml;
 
 namespace OfficeOpenXml.DataValidation.Formulas;
@@ -46,10 +48,28 @@ internal abstract class ExcelDataValidationFormulaValue<T> : ExcelDataValidation
 	/// <param name="namespaceManager">Namespacemanger of the worksheet</param>
 	/// <param name="topNode">validation top node</param>
 	/// <param name="formulaPath">xml path of the current formula</param>
-	public ExcelDataValidationFormulaValue(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
+	protected ExcelDataValidationFormulaValue(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
 		: base(namespaceManager, topNode, formulaPath)
 	{
+	}
 
+	// A stored number becomes the value; anything else is kept as a formula.
+	protected void LoadNumberOrFormula(string formulaPath, Func<double, T> fromNumber)
+	{
+		var value = GetXmlNodeString(formulaPath);
+		if (string.IsNullOrEmpty(value))
+		{
+			return;
+		}
+
+		if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
+		{
+			Value = fromNumber(number);
+		}
+		else
+		{
+			ExcelFormula = value;
+		}
 	}
 
 	private T? _value;

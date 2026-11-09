@@ -76,7 +76,6 @@ internal static class ConvertUtil
 	/// <returns></returns>
 	internal static double GetValueDouble(object v, bool ignoreBool = false, bool retNaN = false)
 	{
-		double d;
 		try
 		{
 			if (ignoreBool && v is bool)
@@ -86,31 +85,44 @@ internal static class ConvertUtil
 
 			if (IsNumeric(v))
 			{
-				if (v is DateTime)
-				{
-					d = ((DateTime)v).ToOADate();
-				}
-				else if (v is TimeSpan)
-				{
-					d = DateTime.FromOADate(0).Add((TimeSpan)v).ToOADate();
-				}
-				else
-				{
-					d = Convert.ToDouble(v, CultureInfo.InvariantCulture);
-				}
-			}
-			else
-			{
-				d = retNaN ? double.NaN : 0;
+				return NumericToDouble(v);
 			}
 		}
-
 		catch
 		{
-			d = retNaN ? double.NaN : 0;
+			// An unconvertible value gets the same default as a non-numeric one
 		}
 
-		return d;
+		return retNaN ? double.NaN : 0;
+	}
+
+	private static double NumericToDouble(object v)
+	{
+		if (v is DateTime dateTime)
+		{
+			return dateTime.ToOADate();
+		}
+
+		if (v is TimeSpan timeSpan)
+		{
+			return DateTime.FromOADate(0).Add(timeSpan).ToOADate();
+		}
+
+		return Convert.ToDouble(v, CultureInfo.InvariantCulture);
+	}
+
+	private static string EscapeEncodedSequences(string t)
+	{
+		var match = Regex.Match(t, "(_x[0-9A-F]{4,4}_)");
+		var indexAdd = 0;
+		while (match.Success)
+		{
+			t = t.Insert(match.Index + indexAdd, "_x005F");
+			indexAdd += 6;
+			match = match.NextMatch();
+		}
+
+		return t;
 	}
 	/// <summary>
 	/// OOXML requires that "," , and &amp; be escaped, but ' and " should *not* be escaped, nor should
@@ -130,19 +142,9 @@ internal static class ConvertUtil
 	/// <returns></returns>
 	internal static void ExcelEncodeString(StreamWriter sw, string t)
 	{
-		if (Regex.IsMatch(t, "(_x[0-9A-F]{4,4}_)"))
-		{
-			var match = Regex.Match(t, "(_x[0-9A-F]{4,4}_)");
-			var indexAdd = 0;
-			while (match.Success)
-			{
-				t = t.Insert(match.Index + indexAdd, "_x005F");
-				indexAdd += 6;
-				match = match.NextMatch();
-			}
-		}
+		t = EscapeEncodedSequences(t);
 
-		for (var i = 0; i < t.Length; i++)
+		for(var i = 0; i < t.Length; i++)
 		{
 			if (t[i] is <= (char)0x1f and not '\t' and not '\n' and not '\r') //Not Tab, CR or LF
 			{
@@ -153,7 +155,6 @@ internal static class ConvertUtil
 				sw.Write(t[i]);
 			}
 		}
-
 	}
 	/// <summary>
 	/// Return true if preserve space attribute is set.
@@ -164,19 +165,9 @@ internal static class ConvertUtil
 	/// <returns></returns>
 	internal static void ExcelEncodeString(StringBuilder sb, string t, bool encodeTabCRLF = false)
 	{
-		if (Regex.IsMatch(t, "(_x[0-9A-F]{4,4}_)"))
-		{
-			var match = Regex.Match(t, "(_x[0-9A-F]{4,4}_)");
-			var indexAdd = 0;
-			while (match.Success)
-			{
-				t = t.Insert(match.Index + indexAdd, "_x005F");
-				indexAdd += 6;
-				match = match.NextMatch();
-			}
-		}
+		t = EscapeEncodedSequences(t);
 
-		for (var i = 0; i < t.Length; i++)
+		for(var i = 0; i < t.Length; i++)
 		{
 			if (t[i] <= 0x1f && ((t[i] != '\t' && t[i] != '\n' && t[i] != '\r' && encodeTabCRLF == false) || encodeTabCRLF)) //Not Tab, CR or LF
 			{
@@ -187,7 +178,6 @@ internal static class ConvertUtil
 				sb.Append(t[i]);
 			}
 		}
-
 	}
 	/// <summary>
 	/// Return true if preserve space attribute is set.
@@ -276,9 +266,7 @@ internal static class ConvertUtil
 
 		var fromType = value.GetType();
 		var toType = typeof(T);
-		var toNullableUnderlyingType = (TypeCompat.IsGenericType(toType) && toType.GetGenericTypeDefinition() == typeof(Nullable<>))
-			? Nullable.GetUnderlyingType(toType)
-			: null;
+		var toNullableUnderlyingType = GetNullableUnderlyingType(toType);
 
 		if (fromType == toType || fromType == toNullableUnderlyingType)
 		{
@@ -286,53 +274,58 @@ internal static class ConvertUtil
 		}
 
 		// if converting to nullable struct and input is blank string, return null
-		if (toNullableUnderlyingType != null && fromType == typeof(string) && ((string)value).Trim() == string.Empty)
+		if (toNullableUnderlyingType != null && IsBlankString(value))
 		{
 			return default;
 		}
 
 		toType = toNullableUnderlyingType ?? toType;
 
-		if (toType == typeof(DateTime))
+		var dateOrTime = ToDateOrTime(value, toType);
+		if (dateOrTime != null)
 		{
-			if (value is double)
-			{
-				return (T)(object)(DateTime.FromOADate((double)value));
-			}
-
-			if (fromType == typeof(TimeSpan))
-			{
-				return ((T)(object)(new DateTime(((TimeSpan)value).Ticks)));
-			}
-
-			if (fromType == typeof(string))
-			{
-				return (T)(object)DateTime.Parse(value.ToString());
-			}
-		}
-		else if (toType == typeof(TimeSpan))
-		{
-			if (value is double)
-			{
-				return (T)(object)(new TimeSpan(DateTime.FromOADate((double)value).Ticks));
-			}
-
-			if (fromType == typeof(DateTime))
-			{
-				return ((T)(object)(new TimeSpan(((DateTime)value).Ticks)));
-			}
-
-			if (fromType == typeof(string))
-			{
-				return (T)(object)TimeSpan.Parse(value.ToString());
-			}
+			return (T)dateOrTime;
 		}
 
 		return (T)Convert.ChangeType(value, toType);
 	}
 
+	private static Type GetNullableUnderlyingType(Type toType)
+		=> TypeCompat.IsGenericType(toType) && toType.GetGenericTypeDefinition() == typeof(Nullable<>)
+			? Nullable.GetUnderlyingType(toType)
+			: null;
+
+	private static bool IsBlankString(object value) => value is string s && s.Trim() == string.Empty;
+
+	private static object ToDateOrTime(object value, Type toType)
+	{
+		if (toType == typeof(DateTime))
+		{
+			return value switch
+			{
+				double d => DateTime.FromOADate(d),
+				TimeSpan ts => new DateTime(ts.Ticks),
+				string s => DateTime.Parse(s),
+				_ => null
+			};
+		}
+
+		if (toType == typeof(TimeSpan))
+		{
+			return value switch
+			{
+				double d => new TimeSpan(DateTime.FromOADate(d).Ticks),
+				DateTime dt => new TimeSpan(dt.Ticks),
+				string s => TimeSpan.Parse(s),
+				_ => null
+			};
+		}
+
+		return null;
+	}
+
 	#region internal cache objects
-	internal static TextInfo _invariantTextInfo = CultureInfo.InvariantCulture.TextInfo;
-	internal static CompareInfo _invariantCompareInfo = CompareInfo.GetCompareInfo(CultureInfo.InvariantCulture.Name);  //TODO:Check that it works
+	internal static readonly TextInfo _invariantTextInfo = CultureInfo.InvariantCulture.TextInfo;
+	internal static readonly CompareInfo _invariantCompareInfo = CompareInfo.GetCompareInfo(CultureInfo.InvariantCulture.Name);  //TODO:Check that it works
 	#endregion
 }

@@ -69,7 +69,7 @@ namespace OfficeOpenXml.DataValidation;
 public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataValidation>
 {
 	private readonly List<IExcelDataValidation> _validations = [];
-	private readonly ExcelWorksheet _worksheet = null;
+	private readonly ExcelWorksheet _worksheet;
 
 	private const string DataValidationPath = "//d:dataValidations";
 	private readonly string DataValidationItemsPath = string.Format("{0}/d:dataValidation", DataValidationPath);
@@ -124,11 +124,6 @@ public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataVa
 
 	private void OnValidationCountChanged()
 	{
-
-		//if (TopNode != null)
-		//{
-		//    SetXmlNodeString("@count", _validations.Count.ToString());
-		//}
 		var dvNode = GetRootNode();
 		if (_validations.Count == 0)
 		{
@@ -343,7 +338,6 @@ public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataVa
 		}
 
 		Require.Argument(item).IsNotNull("item");
-		//TopNode.RemoveChild(((ExcelDataValidation)item).TopNode);
 		var dvNode = _worksheet.WorksheetXml.DocumentElement.SelectSingleNode(DataValidationPath.TrimStart('/'), NameSpaceManager);
 		dvNode?.RemoveChild(((ExcelDataValidation)item).TopNode);
 		var retVal = _validations.Remove(item);
@@ -435,11 +429,6 @@ public class ExcelDataValidationCollection : XmlHelper, IEnumerable<IExcelDataVa
 			}
 
 			TopNode.RemoveChild(((ExcelDataValidation)m).TopNode);
-			//var dvNode = TopNode.SelectSingleNode(DataValidationPath.TrimStart('/'), NameSpaceManager);
-			//if (dvNode != null)
-			//{
-			//    dvNode.RemoveChild(((ExcelDataValidation)m).TopNode);
-			//}
 		}
 
 		_validations.RemoveAll(match);

@@ -13,27 +13,17 @@ public class ExcelSparkline : XmlHelper
 	}
 	const string _fPath = "xm:f";
 	/// <summary>
-	/// The datarange
+	/// Sets the datarange
 	/// </summary>
-	internal ExcelAddressBase RangeAddress
+	internal void SetRangeAddress(ExcelAddressBase value)
 	{
-		/*get
-            {
-                return new ExcelAddressBase(GetXmlNodeString(_fPath));
-            }
-            internal*/
-		set
+		if (value is ExcelNamedRange namedRange)
 		{
-			//SetXmlNodeString(_fPath, value.FullAddress);
-
-			if (value is ExcelNamedRange)
-			{
-				SetXmlNodeString(_fPath, (value as ExcelNamedRange).Name);
-			}
-			else
-			{
-				SetXmlNodeString(_fPath, value.FullAddress);
-			}
+			SetXmlNodeString(_fPath, namedRange.Name);
+		}
+		else
+		{
+			SetXmlNodeString(_fPath, value.FullAddress);
 		}
 	}
 
@@ -63,7 +53,5 @@ public class ExcelSparkline : XmlHelper
 			SetXmlNodeString("xm:sqref", value.Address);
 		}
 	}
-	public override string ToString() =>
-		//return Cell.Address + ", " +RangeAddress.Address;
-		Cell.Address + ", " + GetXmlNodeString(_fPath);
+	public override string ToString() => Cell.Address + ", " + GetXmlNodeString(_fPath);
 }
