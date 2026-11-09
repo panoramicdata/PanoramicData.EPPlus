@@ -41,15 +41,13 @@ namespace OfficeOpenXml.Drawing;
 public sealed class ExcelDrawingFill : XmlHelper
 {
 	readonly string _fillPath;
-	XmlNode _fillNode;
 	internal ExcelDrawingFill(XmlNamespaceManager nameSpaceManager, XmlNode topNode, string fillPath) :
 		base(nameSpaceManager, topNode)
 	{
 		_fillPath = fillPath;
-		_fillNode = topNode.SelectSingleNode(_fillPath, NameSpaceManager);
+		var fillNode = topNode.SelectSingleNode(_fillPath, NameSpaceManager);
 		SchemaNodeOrder = ["tickLblPos", "spPr", "txPr", "dLblPos", "crossAx", "printSettings", "showVal", "prstGeom", "noFill", "solidFill", "blipFill", "gradFill", "noFill", "pattFill", "ln", "prstDash"];
-		//Setfill node
-		if (_fillNode != null)
+		if (fillNode != null)
 		{
 			_fillTypeNode = topNode.SelectSingleNode("solidFill");
 			_fillTypeNode ??= topNode.SelectSingleNode("noFill");
@@ -100,7 +98,6 @@ public sealed class ExcelDrawingFill : XmlHelper
 		}
 
 		CreateNode(_fillPath + "/a:" + GetStyleText(value), false);
-		_fillNode = TopNode.SelectSingleNode(_fillPath + "/a:" + GetStyleText(value), NameSpaceManager);
 	}
 
 	private static eFillStyle GetStyleEnum(string name) => name switch

@@ -32,6 +32,7 @@
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Style.XmlAccess;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
 
@@ -181,6 +182,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	readonly string _nameXPath;
 	protected internal int _id;
 	const float STANDARD_DPI = 96;
+	[SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Published constant; changing it to a static property would break compiled callers.")]
 	public const int EMU_PER_PIXEL = 9525;
 	protected internal int _width = int.MinValue, _height = int.MinValue, _top = int.MinValue, _left = int.MinValue;
 	bool _doNotAdjust;
@@ -555,7 +557,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	{
 		_doNotAdjust = true;
 		pixels = (int)(pixels / (dpi / STANDARD_DPI) + .5);
-		var pixOff = pixels - ((int)(GetRowHeight(From.Row + 1) / 0.75) - (int)(From.RowOff / EMU_PER_PIXEL));
+		var pixOff = pixels - ((int)(GetRowHeight(From.Row + 1) / 0.75) - From.RowOff / EMU_PER_PIXEL);
 		var prevPixOff = pixels;
 		var row = From.Row + 1;
 
@@ -585,8 +587,8 @@ public class ExcelDrawing : XmlHelper, IDisposable
 		var mdw = ws.Workbook.MaxFontWidth;
 
 		pixels = (int)(pixels / (dpi / STANDARD_DPI) + .5);
-		var pixOff = (int)pixels - ((int)decimal.Truncate(((256 * GetColumnWidth(From.Column + 1) + decimal.Truncate(128 / (decimal)mdw)) / 256) * mdw) - From.ColumnOff / EMU_PER_PIXEL);
-		var prevPixOff = From.ColumnOff / EMU_PER_PIXEL + (int)pixels;
+		var pixOff = pixels - ((int)decimal.Truncate(((256 * GetColumnWidth(From.Column + 1) + decimal.Truncate(128 / (decimal)mdw)) / 256) * mdw) - From.ColumnOff / EMU_PER_PIXEL);
+		var prevPixOff = From.ColumnOff / EMU_PER_PIXEL + pixels;
 		var col = From.Column + 2;
 
 		while (pixOff >= 0)

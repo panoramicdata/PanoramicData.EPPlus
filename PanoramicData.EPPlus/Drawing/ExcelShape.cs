@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Style;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Xml;
@@ -286,6 +287,7 @@ public sealed class ExcelShape : ExcelDrawing
 	/// <summary>
 	/// Shape style
 	/// </summary>
+	[SuppressMessage("Minor Code Smell", "S2372:Exceptions should not be thrown from property getters", Justification = "Published behaviour: an unknown shape type in the XML is reported to the caller.")]
 	public eShapeStyle Style
 	{
 		get
@@ -359,7 +361,6 @@ public sealed class ExcelShape : ExcelDrawing
 				if (node == null)
 				{
 					Text = "";    //Creates the node p element
-					node = TopNode.SelectSingleNode(PARAGRAPH_PATH, NameSpaceManager);
 				}
 
 				_font = new ExcelTextFont(NameSpaceManager, TopNode, "xdr:sp/xdr:txBody/a:p/a:pPr/a:defRPr", paragraphNodeOrder);
