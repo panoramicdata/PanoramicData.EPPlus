@@ -75,7 +75,6 @@ public class SumProduct : ExcelFunction
 			if (list.Count != arrayLength)
 			{
 				throw new ExcelErrorValueException(ExcelErrorValue.Create(eErrorType.Value));
-				//throw new ExcelFunctionException("All supplied arrays must have the same length", ExcelErrorCodes.Value);
 			}
 		}
 

@@ -49,7 +49,6 @@ public class FormulaParser : IDisposable
 	public FormulaParser(ExcelDataProvider excelDataProvider)
 		: this(excelDataProvider, ParsingContext.Create())
 	{
-
 	}
 
 	public FormulaParser(ExcelDataProvider excelDataProvider, ParsingContext parsingContext)
@@ -104,7 +103,6 @@ public class FormulaParser : IDisposable
 	{
 		var rangeAddress = _parsingContext.RangeAddressFactory.Create(worksheet, column, row);
 		using var scope = _parsingContext.Scopes.NewScope(rangeAddress);
-		//    _parsingContext.Dependencies.AddFormulaScope(scope);
 		var graph = _graphBuilder.Build(tokens);
 		if (!graph.Expressions.Any())
 		{
@@ -174,15 +172,7 @@ public class FormulaParser : IDisposable
 		return string.IsNullOrEmpty(f)
 			? _excelDataProvider.GetRangeValue(worksheetName, row, col)
 			: Parse(f, _parsingContext.RangeAddressFactory.Create(worksheetName, col, row));
-		//var dataItem = _excelDataProvider.GetRangeValues(address).FirstOrDefault();
-		//if (dataItem == null /*|| (dataItem.Value == null && dataItem.Formula == null)*/) return null;
-		//if (!string.IsNullOrEmpty(dataItem.Formula))
-		//{
-		//    return Parse(dataItem.Formula, _parsingContext.RangeAddressFactory.Create(address));
-		//}
-		//return Parse(dataItem.Value.ToString(), _parsingContext.RangeAddressFactory.Create(address));
 	}
-
 
 	internal void InitNewCalc() => _excelDataProvider?.Reset();
 

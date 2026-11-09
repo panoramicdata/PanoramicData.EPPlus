@@ -67,12 +67,10 @@ public class Operator : IOperator
 		if (left.Result is ExcelErrorValue)
 		{
 			return new CompileResult(left.Result, DataType.ExcelError);
-			//throw(new ExcelErrorValueException((ExcelErrorValue)left.Result));
 		}
 		else if (right.Result is ExcelErrorValue)
 		{
 			return new CompileResult(right.Result, DataType.ExcelError);
-			//throw(new ExcelErrorValueException((ExcelErrorValue)right.Result));
 		}
 
 		return _implementation(left, right);
@@ -213,7 +211,6 @@ public class Operator : IOperator
 						   (l, r) => Compare(l, r, (compRes) => compRes < 0));
 
 	public static IOperator LessThanOrEqual =>
-			//return new Operator(Operators.LessThanOrEqual, PrecedenceComparison, (l, r) => new CompileResult(Compare(l, r) <= 0, DataType.Boolean));
 			new Operator(Operators.LessThanOrEqual, PrecedenceComparison, (l, r) => Compare(l, r, (compRes) => compRes <= 0));
 
 	private static IOperator _percent;

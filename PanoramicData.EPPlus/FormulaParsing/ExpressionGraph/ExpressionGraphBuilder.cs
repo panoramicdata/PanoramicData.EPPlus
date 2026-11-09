@@ -48,7 +48,6 @@ public class ExpressionGraphBuilder : IExpressionGraphBuilder
 	public ExpressionGraphBuilder(ExcelDataProvider excelDataProvider, ParsingContext parsingContext)
 		: this(new ExpressionFactory(excelDataProvider, parsingContext), parsingContext)
 	{
-
 	}
 
 	public ExpressionGraphBuilder(IExpressionFactory expressionFactory, ParsingContext parsingContext)
@@ -88,10 +87,6 @@ public class ExpressionGraphBuilder : IExpressionGraphBuilder
 			{
 				_tokenIndex++;
 				BuildGroupExpression(tokens, parent);
-				//if (parent is FunctionExpression)
-				//{
-				//    return;
-				//}
 			}
 			else if (token.TokenType is TokenType.ClosingParenthesis or TokenType.ClosingEnumerable)
 			{

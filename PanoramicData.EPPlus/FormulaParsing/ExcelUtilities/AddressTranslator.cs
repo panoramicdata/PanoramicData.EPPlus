@@ -85,10 +85,7 @@ public class AddressTranslator
 				col += currentNumericValue;
 			}
 		}
-		//col--;
-		//row = GetIntPart(address) - 1 ?? GetRowIndexByBehaviour(behaviour);
 		row = GetIntPart(address) ?? GetRowIndexByBehaviour(behaviour);
-
 	}
 
 	private int GetRowIndexByBehaviour(RangeCalculationBehaviour behaviour) => behaviour == RangeCalculationBehaviour.FirstPart ? 1 : _excelDataProvider.ExcelMaxRows;

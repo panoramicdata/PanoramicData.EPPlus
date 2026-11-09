@@ -101,12 +101,6 @@ public abstract class ExcelDataProvider : IDisposable
 	public abstract string GetRangeFormula(string worksheetName, int row, int column);
 	public abstract List<Token> GetRangeFormulaTokens(string worksheetName, int row, int column);
 	public abstract bool IsRowHidden(string worksheetName, int row);
-	///// <summary>
-	///// Returns a single cell value
-	///// </summary>
-	///// <param name="address"></param>
-	///// <returns></returns>
-	//public abstract object GetCellValue(int sheetID, string address);
 
 	/// <summary>
 	/// Returns a single cell value
@@ -116,13 +110,6 @@ public abstract class ExcelDataProvider : IDisposable
 	/// <param name="col"></param>
 	/// <returns></returns>
 	public abstract object GetCellValue(string sheetName, int row, int col);
-
-	///// <summary>
-	///// Sets the value on the cell
-	///// </summary>
-	///// <param name="address"></param>
-	///// <param name="value"></param>
-	//public abstract void SetCellValue(string address, object value);
 
 	/// <summary>
 	/// Returns the address of the lowest rightmost cell on the worksheet.

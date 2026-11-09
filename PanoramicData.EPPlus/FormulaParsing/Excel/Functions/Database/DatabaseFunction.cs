@@ -36,7 +36,6 @@ public abstract class DatabaseFunction : ExcelFunction
 	public DatabaseFunction()
 		: this(new RowMatcher())
 	{
-
 	}
 
 	public DatabaseFunction(RowMatcher rowMatcher)
@@ -47,7 +46,6 @@ public abstract class DatabaseFunction : ExcelFunction
 	protected IEnumerable<double> GetMatchingValues(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
 		var dbAddress = arguments.ElementAt(0).ValueAsRangeInfo.Address.Address;
-		//var field = ArgToString(arguments, 1).ToLower(CultureInfo.InvariantCulture);
 		var field = arguments.ElementAt(1).Value;
 		var criteriaRange = arguments.ElementAt(2).ValueAsRangeInfo.Address.Address;
 

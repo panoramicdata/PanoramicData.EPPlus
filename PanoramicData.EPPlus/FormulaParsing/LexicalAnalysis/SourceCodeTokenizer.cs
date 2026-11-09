@@ -39,11 +39,9 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 	public static ISourceCodeTokenizer Default => new SourceCodeTokenizer(FunctionNameProvider.Empty, NameValueProvider.Empty, false);
 	public static ISourceCodeTokenizer R1C1 => new SourceCodeTokenizer(FunctionNameProvider.Empty, NameValueProvider.Empty, true);
 
-
 	public SourceCodeTokenizer(IFunctionNameProvider functionRepository, INameValueProvider nameValueProvider, bool r1c1 = false)
 		: this(new TokenFactory(functionRepository, nameValueProvider, r1c1), new TokenSeparatorProvider())
 	{
-
 	}
 	public SourceCodeTokenizer(ITokenFactory tokenFactory, ITokenSeparatorProvider tokenProvider)
 	{
@@ -82,9 +80,6 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 
 		return context.Result;
 	}
-
-
-
 
 	private static void CleanupTokens(TokenizerContext context, IDictionary<string, Token> tokens)
 	{
@@ -140,7 +135,7 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 					context.Result.RemoveAt(i + 1);
 				}
 			}
-			// Clean up leading '+' along with the following operator combinations: ++, --, +-, -+
+			// Clean up a leading plus sign and doubled plus or minus operator pairs
 			else if ((token.TokenType == TokenType.Operator || token.TokenType == TokenType.Negator) && i < context.Result.Count - 1 &&
 					 (token.Value == "+" || token.Value == "-"))
 			{

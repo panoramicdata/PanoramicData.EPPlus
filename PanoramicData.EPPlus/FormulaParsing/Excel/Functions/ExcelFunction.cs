@@ -41,7 +41,6 @@ public abstract class ExcelFunction
 	public ExcelFunction()
 		: this(new ArgumentCollectionUtil(), new ArgumentParsers(), new CompileResultValidators())
 	{
-
 	}
 
 	public ExcelFunction(
@@ -76,17 +75,11 @@ public abstract class ExcelFunction
 
 	public virtual bool IsErrorHandlingFunction => false;
 
-	/// <summary>
-	/// Used for some Lookupfunctions to indicate that function arguments should
-	/// not be compiled before the function is called.
-	/// </summary>
-	//public bool SkipArgumentEvaluation { get; set; }
 	protected static object GetFirstValue(IEnumerable<FunctionArgument> val)
 	{
 		var arg = ((IEnumerable<FunctionArgument>)val).FirstOrDefault();
 		if (arg.Value is ExcelDataProvider.IRangeInfo)
 		{
-			//var r=((ExcelDataProvider.IRangeInfo)arg);
 			var r = arg.ValueAsRangeInfo;
 			return r.GetValue(r.Address._fromRow, r.Address._fromCol);
 		}
@@ -294,12 +287,6 @@ public abstract class ExcelFunction
 
 	protected static bool IsNumeric(object val) => val != null
 && (TypeCompat.IsPrimitive(val) || val is double || val is decimal || val is System.DateTime || val is TimeSpan);
-
-	//protected virtual bool IsNumber(object obj)
-	//{
-	//    if (obj == null) return false;
-	//    return (obj is int || obj is double || obj is short || obj is decimal || obj is long);
-	//}
 
 	/// <summary>
 	/// Helper method for comparison of two doubles.

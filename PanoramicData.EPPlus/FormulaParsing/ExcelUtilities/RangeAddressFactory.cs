@@ -41,8 +41,6 @@ public class RangeAddressFactory
 	public RangeAddressFactory(ExcelDataProvider excelDataProvider)
 		: this(excelDataProvider, new AddressTranslator(excelDataProvider), new IndexToAddressTranslator(excelDataProvider, ExcelReferenceType.RelativeRowAndColumn))
 	{
-
-
 	}
 
 	public RangeAddressFactory(ExcelDataProvider excelDataProvider, AddressTranslator addressTranslator, IndexToAddressTranslator indexToAddressTranslator)
@@ -76,7 +74,6 @@ public class RangeAddressFactory
 	public RangeAddress Create(string worksheetName, string address)
 	{
 		Require.That(address).Named("range").IsNotNullOrEmpty();
-		//var addressInfo = ExcelAddressInfo.Parse(address);
 		var adr = new ExcelAddressBase(address);
 		var sheet = string.IsNullOrEmpty(adr.WorkSheet) ? worksheetName : adr.WorkSheet;
 		var dim = _excelDataProvider.GetDimensionEnd(sheet);
@@ -90,21 +87,12 @@ public class RangeAddressFactory
 			ToCol = adr._toCol
 		};
 
-		//if (addressInfo.IsMultipleCells)
-		//{
-		//    HandleMultipleCellAddress(rangeAddress, addressInfo);
-		//}
-		//else
-		//{
-		//    HandleSingleCellAddress(rangeAddress, addressInfo);
-		//}
 		return rangeAddress;
 	}
 
 	public RangeAddress Create(string range)
 	{
 		Require.That(range).Named("range").IsNotNullOrEmpty();
-		//var addressInfo = ExcelAddressInfo.Parse(range);
 		var adr = new ExcelAddressBase(range);
 		if (adr.Table != null)
 		{
@@ -126,14 +114,6 @@ public class RangeAddressFactory
 			ToCol = adr._toCol
 		};
 
-		//if (addressInfo.IsMultipleCells)
-		//{
-		//    HandleMultipleCellAddress(rangeAddress, addressInfo);
-		//}
-		//else
-		//{
-		//    HandleSingleCellAddress(rangeAddress, addressInfo);
-		//}
 		return rangeAddress;
 	}
 

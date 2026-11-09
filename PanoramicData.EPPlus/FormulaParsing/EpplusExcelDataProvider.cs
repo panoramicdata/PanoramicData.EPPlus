@@ -117,9 +117,7 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 
 		public void Dispose()
 		{
-			//_values = null;
-			//_ws = null;
-			//_cell = null;
+			// The worksheet owns the cell store, so there is nothing to release.
 		}
 
 		object System.Collections.IEnumerator.Current => this;
@@ -131,7 +129,6 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		}
 
 		public void Reset() => _values.Init();
-
 
 		public bool NextCell()
 		{
@@ -188,7 +185,6 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		public bool IsExcelError => ExcelErrorValue.Values.IsErrorValue(_values.Value._value);
 
 		public IList<Token> Tokens => _ws._formulaTokens.GetValue(_values.Row, _values.Column);
-
 	}
 	public class NameInfo : ExcelDataProvider.INameInfo
 	{
@@ -234,10 +230,8 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		{
 			addr = ConvertToA1C1(addr);
 		}
-		//SetCurrentWorksheet(addr.WorkSheet); 
 		var wsName = string.IsNullOrEmpty(addr.WorkSheet) ? _currentWorksheet.Name : addr.WorkSheet;
 		var ws = _package.Workbook.Worksheets[wsName];
-		//return new CellsStoreEnumerator<object>(ws._values, addr._fromRow, addr._fromCol, addr._toRow, addr._toCol);
 		return new RangeInfo(ws, addr);
 	}
 	public override IRangeInfo GetRange(string worksheet, string address)
@@ -247,10 +241,8 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		{
 			addr = ConvertToA1C1(addr);
 		}
-		//SetCurrentWorksheet(addr.WorkSheet); 
 		var wsName = string.IsNullOrEmpty(addr.WorkSheet) ? _currentWorksheet.Name : addr.WorkSheet;
 		var ws = _package.Workbook.Worksheets[wsName];
-		//return new CellsStoreEnumerator<object>(ws._values, addr._fromRow, addr._fromCol, addr._toRow, addr._toCol);
 		return new RangeInfo(ws, addr);
 	}
 
@@ -337,11 +329,9 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		return (IEnumerable<object>)(new CellsStoreEnumerator<ExcelCoreValue>(ws._values, addr._fromRow, addr._fromCol, addr._toRow, addr._toCol));
 	}
 
-
 	public object GetValue(int row, int column) => _currentWorksheet.GetValueInner(row, column);
 
 	public bool IsMerged(int row, int column) =>
-		//return _currentWorksheet._flags.GetFlagValue(row, column, CellFlags.Merged);
 		_currentWorksheet.MergedCells[row, column] != null;
 
 	public bool IsHidden(int row, int column) => _currentWorksheet.Column(column).Hidden || _currentWorksheet.Column(column).Width == 0 ||
@@ -387,18 +377,7 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		{
 			_currentWorksheet = _package.Workbook.Worksheets.First();
 		}
-
 	}
-
-	//public override void SetCellValue(string address, object value)
-	//{
-	//    var addressInfo = ExcelAddressInfo.Parse(address);
-	//    var ra = _rangeAddressFactory.Create(address);
-	//    SetCurrentWorksheet(addressInfo);
-	//    //var valueInfo = (ICalcEngineValueInfo)_currentWorksheet;
-	//    //valueInfo.SetFormulaValue(ra.FromRow + 1, ra.FromCol + 1, value);
-	//    _currentWorksheet.Cells[ra.FromRow + 1, ra.FromCol + 1].Value = value;
-	//}
 
 	public override void Dispose() => _package.Dispose();
 
@@ -444,10 +423,5 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		return b;
 	}
 
-	public override void Reset() => _names = []; //Reset name cache.            
-
-	//public override void SetToTableAddress(ExcelAddress address)
-	//{
-	//    address.SetRCFromTable(_package, address);
-	//}
+	public override void Reset() => _names = [];
 }

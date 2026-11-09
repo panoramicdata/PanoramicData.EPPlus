@@ -37,7 +37,6 @@ public class IndexToAddressTranslator
 	public IndexToAddressTranslator(ExcelDataProvider excelDataProvider)
 		: this(excelDataProvider, ExcelReferenceType.AbsoluteRowAndColumn)
 	{
-
 	}
 
 	public IndexToAddressTranslator(ExcelDataProvider excelDataProvider, ExcelReferenceType referenceType)
@@ -55,7 +54,6 @@ public class IndexToAddressTranslator
 
 		if (iColumnNumber < 1)
 		{
-			//throw new Exception("Column number is out of range");
 			return "#REF!";
 		}
 
