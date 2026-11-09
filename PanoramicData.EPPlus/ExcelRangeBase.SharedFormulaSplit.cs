@@ -4,8 +4,9 @@ namespace OfficeOpenXml;
 
 public partial class ExcelRangeBase
 {
-	private void SplitPartlyCollidingFormula(ExcelAddressBase address, ExcelWorksheet.Formulas f, ExcelRange fRange)
+	private void SplitPartlyCollidingFormula(ExcelAddressBase address, ExcelWorksheet.Formulas formula, ExcelRange fRange)
 	{
+		var f = formula;
 		var fIsSet = false;
 		var formulaR1C1 = fRange.FormulaR1C1;
 		//Top Range

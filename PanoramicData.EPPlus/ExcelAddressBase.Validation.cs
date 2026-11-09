@@ -41,7 +41,7 @@ public partial class ExcelAddressBase
 
 	private static AddressType GetAddressOrNameType(string Address)
 	{
-		if (TrySplitAddress(Address, out var wb, out var ws, out var intAddress))
+		if (TrySplitAddress(Address, out var wb, out _, out var intAddress))
 		{
 			if (intAddress.Contains('[')) //Table reference
 			{

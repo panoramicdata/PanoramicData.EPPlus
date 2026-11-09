@@ -29,7 +29,17 @@ public partial class ExcelRangeBase
 			}
 			else
 			{
-				AppendTextChar(c, line, Format, v, items, QCount, isQualifier, ref isText, ref col);
+				AppendPendingQualifiers(v, Format.TextQualifier, QCount);
+
+				if (isQualifier)
+				{
+					v.Append(c);
+				}
+				else
+				{
+					AppendUnquotedChar(c, line, Format, v, items, QCount, ref isText, ref col);
+				}
+
 				QCount = 0;
 			}
 		}
@@ -39,15 +49,9 @@ public partial class ExcelRangeBase
 	}
 
 	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour of LoadFromText: callers may catch this exact exception type, so it is kept.")]
-	private static void AppendTextChar(char c, string line, ExcelTextFormat Format, StringBuilder v, List<object> items, int QCount, bool isQualifier, ref bool isText, ref int col)
+	private static void AppendUnquotedChar(char c, string line, ExcelTextFormat Format, StringBuilder v, List<object> items, int QCount, ref bool isText, ref int col)
 	{
-		AppendPendingQualifiers(v, Format.TextQualifier, QCount);
-
-		if (isQualifier)
-		{
-			v.Append(c);
-		}
-		else if (c == Format.Delimiter)
+		if (c == Format.Delimiter)
 		{
 			items.Add(ConvertData(Format, v.ToString(), col, isText));
 			v.Clear();

@@ -35,8 +35,9 @@ public partial class ExcelRangeBase
 		}
 	}
 
-	private ExcelColumn SetStyleNameOnFollowingColumns(ExcelColumn column, CellsStoreEnumerator<ExcelCoreValue> cols, string value)
+	private ExcelColumn SetStyleNameOnFollowingColumns(ExcelColumn firstColumn, CellsStoreEnumerator<ExcelCoreValue> cols, string value)
 	{
+		var column = firstColumn;
 		while (column.ColumnMin <= _toCol)
 		{
 			if (column.ColumnMax > _toCol)

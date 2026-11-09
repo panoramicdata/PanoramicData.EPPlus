@@ -56,8 +56,8 @@ public partial class ExcelAddressBase
 		}
 		else if (c == ',' && !isText)
 		{
-			isMulti = true;
-			SetAddress(ref first, ref second, ref hasSheet, isMulti);
+			SetAddress(ref first, ref second, ref hasSheet, true);
+			return true;
 		}
 		else
 		{

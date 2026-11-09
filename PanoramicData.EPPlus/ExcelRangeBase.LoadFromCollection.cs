@@ -126,8 +126,9 @@ public partial class ExcelRangeBase
 		return false;
 	}
 
-	private ExcelRangeBase CreateCollectionRange(object[,] values, int row, int col, bool PrintHeaders, TableStyles TableStyle)
+	private ExcelRangeBase CreateCollectionRange(object[,] values, int rowCount, int col, bool PrintHeaders, TableStyles TableStyle)
 	{
+		var row = rowCount;
 		_worksheet.SetRangeValueInner(_fromRow, _fromCol, _fromRow + row - 1, _fromCol + col - 1, values);
 
 		//Must have at least 1 row, if header is showen
