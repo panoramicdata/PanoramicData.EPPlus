@@ -22,6 +22,7 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -61,6 +62,35 @@ public abstract class HiddenValuesHandlingFunction : ExcelFunction
 
 	protected bool ShouldIgnore(ExcelDataProvider.ICellInfo c, ParsingContext context) => CellStateHelper.ShouldIgnore(IgnoreHiddenValues, c, context);
 	protected bool ShouldIgnore(FunctionArgument arg) => IgnoreHiddenValues && arg.ExcelStateFlagIsSet(ExcelCellState.HiddenCell);
+
+	private protected CompileResult SumOverArguments(IEnumerable<FunctionArgument> arguments, System.Func<FunctionArgument, double> calculate)
+	{
+		var retVal = 0d;
+		if (arguments != null)
+		{
+			foreach (var arg in arguments)
+			{
+				retVal += calculate(arg);
+			}
+		}
+
+		return CreateResult(retVal, DataType.Decimal);
+	}
+
+	private protected double SumVisibleCells(ExcelDataProvider.IRangeInfo range, ParsingContext context, System.Func<double, double> transform)
+	{
+		var retVal = 0d;
+		foreach (var c in range)
+		{
+			if (!ShouldIgnore(c, context))
+			{
+				CheckForAndHandleExcelError(c);
+				retVal += transform(c.ValueDouble);
+			}
+		}
+
+		return retVal;
+	}
 
 	private protected static double? GetAverageNumericValue(object obj, bool isInArray)
 	{

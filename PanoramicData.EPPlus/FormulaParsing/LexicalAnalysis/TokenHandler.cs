@@ -116,31 +116,9 @@ public class TokenHandler : ITokenIndexProvider
 		return result;
 	}
 
-	private static bool TokenIsNegator(TokenizerContext context) => TokenIsNegator(context.LastToken);
-	private static bool TokenIsNegator(Token t) => t == null
-					||
-					t.TokenType == TokenType.Operator
-					||
-					t.TokenType == TokenType.OpeningParenthesis
-					||
-					t.TokenType == TokenType.Comma
-					||
-					t.TokenType == TokenType.SemiColon
-					||
-					t.TokenType == TokenType.OpeningEnumerable;
+	private static bool TokenIsNegator(TokenizerContext context) => TokenizerHelper.PrecedesNegator(context.LastToken);
 
-	private Token CreateToken(TokenizerContext context, string worksheet)
-	{
-		if (context.CurrentToken == "-")
-		{
-			if (context.LastToken == null && context.LastToken.TokenType == TokenType.Operator)
-			{
-				return new Token("-", TokenType.Negator);
-			}
-		}
-
-		return _tokenFactory.Create(context.Result, context.CurrentToken, worksheet);
-	}
+	private Token CreateToken(TokenizerContext context, string worksheet) => TokenizerHelper.CreateCurrentToken(_tokenFactory, context, worksheet);
 
 	int ITokenIndexProvider.Index => _tokenIndex;
 

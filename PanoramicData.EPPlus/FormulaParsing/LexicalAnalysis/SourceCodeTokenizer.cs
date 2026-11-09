@@ -201,7 +201,7 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 	{
 		if (context.Result[i].Value == "-" && i > 0 && (context.Result[i].TokenType == TokenType.Operator || context.Result[i].TokenType == TokenType.Negator))
 		{
-			if (TokenIsNegator(context.Result[i - 1]))
+			if (TokenizerHelper.PrecedesNegator(context.Result[i - 1]))
 			{
 				context.Result[i] = new Token("-", TokenType.Negator);
 			}
@@ -212,29 +212,5 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 		}
 	}
 
-	private static bool TokenIsNegator(TokenizerContext context) => TokenIsNegator(context.LastToken);
-	private static bool TokenIsNegator(Token t) => t == null
-					||
-					t.TokenType == TokenType.Operator
-					||
-					t.TokenType == TokenType.OpeningParenthesis
-					||
-					t.TokenType == TokenType.Comma
-					||
-					t.TokenType == TokenType.SemiColon
-					||
-					t.TokenType == TokenType.OpeningEnumerable;
-
-	private Token CreateToken(TokenizerContext context, string worksheet)
-	{
-		if (context.CurrentToken == "-")
-		{
-			if (context.LastToken == null && context.LastToken.TokenType == TokenType.Operator)
-			{
-				return new Token("-", TokenType.Negator);
-			}
-		}
-
-		return _tokenFactory.Create(context.Result, context.CurrentToken, worksheet);
-	}
+	private Token CreateToken(TokenizerContext context, string worksheet) => TokenizerHelper.CreateCurrentToken(_tokenFactory, context, worksheet);
 }
