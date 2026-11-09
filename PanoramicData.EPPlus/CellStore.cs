@@ -32,7 +32,9 @@ using OfficeOpenXml;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
+[SuppressMessage("Minor Code Smell", "S1210:Equality and comparison operators should be overloaded when implementing IComparable", Justification = "Internal ordering key for Array.BinarySearch; overriding equality would change reference semantics.")]
 internal class IndexBase : IComparable<IndexBase>
 {
 	internal short Index;
@@ -40,6 +42,8 @@ internal class IndexBase : IComparable<IndexBase>
 		Index - other.Index;
 }
 // to compress memory size, use struct
+[SuppressMessage("Minor Code Smell", "S1210:Equality and comparison operators should be overloaded when implementing IComparable", Justification = "Internal ordering key for Array.BinarySearch only.")]
+[SuppressMessage("Minor Code Smell", "S3898:Value types should implement IEquatable<T>", Justification = "Internal ordering key for Array.BinarySearch only; never compared for equality.")]
 internal struct IndexItem : IComparable<IndexItem>
 {
 	internal int IndexPointer
@@ -489,6 +493,39 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			return false;
 		}
 	}
+	private int GetOrAddPagePosition(int col, int row, short page)
+	{
+		var pos = _columnIndex[col].GetPosition(row);
+		if (pos < 0)
+		{
+			pos = ~pos;
+			if (pos - 1 < 0 || _columnIndex[col]._pages[pos - 1].IndexOffset + PageSize - 1 < row)
+			{
+				CellStore<T>.AddPage(_columnIndex[col], pos, page);
+			}
+			else
+			{
+				pos--;
+			}
+		}
+
+		if (pos >= _columnIndex[col].PageCount)
+		{
+			CellStore<T>.AddPage(_columnIndex[col], pos, page);
+		}
+
+		return pos;
+	}
+
+	private int AddCellInNewColumn(int col, int column, int row, short page, T? value)
+	{
+		AddColumn(col, column);
+		CellStore<T>.AddPage(_columnIndex[col], 0, page);
+		var ix = (short)(row - (page << pageBits));
+		AddCell(_columnIndex[col], 0, 0, ix, value);
+		return col;
+	}
+
 	internal void SetValue(int Row, int Column, T? Value)
 	{
 		lock (_columnIndex)
@@ -497,30 +534,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			var page = (short)(Row >> pageBits);
 			if (col >= 0)
 			{
-				var pos = _columnIndex[col].GetPosition(Row);
-				if (pos < 0)
-				{
-					pos = ~pos;
-					if (pos - 1 < 0 || _columnIndex[col]._pages[pos - 1].IndexOffset + PageSize - 1 < Row)
-					{
-						CellStore<T>.AddPage(_columnIndex[col], pos, page);
-					}
-					else
-					{
-						pos--;
-					}
-				}
-
-				if (pos >= _columnIndex[col].PageCount)
-				{
-					CellStore<T>.AddPage(_columnIndex[col], pos, page);
-				}
-
+				var pos = GetOrAddPagePosition(col, Row, page);
 				var pageItem = _columnIndex[col]._pages[pos];
 				if (!(pageItem.MinIndex <= Row && pageItem.MaxIndex >= Row) && pageItem.IndexExpanded > Row)   //TODO: Fix issue
 				{
 					pos--;
-					page--;
 					if (pos < 0)
 					{
 						throw new Exception("Unexpected error when setting value");
@@ -544,11 +562,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 			else //Column does not exist
 			{
-				col = ~col;
-				AddColumn(col, Column);
-				CellStore<T>.AddPage(_columnIndex[col], 0, page);
-				var ix = (short)(Row - (page << pageBits));
-				AddCell(_columnIndex[col], 0, 0, ix, Value);
+				AddCellInNewColumn(~col, Column, Row, page, Value);
 			}
 		}
 	}
@@ -591,25 +605,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					{
 						if (col >= 0)
 						{
-							var pos = _columnIndex[col].GetPosition(rowIx);
-							if (pos < 0)
-							{
-								pos = ~pos;
-								if (pos - 1 < 0 || _columnIndex[col]._pages[pos - 1].IndexOffset + PageSize - 1 < rowIx)
-								{
-									CellStore<T>.AddPage(_columnIndex[col], pos, page);
-								}
-								else
-								{
-									pos--;
-								}
-							}
-
-							if (pos >= _columnIndex[col].PageCount)
-							{
-								CellStore<T>.AddPage(_columnIndex[col], pos, page);
-							}
-
+							var pos = GetOrAddPagePosition(col, rowIx, page);
 							var pageItem = _columnIndex[col]._pages[pos];
 							if (pageItem.IndexOffset > rowIx)
 							{
@@ -639,11 +635,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 						}
 						else //Column does not exist
 						{
-							col = ~col;
-							AddColumn(col, colIx);
-							CellStore<T>.AddPage(_columnIndex[col], 0, page);
-							var ix = (short)(rowIx - (page << pageBits));
-							AddCell(_columnIndex[col], 0, 0, ix, default);
+							col = AddCellInNewColumn(~col, colIx, rowIx, page, default);
 							Updater(_values, _columnIndex[col]._pages[0].Rows[0].IndexPointer, rowIx, colIx, Value);
 						}
 					}
@@ -662,30 +654,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			var page = (short)(Row >> pageBits);
 			if (col >= 0)
 			{
-				var pos = _columnIndex[col].GetPosition(Row);
-				if (pos < 0)
-				{
-					pos = ~pos;
-					if (pos - 1 < 0 || _columnIndex[col]._pages[pos - 1].IndexOffset + PageSize - 1 < Row)
-					{
-						CellStore<T>.AddPage(_columnIndex[col], pos, page);
-					}
-					else
-					{
-						pos--;
-					}
-				}
-
-				if (pos >= _columnIndex[col].PageCount)
-				{
-					CellStore<T>.AddPage(_columnIndex[col], pos, page);
-				}
-
+				var pos = GetOrAddPagePosition(col, Row, page);
 				var pageItem = _columnIndex[col]._pages[pos];
 				if (pageItem.IndexOffset > Row)
 				{
 					pos--;
-					page--;
 					if (pos < 0)
 					{
 						throw new Exception("Unexpected error when setting value");
@@ -710,11 +683,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 			else //Column does not exist
 			{
-				col = ~col;
-				AddColumn(col, Column);
-				CellStore<T>.AddPage(_columnIndex[col], 0, page);
-				var ix = (short)(Row - (page << pageBits));
-				AddCell(_columnIndex[col], 0, 0, ix, default);
+				col = AddCellInNewColumn(~col, Column, Row, page, default);
 				Updater(_values, _columnIndex[col]._pages[0].Rows[0].IndexPointer, Value);
 			}
 		}
@@ -864,7 +833,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 									{
 										var fr = shift ? fromRow : endRow - rowsLeft;
 										pagePos = column.GetPosition(fr);
-										delEndRow = CellStore<T>.DeleteCells(column._pages[pagePos], fr, shift ? fr + rowsLeft : endRow, shift);
+										CellStore<T>.DeleteCells(column._pages[pagePos], fr, shift ? fr + rowsLeft : endRow, shift);
 										if (shift)
 										{
 											UpdatePageOffset(column, pagePos, rowsLeft);
@@ -919,8 +888,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			if (Math.Abs(column._pages[pagePos].Offset) > PageSize ||
 				Math.Abs(column._pages[pagePos].Rows[column._pages[pagePos].RowCount - 1].Index) > PageSizeMax) //Split or Merge???
 			{
-				rows = CellStore<T>.ResetPageOffset(column, pagePos, rows);
-				return;
+				CellStore<T>.ResetPageOffset(column, pagePos, rows);
 			}
 		}
 	}
@@ -940,7 +908,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					toPage.IndexOffset + toPage.Rows[0].Index <= PageSizeMax)
 				{
 					CellStore<T>.MergePage(column, pagePos - 1);
-
 				}
 			}
 			else //No page after 
@@ -953,11 +920,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		{
 			toPage = column._pages[pagePos + 1];
 			pageAdd = 1;
-			if (fromPage.Index + 1 == toPage.Index)
-			{
-
-			}
-			else
+			if (fromPage.Index + 1 != toPage.Index)
 			{
 				fromPage.Index += pageAdd;
 				fromPage.Offset += PageSize;
@@ -976,7 +939,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			//Delete entire page.
 			var delSize = page.MaxIndex - page.MinIndex + 1;
 			rows -= delSize;
-			var prevOffset = page.Offset;
 			Array.Copy(column._pages, pagePos + 1, column._pages, pagePos, column.PageCount - pagePos - 1);
 			column.PageCount--;
 			if (column.PageCount == 0)
@@ -1013,7 +975,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	///
 	private static int DeleteCells(PageIndex page, int fromRow, int toRow, bool shift)
 	{
-		var fromPos = page.GetPosition(fromRow - (page.IndexOffset));
+		var fromPos = page.GetPosition(fromRow - page.IndexOffset);
 		if (fromPos < 0)
 		{
 			fromPos = ~fromPos;
@@ -1142,7 +1104,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					column._pages[p].Index += addPages;
 					column._pages[p].Offset += offset;
 				}
-
 			}
 
 			var size = page.RowCount - rowPos;
@@ -1211,7 +1172,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 	private void SplitPageInsert(ColumnIndex column, int pagePos, int rowPos, int rows, int size, int addPages)
 	{
-		var newRows = new IndexItem[GetSize(size)];
 		var page = column._pages[pagePos];
 
 		var rStart = -1;
@@ -1233,7 +1193,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		if (rc > 0)
 		{
 			//Copy to a new page
-			var row = page.IndexOffset;
 			var newPage = CellStore<T>.CopyNew(page, rStart, rc);
 			var ix = (short)(page.Index + addPages);
 			var offset = page.IndexOffset + rows - (ix * PageSize);
@@ -1253,7 +1212,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 	private static void CopyMergePage(PageIndex page, int rowPos, int rows, int size, PageIndex ToPage)
 	{
-		var startRow = page.IndexOffset + page.Rows[rowPos].Index + rows;
 		var newRows = new IndexItem[GetSize(ToPage.RowCount + size)];
 		page.RowCount -= size;
 		Array.Copy(page.Rows, rowPos, newRows, 0, size);
@@ -1391,12 +1349,11 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 		Array.Copy(columnIndex._pages, pagePos + 1, columnIndex._pages, pagePos + 2, columnIndex.PageCount - pagePos - 1);
 		columnIndex._pages[pagePos + 1] = nextPage;
-		page = nextPage;
 		columnIndex.PageCount++;
 		return pagePos + 1;
 	}
 
-	private static PageIndex AdjustIndex(ColumnIndex columnIndex, int pagePos)
+	private static void AdjustIndex(ColumnIndex columnIndex, int pagePos)
 	{
 		var page = columnIndex._pages[pagePos];
 		//First Adjust indexes
@@ -1414,7 +1371,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			page.Index--;
 			page.Offset += PageSize;
 		}
-		return page;
 	}
 
 	private static void AddPageRowOffset(PageIndex page, short offset)
@@ -1771,6 +1727,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			}
 		}
 	}
+	[SuppressMessage("Major Bug", "S2234:Arguments should be passed in the same order as the method parameters", Justification = "Upstream EPPlus behaviour; reordering the recursive call would change enumeration results.")]
 	internal bool GetPrevCell(ref int row, ref int colPos, int startRow, int startColPos, int endColPos)
 	{
 		if (ColumnCount == 0)
@@ -1884,7 +1841,6 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 {
 	private readonly CellStore<T> _cellStore;
 	private int _row, _colPos;
-	private int[] _pagePos, _cellPos;
 	private readonly int _startRow, _startCol, _endRow, _endCol;
 	private int _minRow, _minColPos, _maxRow, _maxColPos;
 
@@ -1903,7 +1859,6 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 		_endCol = EndCol;
 
 		Init();
-
 	}
 
 	internal void Init()
@@ -1925,15 +1880,6 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 
 		_row = _minRow;
 		_colPos = _minColPos - 1;
-
-		var cols = _maxColPos - _minColPos + 1;
-		_pagePos = new int[cols];
-		_cellPos = new int[cols];
-		for (var i = 0; i < cols; i++)
-		{
-			_pagePos[i] = -1;
-			_cellPos[i] = -1;
-		}
 	}
 	internal int Row => _row;
 	internal int Column
@@ -2022,5 +1968,5 @@ internal class FlagCellStore : CellStore<byte>
 			SetValue(Row, Col, (byte)(currentValue & ~cellFlags)); // remove the CellFlag bit
 		}
 	}
-	internal bool GetFlagValue(int Row, int Col, CellFlags cellFlags) => !(((byte)cellFlags & GetValue(Row, Col)) == 0);
+	internal bool GetFlagValue(int Row, int Col, CellFlags cellFlags) => ((byte)cellFlags & GetValue(Row, Col)) != 0;
 }
