@@ -14,6 +14,7 @@ public class AverageIfTests
 	private EpplusExcelDataProvider _provider;
 	private ParsingContext _parsingContext;
 	private ExcelWorksheet _worksheet;
+	private CriteriaRangeHelper _criteria;
 
 	[TestInitialize]
 	public void Initialize()
@@ -23,259 +24,54 @@ public class AverageIfTests
 		_parsingContext = ParsingContext.Create();
 		_parsingContext.Scopes.NewScope(RangeAddress.Empty);
 		_worksheet = _package.Workbook.Worksheets.Add("testsheet");
+		_criteria = new CriteriaRangeHelper(_provider, _worksheet, _parsingContext);
 	}
 
 	[TestCleanup]
 	public void Cleanup() => _package.Dispose();
 
 	[TestMethod]
-	public void AverageIfNumeric()
-	{
-		_worksheet.Cells["A1"].Value = 1d;
-		_worksheet.Cells["A2"].Value = 2d;
-		_worksheet.Cells["A3"].Value = 3d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">1", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(4d, result.Result);
-	}
+	public void AverageIfNumeric() => Assert.AreEqual(4d, _criteria.ExecuteWithSumRange(new AverageIf(), 1d, 2d, 3d, ">1"));
 
 	[TestMethod]
-	public void AverageIfNonNumeric()
-	{
-		_worksheet.Cells["A1"].Value = "Monday";
-		_worksheet.Cells["A2"].Value = "Tuesday";
-		_worksheet.Cells["A3"].Value = "Thursday";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "T*day", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(4d, result.Result);
-	}
+	public void AverageIfNonNumeric() => Assert.AreEqual(4d, _criteria.ExecuteWithSumRange(new AverageIf(), "Monday", "Tuesday", "Thursday", "T*day"));
 
 	[TestMethod]
-	public void AverageIfNumericExpression()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = 1d;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		var func = new AverageIf();
-		var range = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var args = FunctionsHelper.CreateArgs(range, 1d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void AverageIfNumericExpression() => Assert.AreEqual(1d, _criteria.Execute(new AverageIf(), null, 1d, "Not Empty", 1d));
 
 	[TestMethod]
-	public void AverageIfEqualToEmptyString()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void AverageIfEqualToEmptyString() => Assert.AreEqual(1d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, "Not Empty", ""));
 
 	[TestMethod]
-	public void AverageIfNotEqualToNull()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<>", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(4d, result.Result);
-	}
+	public void AverageIfNotEqualToNull() => Assert.AreEqual(4d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, "Not Empty", "<>"));
 
 	[TestMethod]
-	public void AverageIfEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 0d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageIfEqualToZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, 0d, "0"));
 
 	[TestMethod]
-	public void AverageIfNotEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 0d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<>0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(2d, result.Result);
-	}
+	public void AverageIfNotEqualToZero() => Assert.AreEqual(2d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, 0d, "<>0"));
 
 	[TestMethod]
-	public void AverageIfGreaterThanZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageIfGreaterThanZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, 1d, ">0"));
 
 	[TestMethod]
-	public void AverageIfGreaterThanOrEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">=0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageIfGreaterThanOrEqualToZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, 1d, ">=0"));
 
 	[TestMethod]
-	public void AverageIfLessThanZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = -1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageIfLessThanZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, -1d, "<0"));
 
 	[TestMethod]
-	public void AverageIfLessThanOrEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = -1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<=0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageIfLessThanOrEqualToZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, -1d, "<=0"));
 
 	[TestMethod]
-	public void AverageIfLessThanCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void AverageIfLessThanCharacter() => Assert.AreEqual(3d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, "Not Empty", "<a"));
 
 	[TestMethod]
-	public void AverageIfLessThanOrEqualToCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<=a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void AverageIfLessThanOrEqualToCharacter() => Assert.AreEqual(3d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, "Not Empty", "<=a"));
 
 	[TestMethod]
-	public void AverageIfGreaterThanCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageIfGreaterThanCharacter() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, "Not Empty", ">a"));
 
 	[TestMethod]
-	public void AverageIfGreaterThanOrEqualToCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new AverageIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">=a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageIfGreaterThanOrEqualToCharacter() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new AverageIf(), null, string.Empty, "Not Empty", ">=a"));
 }
