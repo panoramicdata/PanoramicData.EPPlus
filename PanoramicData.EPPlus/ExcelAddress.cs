@@ -325,21 +325,9 @@ public class ExcelAddressBase : ExcelCellBase
 			_ws = address;
 		}
 
-		if (_ws.StartsWith('\''))
+		if (TrySetQuotedWorksheet())
 		{
-			pos = _ws.IndexOf('\'', 1);
-			while (pos > 0 && pos + 1 < _ws.Length && _ws[pos + 1] == '\'')
-			{
-				_ws = _ws[..pos] + _ws[(pos + 1)..];
-				pos = _ws.IndexOf('\'', pos + 1);
-			}
-
-			if (pos > 0)
-			{
-				_address = _ws[(pos + 2)..];
-				_ws = _ws[1..pos];
-				return;
-			}
+			return;
 		}
 
 		pos = _ws.IndexOf('!');
@@ -359,6 +347,30 @@ public class ExcelAddressBase : ExcelCellBase
 		{
 			_address = address;
 		}
+	}
+
+	private bool TrySetQuotedWorksheet()
+	{
+		if (!_ws.StartsWith('\''))
+		{
+			return false;
+		}
+
+		var pos = _ws.IndexOf('\'', 1);
+		while (pos > 0 && pos + 1 < _ws.Length && _ws[pos + 1] == '\'')
+		{
+			_ws = _ws[..pos] + _ws[(pos + 1)..];
+			pos = _ws.IndexOf('\'', pos + 1);
+		}
+
+		if (pos > 0)
+		{
+			_address = _ws[(pos + 2)..];
+			_ws = _ws[1..pos];
+			return true;
+		}
+
+		return false;
 	}
 	internal void ChangeWorksheet(string wsName, string newWs)
 	{

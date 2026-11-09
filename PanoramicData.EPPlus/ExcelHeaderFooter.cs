@@ -514,42 +514,29 @@ public sealed class ExcelHeaderFooter : XmlHelper
 	/// </summary>
 	internal void Save()
 	{
-		if (_oddHeader != null)
-		{
-			SetXmlNodeString("d:oddHeader", GetText(OddHeader));
-		}
+		SaveText("d:oddHeader", _oddHeader);
+		SaveText("d:oddFooter", _oddFooter);
 
-		if (_oddFooter != null)
-		{
-			SetXmlNodeString("d:oddFooter", GetText(OddFooter));
-		}
-
-		// only set evenHeader and evenFooter 
+		// only set evenHeader and evenFooter
 		if (differentOddEven)
 		{
-			if (_evenHeader != null)
-			{
-				SetXmlNodeString("d:evenHeader", GetText(EvenHeader));
-			}
-
-			if (_evenFooter != null)
-			{
-				SetXmlNodeString("d:evenFooter", GetText(EvenFooter));
-			}
+			SaveText("d:evenHeader", _evenHeader);
+			SaveText("d:evenFooter", _evenFooter);
 		}
 
 		// only set firstHeader and firstFooter
 		if (differentFirst)
 		{
-			if (_firstHeader != null)
-			{
-				SetXmlNodeString("d:firstHeader", GetText(FirstHeader));
-			}
+			SaveText("d:firstHeader", _firstHeader);
+			SaveText("d:firstFooter", _firstFooter);
+		}
+	}
 
-			if (_firstFooter != null)
-			{
-				SetXmlNodeString("d:firstFooter", GetText(FirstFooter));
-			}
+	private void SaveText(string path, ExcelHeaderFooterText? text)
+	{
+		if (text != null)
+		{
+			SetXmlNodeString(path, GetText(text));
 		}
 	}
 	internal void SaveHeaderFooterImages()
