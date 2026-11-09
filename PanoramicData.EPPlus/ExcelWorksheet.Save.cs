@@ -1,6 +1,5 @@
 ﻿using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
-using OfficeOpenXml.Packaging.DotNetZip;
 using OfficeOpenXml.Utils;
 using System.Xml;
 
@@ -75,16 +74,7 @@ public partial class ExcelWorksheet
 			Drawings.DrawingXml.Save(partPack.GetStream(FileMode.Create, FileAccess.Write));
 		}
 	}
-	internal void SaveHandler(ZipOutputStream stream, CompressionLevel compressionLevel, string fileName)
-	{
-		//Init Zip
-		stream.CodecBufferSize = 8096;
-		stream.CompressionLevel = (Packaging.DotNetZip.Zlib.CompressionLevel)compressionLevel;
-		stream.PutNextEntry(fileName);
-
-
-		SaveXml(stream);
-	}
+	internal void SaveHandler(Stream stream) => SaveXml(stream);
 
 
 

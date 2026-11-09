@@ -28,9 +28,9 @@
  *******************************************************************************
  * Jan Källman		Added		25-Oct-2012
  *******************************************************************************/
-using OfficeOpenXml.Packaging.DotNetZip;
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Security;
 using System.Text;
 
@@ -67,7 +67,7 @@ public class ZipPackageRelationshipCollection : IEnumerable<ZipPackageRelationsh
 		return ret;
 	}
 
-	internal void WriteZip(ZipOutputStream os, string fileName)
+	internal void WriteZip(ZipArchive archive, string fileName, CompressionLevel compressionLevel)
 	{
 		StringBuilder xml = new("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">");
 		foreach (var rel in _rels.Values)
@@ -77,9 +77,8 @@ public class ZipPackageRelationshipCollection : IEnumerable<ZipPackageRelationsh
 
 		xml.Append("</Relationships>");
 
-		os.PutNextEntry(fileName);
 		var b = Encoding.UTF8.GetBytes(xml.ToString());
-		os.Write(b, 0, b.Length);
+		ZipPackage.WriteEntry(archive, fileName, compressionLevel, entryStream => entryStream.Write(b, 0, b.Length));
 	}
 
 	public int Count => _rels.Count;

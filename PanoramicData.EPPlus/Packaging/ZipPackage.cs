@@ -28,14 +28,16 @@
  *******************************************************************************
  * Jan Källman		Added		25-Oct-2012
  *******************************************************************************/
-using OfficeOpenXml.Packaging.DotNetZip;
 using OfficeOpenXml.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using ZipCompressionLevel = System.IO.Compression.CompressionLevel;
+
 namespace OfficeOpenXml.Packaging;
 
 /// <summary>
@@ -69,6 +71,8 @@ public class ZipPackage : ZipPackageRelationshipBase
 			Match = match;
 		}
 	}
+	private const string NotAPackageMessage = "The file is not an valid Package file. If the file is encrypted, please supply the password in the constructor.";
+
 	readonly Dictionary<string, ZipPackagePart> Parts = new(StringComparer.OrdinalIgnoreCase);
 	internal Dictionary<string, ContentType> _contentTypes = new(StringComparer.OrdinalIgnoreCase);
 	internal char _dirSeparator = '/';
@@ -93,71 +97,81 @@ public class ZipPackage : ZipPackageRelationshipBase
 		{
 			var rels = new Dictionary<string, string>();
 			stream.Seek(0, SeekOrigin.Begin);
-			using ZipInputStream zip = new(stream);
+			using var zip = OpenArchive(stream);
 			var hasContentTypeXml = ReadEntries(zip, rels);
 			ApplyPartRelationsAndContentTypes(rels);
 
 			if (!hasContentTypeXml)
 			{
-				throw (new InvalidDataException("The file is not an valid Package file. If the file is encrypted, please supply the password in the constructor."));
+				throw new InvalidDataException(NotAPackageMessage);
 			}
-
-			zip.Close();
-			zip.Dispose();
 		}
 	}
 
-	private bool ReadEntries(ZipInputStream zip, Dictionary<string, string> rels)
+	private static ZipArchive OpenArchive(Stream stream)
 	{
-		var hasContentTypeXml = false;
-		var e = zip.GetNextEntry();
-		if (e == null)
+		try
 		{
-			throw (new InvalidDataException("The file is not an valid Package file. If the file is encrypted, please supply the password in the constructor."));
+			return new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
+		}
+		catch (InvalidDataException ex)
+		{
+			throw new InvalidDataException(NotAPackageMessage, ex);
+		}
+	}
+
+	private bool ReadEntries(ZipArchive zip, Dictionary<string, string> rels)
+	{
+		if (zip.Entries.Count == 0)
+		{
+			throw new InvalidDataException(NotAPackageMessage);
 		}
 
-		_dirSeparator = e.FileName.Contains('\\') ? '\\' : '/';
+		_dirSeparator = zip.Entries[0].FullName.Contains('\\') ? '\\' : '/';
 
-		while (e != null)
+		var hasContentTypeXml = false;
+		foreach (var e in zip.Entries)
 		{
-			if (e.UncompressedSize > 0)
+			if (e.Length > 0)
 			{
-				var b = new byte[e.UncompressedSize];
-				_ = zip.Read(b, 0, (int)e.UncompressedSize);
-				hasContentTypeXml |= ReadEntry(e, b, rels);
-			}
+				var b = new byte[e.Length];
+				using (var entryStream = e.Open())
+				{
+					entryStream.ReadExactly(b);
+				}
 
-			e = zip.GetNextEntry();
+				hasContentTypeXml |= ReadEntry(e.FullName, b, rels);
+			}
 		}
 
 		return hasContentTypeXml;
 	}
 
 	// Returns true when the entry is the content types part.
-	private bool ReadEntry(Ionic.Zip.ZipEntry e, byte[] b, Dictionary<string, string> rels)
+	private bool ReadEntry(string fileName, byte[] b, Dictionary<string, string> rels)
 	{
-		if (e.FileName.Equals("[content_types].xml", StringComparison.OrdinalIgnoreCase))
+		if (fileName.Equals("[content_types].xml", StringComparison.OrdinalIgnoreCase))
 		{
 			AddContentTypes(Encoding.UTF8.GetString(b));
 			return true;
 		}
 
-		if (e.FileName.Equals($"_rels{_dirSeparator}.rels", StringComparison.OrdinalIgnoreCase))
+		if (fileName.Equals($"_rels{_dirSeparator}.rels", StringComparison.OrdinalIgnoreCase))
 		{
 			ReadRelation(Encoding.UTF8.GetString(b), "");
 		}
-		else if (e.FileName.EndsWith(".rels", StringComparison.OrdinalIgnoreCase))
+		else if (fileName.EndsWith(".rels", StringComparison.OrdinalIgnoreCase))
 		{
-			rels.Add(GetUriKey(e.FileName), Encoding.UTF8.GetString(b));
+			rels.Add(GetUriKey(fileName), Encoding.UTF8.GetString(b));
 		}
 		else
 		{
-			var part = new ZipPackagePart(this, e)
+			var part = new ZipPackagePart(this, fileName)
 			{
 				Stream = new MemoryStream()
 			};
 			part.Stream.Write(b, 0, b.Length);
-			Parts.Add(GetUriKey(e.FileName), part);
+			Parts.Add(GetUriKey(fileName), part);
 		}
 
 		return false;
@@ -272,32 +286,17 @@ public class ZipPackage : ZipPackageRelationshipBase
 	}
 	internal void Save(Stream stream)
 	{
-		var enc = Encoding.UTF8;
-		ZipOutputStream os = new(stream, true)
-		{
-			CompressionLevel = (DotNetZip.Zlib.CompressionLevel)_compression,
-
-			// Without this, EnableZip64 keeps its constructor default of Zip64Option.Never, which
-			// caps every workbook at the classic ZIP limits: 4 GB of size or offset, and 65,534
-			// entries. A large workbook then throws while saving, after all its content has been
-			// built, so the work is lost at the final step.
-			//
-			// AsNecessary rather than Always: a workbook that fits the classic format is still
-			// written in it, so existing files and older readers are unaffected.
-			EnableZip64 = Ionic.Zip.Zip64Option.AsNecessary
-		};
-		/**** ContentType****/
-		os.PutNextEntry("[Content_Types].xml");
-		var b = enc.GetBytes(GetContentTypeXml());
-		os.Write(b, 0, b.Length);
-		/**** Top Rels ****/
-		_rels.WriteZip(os, $"_rels/.rels");
+		// ZipArchive switches to Zip64 only when an archive exceeds the classic limits.
+		using var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true);
+		var contentTypes = Encoding.UTF8.GetBytes(GetContentTypeXml());
+		WriteEntry(archive, "[Content_Types].xml", _compression, entryStream => entryStream.Write(contentTypes, 0, contentTypes.Length));
+		_rels.WriteZip(archive, "_rels/.rels", _compression);
 		ZipPackagePart ssPart = null;
 		foreach (var part in Parts.Values)
 		{
 			if (part.ContentType != ExcelPackage.contentTypeSharedString)
 			{
-				part.WriteZip(os);
+				part.WriteZip(archive);
 			}
 			else
 			{
@@ -305,13 +304,25 @@ public class ZipPackage : ZipPackageRelationshipBase
 			}
 		}
 		//Shared strings must be saved after all worksheets. The ss dictionary is populated when that workheets are saved (to get the best performance).
-		ssPart?.WriteZip(os);
-
-		os.Flush();
-
-		os.Close();
-		os.Dispose();
+		ssPart?.WriteZip(archive);
 	}
+
+	internal static void WriteEntry(ZipArchive archive, string name, CompressionLevel compressionLevel, Action<Stream> write)
+	{
+		var entry = archive.CreateEntry(GetZipEntryName(name), ToZipCompressionLevel(compressionLevel));
+		using var entryStream = entry.Open();
+		write(entryStream);
+	}
+
+	internal static string GetZipEntryName(string uri) => uri.Replace('\\', '/').TrimStart('/');
+
+	// Level0 (None) deflates at the default level, as the DotNetZip writer did.
+	internal static ZipCompressionLevel ToZipCompressionLevel(CompressionLevel compressionLevel) => compressionLevel switch
+	{
+		CompressionLevel.Level1 or CompressionLevel.Level2 or CompressionLevel.Level3 => ZipCompressionLevel.Fastest,
+		CompressionLevel.Level9 => ZipCompressionLevel.SmallestSize,
+		_ => ZipCompressionLevel.Optimal,
+	};
 
 	private string GetContentTypeXml()
 	{
