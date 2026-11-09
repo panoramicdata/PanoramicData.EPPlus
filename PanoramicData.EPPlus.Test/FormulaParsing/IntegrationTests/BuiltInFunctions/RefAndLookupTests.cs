@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing;
 using FakeItEasy;
+using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 using PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.BuiltInFunctions;
@@ -30,35 +31,26 @@ public class RefAndLookupTests : FormulaParserTestBase
 	[TestCleanup]
 	public void Cleanup() => _package.Dispose();
 
+	private static readonly (string Address, object Value)[] OnesInColumnB = [("B1", 1d), ("B2", 1d), ("B3", 1d)];
+
+	private static object CalculateOnNewSheet(string sheetName, string formulaCell, string formula, params (string Address, object Value)[] cells)
+		=> SheetFormulaHelper.CalculateOnNewSheet(sheetName, formulaCell, formula, cells);
+
 	[TestMethod]
 	public void VLookupShouldReturnCorrespondingValue()
 	{
-		using var pck = new ExcelPackage();
-		var ws = pck.Workbook.Worksheets.Add("test");
 		var lookupAddress = "A1:B2";
-		ws.Cells["A1"].Value = 1;
-		ws.Cells["B1"].Value = 1;
-		ws.Cells["A2"].Value = 2;
-		ws.Cells["B2"].Value = 5;
-		ws.Cells["A3"].Formula = "VLOOKUP(2, " + lookupAddress + ", 2)";
-		ws.Calculate();
-		var result = ws.Cells["A3"].Value;
+		var result = CalculateOnNewSheet("test", "A3", "VLOOKUP(2, " + lookupAddress + ", 2)",
+			("A1", 1), ("B1", 1), ("A2", 2), ("B2", 5));
 		Assert.AreEqual(5, result);
 	}
 
 	[TestMethod]
 	public void VLookupShouldReturnClosestValueBelowIfLastArgIsTrue()
 	{
-		using var pck = new ExcelPackage();
-		var ws = pck.Workbook.Worksheets.Add("test");
 		var lookupAddress = "A1:B2";
-		ws.Cells["A1"].Value = 3;
-		ws.Cells["B1"].Value = 1;
-		ws.Cells["A2"].Value = 5;
-		ws.Cells["B2"].Value = 5;
-		ws.Cells["A3"].Formula = "VLOOKUP(4, " + lookupAddress + ", 2, true)";
-		ws.Calculate();
-		var result = ws.Cells["A3"].Value;
+		var result = CalculateOnNewSheet("test", "A3", "VLOOKUP(4, " + lookupAddress + ", 2, true)",
+			("A1", 3), ("B1", 1), ("A2", 5), ("B2", 5));
 		Assert.AreEqual(1, result);
 	}
 
@@ -80,36 +72,18 @@ public class RefAndLookupTests : FormulaParserTestBase
 	public void HLookupShouldReturnClosestValueBelowIfLastArgIsTrue()
 	{
 		var lookupAddress = "A1:B2";
-		using var package = new ExcelPackage();
-		var s = package.Workbook.Worksheets.Add("test");
-		s.Cells[1, 1].Value = 3;
-		s.Cells[1, 2].Value = 5;
-		s.Cells[2, 1].Value = 1;
-		s.Cells[2, 2].Value = 2;
-		s.Cells[5, 5].Formula = "HLOOKUP(4, " + lookupAddress + ", 2, true)";
-		s.Calculate();
-		Assert.AreEqual(1, s.Cells[5, 5].Value);
+		var result = CalculateOnNewSheet("test", "E5", "HLOOKUP(4, " + lookupAddress + ", 2, true)",
+			("A1", 3), ("B1", 5), ("A2", 1), ("B2", 2));
+		Assert.AreEqual(1, result);
 	}
 
 	[TestMethod]
 	public void LookupShouldReturnMatchingValue()
 	{
 		var lookupAddress = "A1:B2";
-		using var package = new ExcelPackage();
-		var s = package.Workbook.Worksheets.Add("test");
-		s.Cells[1, 1].Value = 3;
-		s.Cells[1, 2].Value = 5;
-		s.Cells[2, 1].Value = 4;
-		s.Cells[2, 2].Value = 1;
-		s.Cells[5, 5].Formula = "LOOKUP(4, " + lookupAddress + ")";
-		s.Calculate();
-		Assert.AreEqual(1, s.Cells[5, 5].Value);
-		//    A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,1, 1)).Returns(3);
-		//A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,1, 2)).Returns(5);
-		//A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,2, 1)).Returns(4);
-		//A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,2, 2)).Returns(1);
-		//var result = _parser.Parse("LOOKUP(4, " + lookupAddress + ")");
-		//Assert.AreEqual(1, result);
+		var result = CalculateOnNewSheet("test", "E5", "LOOKUP(4, " + lookupAddress + ")",
+			("A1", 3), ("B1", 5), ("A2", 4), ("B2", 1));
+		Assert.AreEqual(1, result);
 	}
 
 	[TestMethod]
@@ -131,14 +105,7 @@ public class RefAndLookupTests : FormulaParserTestBase
 	}
 
 	[TestMethod]
-	public void RowSholdHandleReference()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("test");
-		s1.Cells["A1"].Formula = "ROW(A4)";
-		s1.Calculate();
-		Assert.AreEqual(4, s1.Cells["A1"].Value);
-	}
+	public void RowSholdHandleReference() => Assert.AreEqual(4, CalculateOnNewSheet("test", "A1", "ROW(A4)"));
 
 	[TestMethod]
 	public void ColumnShouldReturnRowNumber()
@@ -149,14 +116,7 @@ public class RefAndLookupTests : FormulaParserTestBase
 	}
 
 	[TestMethod]
-	public void ColumnSholdHandleReference()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("test");
-		s1.Cells["A1"].Formula = "COLUMN(B4)";
-		s1.Calculate();
-		Assert.AreEqual(2, s1.Cells["A1"].Value);
-	}
+	public void ColumnSholdHandleReference() => Assert.AreEqual(2, CalculateOnNewSheet("test", "A1", "COLUMN(B4)"));
 
 	[TestMethod]
 	public void RowsShouldReturnNbrOfRows()
@@ -206,108 +166,44 @@ public class RefAndLookupTests : FormulaParserTestBase
 
 	[TestMethod]
 	public void OffsetShouldReturnASingleValue()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("Test");
-		s1.Cells["B3"].Value = 1d;
-		s1.Cells["A5"].Formula = "OFFSET(A1, 2, 1)";
-		s1.Calculate();
-		Assert.AreEqual(1d, s1.Cells["A5"].Value);
-	}
+		=> Assert.AreEqual(1d, CalculateOnNewSheet("Test", "A5", "OFFSET(A1, 2, 1)", ("B3", 1d)));
 
 	[TestMethod]
 	public void OffsetShouldReturnARange()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("Test");
-		s1.Cells["B1"].Value = 1d;
-		s1.Cells["B2"].Value = 1d;
-		s1.Cells["B3"].Value = 1d;
-		s1.Cells["A5"].Formula = "SUM(OFFSET(A1:A3, 0, 1))";
-		s1.Calculate();
-		Assert.AreEqual(3d, s1.Cells["A5"].Value);
-	}
+		=> Assert.AreEqual(3d, CalculateOnNewSheet("Test", "A5", "SUM(OFFSET(A1:A3, 0, 1))", OnesInColumnB));
 
 	[TestMethod]
 	public void OffsetShouldReturnARange2()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("Test");
-		s1.Cells["B1"].Value = 10d;
-		s1.Cells["B2"].Value = 10d;
-		s1.Cells["B3"].Value = 10d;
-		s1.Cells["A5"].Formula = "COUNTA(OFFSET(Test!B1, 0, 0, Test!B2, Test!B3))";
-		s1.Calculate();
-		Assert.AreEqual(3d, s1.Cells["A5"].Value);
-	}
+		=> Assert.AreEqual(3d, CalculateOnNewSheet("Test", "A5", "COUNTA(OFFSET(Test!B1, 0, 0, Test!B2, Test!B3))",
+			("B1", 10d), ("B2", 10d), ("B3", 10d)));
 
 	[TestMethod]
 	public void OffsetDirectReferenceToMultiRangeShouldSetValueError()
 	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("Test");
-		s1.Cells["B1"].Value = 1d;
-		s1.Cells["B2"].Value = 1d;
-		s1.Cells["B3"].Value = 1d;
-		s1.Cells["A5"].Formula = "OFFSET(A1:A3, 0, 1)";
-		s1.Calculate();
-		var result = s1.Cells["A5"].Value;
+		var result = CalculateOnNewSheet("Test", "A5", "OFFSET(A1:A3, 0, 1)", OnesInColumnB);
 		Assert.AreEqual(ExcelErrorValue.Create(eErrorType.Value), result);
 	}
 
 	[TestMethod]
 	public void OffsetShouldReturnARangeAccordingToWidth()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("Test");
-		s1.Cells["B1"].Value = 1d;
-		s1.Cells["B2"].Value = 1d;
-		s1.Cells["B3"].Value = 1d;
-		s1.Cells["A5"].Formula = "SUM(OFFSET(A1:A3, 0, 1, 2))";
-		s1.Calculate();
-		Assert.AreEqual(2d, s1.Cells["A5"].Value);
-	}
+		=> Assert.AreEqual(2d, CalculateOnNewSheet("Test", "A5", "SUM(OFFSET(A1:A3, 0, 1, 2))", OnesInColumnB));
 
 	[TestMethod]
 	public void OffsetShouldReturnARangeAccordingToHeight()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("Test");
-		s1.Cells["B1"].Value = 1d;
-		s1.Cells["B2"].Value = 1d;
-		s1.Cells["B3"].Value = 1d;
-		s1.Cells["C1"].Value = 2d;
-		s1.Cells["C2"].Value = 2d;
-		s1.Cells["C3"].Value = 2d;
-		s1.Cells["A5"].Formula = "SUM(OFFSET(A1:A3, 0, 1, 2, 2))";
-		s1.Calculate();
-		Assert.AreEqual(6d, s1.Cells["A5"].Value);
-	}
+		=> Assert.AreEqual(6d, CalculateOnNewSheet("Test", "A5", "SUM(OFFSET(A1:A3, 0, 1, 2, 2))",
+			[.. OnesInColumnB, ("C1", 2d), ("C2", 2d), ("C3", 2d)]));
 
 	[TestMethod]
 	public void OffsetShouldCoverMultipleColumns()
-	{
-		using var package = new ExcelPackage();
-		var s1 = package.Workbook.Worksheets.Add("Test");
-		s1.Cells["C1"].Value = 1d;
-		s1.Cells["C2"].Value = 1d;
-		s1.Cells["C3"].Value = 1d;
-		s1.Cells["D1"].Value = 2d;
-		s1.Cells["D2"].Value = 2d;
-		s1.Cells["D3"].Value = 2d;
-		s1.Cells["A5"].Formula = "SUM(OFFSET(A1:B3, 0, 2))";
-		s1.Calculate();
-		Assert.AreEqual(9d, s1.Cells["A5"].Value);
-	}
+		=> Assert.AreEqual(9d, CalculateOnNewSheet("Test", "A5", "SUM(OFFSET(A1:B3, 0, 2))",
+			("C1", 1d), ("C2", 1d), ("C3", 1d), ("D1", 2d), ("D2", 2d), ("D3", 2d)));
 
 	[TestMethod, Ignore]
 	public void VLookupShouldHandleNames()
 	{
 		using var package = new ExcelPackage(new FileInfo(@"c:\temp\Book3.xlsx"));
 		var s1 = package.Workbook.Worksheets.First();
-		var v = s1.Cells["X10"].Formula;
-		//s1.Calculate();
-		v = s1.Cells["X10"].Formula;
+		_ = s1.Cells["X10"].Formula;
 	}
 
 	[TestMethod]
@@ -315,24 +211,10 @@ public class RefAndLookupTests : FormulaParserTestBase
 	{
 		var lookupAddress = "A1:A5";
 		var resultAddress = "B1:B5";
-		using var package = new ExcelPackage();
-		var s = package.Workbook.Worksheets.Add("test");
-		//lookup_vector
-		s.Cells[1, 1].Value = 4.14;
-		s.Cells[2, 1].Value = 4.19;
-		s.Cells[3, 1].Value = 5.17;
-		s.Cells[4, 1].Value = 5.77;
-		s.Cells[5, 1].Value = 6.39;
-		//result_vector
-		s.Cells[1, 2].Value = "red";
-		s.Cells[2, 2].Value = "orange";
-		s.Cells[3, 2].Value = "yellow";
-		s.Cells[4, 2].Value = "green";
-		s.Cells[5, 2].Value = "blue";
-		//lookup_value
-		s.Cells[1, 3].Value = 4.14;
-		s.Cells[5, 5].Formula = "LOOKUP(C1, " + lookupAddress + ", " + resultAddress + ")";
-		s.Calculate();
-		Assert.AreEqual("red", s.Cells[5, 5].Value);
+		var result = CalculateOnNewSheet("test", "E5", "LOOKUP(C1, " + lookupAddress + ", " + resultAddress + ")",
+			("A1", 4.14), ("A2", 4.19), ("A3", 5.17), ("A4", 5.77), ("A5", 6.39),
+			("B1", "red"), ("B2", "orange"), ("B3", "yellow"), ("B4", "green"), ("B5", "blue"),
+			("C1", 4.14));
+		Assert.AreEqual("red", result);
 	}
 }

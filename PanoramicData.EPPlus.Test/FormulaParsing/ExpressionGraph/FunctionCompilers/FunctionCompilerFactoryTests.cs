@@ -106,7 +106,7 @@ public class FunctionCompilerFactoryTests
 
 	public class MyFunction : ExcelFunction
 	{
-		public const string Name = "MyFunction";
+		public static string Name => "MyFunction";
 		public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context) => throw new NotImplementedException();
 	}
 

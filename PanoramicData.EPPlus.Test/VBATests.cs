@@ -48,7 +48,6 @@ public class VBATests
 		X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
 		store.Open(OpenFlags.ReadOnly);
 		package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
-		//package.Workbook.VbaProject.Protection.SetPassword("");
 		package.SaveAs(new FileInfo(@"c:\temp\vbaSaved.xlsm"));
 	}
 	[Ignore]
@@ -63,9 +62,6 @@ public class VBATests
 		package.Workbook.CodeModule.Name = "DenHärArbetsboken";
 		package.Workbook.Worksheets[1].Name = "FirstSheet";
 		package.Workbook.CodeModule.Code += "\r\nPrivate Sub Workbook_Open()\r\nBlad1.Cells(1,1).Value = \"VBA test\"\r\nMsgBox \"VBA is running!\"\r\nEnd Sub";
-		//X509Store store = new X509Store(StoreLocation.CurrentUser);
-		//store.Open(OpenFlags.ReadOnly);
-		//package.Workbook.VbaProject.Signature.Certificate = store.Certificates[11];
 
 		var m = package.Workbook.VbaProject.Modules.AddModule("Module1");
 		m.Code += "Public Sub Test(param1 as string)\r\n\r\nEnd sub\r\nPublic Function functest() As String\r\n\r\nEnd Function\r\n";
@@ -83,7 +79,6 @@ public class VBATests
 	public void Resign()
 	{
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\vbaWrite.xlsm"));
-		//package.Workbook.VbaProject.Signature.Certificate = store.Certificates[11];
 		package.SaveAs(new FileInfo(@"c:\temp\vbaWrite2.xlsm"));
 	}
 	[Ignore]
@@ -119,14 +114,20 @@ public class VBATests
 	public void VbaError()
 	{
 		DirectoryInfo workingDir = new(@"C:\epplusExample\folder");
-		if (!workingDir.Exists) workingDir.Create();
+		if (!workingDir.Exists)
+		{
+			workingDir.Create();
+		}
 		FileInfo f = new(workingDir.FullName + "//" + "temp.xlsx");
-		if (f.Exists) f.Delete();
+		if (f.Exists)
+		{
+			f.Delete();
+		}
 		ExcelPackage myPackage = new(f);
 		myPackage.Workbook.CreateVBAProject();
-		var excelWorksheet = myPackage.Workbook.Worksheets.Add("Sheet1");
-		var excelWorksheet2 = myPackage.Workbook.Worksheets.Add("Sheet2");
-		var excelWorksheet3 = myPackage.Workbook.Worksheets.Add("Sheet3");
+		myPackage.Workbook.Worksheets.Add("Sheet1");
+		myPackage.Workbook.Worksheets.Add("Sheet2");
+		myPackage.Workbook.Worksheets.Add("Sheet3");
 		FileInfo f2 = new(workingDir.FullName + "//" + "newfile.xlsm");
 		var excelVbaModule = myPackage.Workbook.VbaProject.Modules.AddModule("Module1");
 		StringBuilder mybuilder = new(); mybuilder.AppendLine("Sub Jiminy()");
@@ -153,7 +154,6 @@ public class VBATests
 			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", r.Name), r.Libid + " " + r.ReferenceRecordID.ToString());
 		}
 
-		List<X509Certificate2> ret = [];
 		X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
 		store.Open(OpenFlags.ReadOnly);
 		package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
@@ -164,7 +164,6 @@ public class VBATests
 	public void CreateUnicodeWsName()
 	{
 		using var package = new ExcelPackage();
-		//ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("Test");
 		var worksheet = package.Workbook.Worksheets.Add("测试");
 
 		package.Workbook.CreateVBAProject();
@@ -173,7 +172,7 @@ public class VBATests
 		sb.AppendLine("MsgBox (\"Hello,World\")");
 		sb.AppendLine("End Sub");
 
-		var worksheet2 = package.Workbook.Worksheets.Add("Sheet1");
+		package.Workbook.Worksheets.Add("Sheet1");
 		var stringBuilder = new StringBuilder();
 		stringBuilder.AppendLine("Private Sub Worksheet_Change(ByVal Target As Range)");
 		stringBuilder.AppendLine("GetData");

@@ -62,7 +62,6 @@ public class CommentsTest
 			}
 
 			Assert.IsTrue(stylesDict.ContainsKey("visibility"));
-			//Assert.AreEqual("visible", stylesDict["visibility"]);
 			Assert.AreEqual("hidden", stylesDict["visibility"]);
 			Assert.IsFalse(a1.Comment.Visible);
 			pkg.Save();
@@ -70,9 +69,6 @@ public class CommentsTest
 		}
 		finally
 		{
-			//open results file in program for view xlsx.
-			//comments of cell A1 must be hidden.
-			//System.Diagnostics.Process.Start(Path.GetDirectoryName(xlsxName));
 			File.Delete(xlsxName);
 		}
 	}

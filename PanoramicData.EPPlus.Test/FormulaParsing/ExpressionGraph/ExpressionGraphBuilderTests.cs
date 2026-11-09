@@ -15,20 +15,13 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 public class ExpressionGraphBuilderTests
 {
 	private ExpressionGraphBuilder _graphBuilder;
-	private ExcelDataProvider _excelDataProvider;
 
 	[TestInitialize]
 	public void Setup()
 	{
-		_excelDataProvider = A.Fake<ExcelDataProvider>();
+		var excelDataProvider = A.Fake<ExcelDataProvider>();
 		var parsingContext = ParsingContext.Create();
-		_graphBuilder = new ExpressionGraphBuilder(_excelDataProvider, parsingContext);
-	}
-
-	[TestCleanup]
-	public void Cleanup()
-	{
-
+		_graphBuilder = new ExpressionGraphBuilder(excelDataProvider, parsingContext);
 	}
 
 	[TestMethod]
@@ -265,7 +258,7 @@ public class ExpressionGraphBuilderTests
 		const string formula = "++1--2++-3+-1----3-+2";
 		var tokenizer = new SourceCodeTokenizer(ctx.Configuration.FunctionRepository, ctx.NameValueProvider);
 		var tokens = tokenizer.Tokenize(formula).ToList();
-		var expression = _graphBuilder.Build(tokens);
+		_graphBuilder.Build(tokens);
 		Assert.AreEqual(11, tokens.Count);
 		Assert.AreEqual("+", tokens[1].Value);
 		Assert.AreEqual("-", tokens[3].Value);
@@ -279,7 +272,7 @@ public class ExpressionGraphBuilderTests
 		var ctx = ParsingContext.Create();
 		const string formula = "++-1--(---2)++-3+-1----3-+2";
 		var tokenizer = new SourceCodeTokenizer(ctx.Configuration.FunctionRepository, ctx.NameValueProvider);
-		var tokens = tokenizer.Tokenize(formula).ToList();
+		_ = tokenizer.Tokenize(formula).ToList();
 	}
 
 	[TestMethod]

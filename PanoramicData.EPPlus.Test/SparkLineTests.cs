@@ -48,7 +48,7 @@ public class SparkLineTests : TestBase
 		Assert.AreEqual("FFD00000", c1.Rgb);
 		var ec = sg1.DisplayEmptyCellsAs;
 		Assert.AreEqual(eDispBlanksAs.Gap, ec);
-		var t = sg1.Type;
+		_ = sg1.Type;
 	}
 	public void WriteSparklines()
 	{
@@ -68,7 +68,7 @@ public class SparkLineTests : TestBase
 		sg1.Type = eSparklineType.Line;
 
 		//Column<->Column
-		var sg2 = ws.SparklineGroups.Add(eSparklineType.Column, ws.Cells["D1:D2"], ws.Cells["B1:C4"]);
+		ws.SparklineGroups.Add(eSparklineType.Column, ws.Cells["D1:D2"], ws.Cells["B1:C4"]);
 
 		//Row<->Column
 		var sg3 = ws.SparklineGroups.Add(eSparklineType.Stacked, ws.Cells["A10:B10"], ws.Cells["B1:C4"]);

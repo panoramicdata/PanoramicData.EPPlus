@@ -16,5 +16,5 @@ public static class FunctionsHelper
 		return list;
 	}
 
-	public static IEnumerable<FunctionArgument> Empty() => new List<FunctionArgument>() { new(null) };
+	public static IEnumerable<FunctionArgument> Empty() => new List<FunctionArgument> { new(null) };
 }

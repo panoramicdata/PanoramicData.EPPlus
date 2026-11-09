@@ -124,7 +124,6 @@ public class DateTimeFunctionsTests
 	[TestMethod]
 	public void YearShouldReturnCorrectYearWithStringParam()
 	{
-		var date = new DateTime(2012, 3, 12);
 		var func = new Year();
 		var result = func.Execute(FunctionsHelper.CreateArgs("2012-03-12"), _parsingContext);
 		Assert.AreEqual(2012, result.Result);
@@ -433,13 +432,8 @@ public class DateTimeFunctionsTests
 	[TestMethod]
 	public void WorkdayShouldReturnCorrectResultIfNoHolidayIsSupplied()
 	{
-		var inputDate = new DateTime(2014, 1, 1).ToOADate();
 		var expectedDate = new DateTime(2014, 1, 29).ToOADate();
-
-		var func = new Workday();
-		var args = FunctionsHelper.CreateArgs(inputDate, 20);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedDate, result.Result);
+		Assert.AreEqual(expectedDate, ExecuteWorkday(new DateTime(2014, 1, 1), 20));
 	}
 
 	[TestMethod]
@@ -457,13 +451,8 @@ public class DateTimeFunctionsTests
 	[TestMethod]
 	public void WorkdayShouldReturnCorrectResultWithFourDaysSupplied()
 	{
-		var inputDate = new DateTime(2014, 1, 1).ToOADate();
 		var expectedDate = new DateTime(2014, 1, 7).ToOADate();
-
-		var func = new Workday();
-		var args = FunctionsHelper.CreateArgs(inputDate, 4);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedDate, result.Result);
+		Assert.AreEqual(expectedDate, ExecuteWorkday(new DateTime(2014, 1, 1), 4));
 	}
 
 	[TestMethod]
@@ -496,15 +485,19 @@ public class DateTimeFunctionsTests
 		Assert.AreEqual(expectedDate, actualDate);
 	}
 
-	[TestMethod]
-	public void NetworkdaysShouldReturnNumberOfDays()
+	private static object CalculateA1(string formula)
 	{
 		using var package = new ExcelPackage();
 		var ws = package.Workbook.Worksheets.Add("test");
-		ws.Cells["A1"].Formula = "NETWORKDAYS(DATE(2016,1,1), DATE(2016,1,20))";
+		ws.Cells["A1"].Formula = formula;
 		ws.Calculate();
-		Assert.AreEqual(14, ws.Cells["A1"].Value);
+		return ws.Cells["A1"].Value;
 	}
+
+	private object ExecuteWorkday(DateTime inputDate, int days)
+		=> new Workday().Execute(FunctionsHelper.CreateArgs(inputDate.ToOADate(), days), _parsingContext).Result;
+	[TestMethod]
+	public void NetworkdaysShouldReturnNumberOfDays() => Assert.AreEqual(14, CalculateA1("NETWORKDAYS(DATE(2016,1,1), DATE(2016,1,20))"));
 
 	[TestMethod]
 	public void NetworkdaysShouldReturnNumberOfDaysWithHolidayRange()
@@ -527,53 +520,22 @@ public class DateTimeFunctionsTests
 	}
 
 	[TestMethod]
-	public void NetworkdaysNegativeShouldReturnNumberOfDays()
-	{
-		using var package = new ExcelPackage();
-		var ws = package.Workbook.Worksheets.Add("test");
-		ws.Cells["A1"].Formula = "NETWORKDAYS(DATE(2016,1,1), DATE(2015,12,20))";
-		ws.Calculate();
-		Assert.AreEqual(10, ws.Cells["A1"].Value);
-	}
+	public void NetworkdaysNegativeShouldReturnNumberOfDays() => Assert.AreEqual(10, CalculateA1("NETWORKDAYS(DATE(2016,1,1), DATE(2015,12,20))"));
 
 	[TestMethod]
-	public void NetworkdayIntlShouldUseWeekendArg()
-	{
-		using var package = new ExcelPackage();
-		var ws = package.Workbook.Worksheets.Add("test");
-		ws.Cells["A1"].Formula = "NETWORKDAYS.INTL(DATE(2016,1,1), DATE(2016,1,20), 11)";
-		ws.Calculate();
-		Assert.AreEqual(17, ws.Cells["A1"].Value);
-	}
+	public void NetworkdayIntlShouldUseWeekendArg() => Assert.AreEqual(17, CalculateA1("NETWORKDAYS.INTL(DATE(2016,1,1), DATE(2016,1,20), 11)"));
 
 	[TestMethod]
-	public void NetworkdayIntlShouldUseWeekendStringArg()
-	{
-		using var package = new ExcelPackage();
-		var ws = package.Workbook.Worksheets.Add("test");
-		ws.Cells["A1"].Formula = "NETWORKDAYS.INTL(DATE(2016,1,1), DATE(2016,1,20), \"0000011\")";
-		ws.Calculate();
-		Assert.AreEqual(14, ws.Cells["A1"].Value);
-	}
+	public void NetworkdayIntlShouldUseWeekendStringArg() => Assert.AreEqual(14, CalculateA1("NETWORKDAYS.INTL(DATE(2016,1,1), DATE(2016,1,20), \"0000011\")"));
 
 	[TestMethod]
-	public void NetworkdayIntlShouldReduceHoliday()
-	{
-		using var package = new ExcelPackage();
-		var ws = package.Workbook.Worksheets.Add("test");
-		ws.Cells["A1"].Formula = "NETWORKDAYS.INTL(DATE(2016,1,1), DATE(2016,1,20), \"0000011\", DATE(2016,1,4))";
-		ws.Calculate();
-		Assert.AreEqual(13, ws.Cells["A1"].Value);
-	}
+	public void NetworkdayIntlShouldReduceHoliday() => Assert.AreEqual(13, CalculateA1("NETWORKDAYS.INTL(DATE(2016,1,1), DATE(2016,1,20), \"0000011\", DATE(2016,1,4))"));
 
 	[TestMethod]
 	public void TimeAddition()
 	{
-		using var package = new ExcelPackage();
-		var ws = package.Workbook.Worksheets.Add("test");
-		ws.Cells["A1"].Formula = "1 + (Time(10,0,0))";
-		ws.Calculate();
-		var result = Convert.ToDouble(ws.Cells["A1"].Value);
+		var a1 = CalculateA1("1 + (Time(10,0,0))");
+		var result = Convert.ToDouble(a1);
 		result = System.Math.Round(result, 2);
 		Assert.AreEqual(1.42d, result);
 	}

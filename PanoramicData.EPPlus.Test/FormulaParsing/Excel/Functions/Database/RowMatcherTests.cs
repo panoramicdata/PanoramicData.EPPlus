@@ -11,8 +11,7 @@ public class RowMatcherTests
 {
 	private static ExcelDatabaseCriteria GetCriteria(Dictionary<ExcelDatabaseCriteriaField, object> items)
 	{
-		var provider = A.Fake<ExcelDataProvider>();
-		var criteria = A.Fake<ExcelDatabaseCriteria>();// (provider, string.Empty);
+		var criteria = A.Fake<ExcelDatabaseCriteria>();
 
 		A.CallTo(() => criteria.Items).Returns(items);
 		return criteria;

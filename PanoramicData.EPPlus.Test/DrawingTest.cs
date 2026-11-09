@@ -62,9 +62,9 @@ public class DrawingTest : TestBase
 	public void Picture()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("Picture");
-		var pic = ws.Drawings.AddPicture("Pic1", Resources.Test1);
+		ws.Drawings.AddPicture("Pic1", Resources.Test1);
 
-		pic = ws.Drawings.AddPicture("Pic2", Resources.Test1);
+		var pic = ws.Drawings.AddPicture("Pic2", Resources.Test1);
 		pic.SetPosition(150, 200);
 		pic.Border.LineStyle = eLineStyle.Solid;
 		pic.Border.Fill.Color = Color.DarkCyan;
@@ -76,7 +76,6 @@ public class DrawingTest : TestBase
 		pic.SetPosition(400, 200);
 		pic.SetSize(150);
 
-		//pic = ws.Drawings.AddPicture("Pic4", new FileInfo(Path.Combine(_clipartPath, "Vector Drawing.wmf")));
 		pic = ws.Drawings.AddPicture("Pic5", new FileInfo(Path.Combine(_clipartPath, "BitmapImage.gif")));
 		pic.SetPosition(400, 200);
 		pic.SetSize(150);
@@ -95,7 +94,7 @@ public class DrawingTest : TestBase
 		var fi = new FileInfo(Path.Combine(_clipartPath, "BitmapImage.gif"));
 		if (fi.Exists)
 		{
-			pic = ws2.Drawings.AddPicture("Pic7", fi);
+			ws2.Drawings.AddPicture("Pic7", fi);
 		}
 		else
 		{
@@ -104,8 +103,7 @@ public class DrawingTest : TestBase
 #endif
 		}
 
-		var wsCopy = _pck.Workbook.Worksheets.Add("Picture3", ws2);
-		//_pck.Workbook.Worksheets.Delete(ws2);
+		_pck.Workbook.Worksheets.Add("Picture3", ws2);
 	}
 	//[TestMethod]
 	//[Ignore]
@@ -259,7 +257,6 @@ public class DrawingTest : TestBase
 		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.To.Row = 23;
 		chrt.To.Column = 12;
-		//chrt.Title.Text = "Header Text";
 		var r1 = chrt.Title.RichText.Add("Header");
 		r1.Bold = true;
 		var r2 = chrt.Title.RichText.Add("  Text");
@@ -289,10 +286,6 @@ public class DrawingTest : TestBase
 		chrt.To.Row = 53;
 		chrt.To.Column = 12;
 		chrt.Legend.Position = eLegendPosition.Bottom;
-
-		////chrt.Series[0].DataLabel.Position = eLabelPosition.Center;
-		//Assert.IsTrue(chrt.ChartType == eChartType.XYScatter, "Invalid Charttype");
-
 	}
 	//[TestMethod]
 	//[Ignore]
@@ -344,7 +337,6 @@ public class DrawingTest : TestBase
 		chrt = ws.Drawings.AddChart("Radar2", eChartType.RadarFilled) as ExcelRadarChart;
 		s = chrt.Series.Add("V19:V24", "U19:U24");
 		s.Header = "serie1";
-		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.From.Row = 43;
 		chrt.From.Column = 12;
 		chrt.To.Row = 58;
@@ -373,7 +365,7 @@ public class DrawingTest : TestBase
 
 		var chrt = ws.Drawings.AddChart("Surface1", eChartType.Surface) as ExcelSurfaceChart;
 		var s = chrt.Series.Add("V19:V24", "U19:U24");
-		var s2 = chrt.Series.Add("W19:W24", "U19:U24");
+		chrt.Series.Add("W19:W24", "U19:U24");
 		s.Header = "serie1";
 		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.From.Row = 23;
@@ -381,29 +373,6 @@ public class DrawingTest : TestBase
 		chrt.To.Row = 38;
 		chrt.To.Column = 22;
 		chrt.Title.Text = "Surface Chart 1";
-
-		//chrt = ws.Drawings.AddChart("Surface", eChartType.RadarFilled) as ExcelRadarChart;
-		//s = chrt.Series.Add("V19:V24", "U19:U24");
-		//s.Header = "serie1";
-		//// chrt.Series[0].Marker = eMarkerStyle.Diamond;
-		//chrt.From.Row = 43;
-		//chrt.From.Column = 12;
-		//chrt.To.Row = 58;
-		//chrt.To.Column = 22;
-		//chrt.Title.Text = "Radar Chart 2";
-
-		//chrt = ws.Drawings.AddChart("Radar3", eChartType.RadarMarkers) as ExcelRadarChart;
-		//var rs = (ExcelRadarChartSerie)chrt.Series.Add("V19:V24", "U19:U24");
-		//rs.Header = "serie1";
-		//rs.Marker = eMarkerStyle.Star;
-		//rs.MarkerSize = 14;
-
-		//// chrt.Series[0].Marker = eMarkerStyle.Diamond;
-		//chrt.From.Row = 63;
-		//chrt.From.Column = 12;
-		//chrt.To.Row = 78;
-		//chrt.To.Column = 22;
-		//chrt.Title.Text = "Radar Chart 3";
 	}
 	//[TestMethod]
 	//[Ignore]
@@ -420,8 +389,6 @@ public class DrawingTest : TestBase
 		chrt.Title.Fill.Style = eFillStyle.SolidFill;
 		chrt.Title.Fill.Color = Color.DarkBlue;
 		chrt.DataLabel.ShowValue = true;
-		//chrt.DataLabel.ShowSeriesName = true;
-		//chrt.DataLabel.Separator = ",";
 		chrt.Border.LineCap = eLineCap.Round;
 		chrt.Border.LineStyle = eLineStyle.LongDashDotDot;
 		chrt.Border.Fill.Style = eFillStyle.SolidFill;
@@ -474,7 +441,6 @@ public class DrawingTest : TestBase
 		chrt.VaryColors = true;
 		chrt.View3D.RightAngleAxes = true;
 		chrt.View3D.DepthPercent = 99;
-		//chrt.View3D.HeightPercent = 99;
 		chrt.View3D.RightAngleAxes = true;
 		chrt.SetSize(200);
 		chrt.Title.Text = "Column";
@@ -519,10 +485,9 @@ public class DrawingTest : TestBase
 		tl.Forward = 15;
 		tl.Backward = 1;
 		tl.Intercept = 6;
-		//tl.Period = 12;
 		tl.Order = 5;
 
-		tl = chrt.Series[0].TrendLines.Add(eTrendLine.MovingAvgerage);
+		chrt.Series[0].TrendLines.Add(eTrendLine.MovingAvgerage);
 		chrt.Fill.Color = Color.LightSteelBlue;
 		chrt.Border.LineStyle = eLineStyle.Dot;
 		chrt.Border.Fill.Color = Color.Black;
@@ -651,9 +616,9 @@ public class DrawingTest : TestBase
 	[Ignore]
 	public void DrawingWorksheetCopy()
 	{
-		var wsShapes = _pck.Workbook.Worksheets.Add("Copy Shapes", _pck.Workbook.Worksheets["Shapes"]);
-		var wsScatterChart = _pck.Workbook.Worksheets.Add("Copy Scatter", _pck.Workbook.Worksheets["Scatter"]);
-		var wsPicture = _pck.Workbook.Worksheets.Add("Copy Picture", _pck.Workbook.Worksheets["Picture"]);
+		_pck.Workbook.Worksheets.Add("Copy Shapes", _pck.Workbook.Worksheets["Shapes"]);
+		_pck.Workbook.Worksheets.Add("Copy Scatter", _pck.Workbook.Worksheets["Scatter"]);
+		_pck.Workbook.Worksheets.Add("Copy Picture", _pck.Workbook.Worksheets["Picture"]);
 	}
 	//[TestMethod]
 	//[Ignore]
@@ -680,7 +645,7 @@ public class DrawingTest : TestBase
 		chart.Series.Add(ExcelCellBase.GetAddress(1, 2, worksheet.Dimension.End.Row, 2),
 						 ExcelCellBase.GetAddress(1, 1, worksheet.Dimension.End.Row, 1));
 
-		var Series = chart.Series[0];
+		_ = chart.Series[0];
 		chart.Axis[0].MinorGridlines.Fill.Color = Color.Red;
 		chart.Axis[0].MinorGridlines.LineStyle = eLineStyle.LongDashDot;
 
@@ -763,27 +728,27 @@ public class DrawingTest : TestBase
 	public void DeleteDrawing()
 	{
 		var ws = _pck.Workbook.Worksheets.Add("DeleteDrawing1");
-		var chart1 = ws.Drawings.AddChart("Chart1", eChartType.Line);
+		ws.Drawings.AddChart("Chart1", eChartType.Line);
 		var chart2 = ws.Drawings.AddChart("Chart2", eChartType.Line);
-		var shape1 = ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
-		var pic1 = ws.Drawings.AddPicture("Pic1", Resources.Test1);
+		ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
+		ws.Drawings.AddPicture("Pic1", Resources.Test1);
 		ws.Drawings.Remove(2);
 		ws.Drawings.Remove(chart2);
 		ws.Drawings.Remove("Pic1");
 
 		ws = _pck.Workbook.Worksheets.Add("DeleteDrawing2");
-		chart1 = ws.Drawings.AddChart("Chart1", eChartType.Line);
-		chart2 = ws.Drawings.AddChart("Chart2", eChartType.Line);
-		shape1 = ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
-		pic1 = ws.Drawings.AddPicture("Pic1", Resources.Test1);
+		ws.Drawings.AddChart("Chart1", eChartType.Line);
+		ws.Drawings.AddChart("Chart2", eChartType.Line);
+		ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
+		ws.Drawings.AddPicture("Pic1", Resources.Test1);
 
 		ws.Drawings.Remove("chart1");
 
 		ws = _pck.Workbook.Worksheets.Add("ClearDrawing2");
-		chart1 = ws.Drawings.AddChart("Chart1", eChartType.Line);
-		chart2 = ws.Drawings.AddChart("Chart2", eChartType.Line);
-		shape1 = ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
-		pic1 = ws.Drawings.AddPicture("Pic1", Resources.Test1);
+		ws.Drawings.AddChart("Chart1", eChartType.Line);
+		ws.Drawings.AddChart("Chart2", eChartType.Line);
+		ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
+		ws.Drawings.AddPicture("Pic1", Resources.Test1);
 		ws.Drawings.Clear();
 	}
 	//[TestMethod]
@@ -802,10 +767,10 @@ public class DrawingTest : TestBase
 		{
 			foreach (ExcelDrawing d in pck.Workbook.Worksheets[1].Drawings)
 			{
-				if (d is ExcelChart)
+				if (d is ExcelChart chart)
 				{
 #if (!Core)
-                        TestContext.WriteLine(((ExcelChart)d).ChartType.ToString());
+                        TestContext.WriteLine(chart.ChartType.ToString());
 #endif
 				}
 			}
@@ -835,10 +800,6 @@ public class DrawingTest : TestBase
 		var serie2 = subChart.Series.Add("S7:S15", "Q7:Q15");
 		serie2.Header = "Line";
 
-		//var subChart2 = c2.PlotArea.ChartTypes.Add(eChartType.DoughnutExploded);
-		//var serie3 = subChart2.Series.Add("S7:S15", "Q7:Q15");
-		//serie3.Header = "Doughnut";
-
 		var subChart3 = c2.PlotArea.ChartTypes.Add(eChartType.Area);
 		var serie4 = subChart3.Series.Add("R7:R15", "Q7:Q15");
 		serie4.Header = "Area";
@@ -867,7 +828,7 @@ public class DrawingTest : TestBase
 	public void ReadChartWorksheet()
 	{
 		_pck = new ExcelPackage(new FileInfo(@"c:\temp\chart.xlsx"));
-		var chart = ((ExcelChartsheet)_pck.Workbook.Worksheets[1]).Chart;
+		_ = ((ExcelChartsheet)_pck.Workbook.Worksheets[1]).Chart;
 
 		_pck.SaveAs(new FileInfo(@"c:\temp\chart.xlsx"));
 
@@ -877,7 +838,7 @@ public class DrawingTest : TestBase
 	public void ReadWriteSmoothChart()
 	{
 		_pck = new ExcelPackage(new FileInfo(@"c:\temp\bug\Xds_2014_TEST.xlsx"));
-		var chart = _pck.Workbook.Worksheets[1].Drawings[0] as ExcelChart;
+		_ = _pck.Workbook.Worksheets[1].Drawings[0] as ExcelChart;
 		_pck.Workbook.Worksheets[1].Cells["B2"].Value = 33;
 		_pck.SaveAs(new FileInfo(@"c:\temp\chart.xlsx"));
 
@@ -971,11 +932,6 @@ public class DrawingTest : TestBase
 	[TestMethod]
 	public void DrawingWidthAdjust()
 	{
-		//using (var p = new ExcelPackage(new FileInfo(@"C:\build\AIM\projects\aimweb\Web\ExcelTemplates\MainTemplate.xlsx")))
-		//{
-		//    var ws = p.Workbook.Worksheets[2];
-		//    ws.Column(4).Width = 40;
-		//    p.SaveAs(new FileInfo(@"c:\temp\colwidthAdjust.xlsx"));
-		//}
+		// Needs a local customer template that is not in the repository.
 	}
 }

@@ -149,9 +149,13 @@ public class CellStoreTest : TestBase
 			for (var c = 0; c < cols; c++)
 			{
 				if (isNumeric)
+				{
 					ws.SetValue(r + 1, c + 1, r + c);
+				}
 				else
+				{
 					ws.SetValue(r + 1, c + 1, r.ToString() + "," + c.ToString());
+				}
 			}
 		}
 	}

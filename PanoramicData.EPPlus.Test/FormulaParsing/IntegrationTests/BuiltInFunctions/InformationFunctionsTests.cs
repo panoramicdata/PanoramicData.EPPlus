@@ -9,13 +9,12 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.BuiltInFunct
 [TestClass]
 public class InformationFunctionsTests : FormulaParserTestBase
 {
-	private ExcelDataProvider _excelDataProvider;
 
 	[TestInitialize]
 	public void Setup()
 	{
-		_excelDataProvider = A.Fake<ExcelDataProvider>();
-		_parser = new FormulaParser(_excelDataProvider);
+		var excelDataProvider = A.Fake<ExcelDataProvider>();
+		_parser = new FormulaParser(excelDataProvider);
 	}
 
 	[TestMethod]
