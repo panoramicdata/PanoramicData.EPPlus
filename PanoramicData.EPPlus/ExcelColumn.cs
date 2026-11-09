@@ -69,6 +69,7 @@ public class ExcelColumn : IRangeID
 	/// <summary>
 	/// Sets the last column the definition refers to.
 	/// </summary>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public int ColumnMax
 	{
 		get { return _columnMax; }

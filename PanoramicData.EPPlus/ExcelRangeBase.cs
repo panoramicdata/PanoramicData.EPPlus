@@ -2051,6 +2051,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="Text">The Text</param>
 	/// <param name="Format">Information how to load the text</param>
 	/// <returns>The range containing the data</returns>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelRangeBase LoadFromText(string Text, ExcelTextFormat Format)
 	{
 		if (string.IsNullOrEmpty(Text))
@@ -2331,6 +2332,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// <param name="NumberOfRows">Number of rows. Minimum 1</param>
 	/// <param name="NumberOfColumns">Number of columns. Minimum 1</param>
 	/// <returns></returns>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelRangeBase Offset(int RowOffset, int ColumnOffset, int NumberOfRows, int NumberOfColumns)
 	{
 		if (NumberOfRows < 1 || NumberOfColumns < 1)
@@ -2613,6 +2615,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// Creates an array-formula.
 	/// </summary>
 	/// <param name="ArrayFormula">The formula</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public void CreateArrayFormula(string ArrayFormula)
 	{
 		if (Addresses != null)

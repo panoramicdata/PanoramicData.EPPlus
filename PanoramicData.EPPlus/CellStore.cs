@@ -526,6 +526,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		return col;
 	}
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void SetValue(int Row, int Column, T? Value)
 	{
 		lock (_columnIndex)
@@ -577,6 +578,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	/// <param name="toColumn"></param>
 	/// <param name="Updater"></param>
 	/// <param name="Value"></param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void SetRangeValueSpecial(int fromRow, int fromColumn, int toRow, int toColumn, SetRangeValueDelegate Updater, object Value)
 	{
 		lock (_columnIndex)
@@ -646,6 +648,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 	internal delegate void SetValueDelegate(List<T> list, int index, object value);
 	// Set object's property atomically
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void SetValueSpecial(int Row, int Column, SetValueDelegate Updater, object? Value)
 	{
 		lock (_columnIndex)

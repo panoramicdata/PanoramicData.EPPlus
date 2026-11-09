@@ -2995,6 +2995,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void SetTableTotalFunction(ExcelTable tbl, ExcelTableColumn col, int colNum = -1)
 	{
 		if (tbl.ShowTotal == false)

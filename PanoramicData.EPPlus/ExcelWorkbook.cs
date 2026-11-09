@@ -905,6 +905,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		sw.Write(cache.ToString());
 		sw.Flush();
 	}
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void UpdateDefinedNamesXml()
 	{
 		try

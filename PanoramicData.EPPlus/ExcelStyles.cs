@@ -200,6 +200,7 @@ public sealed class ExcelStyles : XmlHelper
 
 		return 0;
 	}
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void SetStyleAddress(StyleBase sender, Style.StyleChangeEventArgs e, ExcelAddressBase address, ExcelWorksheet ws, ref Dictionary<int, int> styleCashe)
 	{
 		if (address.Start.Column == 0 || address.Start.Row == 0)
@@ -612,6 +613,7 @@ public sealed class ExcelStyles : XmlHelper
 	internal static string Id => "";
 
 	public ExcelNamedStyleXml CreateNamedStyle(string name) => CreateNamedStyle(name, null);
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelNamedStyleXml CreateNamedStyle(string name, ExcelStyle Template)
 	{
 		if (_wb.Styles.NamedStyles.ExistsKey(name))

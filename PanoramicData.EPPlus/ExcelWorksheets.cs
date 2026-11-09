@@ -38,6 +38,7 @@ using OfficeOpenXml.VBA;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -1053,6 +1054,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// <param name="PositionID">The position of the worksheet. Collection is zero-based or one-base depending on the Package.Compatibility.IsWorksheets1Based propery. Default is Zero based</param>
 	/// <seealso cref="ExcelPackage.Compatibility"/>
 	/// <returns></returns>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelWorksheet this[int PositionID]
 	{
 		get
@@ -1156,6 +1158,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// 
 	/// </summary>
 	/// <param name="sourceName"></param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public void MoveToStart(string sourceName)
 	{
 		var sourceSheet = this[sourceName];
@@ -1177,6 +1180,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// 
 	/// </summary>
 	/// <param name="sourceName"></param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public void MoveToEnd(string sourceName)
 	{
 		var sourceSheet = this[sourceName];
@@ -1194,6 +1198,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// <param name="sourcePositionId"></param>
 	public void MoveToEnd(int sourcePositionId) => Move(sourcePositionId, _worksheets.Count + (_pck._worksheetAdd - 1), true);
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void Move(string sourceName, string targetName, bool placeAfter)
 	{
 		var sourceSheet = this[sourceName];
@@ -1211,6 +1216,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		Move(sourceSheet.PositionID, targetSheet.PositionID, placeAfter);
 	}
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void Move(int sourcePositionId, int targetPositionId, bool placeAfter)
 	{
 		// Bugfix: if source and target are the same worksheet the following code will create a duplicate
@@ -1277,6 +1283,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 	}
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void MoveSheetXmlNode(ExcelWorksheet sourceSheet, ExcelWorksheet targetSheet, bool placeAfter)
 	{
 		lock (TopNode.OwnerDocument)

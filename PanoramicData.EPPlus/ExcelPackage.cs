@@ -359,6 +359,7 @@ public sealed class ExcelPackage : IDisposable
 	/// </summary>
 	/// <param name="newStream">The stream object can be empty or contain a package. The stream must be Read/Write</param>
 	/// <param name="Password">The password to decrypt the document</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelPackage(Stream newStream, string Password)
 	{
 		if (!(newStream.CanRead && newStream.CanWrite))
@@ -384,6 +385,7 @@ public sealed class ExcelPackage : IDisposable
 	/// </summary>
 	/// <param name="newStream">The output stream. Must be an empty read/write stream.</param>
 	/// <param name="templateStream">This stream is copied to the output stream at load</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelPackage(Stream newStream, Stream templateStream)
 	{
 		if (newStream.Length > 0)
@@ -404,6 +406,7 @@ public sealed class ExcelPackage : IDisposable
 	/// <param name="newStream">The output stream. Must be an empty read/write stream.</param>
 	/// <param name="templateStream">This stream is copied to the output stream at load</param>
 	/// <param name="Password">Password to decrypted the template</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelPackage(Stream newStream, Stream templateStream, string Password)
 	{
 		if (newStream.Length > 0)
@@ -525,6 +528,7 @@ public sealed class ExcelPackage : IDisposable
 	/// <param name="template">An existing xlsx file to use as a template</param>
 	/// <param name="password">The password to decrypt the package.</param>
 	/// <returns></returns>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void CreateFromTemplate(FileInfo template, string password)
 	{
 		template?.Refresh();
@@ -580,6 +584,7 @@ public sealed class ExcelPackage : IDisposable
 		return new EncryptedPackageHandler().DecryptPackage(file, Encryption);
 	}
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void OpenPackage(Stream ms, string password, Func<bool> isCompoundDocument)
 	{
 		try
@@ -791,6 +796,7 @@ public sealed class ExcelPackage : IDisposable
 	/// This method recursively calls the Save method on all sub-components.
 	/// We close the package after the save is done.
 	/// </summary>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public void Save()
 	{
 		try
@@ -1156,6 +1162,7 @@ public sealed class ExcelPackage : IDisposable
 	/// </summary>
 	/// <param name="inputStream">The input stream.</param>
 	/// <param name="outputStream">The output stream.</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal static void CopyStream(Stream inputStream, ref Stream outputStream)
 	{
 		if (!inputStream.CanRead)

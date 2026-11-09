@@ -495,6 +495,7 @@ public abstract class ExcelCellBase
 	/// <param name="throwException">throw exception if invalid, otherwise returns false</param>
 	/// <returns></returns>
 	internal static bool GetRowCol(string address, out int row, out int col, bool throwException) => GetRowCol(address, out row, out col, throwException, out var fixedRow, out var fixedCol);
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal static bool GetRowCol(string address, out int row, out int col, bool throwException, out bool fixedRow, out bool fixedCol)
 	{
 		var colPart = true;

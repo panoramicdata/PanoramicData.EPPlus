@@ -53,6 +53,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 namespace OfficeOpenXml;
 
 /// <summary>
@@ -131,6 +132,7 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 		}
 	}
 	internal int Count => _cells.Count;
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void Add(IRangeID cell)
 	{
 		var ix = IndexOf(cell.RangeID);
@@ -141,6 +143,7 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 
 		Insert(~ix, cell);
 	}
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void Delete(ulong key)
 	{
 		var ix = IndexOf(key);
@@ -254,7 +257,9 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 
 		return index;
 	}
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal static void InsertColumn(ulong ColumnID, int columns) => throw new Exception("Working on it...");
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal static void DeleteColumn(ulong ColumnID, int columns) => throw new Exception("Working on it...");
 	#endregion
 	#region "Private Methods"
