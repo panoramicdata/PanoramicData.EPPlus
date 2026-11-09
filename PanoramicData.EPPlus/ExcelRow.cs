@@ -280,6 +280,7 @@ public class ExcelRow : IRangeID
 			r.PageBreak = value;
 		}
 	}
+	[SuppressMessage("Major Bug", "S3237:value contextual keyword should be used", Justification = "Public API: assigning any value merges the whole row or column, as in upstream EPPlus.")]
 	public bool Merged
 	{
 		get
@@ -291,7 +292,7 @@ public class ExcelRow : IRangeID
 			_worksheet.MergedCells.Add(new ExcelAddressBase(Row, 1, Row, ExcelPackage.MaxColumns), true);
 		}
 	}
-	internal static ulong GetRowID(int sheetID, int row) => ((ulong)sheetID) + (((ulong)row) << 29);
+	internal static ulong GetRowID(int sheetID, int row) => (ulong)sheetID + ((ulong)row << 29);
 
 	#region IRangeID Members
 
@@ -304,7 +305,7 @@ public class ExcelRow : IRangeID
 		}
 		set
 		{
-			Row = ((int)(value >> 29));
+			Row = (int)(value >> 29);
 		}
 	}
 
@@ -318,7 +319,6 @@ public class ExcelRow : IRangeID
 		var newRow = added.Row(Row);
 		newRow.Collapsed = Collapsed;
 		newRow.Height = Height;
-		newRow.CustomHeight = newRow.CustomHeight;
 		newRow.Hidden = Hidden;
 		newRow.OutlineLevel = OutlineLevel;
 		newRow.PageBreak = PageBreak;

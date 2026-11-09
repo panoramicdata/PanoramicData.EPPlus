@@ -116,7 +116,7 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 		{
 			return Index < 0 || Index >= _list.Count
 				?              throw new ArgumentOutOfRangeException("Comment index out of range")
-				: _list[Index] as ExcelComment;
+				: _list[Index];
 		}
 	}
 	/// <summary>

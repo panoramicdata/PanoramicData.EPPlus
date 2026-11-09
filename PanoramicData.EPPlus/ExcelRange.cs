@@ -88,20 +88,6 @@ public class ExcelRange : ExcelRangeBase
 		}
 	}
 
-	private static ExcelRange GetTableAddess(ExcelWorksheet _worksheet, string address)
-	{
-		var ixStart = address.IndexOf('[');
-		if (ixStart == 0) //External Address
-		{
-			var ixEnd = address.IndexOf(']', ixStart + 1);
-			if (ixStart >= 0 & ixEnd >= 0)
-			{
-				var external = address.Substring(ixStart + 1, ixEnd - 1);
-			}
-		}
-
-		return null;
-	}
 	/// <summary>
 	/// Access a single cell
 	/// </summary>

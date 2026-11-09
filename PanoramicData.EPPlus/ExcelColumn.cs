@@ -228,6 +228,7 @@ public class ExcelColumn : IRangeID
 		get;
 		set;
 	}
+	[SuppressMessage("Major Bug", "S3237:value contextual keyword should be used", Justification = "Public API: assigning any value merges the whole row or column, as in upstream EPPlus.")]
 	public bool Merged
 	{
 		get

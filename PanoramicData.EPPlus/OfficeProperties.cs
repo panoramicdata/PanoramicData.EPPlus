@@ -514,10 +514,10 @@ public sealed class OfficeProperties : XmlHelper
 			valueElem = CustomPropertiesXml.CreateElement("vt", "bool", ExcelPackage.schemaVt);
 			valueElem.InnerText = value.ToString().ToLower(CultureInfo.InvariantCulture);
 		}
-		else if (value is DateTime)
+		else if (value is DateTime dateTime)
 		{
 			valueElem = CustomPropertiesXml.CreateElement("vt", "filetime", ExcelPackage.schemaVt);
-			valueElem.InnerText = ((DateTime)value).AddHours(-1).ToString("yyyy-MM-ddTHH:mm:ssZ");
+			valueElem.InnerText = dateTime.AddHours(-1).ToString("yyyy-MM-ddTHH:mm:ssZ");
 		}
 		else if (value is short or int)
 		{
@@ -527,17 +527,17 @@ public sealed class OfficeProperties : XmlHelper
 		else if (value is double or decimal or float or long)
 		{
 			valueElem = CustomPropertiesXml.CreateElement("vt", "r8", ExcelPackage.schemaVt);
-			if (value is double)
+			if (value is double d)
 			{
-				valueElem.InnerText = ((double)value).ToString(CultureInfo.InvariantCulture);
+				valueElem.InnerText = d.ToString(CultureInfo.InvariantCulture);
 			}
-			else if (value is float)
+			else if (value is float f)
 			{
-				valueElem.InnerText = ((float)value).ToString(CultureInfo.InvariantCulture);
+				valueElem.InnerText = f.ToString(CultureInfo.InvariantCulture);
 			}
-			else if (value is decimal)
+			else if (value is decimal m)
 			{
-				valueElem.InnerText = ((decimal)value).ToString(CultureInfo.InvariantCulture);
+				valueElem.InnerText = m.ToString(CultureInfo.InvariantCulture);
 			}
 			else
 			{
