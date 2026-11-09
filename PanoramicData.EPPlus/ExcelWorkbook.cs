@@ -44,6 +44,7 @@ using OfficeOpenXml.Utils;
 using OfficeOpenXml.VBA;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -353,6 +354,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		}
 	}
 
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "min and max are both dictionary keys, so exact equality is the intended test.")]
 	internal static decimal GetWidthPixels(string fontName, float fontSize)
 	{
 		Dictionary<float, FontSizeInfo> font;
@@ -751,6 +753,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	/// Saves the workbook and all its components to the package.
 	/// For internal use only!
 	/// </summary>
+	[SuppressMessage("Major Code Smell", "S3440:Variables should not be checked against the values they're about to be assigned", Justification = "The ContentType setter rewrites the package content-type map, so it is only called when the value changes.")]
 	internal void Save()  // Workbook Save
 	{
 		if (Worksheets.Count == 0)
@@ -985,7 +988,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		{
 			if (string.IsNullOrEmpty(name.NameFormula))
 			{
-				if ((TypeCompat.IsPrimitive(name.NameValue) || name.NameValue is double || name.NameValue is decimal))
+				if (TypeCompat.IsPrimitive(name.NameValue) || name.NameValue is double || name.NameValue is decimal)
 				{
 					elem.InnerText = Convert.ToDouble(name.NameValue, CultureInfo.InvariantCulture).ToString("R15", CultureInfo.InvariantCulture);
 				}

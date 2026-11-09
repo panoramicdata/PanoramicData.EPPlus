@@ -35,6 +35,7 @@ using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Vml;
 using OfficeOpenXml.Utils;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml;
 
@@ -62,6 +63,8 @@ public enum PictureAlignment
 /// <summary>
 /// Print header and footer 
 /// </summary>
+[SuppressMessage("Minor Code Smell", "S1104:Fields should not have public accessibility", Justification = "Public API: the text fields are published; converting them to properties would break binary compatibility.")]
+[SuppressMessage("Minor Code Smell", "S2357:Fields should be private", Justification = "Public API: the text fields are published; converting them to properties would break binary compatibility.")]
 public class ExcelHeaderFooterText
 {
 	readonly ExcelWorksheet _ws;
@@ -78,7 +81,8 @@ public class ExcelHeaderFooterText
 		var text = TextNode.InnerText;
 		var code = text[..2];
 		var startPos = 2;
-		for (var pos = startPos; pos < text.Length - 2; pos++)
+		var pos = startPos;
+		while (pos < text.Length - 2)
 		{
 			var newCode = text.Substring(pos, 2);
 			if (newCode is "&C" or "&R")
@@ -88,6 +92,8 @@ public class ExcelHeaderFooterText
 				pos = startPos;
 				code = newCode;
 			}
+
+			pos++;
 		}
 
 		SetText(code, text[startPos..]);
@@ -225,6 +231,7 @@ public class ExcelHeaderFooterText
 /// <summary>
 /// Represents the Header and Footer on an Excel Worksheet
 /// </summary>
+[SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Public API: the format codes are published constants used in constant expressions by callers.")]
 public sealed class ExcelHeaderFooter : XmlHelper
 {
 	#region Static Properties
@@ -396,7 +403,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 		{
 			if (_oddFooter == null)
 			{
-				_oddFooter = new ExcelHeaderFooterText(TopNode.SelectSingleNode("d:oddFooter", NameSpaceManager), _ws, "F"); ;
+				_oddFooter = new ExcelHeaderFooterText(TopNode.SelectSingleNode("d:oddFooter", NameSpaceManager), _ws, "F");
 			}
 
 			return _oddFooter;
