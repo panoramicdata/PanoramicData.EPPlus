@@ -155,14 +155,7 @@ internal static class DependencyChainFactory
 			if (!depChain.index.ContainsKey(id))
 			{
 				var f = new FormulaCell { SheetID = ws.SheetID, Row = fs.Row, Column = fs.Column };
-				if (fs.Value is int v)
-				{
-					f.Formula = ws._sharedFormulas[v].GetFormula(fs.Row, fs.Column, ws.Name);
-				}
-				else
-				{
-					f.Formula = fs.Value.ToString();
-				}
+				f.Formula = GetCellFormula(ws, fs.Value, fs.Row, fs.Column, ws.Name);
 
 				if (!string.IsNullOrEmpty(f.Formula))
 				{
@@ -193,84 +186,16 @@ internal static class DependencyChainFactory
 			var t = f.Tokens[f.tokenIx];
 			if (t.TokenType == TokenType.ExcelAddress)
 			{
-				var adr = new ExcelFormulaAddress(t.Value);
-				if (adr.Table != null)
+				if (TryStartAddressIteration(wb, ws, f, t, options))
 				{
-					adr.SetRCFromTable(ws._package, new ExcelAddressBase(f.Row, f.Column, f.Row, f.Column));
-				}
-
-				if (adr.WorkSheet == null && adr.Collide(new ExcelAddressBase(f.Row, f.Column, f.Row, f.Column)) != ExcelAddressBase.eAddressCollition.No && !options.AllowCirculareReferences)
-				{
-					throw new CircularReferenceException(string.Format("Circular Reference in cell {0}", ExcelCellBase.GetAddress(f.Row, f.Column)));
-				}
-
-				if (adr._fromRow > 0 && adr._fromCol > 0)
-				{
-					if (string.IsNullOrEmpty(adr.WorkSheet))
-					{
-						if (f.ws == null)
-						{
-							f.ws = ws;
-						}
-						else if (f.ws.SheetID != f.SheetID)
-						{
-							f.ws = wb.Worksheets.GetBySheetID(f.SheetID);
-						}
-					}
-					else
-					{
-						f.ws = wb.Worksheets[adr.WorkSheet];
-					}
-
-					if (f.ws != null)
-					{
-						f.iterator = new CellsStoreEnumerator<object>(f.ws._formulas, adr.Start.Row, adr.Start.Column, adr.End.Row, adr.End.Column);
-						goto iterateCells;
-					}
+					goto iterateCells;
 				}
 			}
 			else if (t.TokenType == TokenType.NameValue)
 			{
-				ExcelNamedRange name;
-				ExcelAddressBase.SplitAddress(t.Value, out var adrWb, out var adrWs, out var adrName, f.ws == null ? "" : f.ws.Name);
-				if (!string.IsNullOrEmpty(adrWs))
-				{
-					f.ws ??= wb.Worksheets[adrWs];
-
-					if (f.ws.Names.ContainsKey(t.Value))
-					{
-						name = f.ws.Names[adrName];
-					}
-					else if (wb.Names.ContainsKey(adrName))
-					{
-						name = wb.Names[adrName];
-					}
-					else
-					{
-						name = null;
-					}
-
-					if (name != null)
-					{
-						f.ws = name.Worksheet;
-					}
-				}
-				else if (wb.Names.ContainsKey(adrName))
-				{
-					name = wb.Names[t.Value];
-					if (string.IsNullOrEmpty(adrWs))
-					{
-						f.ws = name.Worksheet;
-					}
-				}
-				else
-				{
-					name = null;
-				}
-
+				var name = ResolveName(wb, f, t);
 				if (name != null)
 				{
-
 					if (string.IsNullOrEmpty(name.NameFormula))
 					{
 						if (name.NameValue == null)
@@ -286,34 +211,14 @@ internal static class DependencyChainFactory
 
 						if (!depChain.index.ContainsKey(id))
 						{
-							var rf = new FormulaCell
-							{
-								SheetID = name.LocalSheetId,
-								Row = name.Index,
-								Column = 0,
-								Formula = name.NameFormula
-							};
-							rf.Tokens = name.LocalSheetId == -1 ? lexer.Tokenize(rf.Formula).ToList() : lexer.Tokenize(rf.Formula, wb.Worksheets.GetBySheetID(name.LocalSheetId).Name).ToList();
-
+							var rf = CreateNameFormulaCell(lexer, wb, name);
 							depChain.Add(rf);
 							stack.Push(f);
 							f = rf;
 							goto iterateToken;
 						}
-						else
-						{
-							if (stack.Count > 0)
-							{
-								//Check for circular references
-								foreach (var par in stack)
-								{
-									if (ExcelCellBase.GetCellID(par.SheetID, par.Row, par.Column) == id && !options.AllowCirculareReferences)
-									{
-										throw new CircularReferenceException(string.Format("Circular Reference in name {0}", name.Name));
-									}
-								}
-							}
-						}
+
+						ThrowIfCircularNameReference(stack, id, name, options);
 					}
 				}
 			}
@@ -342,49 +247,155 @@ internal static class DependencyChainFactory
 			var id = ExcelCellBase.GetCellID(f.ws.SheetID, f.iterator.Row, f.iterator.Column);
 			if (!depChain.index.ContainsKey(id))
 			{
-				var rf = new FormulaCell { SheetID = f.ws.SheetID, Row = f.iterator.Row, Column = f.iterator.Column };
-				if (f.iterator.Value is int)
-				{
-					rf.Formula = f.ws._sharedFormulas[(int)v].GetFormula(f.iterator.Row, f.iterator.Column, ws.Name);
-				}
-				else
-				{
-					rf.Formula = v.ToString();
-				}
-
-				rf.ws = f.ws;
-				rf.Tokens = lexer.Tokenize(rf.Formula, f.ws.Name).ToList();
-				ws._formulaTokens.SetValue(rf.Row, rf.Column, rf.Tokens);
+				var rf = CreateCellFormulaCell(lexer, ws, f, v);
 				depChain.Add(rf);
 				stack.Push(f);
 				f = rf;
 				goto iterateToken;
 			}
-			else
+
+			var circularParent = FindCircularCellReference(stack, id);
+			if (circularParent != null)
 			{
-				if (stack.Count > 0)
+				if (!options.AllowCirculareReferences)
 				{
-					//Check for circular references
-					foreach (var par in stack)
-					{
-						if (ExcelCellBase.GetCellID(par.ws.SheetID, par.iterator.Row, par.iterator.Column) == id)
-						{
-							if (options.AllowCirculareReferences == false)
-							{
-								throw new CircularReferenceException(string.Format("Circular Reference in cell {0}!{1}", par.ws.Name, ExcelCellBase.GetAddress(f.Row, f.Column)));
-							}
-							else
-							{
-								f = stack.Pop();
-								goto iterateCells;
-							}
-						}
-					}
+					throw new CircularReferenceException(string.Format("Circular Reference in cell {0}!{1}", circularParent.ws.Name, ExcelCellBase.GetAddress(f.Row, f.Column)));
 				}
+
+				f = stack.Pop();
+				goto iterateCells;
 			}
 		}
 
 		f.tokenIx++;
 		goto iterateToken;
+	}
+
+	private static string GetCellFormula(ExcelWorksheet formulaSheet, object value, int row, int column, string worksheetName) =>
+		value is int sharedFormulaIndex
+			? formulaSheet._sharedFormulas[sharedFormulaIndex].GetFormula(row, column, worksheetName)
+			: value.ToString();
+
+	private static bool TryStartAddressIteration(ExcelWorkbook wb, ExcelWorksheet ws, FormulaCell f, Token t, ExcelCalculationOption options)
+	{
+		var adr = new ExcelFormulaAddress(t.Value);
+		if (adr.Table != null)
+		{
+			adr.SetRCFromTable(ws._package, new ExcelAddressBase(f.Row, f.Column, f.Row, f.Column));
+		}
+
+		if (adr.WorkSheet == null && adr.Collide(new ExcelAddressBase(f.Row, f.Column, f.Row, f.Column)) != ExcelAddressBase.eAddressCollition.No && !options.AllowCirculareReferences)
+		{
+			throw new CircularReferenceException(string.Format("Circular Reference in cell {0}", ExcelCellBase.GetAddress(f.Row, f.Column)));
+		}
+
+		if (adr._fromRow > 0 && adr._fromCol > 0)
+		{
+			SetAddressWorksheet(wb, ws, f, adr);
+			if (f.ws != null)
+			{
+				f.iterator = new CellsStoreEnumerator<object>(f.ws._formulas, adr.Start.Row, adr.Start.Column, adr.End.Row, adr.End.Column);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static void SetAddressWorksheet(ExcelWorkbook wb, ExcelWorksheet ws, FormulaCell f, ExcelFormulaAddress adr)
+	{
+		if (!string.IsNullOrEmpty(adr.WorkSheet))
+		{
+			f.ws = wb.Worksheets[adr.WorkSheet];
+		}
+		else if (f.ws == null)
+		{
+			f.ws = ws;
+		}
+		else if (f.ws.SheetID != f.SheetID)
+		{
+			f.ws = wb.Worksheets.GetBySheetID(f.SheetID);
+		}
+	}
+
+	private static ExcelNamedRange ResolveName(ExcelWorkbook wb, FormulaCell f, Token t)
+	{
+		ExcelAddressBase.SplitAddress(t.Value, out _, out var adrWs, out var adrName, f.ws == null ? "" : f.ws.Name);
+		if (string.IsNullOrEmpty(adrWs))
+		{
+			if (!wb.Names.ContainsKey(adrName))
+			{
+				return null;
+			}
+
+			var workbookName = wb.Names[t.Value];
+			f.ws = workbookName.Worksheet;
+			return workbookName;
+		}
+
+		f.ws ??= wb.Worksheets[adrWs];
+		ExcelNamedRange name = null;
+		if (f.ws.Names.ContainsKey(t.Value))
+		{
+			name = f.ws.Names[adrName];
+		}
+		else if (wb.Names.ContainsKey(adrName))
+		{
+			name = wb.Names[adrName];
+		}
+
+		if (name != null)
+		{
+			f.ws = name.Worksheet;
+		}
+
+		return name;
+	}
+
+	private static FormulaCell CreateNameFormulaCell(ILexer lexer, ExcelWorkbook wb, ExcelNamedRange name)
+	{
+		var rf = new FormulaCell
+		{
+			SheetID = name.LocalSheetId,
+			Row = name.Index,
+			Column = 0,
+			Formula = name.NameFormula
+		};
+		rf.Tokens = name.LocalSheetId == -1 ? lexer.Tokenize(rf.Formula).ToList() : lexer.Tokenize(rf.Formula, wb.Worksheets.GetBySheetID(name.LocalSheetId).Name).ToList();
+		return rf;
+	}
+
+	private static void ThrowIfCircularNameReference(Stack<FormulaCell> stack, ulong id, ExcelNamedRange name, ExcelCalculationOption options)
+	{
+		foreach (var par in stack)
+		{
+			if (ExcelCellBase.GetCellID(par.SheetID, par.Row, par.Column) == id && !options.AllowCirculareReferences)
+			{
+				throw new CircularReferenceException(string.Format("Circular Reference in name {0}", name.Name));
+			}
+		}
+	}
+
+	private static FormulaCell CreateCellFormulaCell(ILexer lexer, ExcelWorksheet ws, FormulaCell f, object v)
+	{
+		var rf = new FormulaCell { SheetID = f.ws.SheetID, Row = f.iterator.Row, Column = f.iterator.Column };
+		rf.Formula = GetCellFormula(f.ws, v, f.iterator.Row, f.iterator.Column, ws.Name);
+		rf.ws = f.ws;
+		rf.Tokens = lexer.Tokenize(rf.Formula, f.ws.Name).ToList();
+		ws._formulaTokens.SetValue(rf.Row, rf.Column, rf.Tokens);
+		return rf;
+	}
+
+	private static FormulaCell FindCircularCellReference(Stack<FormulaCell> stack, ulong id)
+	{
+		foreach (var par in stack)
+		{
+			if (ExcelCellBase.GetCellID(par.ws.SheetID, par.iterator.Row, par.iterator.Column) == id)
+			{
+				return par;
+			}
+		}
+
+		return null;
 	}
 }
