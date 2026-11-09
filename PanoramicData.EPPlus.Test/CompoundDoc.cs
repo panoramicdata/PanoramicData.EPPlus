@@ -9,63 +9,14 @@ using System.Linq;
 
 namespace PanoramicData.EPPlus.Test;
 
-/// <summary>
-/// Summary description for CompoundDoc
-/// </summary>
 [TestClass]
 public class CompoundDoc
 {
-	public CompoundDoc()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
-
-	private TestContext _testContextInstance;
-
-	/// <summary>
-	///Gets or sets the test context which provides
-	///information about and functionality for the current test run.
-	///</summary>
-	public TestContext TestContext
-	{
-		get
-		{
-			return _testContextInstance;
-		}
-		set
-		{
-			_testContextInstance = value;
-		}
-	}
-
-	#region Additional test attributes
-	//
-	// You can use the following additional attributes as you write your tests:
-	//
-	// Use ClassInitialize to run code before running the first test in the class
-	// [ClassInitialize()]
-	// public static void MyClassInitialize(TestContext testContext) { }
-	//
-	// Use ClassCleanup to run code after all tests in a class have run
-	// [ClassCleanup()]
-	// public static void MyClassCleanup() { }
-	//
-	// Use TestInitialize to run code before running each test 
-	// [TestInitialize()]
-	// public void MyTestInitialize() { }
-	//
-	// Use TestCleanup to run code after each test has run
-	// [TestCleanup()]
-	// public void MyTestCleanup() { }
-	//
-	#endregion
+	public TestContext TestContext { get; set; }
 
 	[TestMethod, Ignore]
 	public void Read()
 	{
-		//var doc = File.ReadAllBytes(@"c:\temp\vbaProject.bin");
 		var doc = File.ReadAllBytes(@"c:\temp\vba.bin");
 		var cd = new CompoundDocumentFile(doc);
 		var ms = new MemoryStream();
@@ -114,7 +65,9 @@ public class CompoundDoc
 		var sheets = Enumerable.Range(1, noSheets)   //460
 			.Select(x => $"Sheet{x}");
 		foreach (var sheet in sheets)
+		{
 			package.Workbook.Worksheets.Add(sheet);
+		}
 
 		package.Workbook.CreateVBAProject();
 		package.Workbook.VbaProject.Modules.AddModule("Module1").Code
@@ -137,7 +90,7 @@ public class CompoundDoc
 	public void ReadVba()
 	{
 		var p = new ExcelPackage(new FileInfo(@"c:\temp\pricecheck.xlsm"));
-		var vba = p.Workbook.VbaProject;
+		_ = p.Workbook.VbaProject;
 		p.SaveAs(new FileInfo(@"c:\temp\pricecheckSaved.xlsm"));
 	}
 
@@ -150,7 +103,10 @@ public class CompoundDoc
 	public void Issue131()
 	{
 		var src = TempFile("report.xlsm");
-		if (src.Exists) src.Delete();
+		if (src.Exists)
+		{
+			src.Delete();
+		}
 		var package = new ExcelPackage(src);
 		var sheets = Enumerable.Range(1, 500)   //460
 			.Select(x => $"Sheet{x}");
@@ -237,10 +193,6 @@ public class CompoundDoc
 				rng.Style.Fill.BackgroundColor.SetColor(Color.DarkBlue);
 			}
 
-			//Calculate (Commented away thisk, it was a bit time consuming... /MA)
-			// Console.WriteLine("{0:HH.mm.ss}\tCalculate formulas...", DateTime.Now);
-			// ws.Calculate();
-
 			Console.WriteLine("{0:HH.mm.ss}\tAutofit columns and lock and format cells...", DateTime.Now);
 			ws.Cells[Rows - 100, 1, Rows, 5].AutoFitColumns(5);   //Auto fit using the last 100 rows with minimum width 5
 			ws.Column(5).Width = 15;                            //We need to set the width for column F manually since the end sum formula is the widest cell in the column (EPPlus don't calculate any forumlas, so no output text is avalible). 
@@ -265,17 +217,13 @@ public class CompoundDoc
 	[TestMethod, Ignore]
 	public void ReadPerfTest()
 	{
-		var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\sample7compdoctest.xlsx"), "");
-		//var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\sample7compdoctest_4.5.xlsx"), "");
-		//var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\sample7compdoctest.310k.xlsx"), "");
+		_ = new ExcelPackage(new FileInfo(@"c:\temp\bug\sample7compdoctest.xlsx"), "");
 	}
 	[TestMethod, Ignore]
 	public void ReadVbaIssue107()
 	{
-		//var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\report.xlsm"));
-		//var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\report411.xlsm"));
 		var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\sample7.xlsx"), "");
-		var vba = p.Workbook.VbaProject;
+		_ = p.Workbook.VbaProject;
 	}
 
 }

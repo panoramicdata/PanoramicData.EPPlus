@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
 using System.IO;
@@ -12,25 +13,15 @@ using OfficeOpenXml.FormulaParsing;
 namespace PanoramicData.EPPlus.Test;
 
 [TestClass]
-public class ReadTemplate //: TestBase
+public class ReadTemplate
 {
-	//[ClassInitialize()]
-	//public static void ClassInit(TestContext testContext)
-	//{
-	//    //InitBase();
-	//}
-	//[ClassCleanup()]
-	//public static void ClassCleanup()
-	//{
-	//    //SaveWorksheet("Worksheet.xlsx");
-	//}
 	[TestMethod]
 	public void ReadBlankStream()
 	{
 		MemoryStream stream = new();
 		using (ExcelPackage pck = new(stream))
 		{
-			var ws = pck.Workbook.Worksheets.Add("Perf");
+			pck.Workbook.Worksheets.Add("Perf");
 			pck.SaveAs(stream);
 		}
 
@@ -51,7 +42,7 @@ public class ReadTemplate //: TestBase
 	{
 		ExcelPackage xlsPack = new(new FileInfo(@"c:\temp\billing_template.xlsx"));
 		var xlsWb = xlsPack.Workbook;
-		var xlsSheet = xlsWb.Worksheets["Billing"];
+		_ = xlsWb.Worksheets["Billing"];
 	}
 	[Ignore]
 	[TestMethod]
@@ -80,10 +71,7 @@ public class ReadTemplate //: TestBase
 	[TestMethod]
 	public void InternalZip()
 	{
-		//var file = @"c:\temp\condi.xlsx";
-		//using (ExcelPackage pck = new ExcelPackage(file))
-		//{
-		//}
+		// Needs a local workbook that is not in the repository.
 	}
 	[Ignore]
 	[TestMethod]
@@ -106,14 +94,14 @@ public class ReadTemplate //: TestBase
 				while (rowCount <= lastRow)
 				{
 					var columnCount = 1;
-					var line = "";
+					var line = new StringBuilder();
 					while (columnCount <= lastColumn)
 					{
-						line += currentWorksheet.Cells[rowCount, columnCount].Value + "|";
+						line.Append(currentWorksheet.Cells[rowCount, columnCount].Value).Append('|');
 						columnCount++;
 					}
 
-					lines.Add(line);
+					lines.Add(line.ToString());
 					rowCount++;
 				}
 			}
@@ -245,7 +233,6 @@ public class ReadTemplate //: TestBase
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\bug\test4.xlsx"));
 		var ws = package.Workbook.Worksheets[1];
 		ws.Cells["A1"].Value = 1;
-		//ws.Column(0).Style.Font.Bold = true;
 		package.SaveAs(new FileInfo(@"c:\temp\bug2.xlsx"));
 	}
 	[Ignore]
@@ -253,8 +240,8 @@ public class ReadTemplate //: TestBase
 	public void ReadBug13()
 	{
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\original.xlsx"));
-		var ws = package.Workbook.Worksheets[1];
-		package.Workbook.Calculate(new OfficeOpenXml.FormulaParsing.ExcelCalculationOption() { AllowCirculareReferences = true });
+		_ = package.Workbook.Worksheets[1];
+		package.Workbook.Calculate(new OfficeOpenXml.FormulaParsing.ExcelCalculationOption { AllowCirculareReferences = true });
 		package.SaveAs(new FileInfo(@"c:\temp\bug2.xlsx"));
 	}
 	[Ignore]
@@ -279,13 +266,12 @@ public class ReadTemplate //: TestBase
 		package.SaveAs(new FileInfo(@"c:\temp\bug2.xlsx"));
 	}
 	#region "Threading Cellstore Test"
-	public int _threadCount = 0;
-	ExcelPackage _pckThread;
+	private int _threadCount;
 	[TestMethod, Ignore]
 	public void ThreadingTest()
 	{
-		_pckThread = new ExcelPackage();
-		var ws = _pckThread.Workbook.Worksheets.Add("Threading");
+		var pckThread = new ExcelPackage();
+		var ws = pckThread.Workbook.Worksheets.Add("Threading");
 
 		for (var t = 0; t < 20; t++)
 		{
@@ -301,11 +287,11 @@ public class ReadTemplate //: TestBase
 			thread.Start();
 		}
 
-		while (1 == 1)
+		while (true)
 		{
 			if (_threadCount == 0)
 			{
-				_pckThread.SaveAs(new FileInfo("c:\\temp\\thread.xlsx"));
+				pckThread.SaveAs(new FileInfo("c:\\temp\\thread.xlsx"));
 				break;
 			}
 
@@ -396,7 +382,7 @@ public class ReadTemplate //: TestBase
 	public void I15039()
 	{
 		using var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\15039.xlsm"));
-		var ws = p.Workbook.Worksheets[1];
+		_ = p.Workbook.Worksheets[1];
 
 		p.SaveAs(new FileInfo(@"c:\temp\bug\15039-saved.xlsm"));
 	}
@@ -456,7 +442,7 @@ public class ReadTemplate //: TestBase
 		ws = p.Workbook.Worksheets.Add("Градуировка");
 		using var p2 = new ExcelPackage();
 		p2.Workbook.CreateVBAProject();
-		var ws2 = p2.Workbook.Worksheets.Add("Градуировка2", ws);
+		p2.Workbook.Worksheets.Add("Градуировка2", ws);
 	}
 
 	[TestMethod, Ignore]
@@ -505,7 +491,10 @@ public class ReadTemplate //: TestBase
 
 	private static void CreateXlsxSheet(string pFileName, int pRows, int pColumns)
 	{
-		if (File.Exists(pFileName)) File.Delete(pFileName);
+		if (File.Exists(pFileName))
+		{
+			File.Delete(pFileName);
+		}
 
 		using ExcelPackage excelPackage = new(new FileInfo(pFileName));
 		var excelWorksheet = excelPackage.Workbook.Worksheets.Add("Testsheet");
@@ -532,7 +521,7 @@ public class ReadTemplate //: TestBase
 		// Try to style the first column, begining with row 3 which has no content yet...
 		using (var range = excelWorksheet.Cells[ExcelCellBase.GetAddress(3, 1, pRows, 1)])
 		{
-			var style = range.Style;
+			_ = range.Style;
 		}
 
 		// now I would add data to the first column (left out here)...
