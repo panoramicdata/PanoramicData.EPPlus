@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing;
+﻿using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
+
+using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;
 
@@ -18,36 +15,11 @@ public class FunctionRepositoryTests
 		var functionRepository = FunctionRepository.Create();
 		Assert.IsFalse(functionRepository.IsFunctionName(MyFunction.Name));
 		Assert.IsFalse(functionRepository.CustomCompilers.ContainsKey(typeof(MyFunction)));
-		functionRepository.LoadModule(new TestFunctionModule());
+		functionRepository.LoadModule(new TestFunctionModule(ParsingContext.Create()));
 		Assert.IsTrue(functionRepository.IsFunctionName(MyFunction.Name));
 		Assert.IsTrue(functionRepository.CustomCompilers.ContainsKey(typeof(MyFunction)));
 		// Make sure reloading the module overwrites previous functions and compilers
-		functionRepository.LoadModule(new TestFunctionModule());
-	}
-	#endregion
-
-	#region Nested Classes
-	public class TestFunctionModule : FunctionsModule
-	{
-		public TestFunctionModule()
-		{
-			var myFunction = new MyFunction();
-			var customCompiler = new MyFunctionCompiler(myFunction, ParsingContext.Create());
-			Functions.Add(MyFunction.Name, myFunction);
-			CustomCompilers.Add(typeof(MyFunction), customCompiler);
-		}
-	}
-
-	public class MyFunction : ExcelFunction
-	{
-		public static string Name => "MyFunction";
-		public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context) => throw new NotImplementedException();
-	}
-
-	public class MyFunctionCompiler : FunctionCompiler
-	{
-		public MyFunctionCompiler(MyFunction function, ParsingContext context) : base(function, context) { }
-		public override CompileResult Compile(IEnumerable<Expression> children) => throw new NotImplementedException();
+		functionRepository.LoadModule(new TestFunctionModule(ParsingContext.Create()));
 	}
 	#endregion
 }

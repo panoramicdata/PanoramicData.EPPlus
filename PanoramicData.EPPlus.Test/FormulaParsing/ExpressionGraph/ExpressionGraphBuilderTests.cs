@@ -1,13 +1,9 @@
 ﻿using FakeItEasy;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph.CompileStrategy;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 
@@ -54,8 +50,7 @@ public class ExpressionGraphBuilderTests
 		Assert.AreEqual("1 + 2", result.Expressions.First().Compile().Result);
 	}
 
-	[TestMethod]
-	public void BuildShouldSetOperatorOnGroupExpressionCorrectly()
+	private OfficeOpenXml.FormulaParsing.ExpressionGraph.ExpressionGraph BuildGroupedTimesTwo()
 	{
 		var tokens = new List<Token>
 		{
@@ -67,7 +62,21 @@ public class ExpressionGraphBuilderTests
 			new("*", TokenType.Operator),
 			new("2", TokenType.Integer)
 		};
-		var result = _graphBuilder.Build(tokens);
+		return _graphBuilder.Build(tokens);
+	}
+
+	private OfficeOpenXml.FormulaParsing.ExpressionGraph.ExpressionGraph BuildFromFormula(string formula)
+	{
+		var ctx = ParsingContext.Create();
+		var tokenizer = new SourceCodeTokenizer(ctx.Configuration.FunctionRepository, ctx.NameValueProvider);
+		var tokens = tokenizer.Tokenize(formula);
+		return _graphBuilder.Build(tokens);
+	}
+
+	[TestMethod]
+	public void BuildShouldSetOperatorOnGroupExpressionCorrectly()
+	{
+		var result = BuildGroupedTimesTwo();
 
 		Assert.AreEqual(Operator.Multiply.Operator, result.Expressions.First().Operator.Operator);
 
@@ -76,17 +85,7 @@ public class ExpressionGraphBuilderTests
 	[TestMethod]
 	public void BuildShouldSetChildrenOnGroupExpression()
 	{
-		var tokens = new List<Token>
-		{
-			new("(", TokenType.OpeningParenthesis),
-			new("2", TokenType.Integer),
-			new("+", TokenType.Operator),
-			new("4", TokenType.Integer),
-			new(")", TokenType.ClosingParenthesis),
-			new("*", TokenType.Operator),
-			new("2", TokenType.Integer)
-		};
-		var result = _graphBuilder.Build(tokens);
+		var result = BuildGroupedTimesTwo();
 
 		Assert.IsInstanceOfType<GroupExpression>(result.Expressions.First());
 		Assert.AreEqual(2, result.Expressions.First().Children.Count());
@@ -95,17 +94,7 @@ public class ExpressionGraphBuilderTests
 	[TestMethod]
 	public void BuildShouldSetNextOnGroupedExpression()
 	{
-		var tokens = new List<Token>
-		{
-			new("(", TokenType.OpeningParenthesis),
-			new("2", TokenType.Integer),
-			new("+", TokenType.Operator),
-			new("4", TokenType.Integer),
-			new(")", TokenType.ClosingParenthesis),
-			new("*", TokenType.Operator),
-			new("2", TokenType.Integer)
-		};
-		var result = _graphBuilder.Build(tokens);
+		var result = BuildGroupedTimesTwo();
 
 		Assert.IsNotNull(result.Expressions.First().Next);
 		Assert.IsInstanceOfType<IntegerExpression>(result.Expressions.First().Next);
@@ -227,11 +216,8 @@ public class ExpressionGraphBuilderTests
 	[TestMethod]
 	public void ShouldHandleInnerFunctionCall2()
 	{
-		var ctx = ParsingContext.Create();
 		const string formula = "IF(3>2;\"Yes\";\"No\")";
-		var tokenizer = new SourceCodeTokenizer(ctx.Configuration.FunctionRepository, ctx.NameValueProvider);
-		var tokens = tokenizer.Tokenize(formula);
-		var expression = _graphBuilder.Build(tokens);
+		var expression = BuildFromFormula(formula);
 		Assert.AreEqual(1, expression.Expressions.Count());
 
 		var compiler = new ExpressionCompiler(new ExpressionConverter(), new CompileStrategyFactory());
@@ -242,11 +228,8 @@ public class ExpressionGraphBuilderTests
 	[TestMethod]
 	public void ShouldHandleInnerFunctionCall3()
 	{
-		var ctx = ParsingContext.Create();
 		const string formula = "IF(I10>=0;IF(O10>I10;((O10-I10)*$B10)/$C$27;IF(O10<0;(O10*$B10)/$C$27;\"\"));IF(O10<0;((O10-I10)*$B10)/$C$27;IF(O10>0;(O10*$B10)/$C$27;)))";
-		var tokenizer = new SourceCodeTokenizer(ctx.Configuration.FunctionRepository, ctx.NameValueProvider);
-		var tokens = tokenizer.Tokenize(formula);
-		var expression = _graphBuilder.Build(tokens);
+		var expression = BuildFromFormula(formula);
 		Assert.AreEqual(1, expression.Expressions.Count());
 		var exp1 = expression.Expressions.First();
 		Assert.AreEqual(3, exp1.Children.Count());

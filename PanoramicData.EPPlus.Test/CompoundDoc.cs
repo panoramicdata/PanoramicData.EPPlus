@@ -112,7 +112,9 @@ public class CompoundDoc
 		var sheets = Enumerable.Range(1, 500)   //460
 			.Select(x => $"Sheet{x}");
 		foreach (var sheet in sheets)
+		{
 			package.Workbook.Worksheets.Add(sheet);
+		}
 
 		package.Workbook.CreateVBAProject();
 		package.Workbook.VbaProject.Modules.AddModule("Module1").Code
@@ -144,7 +146,6 @@ public class CompoundDoc
 			cols.Style.Fill.PatternType = ExcelFillStyle.Solid;
 			cols.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
 
-			var rnd = new Random();
 			for (var row = 1; row <= Rows; row++)
 			{
 				for (var c = 0; c < colMult * 5; c += 5)
@@ -152,7 +153,7 @@ public class CompoundDoc
 					ws.SetValue(row, 1 + c, row);                               //The SetValue method is a little bit faster than using the Value property
 					ws.SetValue(row, 2 + c, string.Format("Row {0}", row));
 					ws.SetValue(row, 3 + c, DateTime.Today.AddDays(row));
-					ws.SetValue(row, 4 + c, rnd.NextDouble() * 10000);
+					ws.SetValue(row, 4 + c, Random.Shared.NextDouble() * 10000);
 				}
 			}
 
