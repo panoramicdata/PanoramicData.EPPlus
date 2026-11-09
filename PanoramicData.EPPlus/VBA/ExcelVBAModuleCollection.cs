@@ -120,7 +120,7 @@ public class ExcelVbaModuleCollection : ExcelVBACollectionBase<ExcelVBAModule>
 			Name = Name,
 			Type = eModuleType.Module
 		};
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Name", Value = Name, DataType = eAttributeDataType.String });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Name", Value = Name, DataType = eAttributeDataType.String });
 		m.Type = eModuleType.Module;
 		_list.Add(m);
 		return m;
@@ -138,18 +138,16 @@ public class ExcelVbaModuleCollection : ExcelVBACollectionBase<ExcelVBAModule>
 			Name = Name,
 			Type = eModuleType.Class
 		};
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Name", Value = Name, DataType = eAttributeDataType.String });
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Base", Value = "0{FCFB3D2A-A0FA-1068-A738-08002B3371B5}", DataType = eAttributeDataType.String });
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_GlobalNameSpace", Value = "False", DataType = eAttributeDataType.NonString });
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Creatable", Value = "False", DataType = eAttributeDataType.NonString });
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_PredeclaredId", Value = "False", DataType = eAttributeDataType.NonString });
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Exposed", Value = Exposed ? "True" : "False", DataType = eAttributeDataType.NonString });
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_TemplateDerived", Value = "False", DataType = eAttributeDataType.NonString });
-		m.Attributes._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Customizable", Value = "False", DataType = eAttributeDataType.NonString });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Name", Value = Name, DataType = eAttributeDataType.String });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Base", Value = "0{FCFB3D2A-A0FA-1068-A738-08002B3371B5}", DataType = eAttributeDataType.String });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_GlobalNameSpace", Value = "False", DataType = eAttributeDataType.NonString });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Creatable", Value = "False", DataType = eAttributeDataType.NonString });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_PredeclaredId", Value = "False", DataType = eAttributeDataType.NonString });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Exposed", Value = Exposed ? "True" : "False", DataType = eAttributeDataType.NonString });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_TemplateDerived", Value = "False", DataType = eAttributeDataType.NonString });
+		m.Attributes._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Customizable", Value = "False", DataType = eAttributeDataType.NonString });
 
-		//m.Code = _project.GetBlankClassModule(Name, Exposed);
 		m.Private = !Exposed;
-		//m.ClassID=
 		_list.Add(m);
 		return m;
 	}

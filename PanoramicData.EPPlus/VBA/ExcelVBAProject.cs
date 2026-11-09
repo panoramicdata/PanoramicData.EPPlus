@@ -118,7 +118,7 @@ public class ExcelVbaProject
 	/// Code Modules (Modules, classes, designer code)
 	/// </summary>
 	public ExcelVbaModuleCollection Modules { get; set; }
-	ExcelVbaSignature _signature = null;
+	ExcelVbaSignature _signature;
 	/// <summary>
 	/// The digital signature
 	/// </summary>
@@ -131,7 +131,7 @@ public class ExcelVbaProject
 			return _signature;
 		}
 	}
-	ExcelVbaProtection _protection = null;
+	ExcelVbaProtection _protection;
 	/// <summary>
 	/// VBA protection 
 	/// </summary>
@@ -170,7 +170,7 @@ public class ExcelVbaProject
 			var pos = 0;
 			while (pos + 9 < code.Length && code.Substring(pos, 9) == "Attribute")
 			{
-				var linePos = code.IndexOf("\r\n", pos);
+				var linePos = code.IndexOf("\r\n", pos, StringComparison.CurrentCulture);
 				string[] lineSplit;
 				if (linePos > 0)
 				{
@@ -185,7 +185,7 @@ public class ExcelVbaProject
 				{
 					lineSplit[1] = lineSplit[1].Trim();
 					var attr =
-						new ExcelVbaModuleAttribute()
+						new ExcelVbaModuleAttribute
 						{
 							Name = lineSplit[0].Trim(),
 							DataType = lineSplit[1].StartsWith("\"") ? eAttributeDataType.String : eAttributeDataType.NonString,
@@ -208,11 +208,7 @@ public class ExcelVbaProject
 		var lines = Regex.Split(ProjectStreamText, "\r\n");
 		foreach (var line in lines)
 		{
-			if (line.StartsWith("["))
-			{
-
-			}
-			else
+			if (!line.StartsWith("["))
 			{
 				var split = line.Split('=');
 				if (split.Length > 1 && split[1].Length > 1 && split[1].StartsWith("\"")) //Remove any double qouates
@@ -220,90 +216,92 @@ public class ExcelVbaProject
 					split[1] = split[1][1..^1];
 				}
 
-				switch (split[0])
+				if (!ReadModuleProperty(split, ref prevPackage))
 				{
-					case "ID":
-						ProjectID = split[1];
-						break;
-					case "Document":
-						var mn = split[1][..split[1].IndexOf("/&H")];
-						Modules[mn].Type = eModuleType.Document;
-						break;
-					case "Package":
-						prevPackage = split[1];
-						break;
-					case "BaseClass":
-						Modules[split[1]].Type = eModuleType.Designer;
-						Modules[split[1]].ClassID = prevPackage;
-						break;
-					case "Module":
-						Modules[split[1]].Type = eModuleType.Module;
-						break;
-					case "Class":
-						Modules[split[1]].Type = eModuleType.Class;
-						break;
-					case "HelpFile":
-					case "Name":
-					case "HelpContextID":
-					case "Description":
-					case "VersionCompatible32":
-						break;
-					//393222000"
-					case "CMG":
-						var cmg = Decrypt(split[1]);
-						_protection.UserProtected = (cmg[0] & 1) != 0;
-						_protection.HostProtected = (cmg[0] & 2) != 0;
-						_protection.VbeProtected = (cmg[0] & 4) != 0;
-						break;
-					case "DPB":
-						var dpb = Decrypt(split[1]);
-						if (dpb.Length >= 28)
-						{
-							var reserved = dpb[0];
-							var flags = new byte[3];
-							Array.Copy(dpb, 1, flags, 0, 3);
-							var keyNoNulls = new byte[4];
-							_protection.PasswordKey = new byte[4];
-							Array.Copy(dpb, 4, keyNoNulls, 0, 4);
-							var hashNoNulls = new byte[20];
-							_protection.PasswordHash = new byte[20];
-							Array.Copy(dpb, 8, hashNoNulls, 0, 20);
-							//Handle 0x00 bitwise 2.4.4.3 
-							for (var i = 0; i < 24; i++)
-							{
-								var bit = 128 >> (int)((i % 8));
-								if (i < 4)
-								{
-									if ((int)(flags[0] & bit) == 0)
-									{
-										_protection.PasswordKey[i] = 0;
-									}
-									else
-									{
-										_protection.PasswordKey[i] = keyNoNulls[i];
-									}
-								}
-								else
-								{
-									var flagIndex = (i - i % 8) / 8;
-									if ((int)(flags[flagIndex] & bit) == 0)
-									{
-										_protection.PasswordHash[i - 4] = 0;
-									}
-									else
-									{
-										_protection.PasswordHash[i - 4] = hashNoNulls[i - 4];
-									}
-								}
-							}
-						}
-
-						break;
-					case "GC":
-						_protection.VisibilityState = Decrypt(split[1])[0] == 0xFF;
-
-						break;
+					ReadProtectionProperty(split);
 				}
+			}
+		}
+	}
+
+	private bool ReadModuleProperty(string[] split, ref string prevPackage)
+	{
+		switch (split[0])
+		{
+			case "Document":
+				var mn = split[1][..split[1].IndexOf("/&H")];
+				Modules[mn].Type = eModuleType.Document;
+				return true;
+			case "Package":
+				prevPackage = split[1];
+				return true;
+			case "BaseClass":
+				Modules[split[1]].Type = eModuleType.Designer;
+				Modules[split[1]].ClassID = prevPackage;
+				return true;
+			case "Module":
+				Modules[split[1]].Type = eModuleType.Module;
+				return true;
+			case "Class":
+				Modules[split[1]].Type = eModuleType.Class;
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private void ReadProtectionProperty(string[] split)
+	{
+		switch (split[0])
+		{
+			case "ID":
+				ProjectID = split[1];
+				break;
+			case "CMG":
+				var cmg = Decrypt(split[1]);
+				_protection.UserProtected = (cmg[0] & 1) != 0;
+				_protection.HostProtected = (cmg[0] & 2) != 0;
+				_protection.VbeProtected = (cmg[0] & 4) != 0;
+				break;
+			case "DPB":
+				ReadPasswordHash(Decrypt(split[1]));
+				break;
+			case "GC":
+				_protection.VisibilityState = Decrypt(split[1])[0] == 0xFF;
+				break;
+			default:
+				// HelpFile, Name, HelpContextID, Description and VersionCompatible32 are not read back
+				break;
+		}
+	}
+
+	private void ReadPasswordHash(byte[] dpb)
+	{
+		if (dpb.Length < 28)
+		{
+			return;
+		}
+
+		var flags = new byte[3];
+		Array.Copy(dpb, 1, flags, 0, 3);
+		var keyNoNulls = new byte[4];
+		_protection.PasswordKey = new byte[4];
+		Array.Copy(dpb, 4, keyNoNulls, 0, 4);
+		var hashNoNulls = new byte[20];
+		_protection.PasswordHash = new byte[20];
+		Array.Copy(dpb, 8, hashNoNulls, 0, 20);
+		//Handle 0x00 bitwise 2.4.4.3
+		for (var i = 0; i < 24; i++)
+		{
+			var bit = 128 >> (i % 8);
+			if (i < 4)
+			{
+				_protection.PasswordKey[i] = (flags[0] & bit) == 0 ? (byte)0 : keyNoNulls[i];
+			}
+			else
+			{
+				var flagIndex = (i - i % 8) / 8;
+				_protection.PasswordHash[i - 4] = (flags[flagIndex] & bit) == 0 ? (byte)0 : hashNoNulls[i - 4];
 			}
 		}
 	}
@@ -317,7 +315,7 @@ public class ExcelVbaProject
 	{
 		var enc = GetByte(value);
 		var dec = new byte[(value.Length - 1)];
-		byte seed, version, projKey, ignoredLength;
+		byte seed, ignoredLength;
 		seed = enc[0];
 		dec[0] = (byte)(enc[1] ^ seed);
 		dec[1] = (byte)(enc[2] ^ seed);
@@ -326,8 +324,6 @@ public class ExcelVbaProject
 			dec[i] = (byte)(enc[i + 1] ^ (enc[i - 1] + dec[i - 1]));
 		}
 
-		version = dec[0];
-		projKey = dec[1];
 		ignoredLength = (byte)((seed & 6) / 2);
 		var datalength = BitConverter.ToInt32(dec, ignoredLength + 2);
 		var data = new byte[datalength];
@@ -379,20 +375,13 @@ public class ExcelVbaProject
 	}
 	private static string GetString(byte[] value, int max)
 	{
-		var ret = "";
+		var ret = new StringBuilder();
 		for (var i = 0; i <= max; i++)
 		{
-			if (value[i] < 16)
-			{
-				ret += "0" + value[i].ToString("x");
-			}
-			else
-			{
-				ret += value[i].ToString("x");
-			}
+			ret.Append(value[i].ToString("x2"));
 		}
 
-		return ret.ToUpperInvariant();
+		return ret.ToString().ToUpperInvariant();
 	}
 	private static byte[] GetByte(string value)
 	{
@@ -409,156 +398,223 @@ public class ExcelVbaProject
 		var dir = VBACompression.DecompressPart(Document.Storage.SubStorage["VBA"].DataStreams["dir"]);
 		MemoryStream ms = new(dir);
 		BinaryReader br = new(ms);
-		ExcelVbaReference currentRef = null;
-		var referenceName = "";
-		ExcelVBAModule currentModule = null;
-		var terminate = false;
-		while (br.BaseStream.Position < br.BaseStream.Length && terminate == false)
+		var state = new DirStreamState();
+		while (br.BaseStream.Position < br.BaseStream.Length)
 		{
 			var id = br.ReadUInt16();
 			var size = br.ReadUInt32();
-			switch (id)
+			//Terminator
+			if (id == 0x10)
 			{
-				case 0x01:
-					SystemKind = (eSyskind)br.ReadUInt32();
-					break;
-				case 0x02:
-					Lcid = (int)br.ReadUInt32();
-					break;
-				case 0x03:
-					CodePage = (int)br.ReadUInt16();
-					break;
-				case 0x04:
-					Name = GetString(br, size);
-					break;
-				case 0x05:
-					Description = GetUnicodeString(br, size);
-					break;
-				case 0x06:
-					HelpFile1 = GetString(br, size);
-					break;
-				case 0x3D:
-					HelpFile2 = GetString(br, size);
-					break;
-				case 0x07:
-					HelpContextID = (int)br.ReadUInt32();
-					break;
-				case 0x08:
-					LibFlags = (int)br.ReadUInt32();
-					break;
-				case 0x09:
-					MajorVersion = (int)br.ReadUInt32();
-					MinorVersion = (int)br.ReadUInt16();
-					break;
-				case 0x0C:
-					Constants = GetUnicodeString(br, size);
-					break;
-				case 0x0D:
-					var sizeLibID = br.ReadUInt32();
-					var regRef = new ExcelVbaReference
-					{
-						Name = referenceName,
-						ReferenceRecordID = id,
-						Libid = GetString(br, sizeLibID)
-					};
-					var reserved1 = br.ReadUInt32();
-					var reserved2 = br.ReadUInt16();
-					References.Add(regRef);
-					break;
-				case 0x0E:
-					var projRef = new ExcelVbaReferenceProject
-					{
-						ReferenceRecordID = id,
-						Name = referenceName
-					};
-					sizeLibID = br.ReadUInt32();
-					projRef.Libid = GetString(br, sizeLibID);
-					sizeLibID = br.ReadUInt32();
-					projRef.LibIdRelative = GetString(br, sizeLibID);
-					projRef.MajorVersion = br.ReadUInt32();
-					projRef.MinorVersion = br.ReadUInt16();
-					References.Add(projRef);
-					break;
-				case 0x0F:
-					var modualCount = br.ReadUInt16();
-					break;
-				case 0x13:
-					var cookie = br.ReadUInt16();
-					break;
-				case 0x14:
-					LcidInvoke = (int)br.ReadUInt32();
-					break;
-				case 0x16:
-					referenceName = GetUnicodeString(br, size);
-					break;
-				case 0x19:
-					currentModule = new ExcelVBAModule
-					{
-						Name = GetUnicodeString(br, size)
-					};
-					Modules.Add(currentModule);
-					break;
-				case 0x1A:
-					currentModule.streamName = GetUnicodeString(br, size);
-					break;
-				case 0x1C:
-					currentModule.Description = GetUnicodeString(br, size);
-					break;
-				case 0x1E:
-					currentModule.HelpContext = (int)br.ReadUInt32();
-					break;
-				case 0x21:
-				case 0x22:
-					break;
-				case 0x2B:      //Modul Terminator
-					break;
-				case 0x2C:
-					currentModule.Cookie = br.ReadUInt16();
-					break;
-				case 0x31:
-					currentModule.ModuleOffset = br.ReadUInt32();
-					break;
-				case 0x10:
-					terminate = true;
-					break;
-				case 0x30:
-					var extRef = (ExcelVbaReferenceControl)currentRef;
-					var sizeExt = br.ReadUInt32();
-					extRef.LibIdExternal = GetString(br, sizeExt);
-
-					var reserved4 = br.ReadUInt32();
-					var reserved5 = br.ReadUInt16();
-					extRef.OriginalTypeLib = new Guid(br.ReadBytes(16));
-					extRef.Cookie = br.ReadUInt32();
-					break;
-				case 0x33:
-					currentRef = new ExcelVbaReferenceControl
-					{
-						ReferenceRecordID = id,
-						Name = referenceName,
-						Libid = GetString(br, size)
-					};
-					References.Add(currentRef);
-					break;
-				case 0x2F:
-					var contrRef = (ExcelVbaReferenceControl)currentRef;
-					contrRef.ReferenceRecordID = id;
-
-					var sizeTwiddled = br.ReadUInt32();
-					contrRef.LibIdTwiddled = GetString(br, sizeTwiddled);
-					var r1 = br.ReadUInt32();
-					var r2 = br.ReadUInt16();
-
-					break;
-				case 0x25:
-					currentModule.ReadOnly = true;
-					break;
-				case 0x28:
-					currentModule.Private = true;
-					break;
-				default:
-					break;
+				break;
 			}
+
+			if (!ReadProjectInfoRecord(br, id, size)
+				&& !ReadProjectVersionRecord(br, id, size)
+				&& !ReadReferenceRecord(br, id, size, state)
+				&& !ReadModuleRecord(br, id, size, state))
+			{
+				ReadModuleFlagRecord(br, id, state);
+			}
+		}
+	}
+
+	private sealed class DirStreamState
+	{
+		internal ExcelVbaReference CurrentRef { get; set; }
+		internal string ReferenceName { get; set; } = "";
+		internal ExcelVBAModule CurrentModule { get; set; }
+	}
+
+	private bool ReadProjectInfoRecord(BinaryReader br, ushort id, uint size)
+	{
+		switch (id)
+		{
+			case 0x01:
+				SystemKind = (eSyskind)br.ReadUInt32();
+				return true;
+			case 0x02:
+				Lcid = (int)br.ReadUInt32();
+				return true;
+			case 0x03:
+				CodePage = (int)br.ReadUInt16();
+				return true;
+			case 0x04:
+				Name = GetString(br, size);
+				return true;
+			case 0x05:
+				Description = GetUnicodeString(br, size);
+				return true;
+			case 0x06:
+				HelpFile1 = GetString(br, size);
+				return true;
+			case 0x3D:
+				HelpFile2 = GetString(br, size);
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private bool ReadProjectVersionRecord(BinaryReader br, ushort id, uint size)
+	{
+		switch (id)
+		{
+			case 0x07:
+				HelpContextID = (int)br.ReadUInt32();
+				return true;
+			case 0x08:
+				LibFlags = (int)br.ReadUInt32();
+				return true;
+			case 0x09:
+				MajorVersion = (int)br.ReadUInt32();
+				MinorVersion = (int)br.ReadUInt16();
+				return true;
+			case 0x0C:
+				Constants = GetUnicodeString(br, size);
+				return true;
+			case 0x14:
+				LcidInvoke = (int)br.ReadUInt32();
+				return true;
+			case 0x0F:
+			case 0x13:
+				// Module count and cookie are not kept
+				_ = br.ReadUInt16();
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private bool ReadReferenceRecord(BinaryReader br, ushort id, uint size, DirStreamState state)
+	{
+		switch (id)
+		{
+			case 0x16:
+				state.ReferenceName = GetUnicodeString(br, size);
+				return true;
+			case 0x0D:
+				ReadRegisteredReference(br, id, state.ReferenceName);
+				return true;
+			case 0x0E:
+				ReadProjectReference(br, id, state.ReferenceName);
+				return true;
+			case 0x33:
+				state.CurrentRef = new ExcelVbaReferenceControl
+				{
+					ReferenceRecordID = id,
+					Name = state.ReferenceName,
+					Libid = GetString(br, size)
+				};
+				References.Add(state.CurrentRef);
+				return true;
+			case 0x30:
+				ReadExtendedReference(br, (ExcelVbaReferenceControl)state.CurrentRef);
+				return true;
+			case 0x2F:
+				ReadTwiddledReference(br, id, (ExcelVbaReferenceControl)state.CurrentRef);
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private void ReadRegisteredReference(BinaryReader br, ushort id, string referenceName)
+	{
+		var sizeLibID = br.ReadUInt32();
+		var regRef = new ExcelVbaReference
+		{
+			Name = referenceName,
+			ReferenceRecordID = id,
+			Libid = GetString(br, sizeLibID)
+		};
+		// Reserved1, Reserved2
+		_ = br.ReadUInt32();
+		_ = br.ReadUInt16();
+		References.Add(regRef);
+	}
+
+	private void ReadProjectReference(BinaryReader br, ushort id, string referenceName)
+	{
+		var projRef = new ExcelVbaReferenceProject
+		{
+			ReferenceRecordID = id,
+			Name = referenceName
+		};
+		var sizeLibID = br.ReadUInt32();
+		projRef.Libid = GetString(br, sizeLibID);
+		sizeLibID = br.ReadUInt32();
+		projRef.LibIdRelative = GetString(br, sizeLibID);
+		projRef.MajorVersion = br.ReadUInt32();
+		projRef.MinorVersion = br.ReadUInt16();
+		References.Add(projRef);
+	}
+
+	private void ReadExtendedReference(BinaryReader br, ExcelVbaReferenceControl extRef)
+	{
+		var sizeExt = br.ReadUInt32();
+		extRef.LibIdExternal = GetString(br, sizeExt);
+		// Reserved4, Reserved5
+		_ = br.ReadUInt32();
+		_ = br.ReadUInt16();
+		extRef.OriginalTypeLib = new Guid(br.ReadBytes(16));
+		extRef.Cookie = br.ReadUInt32();
+	}
+
+	private void ReadTwiddledReference(BinaryReader br, ushort id, ExcelVbaReferenceControl contrRef)
+	{
+		contrRef.ReferenceRecordID = id;
+		var sizeTwiddled = br.ReadUInt32();
+		contrRef.LibIdTwiddled = GetString(br, sizeTwiddled);
+		// Reserved1, Reserved2
+		_ = br.ReadUInt32();
+		_ = br.ReadUInt16();
+	}
+
+	private bool ReadModuleRecord(BinaryReader br, ushort id, uint size, DirStreamState state)
+	{
+		switch (id)
+		{
+			case 0x19:
+				state.CurrentModule = new ExcelVBAModule
+				{
+					Name = GetUnicodeString(br, size)
+				};
+				Modules.Add(state.CurrentModule);
+				return true;
+			case 0x1A:
+				state.CurrentModule.streamName = GetUnicodeString(br, size);
+				return true;
+			case 0x1C:
+				state.CurrentModule.Description = GetUnicodeString(br, size);
+				return true;
+			case 0x1E:
+				state.CurrentModule.HelpContext = (int)br.ReadUInt32();
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	private static void ReadModuleFlagRecord(BinaryReader br, ushort id, DirStreamState state)
+	{
+		switch (id)
+		{
+			case 0x2C:
+				state.CurrentModule.Cookie = br.ReadUInt16();
+				break;
+			case 0x31:
+				state.CurrentModule.ModuleOffset = br.ReadUInt32();
+				break;
+			case 0x25:
+				state.CurrentModule.ReadOnly = true;
+				break;
+			case 0x28:
+				state.CurrentModule.Private = true;
+				break;
+			default:
+				// Module type (0x21, 0x22), terminator (0x2B) and unknown records carry no data to keep
+				break;
 		}
 	}
 	#endregion
@@ -609,7 +665,7 @@ public class ExcelVbaProject
 			{
 				Uri = new Uri(PartUri, UriKind.Relative);
 				Part = _pck.CreatePart(Uri, ExcelPackage.schemaVBA);
-				var rel = _wb.Part.CreateRelationship(Uri, Packaging.TargetMode.Internal, schemaRelVba);
+				_wb.Part.CreateRelationship(Uri, Packaging.TargetMode.Internal, schemaRelVba);
 			}
 
 			var st = Part.GetStream(FileMode.Create);
@@ -649,7 +705,51 @@ public class ExcelVbaProject
 	private byte[] CreateDirStream()
 	{
 		BinaryWriter bw = new(new MemoryStream());
+		WriteProjectInformation(bw);
 
+		/****** PROJECTREFERENCES Record ******/
+		foreach (var reference in References)
+		{
+			WriteNameReference(bw, reference);
+
+			if (reference.ReferenceRecordID == 0x2F)
+			{
+				WriteControlReference(bw, reference);
+			}
+			else if (reference.ReferenceRecordID == 0x33)
+			{
+				WriteOrginalReference(bw, reference);
+			}
+			else if (reference.ReferenceRecordID == 0x0D)
+			{
+				WriteRegisteredReference(bw, reference);
+			}
+			else if (reference.ReferenceRecordID == 0x0E)
+			{
+				WriteProjectReference(bw, reference);
+			}
+		}
+
+		bw.Write((ushort)0x0F);
+		bw.Write((uint)0x02);
+		bw.Write((ushort)Modules.Count);
+		bw.Write((ushort)0x13);
+		bw.Write((uint)0x02);
+		bw.Write((ushort)0xFFFF);
+
+		foreach (var module in Modules)
+		{
+			WriteModuleRecord(bw, module);
+		}
+
+		bw.Write((ushort)0x10);             //Terminator
+		bw.Write((uint)0);
+
+		return VBACompression.CompressPart(((MemoryStream)bw.BaseStream).ToArray());
+	}
+
+	private void WriteProjectInformation(BinaryWriter bw)
+	{
 		/****** PROJECTINFORMATION Record ******/
 		bw.Write((ushort)1);        //ID
 		bw.Write((uint)4);          //Size
@@ -711,46 +811,6 @@ public class ExcelVbaProject
 		bw.Write((ushort)0x3C);                                           //ID
 		bw.Write((uint)Constants.Length / 2);                              //Size
 		bw.Write(Encoding.Unicode.GetBytes(Constants));  //HelpFile2
-
-		/****** PROJECTREFERENCES Record ******/
-		foreach (var reference in References)
-		{
-			WriteNameReference(bw, reference);
-
-			if (reference.ReferenceRecordID == 0x2F)
-			{
-				WriteControlReference(bw, reference);
-			}
-			else if (reference.ReferenceRecordID == 0x33)
-			{
-				WriteOrginalReference(bw, reference);
-			}
-			else if (reference.ReferenceRecordID == 0x0D)
-			{
-				WriteRegisteredReference(bw, reference);
-			}
-			else if (reference.ReferenceRecordID == 0x0E)
-			{
-				WriteProjectReference(bw, reference);
-			}
-		}
-
-		bw.Write((ushort)0x0F);
-		bw.Write((uint)0x02);
-		bw.Write((ushort)Modules.Count);
-		bw.Write((ushort)0x13);
-		bw.Write((uint)0x02);
-		bw.Write((ushort)0xFFFF);
-
-		foreach (var module in Modules)
-		{
-			WriteModuleRecord(bw, module);
-		}
-
-		bw.Write((ushort)0x10);             //Terminator
-		bw.Write((uint)0);
-
-		return VBACompression.CompressPart(((MemoryStream)bw.BaseStream).ToArray());
 	}
 
 	private void WriteModuleRecord(BinaryWriter bw, ExcelVBAModule module)
@@ -926,7 +986,7 @@ public class ExcelVbaProject
 			sb.AppendFormat("Description=\"{0}\"\r\n", Description);
 		}
 
-		sb.AppendFormat("VersionCompatible32=\"393222000\"\r\n");
+		sb.Append("VersionCompatible32=\"393222000\"\r\n");
 
 		sb.AppendFormat("CMG=\"{0}\"\r\n", WriteProtectionStat());
 		sb.AppendFormat("DPB=\"{0}\"\r\n", WritePassword());
@@ -969,7 +1029,7 @@ public class ExcelVbaProject
 			//Set Null bits
 			for (var i = 0; i < 24; i++)
 			{
-				var bit = (byte)(128 >> (int)((i % 8)));
+				var bit = (byte)(128 >> (i % 8));
 				if (i < 4)
 				{
 					if (nullKey[i] == 0)
@@ -1011,8 +1071,7 @@ public class ExcelVbaProject
 	{
 		if (size > 0)
 		{
-			var byteTemp = new byte[size];
-			byteTemp = br.ReadBytes((int)size);
+			var byteTemp = br.ReadBytes((int)size);
 			return enc.GetString(byteTemp);
 		}
 		else
@@ -1023,7 +1082,7 @@ public class ExcelVbaProject
 	private string GetUnicodeString(BinaryReader br, uint size)
 	{
 		var s = GetString(br, size);
-		int reserved = br.ReadUInt16();
+		_ = br.ReadUInt16();
 		var sizeUC = br.ReadUInt32();
 		var sUC = GetString(br, sizeUC, Encoding.Unicode);
 		return sUC.Length == 0 ? s : sUC;
@@ -1073,7 +1132,7 @@ public class ExcelVbaProject
 			name = "Sheet" + i.ToString();
 			while (Modules[name] != null)
 			{
-				name = "Sheet" + (++i).ToString(); ;
+				name = "Sheet" + (++i).ToString();
 			}
 		}
 
@@ -1082,14 +1141,14 @@ public class ExcelVbaProject
 	internal static ExcelVbaModuleAttributesCollection GetDocumentAttributes(string name, string clsid)
 	{
 		var attr = new ExcelVbaModuleAttributesCollection();
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Name", Value = name, DataType = eAttributeDataType.String });
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Base", Value = clsid, DataType = eAttributeDataType.String });
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_GlobalNameSpace", Value = "False", DataType = eAttributeDataType.NonString });
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Creatable", Value = "False", DataType = eAttributeDataType.NonString });
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_PredeclaredId", Value = "True", DataType = eAttributeDataType.NonString });
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Exposed", Value = "False", DataType = eAttributeDataType.NonString });
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_TemplateDerived", Value = "False", DataType = eAttributeDataType.NonString });
-		attr._list.Add(new ExcelVbaModuleAttribute() { Name = "VB_Customizable", Value = "True", DataType = eAttributeDataType.NonString });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Name", Value = name, DataType = eAttributeDataType.String });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Base", Value = clsid, DataType = eAttributeDataType.String });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_GlobalNameSpace", Value = "False", DataType = eAttributeDataType.NonString });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Creatable", Value = "False", DataType = eAttributeDataType.NonString });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_PredeclaredId", Value = "True", DataType = eAttributeDataType.NonString });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Exposed", Value = "False", DataType = eAttributeDataType.NonString });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_TemplateDerived", Value = "False", DataType = eAttributeDataType.NonString });
+		attr._list.Add(new ExcelVbaModuleAttribute { Name = "VB_Customizable", Value = "True", DataType = eAttributeDataType.NonString });
 
 		return attr;
 	}
