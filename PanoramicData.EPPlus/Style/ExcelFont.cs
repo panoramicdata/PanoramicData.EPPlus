@@ -30,6 +30,7 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
 namespace OfficeOpenXml.Style;
@@ -196,5 +197,6 @@ public sealed class ExcelFont : StyleBase
 		}
 	}
 
+	[SuppressMessage("Minor Code Smell", "S1449:Culture should be specified for \"string\" operations", Justification = "Id is an in-process style cache key built the same way as its counterparts; changing the format could stop existing styles matching.")]
 	internal override string Id => Name + Size.ToString() + Family.ToString() + Scheme.ToString() + Bold.ToString()[0] + Italic.ToString()[0] + Strike.ToString()[0] + UnderLine.ToString()[0] + VerticalAlign;
 }

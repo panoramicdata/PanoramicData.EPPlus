@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Style.XmlAccess;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OfficeOpenXml.Style;
 
@@ -177,5 +178,6 @@ public class ExcelGradientFill : StyleBase
 
 		}
 	}
+	[SuppressMessage("Minor Code Smell", "S1449:Culture should be specified for \"string\" operations", Justification = "Id is an in-process style cache key built the same way as its counterparts; changing the format could stop existing styles matching.")]
 	internal override string Id => Degree.ToString() + Type + Color1.Id + Color2.Id + Top.ToString() + Bottom.ToString() + Left.ToString() + Right.ToString();
 }
