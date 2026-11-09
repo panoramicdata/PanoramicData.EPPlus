@@ -43,18 +43,7 @@ internal class ExcelDataValidationFormulaDecimal : ExcelDataValidationFormulaVal
 	public ExcelDataValidationFormulaDecimal(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
 		: base(namespaceManager, topNode, formulaPath)
 	{
-		var value = GetXmlNodeString(formulaPath);
-		if (!string.IsNullOrEmpty(value))
-		{
-			if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var dValue))
-			{
-				Value = dValue;
-			}
-			else
-			{
-				ExcelFormula = value;
-			}
-		}
+		LoadNumberOrFormula(formulaPath, dValue => dValue);
 	}
 
 	protected override string GetValueAsString() => Value.HasValue ? Value.Value.ToString("R15", CultureInfo.InvariantCulture) : string.Empty;

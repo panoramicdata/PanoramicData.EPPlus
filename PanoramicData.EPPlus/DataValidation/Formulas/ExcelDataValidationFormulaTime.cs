@@ -59,7 +59,7 @@ internal class ExcelDataValidationFormulaTime : ExcelDataValidationFormulaValue<
 			Value = new ExcelTime();
 		}
 
-		Value.TimeChanged += new EventHandler(Value_TimeChanged);
+		Value.TimeChanged += Value_TimeChanged;
 	}
 
 	void Value_TimeChanged(object sender, EventArgs e) => SetXmlNodeString(FormulaPath, Value.ToExcelString());
