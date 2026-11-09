@@ -84,7 +84,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	{
 		internal int pos;
 		internal string Text;
-		internal bool isRichText = false;
+		internal bool isRichText;
 	}
 	#region Private Properties
 	internal ExcelPackage _package;
@@ -120,11 +120,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	internal Dictionary<string, SharedStringItem> _sharedStrings = []; //Used when reading cells.
 	internal List<SharedStringItem> _sharedStringsList = []; //Used when reading cells.
 	internal ExcelNamedRangeCollection _names;
-	internal int _nextDrawingID = 0;
+	internal int _nextDrawingID;
 	internal int _nextTableID = int.MinValue;
 	internal int _nextPivotTableID = int.MinValue;
 	internal XmlNamespaceManager _namespaceManager;
-	internal FormulaParser _formulaParser = null;
+	internal FormulaParser _formulaParser;
 	internal FormulaParserManager _parserManager;
 	internal CellStore<List<Token>> _formulaTokens;
 	/// <summary>
@@ -391,7 +391,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		}
 	}
 
-	ExcelProtection _protection = null;
+	ExcelProtection _protection;
 	/// <summary>
 	/// Access properties to protect or unprotect a workbook
 	/// </summary>
@@ -407,7 +407,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			return _protection;
 		}
 	}
-	ExcelWorkbookView _view = null;
+	ExcelWorkbookView _view;
 	/// <summary>
 	/// Access to workbook view properties
 	/// </summary>
@@ -420,7 +420,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			return _view;
 		}
 	}
-	ExcelVbaProject _vba = null;
+	ExcelVbaProject _vba;
 	/// <summary>
 	/// A reference to the VBA project.
 	/// Null if no project exists.
@@ -506,7 +506,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 
 	const string date1904Path = "d:workbookPr/@date1904";
 	internal const double date1904Offset = 365.5 * 4;  // offset to fix 1900 and 1904 differences, 4 OLE years
-	private bool? date1904Cache = null;
+	private bool? date1904Cache;
 
 	internal bool ExistsPivotCache(int cacheID, ref int newID)
 	{

@@ -110,15 +110,15 @@ public class ExcelHeaderFooterText
 	/// <summary>
 	/// Get/set the text to appear on the left hand side of the header (or footer) on the worksheet.
 	/// </summary>
-	public string LeftAlignedText = null;
+	public string LeftAlignedText;
 	/// <summary>
 	/// Get/set the text to appear in the center of the header (or footer) on the worksheet.
 	/// </summary>
-	public string CenteredText = null;
+	public string CenteredText;
 	/// <summary>
 	/// Get/set the text to appear on the right hand side of the header (or footer) on the worksheet.
 	/// </summary>
-	public string RightAlignedText = null;
+	public string RightAlignedText;
 	/// <summary>
 	/// Inserts a picture at the end of the text in the header or footer
 	/// </summary>
@@ -467,7 +467,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			return _firstFooter;
 		}
 	}
-	private ExcelVmlDrawingPictureCollection _vmlDrawingsHF = null;
+	private ExcelVmlDrawingPictureCollection _vmlDrawingsHF;
 	/// <summary>
 	/// Vml drawings. Underlaying object for Header footer images
 	/// </summary>

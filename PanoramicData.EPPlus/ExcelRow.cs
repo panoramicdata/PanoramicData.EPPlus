@@ -32,6 +32,7 @@
 
 using OfficeOpenXml.Style;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 namespace OfficeOpenXml;
 
@@ -63,6 +64,7 @@ internal class RowInternal
 public class ExcelRow : IRangeID
 {
 	private readonly ExcelWorksheet _worksheet;
+	[SuppressMessage("Minor Code Smell", "S3052:Members should not be initialized to default values", Justification = "The field is never assigned; without the initialiser CS0649 fails the build.")]
 	private readonly XmlElement _rowElement = null;
 	/// <summary>
 	/// Internal RowID.
@@ -86,7 +88,7 @@ public class ExcelRow : IRangeID
 	/// <summary>
 	/// Provides access to the node representing the row.
 	/// </summary>
-	internal XmlNode Node => (_rowElement);
+	internal XmlNode Node => _rowElement;
 
 	#region ExcelRow Hidden
 	/// <summary>

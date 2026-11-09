@@ -171,8 +171,8 @@ public enum CompressionLevel
 public sealed class ExcelPackage : IDisposable
 {
 	internal const bool preserveWhitespace = false;
-	Stream _stream = null;
-	private bool _isExternalStream = false;
+	Stream _stream;
+	private bool _isExternalStream;
 	internal class ImageInfo
 	{
 		internal string Hash { get; set; }
@@ -631,7 +631,7 @@ public sealed class ExcelPackage : IDisposable
 	/// Returns a reference to the package
 	/// </summary>
 	public Packaging.ZipPackage Package => (_package);
-	ExcelEncryption _encryption = null;
+	ExcelEncryption _encryption;
 	/// <summary>
 	/// Information how and if the package is encrypted
 	/// </summary>
@@ -946,7 +946,7 @@ public sealed class ExcelPackage : IDisposable
 		Encryption.Password = password;
 		SaveAs(OutputStream);
 	}
-	FileInfo _file = null;
+	FileInfo _file;
 
 	/// <summary>
 	/// The output file. Null if no file is used
@@ -996,7 +996,7 @@ public sealed class ExcelPackage : IDisposable
 			Package.Compression = value;
 		}
 	}
-	CompatibilitySettings _compatibility = null;
+	CompatibilitySettings _compatibility;
 	/// <summary>
 	/// Compatibility settings for older versions of EPPlus.
 	/// </summary>
@@ -1172,7 +1172,7 @@ public sealed class ExcelPackage : IDisposable
 		_workbook = null;
 	}
 	static readonly object _lock = new();
-	internal int _worksheetAdd = 0;
+	internal int _worksheetAdd;
 	/// <summary>
 	/// Copies the input stream to the output stream.
 	/// </summary>

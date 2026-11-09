@@ -168,7 +168,7 @@ public class ExcelWorksheetView : XmlHelper
 	protected internal XmlElement SheetViewElement => (XmlElement)TopNode;
 	#endregion
 	#region TabSelected
-	private XmlElement _selectionNode = null;
+	private XmlElement _selectionNode;
 	private XmlElement SelectionNode
 	{
 		get

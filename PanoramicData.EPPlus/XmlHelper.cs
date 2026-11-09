@@ -64,7 +64,7 @@ public abstract class XmlHelper
 
 	internal XmlNode? TopNode { get; set; }
 
-	string[]? _schemaNodeOrder = null;
+	string[]? _schemaNodeOrder;
 
 	/// <summary>
 	/// Schema order list

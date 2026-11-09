@@ -211,7 +211,7 @@ internal class PageIndex : IndexBase, IDisposable
 	{
 		Rows = null;
 	}
-	internal int Offset = 0;
+	internal int Offset;
 	internal int IndexOffset => IndexExpanded + (int)Offset;
 	internal int IndexExpanded => (Index << CellStore<int>.pageBits);
 	internal IndexItem[]? Rows { get; set; }

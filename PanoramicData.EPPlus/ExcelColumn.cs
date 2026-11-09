@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Style;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 namespace OfficeOpenXml;
 
@@ -40,6 +41,7 @@ namespace OfficeOpenXml;
 public class ExcelColumn : IRangeID
 {
 	private readonly ExcelWorksheet _worksheet;
+	[SuppressMessage("Minor Code Smell", "S3052:Members should not be initialized to default values", Justification = "The field is never assigned; without the initialiser CS0649 fails the build.")]
 	private readonly XmlElement _colElement = null;
 
 	#region ExcelColumn Constructor
@@ -98,7 +100,7 @@ public class ExcelColumn : IRangeID
 	/// <summary>
 	/// Allows the column to be hidden in the worksheet
 	/// </summary>
-	internal bool _hidden = false;
+	internal bool _hidden;
 	public bool Hidden
 	{
 		get

@@ -66,7 +66,7 @@ public class ExcelProtectedRange : XmlHelper
 			SetXmlNodeString("@name", value);
 		}
 	}
-	ExcelAddress _address = null;
+	ExcelAddress _address;
 	public ExcelAddress Address
 	{
 		get

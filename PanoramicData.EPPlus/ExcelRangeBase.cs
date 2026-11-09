@@ -64,7 +64,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// Reference to the worksheet
 	/// </summary>
 	protected ExcelWorksheet _worksheet;
-	internal ExcelWorkbook? _workbook = null;
+	internal ExcelWorkbook? _workbook;
 	private delegate void _changeProp(ExcelRangeBase range, _setValue method, object? value);
 	private delegate void _setValue(ExcelRangeBase range, object value, int row, int col);
 	private _changeProp _changePropMethod;
@@ -1284,7 +1284,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			return _worksheet._flags.GetFlagValue(_fromRow, _fromCol, CellFlags.ArrayFormula);
 		}
 	}
-	protected ExcelRichTextCollection? _rtc = null;
+	protected ExcelRichTextCollection? _rtc;
 	/// <summary>
 	/// Cell value is richtext formatted. 
 	/// Richtext-property only apply to the left-top cell of the range.

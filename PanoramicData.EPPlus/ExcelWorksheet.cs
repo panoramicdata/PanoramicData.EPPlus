@@ -326,7 +326,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 	internal Dictionary<int, Formulas>? _sharedFormulas = [];
 	internal int _minCol = ExcelPackage.MaxColumns;
-	internal int _maxCol = 0;
+	internal int _maxCol;
 	#region Worksheet Private Properties
 	internal ExcelPackage? _package;
 	private readonly Uri _worksheetUri;
@@ -770,7 +770,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// </summary>
 	public XmlDocument WorksheetXml => (_worksheetXml);
 
-	internal ExcelVmlDrawingCommentCollection? _vmlDrawings = null;
+	internal ExcelVmlDrawingCommentCollection? _vmlDrawings;
 
 	/// <summary>
 	/// Vml drawings. underlaying object for comments
@@ -788,7 +788,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 	}
 
-	internal ExcelCommentCollection? _comments = null;
+	internal ExcelCommentCollection? _comments;
 	/// <summary>
 	/// Collection of comments
 	/// </summary>
@@ -3653,7 +3653,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		remove.ForEach(i => _sharedFormulas.Remove(i));
 	}
 
-	private Dictionary<int, int>? _columnStyles = null;
+	private Dictionary<int, int>? _columnStyles;
 
 	// get StyleID without cell style for UpdateRowCellData
 	internal int GetStyleIdDefaultWithMemo(int row, int col)
@@ -3996,7 +3996,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 	}
-	ExcelSheetProtection? _protection = null;
+	ExcelSheetProtection? _protection;
 	/// <summary>
 	/// Access to sheet protection properties
 	/// </summary>
@@ -4021,7 +4021,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	}
 
 	#region Drawing
-	ExcelDrawings? _drawings = null;
+	ExcelDrawings? _drawings;
 	/// <summary>
 	/// Collection of drawing-objects like shapes, images and charts
 	/// </summary>
@@ -4037,7 +4037,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	#endregion
 
 	#region SparklineGroups
-	ExcelSparklineGroupCollection? _sparklineGroups = null;
+	ExcelSparklineGroupCollection? _sparklineGroups;
 	/// <summary>
 	/// Collection of Sparkline-objects. 
 	/// Sparklines are small in-cell charts.
@@ -4053,7 +4053,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	}
 	#endregion
 
-	ExcelTableCollection? _tables = null;
+	ExcelTableCollection? _tables;
 	/// <summary>
 	/// Tables defined in the worksheet.
 	/// </summary>
@@ -4072,7 +4072,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _tables;
 		}
 	}
-	internal ExcelPivotTableCollection? _pivotTables = null;
+	internal ExcelPivotTableCollection? _pivotTables;
 	/// <summary>
 	/// Pivottables defined in the worksheet.
 	/// </summary>
@@ -4094,7 +4094,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _pivotTables;
 		}
 	}
-	private ExcelConditionalFormattingCollection? _conditionalFormatting = null;
+	private ExcelConditionalFormattingCollection? _conditionalFormatting;
 	/// <summary>
 	/// ConditionalFormatting defined in the worksheet. Use the Add methods to create ConditionalFormatting and add them to the worksheet. Then
 	/// set the properties on the instance returned.
@@ -4110,7 +4110,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			return _conditionalFormatting;
 		}
 	}
-	private ExcelDataValidationCollection? _dataValidation = null;
+	private ExcelDataValidationCollection? _dataValidation;
 	/// <summary>
 	/// DataValidation defined in the worksheet. Use the Add methods to create DataValidations and add them to the worksheet. Then
 	/// set the properties on the instance returned.
@@ -4129,7 +4129,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 	internal void ClearValidations() => _dataValidation = null;
 
-	ExcelBackgroundImage? _backgroundImage = null;
+	ExcelBackgroundImage? _backgroundImage;
 	/// <summary>
 	/// An image displayed as the background of the worksheet.
 	/// </summary>
