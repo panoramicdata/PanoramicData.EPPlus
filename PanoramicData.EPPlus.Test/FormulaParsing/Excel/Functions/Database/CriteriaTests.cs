@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 
@@ -35,20 +33,13 @@ public class CriteriaTests
 	}
 
 	[TestMethod]
-	public void CriteriaShouldIgnoreEmptyFields1()
-	{
-		var criteria = ReadCriteria(("A1", "Crit1"), ("B1", "Crit2"), ("A2", 1));
-
-		Assert.AreEqual(1, criteria.Items.Count);
-		Assert.AreEqual("crit1", criteria.Items.Keys.First().ToString());
-		Assert.AreEqual(1, criteria.Items.Values.Last());
-	}
+	public void CriteriaShouldIgnoreEmptyFields1() => AssertOnlyCrit1Is1(ReadCriteria(("A1", "Crit1"), ("B1", "Crit2"), ("A2", 1)));
 
 	[TestMethod]
-	public void CriteriaShouldIgnoreEmptyFields2()
-	{
-		var criteria = ReadCriteria(("A1", "Crit1"), ("A2", 1));
+	public void CriteriaShouldIgnoreEmptyFields2() => AssertOnlyCrit1Is1(ReadCriteria(("A1", "Crit1"), ("A2", 1)));
 
+	private static void AssertOnlyCrit1Is1(ExcelDatabaseCriteria criteria)
+	{
 		Assert.AreEqual(1, criteria.Items.Count);
 		Assert.AreEqual("crit1", criteria.Items.Keys.First().ToString());
 		Assert.AreEqual(1, criteria.Items.Values.Last());

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Text;
 using OfficeOpenXml.Utils;
 using OfficeOpenXml;
 using System.Security.Cryptography.X509Certificates;
-using System.IO;
 
 namespace PanoramicData.EPPlus.Test;
 
@@ -33,21 +29,9 @@ public class VBATests
 	public void ReadVBA()
 	{
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\report.xlsm"));
-		File.WriteAllText(@"c:\temp\vba\modules\dir.txt", package.Workbook.VbaProject.CodePage + "," + package.Workbook.VbaProject.Constants + "," + package.Workbook.VbaProject.Description + "," + package.Workbook.VbaProject.HelpContextID.ToString() + "," + package.Workbook.VbaProject.HelpFile1 + "," + package.Workbook.VbaProject.HelpFile2 + "," + package.Workbook.VbaProject.Lcid.ToString() + "," + package.Workbook.VbaProject.LcidInvoke.ToString() + "," + package.Workbook.VbaProject.LibFlags.ToString() + "," + package.Workbook.VbaProject.MajorVersion.ToString() + "," + package.Workbook.VbaProject.MinorVersion.ToString() + "," + package.Workbook.VbaProject.Name + "," + package.Workbook.VbaProject.ProjectID + "," + package.Workbook.VbaProject.SystemKind.ToString() + "," + package.Workbook.VbaProject.Protection.HostProtected.ToString() + "," + package.Workbook.VbaProject.Protection.UserProtected.ToString() + "," + package.Workbook.VbaProject.Protection.VbeProtected.ToString() + "," + package.Workbook.VbaProject.Protection.VisibilityState.ToString());
-		foreach (var module in package.Workbook.VbaProject.Modules)
-		{
-			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", module.Name), module.Code);
-		}
+		WriteVbaProjectToTextFiles(package);
 
-		foreach (var r in package.Workbook.VbaProject.References)
-		{
-			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", r.Name), r.Libid + " " + r.ReferenceRecordID.ToString());
-		}
-
-		List<X509Certificate2> ret = [];
-		X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
-		store.Open(OpenFlags.ReadOnly);
-		package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
+		SignWithTwentiethCertificate(package);
 		package.SaveAs(new FileInfo(@"c:\temp\vbaSaved.xlsm"));
 	}
 	[Ignore]
@@ -103,10 +87,6 @@ public class VBATests
 		code.AppendLine("End Sub");
 		module.Code = code.ToString();
 
-		//X509Store store = new X509Store(StoreLocation.CurrentUser);
-		//store.Open(OpenFlags.ReadOnly);
-		//package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
-
 		package.SaveAs(new FileInfo(@"c:\temp\vbaLong.xlsm"));
 	}
 	[Ignore]
@@ -143,21 +123,9 @@ public class VBATests
 	public void ReadVBAUnicodeWsName()
 	{
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\bug\VbaUnicodeWS.xlsm"));
-		File.WriteAllText(@"c:\temp\vba\modules\dir.txt", package.Workbook.VbaProject.CodePage + "," + package.Workbook.VbaProject.Constants + "," + package.Workbook.VbaProject.Description + "," + package.Workbook.VbaProject.HelpContextID.ToString() + "," + package.Workbook.VbaProject.HelpFile1 + "," + package.Workbook.VbaProject.HelpFile2 + "," + package.Workbook.VbaProject.Lcid.ToString() + "," + package.Workbook.VbaProject.LcidInvoke.ToString() + "," + package.Workbook.VbaProject.LibFlags.ToString() + "," + package.Workbook.VbaProject.MajorVersion.ToString() + "," + package.Workbook.VbaProject.MinorVersion.ToString() + "," + package.Workbook.VbaProject.Name + "," + package.Workbook.VbaProject.ProjectID + "," + package.Workbook.VbaProject.SystemKind.ToString() + "," + package.Workbook.VbaProject.Protection.HostProtected.ToString() + "," + package.Workbook.VbaProject.Protection.UserProtected.ToString() + "," + package.Workbook.VbaProject.Protection.VbeProtected.ToString() + "," + package.Workbook.VbaProject.Protection.VisibilityState.ToString());
-		foreach (var module in package.Workbook.VbaProject.Modules)
-		{
-			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", module.Name), module.Code);
-		}
+		WriteVbaProjectToTextFiles(package);
 
-		foreach (var r in package.Workbook.VbaProject.References)
-		{
-			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", r.Name), r.Libid + " " + r.ReferenceRecordID.ToString());
-		}
-
-		X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
-		store.Open(OpenFlags.ReadOnly);
-		package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
-		//package.Workbook.VbaProject.Protection.SetPassword("");
+		SignWithTwentiethCertificate(package);
 		package.SaveAs(new FileInfo(@"c:\temp\vbaSaved.xlsm"));
 	}
 	[TestMethod]
@@ -220,5 +188,26 @@ public class VBATests
 		Console.WriteLine(package.Workbook.VbaProject.Modules[0].Name);
 
 		package.SaveAs(new FileInfo(@"c:\temp\bug\makroepp.xlsm"));
+	}
+
+	private static void WriteVbaProjectToTextFiles(ExcelPackage package)
+	{
+		File.WriteAllText(@"c:\temp\vba\modules\dir.txt", package.Workbook.VbaProject.CodePage + "," + package.Workbook.VbaProject.Constants + "," + package.Workbook.VbaProject.Description + "," + package.Workbook.VbaProject.HelpContextID.ToString() + "," + package.Workbook.VbaProject.HelpFile1 + "," + package.Workbook.VbaProject.HelpFile2 + "," + package.Workbook.VbaProject.Lcid.ToString() + "," + package.Workbook.VbaProject.LcidInvoke.ToString() + "," + package.Workbook.VbaProject.LibFlags.ToString() + "," + package.Workbook.VbaProject.MajorVersion.ToString() + "," + package.Workbook.VbaProject.MinorVersion.ToString() + "," + package.Workbook.VbaProject.Name + "," + package.Workbook.VbaProject.ProjectID + "," + package.Workbook.VbaProject.SystemKind.ToString() + "," + package.Workbook.VbaProject.Protection.HostProtected.ToString() + "," + package.Workbook.VbaProject.Protection.UserProtected.ToString() + "," + package.Workbook.VbaProject.Protection.VbeProtected.ToString() + "," + package.Workbook.VbaProject.Protection.VisibilityState.ToString());
+		foreach (var module in package.Workbook.VbaProject.Modules)
+		{
+			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", module.Name), module.Code);
+		}
+
+		foreach (var r in package.Workbook.VbaProject.References)
+		{
+			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", r.Name), r.Libid + " " + r.ReferenceRecordID.ToString());
+		}
+	}
+
+	private static void SignWithTwentiethCertificate(ExcelPackage package)
+	{
+		X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
+		store.Open(OpenFlags.ReadOnly);
+		package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
 	}
 }

@@ -1,8 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 using OfficeOpenXml.ConditionalFormatting;
 using System.Drawing;
-using System.IO;
 
 namespace PanoramicData.EPPlus.Test.ConditionalFormatting;
 
@@ -42,11 +40,7 @@ public class ConditionalFormatting
 	{
 		var ws = _excelPackage.Workbook.Worksheets.Add("ColorScale");
 		ws.ConditionalFormatting.AddTwoColorScale(ws.Cells["A1:A5"]);
-		ws.SetValue(1, 1, 1);
-		ws.SetValue(2, 1, 2);
-		ws.SetValue(3, 1, 3);
-		ws.SetValue(4, 1, 4);
-		ws.SetValue(5, 1, 5);
+		SetRowNumbers(ws, 1, 5);
 	}
 
 	/// <summary>
@@ -102,11 +96,7 @@ public class ConditionalFormatting
 	{
 		var ws = _excelPackage.Workbook.Worksheets.Add("Databar");
 		ws.ConditionalFormatting.AddDatabar(ws.Cells["A1:A5"], Color.BlueViolet);
-		ws.SetValue(1, 1, 1);
-		ws.SetValue(2, 1, 2);
-		ws.SetValue(3, 1, 3);
-		ws.SetValue(4, 1, 4);
-		ws.SetValue(5, 1, 5);
+		SetRowNumbers(ws, 1, 5);
 	}
 	[TestMethod]
 	public void DatabarChangingAddressAddsConditionalFormatNodeInSchemaOrder()
@@ -126,9 +116,7 @@ public class ConditionalFormatting
 	{
 		var ws = _excelPackage.Workbook.Worksheets.Add("IconSet");
 		ws.ConditionalFormatting.AddThreeIconSet(ws.Cells["A1:A3"], eExcelconditionalFormatting3IconsSetType.Symbols);
-		ws.SetValue(1, 1, 1);
-		ws.SetValue(2, 1, 2);
-		ws.SetValue(3, 1, 3);
+		SetRowNumbers(ws, 1, 3);
 
 		var cf4 = ws.ConditionalFormatting.AddFourIconSet(ws.Cells["B1:B4"], eExcelconditionalFormatting4IconsSetType.Rating);
 		cf4.Icon1.Type = eExcelConditionalFormattingValueObjectType.Formula;
@@ -137,10 +125,7 @@ public class ConditionalFormatting
 		cf4.Icon2.Formula = "1/3";
 		cf4.Icon3.Type = eExcelConditionalFormattingValueObjectType.Formula;
 		cf4.Icon3.Formula = "2/3";
-		ws.SetValue(1, 2, 1);
-		ws.SetValue(2, 2, 2);
-		ws.SetValue(3, 2, 3);
-		ws.SetValue(4, 2, 4);
+		SetRowNumbers(ws, 2, 4);
 
 		var cf5 = ws.ConditionalFormatting.AddFiveIconSet(ws.Cells["C1:C5"], eExcelconditionalFormatting5IconsSetType.Quarters);
 		cf5.Icon1.Type = eExcelConditionalFormattingValueObjectType.Num;
@@ -156,38 +141,14 @@ public class ConditionalFormatting
 		cf5.ShowValue = false;
 		cf5.Reverse = true;
 
-		ws.SetValue(1, 3, 1);
-		ws.SetValue(2, 3, 2);
-		ws.SetValue(3, 3, 3);
-		ws.SetValue(4, 3, 4);
-		ws.SetValue(5, 3, 5);
+		SetRowNumbers(ws, 3, 5);
 	}
-	//[TestMethod]
-	//public void TwoAndThreeColorConditionalFormattingFromFileDoesNotGetOverwrittenWithDefaultValues()
-	//{
-	//    var file = new FileInfo(
-	//        AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin"))
-	//        + @"Workbooks\MultiColorConditionalFormatting.xlsx");
-	//        Assert.IsTrue(file.Exists);
-	//        using (var package = new ExcelPackage(file))
-	//    {
-	//        var sheet = package.Workbook.Worksheets.First();
-	//        Assert.AreEqual(2, sheet.ConditionalFormatting.Count);
-	//        var twoColor = (ExcelConditionalFormattingTwoColorScale)sheet.ConditionalFormatting.First(cf => cf is ExcelConditionalFormattingTwoColorScale);
-	//        var threeColor = (ExcelConditionalFormattingThreeColorScale)sheet.ConditionalFormatting.First(cf => cf is ExcelConditionalFormattingThreeColorScale);
 
-	//        var defaultTwoColorScale = new ExcelConditionalFormattingTwoColorScale(new ExcelAddress("A1"), 2, sheet);
-	//        var defaultThreeColorScale = new ExcelConditionalFormattingThreeColorScale(new ExcelAddress("A1"), 2, sheet);
-
-	//        Assert.IsNull(twoColor.HighValue);
-	//        Assert.IsNull(twoColor.LowValue);
-	//        Assert.IsNotNull(defaultTwoColorScale.HighValue);
-	//        Assert.IsNotNull(defaultTwoColorScale.LowValue);
-	//        Assert.IsNull(threeColor.HighValue);
-	//        Assert.IsNull(threeColor.LowValue);
-	//        Assert.IsNotNull(defaultThreeColorScale.HighValue);
-	//        Assert.IsNotNull(defaultThreeColorScale.LowValue);
-	//    }
-	//}
-
+	private static void SetRowNumbers(ExcelWorksheet ws, int column, int rows)
+	{
+		for (var row = 1; row <= rows; row++)
+		{
+			ws.SetValue(row, column, row);
+		}
+	}
 }
