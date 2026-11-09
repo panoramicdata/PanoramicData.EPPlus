@@ -24,87 +24,47 @@ public class MathExcelRangeTests
 	[TestCleanup]
 	public void Cleanup() => _package.Dispose();
 
-	[TestMethod]
-	public void AbsShouldReturn3()
+	private object Calculate(string address, string formula)
 	{
-		_worksheet.Cells["A4"].Formula = "ABS(A2)";
+		_worksheet.Cells[address].Formula = formula;
 		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(3d, result);
+		return _worksheet.Cells[address].Value;
 	}
+	[TestMethod]
+	public void AbsShouldReturn3() => Assert.AreEqual(3d, Calculate("A4", "ABS(A2)"));
 
 	[TestMethod]
-	public void CountShouldReturn3()
-	{
-		_worksheet.Cells["A4"].Formula = "COUNT(A1:A3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(3d, result);
-	}
+	public void CountShouldReturn3() => Assert.AreEqual(3d, Calculate("A4", "COUNT(A1:A3)"));
 
 	[TestMethod]
 	public void CountShouldReturn2IfACellValueIsNull()
 	{
 		_worksheet.Cells["A2"].Value = null;
-		_worksheet.Cells["A4"].Formula = "COUNT(A1:A3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
+		var result = Calculate("A4", "COUNT(A1:A3)");
 		Assert.AreEqual(2d, result);
 	}
 
 	[TestMethod]
-	public void CountAShouldReturn3()
-	{
-		_worksheet.Cells["A4"].Formula = "COUNTA(A1:A3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(3d, result);
-	}
+	public void CountAShouldReturn3() => Assert.AreEqual(3d, Calculate("A4", "COUNTA(A1:A3)"));
 
 	[TestMethod]
-	public void CountIfShouldReturnCorrectResult()
-	{
-		_worksheet.Cells["A4"].Formula = "COUNTIF(A1:A3, \">2\")";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(2d, result);
-	}
+	public void CountIfShouldReturnCorrectResult() => Assert.AreEqual(2d, Calculate("A4", "COUNTIF(A1:A3, \">2\")"));
 
 	[TestMethod]
-	public void MaxShouldReturn6()
-	{
-		_worksheet.Cells["A4"].Formula = "Max(A1:A3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(6d, result);
-	}
+	public void MaxShouldReturn6() => Assert.AreEqual(6d, Calculate("A4", "Max(A1:A3)"));
 
 	[TestMethod]
-	public void MinShouldReturn1()
-	{
-		_worksheet.Cells["A4"].Formula = "Min(A1:A3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(1d, result);
-	}
+	public void MinShouldReturn1() => Assert.AreEqual(1d, Calculate("A4", "Min(A1:A3)"));
 
 	[TestMethod]
-	public void AverageShouldReturn3Point333333()
-	{
-		_worksheet.Cells["A4"].Formula = "Average(A1:A3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(3d + 1d / 3d, result);
-	}
+	public void AverageShouldReturn3Point333333() => Assert.AreEqual(3d + 1d / 3d, Calculate("A4", "Average(A1:A3)"));
 
 	[TestMethod]
 	public void AverageIfShouldHandleSingleRangeNumericExpressionMatch()
 	{
 		_worksheet.Cells["A4"].Value = "B";
 		_worksheet.Cells["A5"].Value = 3;
-		_worksheet.Cells["A6"].Formula = "AverageIf(A1:A5,\">1\")";
-		_worksheet.Calculate();
-		Assert.AreEqual(4d, _worksheet.Cells["A6"].Value);
+		Assert.AreEqual(4d, Calculate("A6", "AverageIf(A1:A5,\">1\")"));
 	}
 
 	[TestMethod]
@@ -112,9 +72,7 @@ public class MathExcelRangeTests
 	{
 		_worksheet.Cells["A4"].Value = "ABC";
 		_worksheet.Cells["A5"].Value = "3";
-		_worksheet.Cells["A6"].Formula = "AverageIf(A1:A5,\">1\")";
-		_worksheet.Calculate();
-		Assert.AreEqual(4.5d, _worksheet.Cells["A6"].Value);
+		Assert.AreEqual(4.5d, Calculate("A6", "AverageIf(A1:A5,\">1\")"));
 	}
 
 	[TestMethod]
@@ -132,9 +90,7 @@ public class MathExcelRangeTests
 		_worksheet.Cells["B4"].Value = 6;
 		_worksheet.Cells["B5"].Value = 7;
 
-		_worksheet.Cells["A6"].Formula = "AverageIf(A1:A5,\"abc\",B1:B5)";
-		_worksheet.Calculate();
-		Assert.AreEqual(2d, _worksheet.Cells["A6"].Value);
+		Assert.AreEqual(2d, Calculate("A6", "AverageIf(A1:A5,\"abc\",B1:B5)"));
 	}
 
 	[TestMethod]
@@ -152,9 +108,7 @@ public class MathExcelRangeTests
 		_worksheet.Cells["B4"].Value = 1;
 		_worksheet.Cells["B5"].Value = 8;
 
-		_worksheet.Cells["A6"].Formula = "AverageIf(A1:A5,\">2\",B1:B5)";
-		_worksheet.Calculate();
-		Assert.AreEqual(2d, _worksheet.Cells["A6"].Value);
+		Assert.AreEqual(2d, Calculate("A6", "AverageIf(A1:A5,\">2\",B1:B5)"));
 	}
 
 	[TestMethod]
@@ -172,9 +126,7 @@ public class MathExcelRangeTests
 		_worksheet.Cells["B4"].Value = 6;
 		_worksheet.Cells["B5"].Value = 8;
 
-		_worksheet.Cells["A6"].Formula = "AverageIf(A1:A5, \"ab*\",B1:B5)";
-		_worksheet.Calculate();
-		Assert.AreEqual(4d, _worksheet.Cells["A6"].Value);
+		Assert.AreEqual(4d, Calculate("A6", "AverageIf(A1:A5, \"ab*\",B1:B5)"));
 	}
 
 	[TestMethod]
@@ -186,9 +138,7 @@ public class MathExcelRangeTests
 		_worksheet.Cells["B1"].Value = 5;
 		_worksheet.Cells["B2"].Value = 6;
 		_worksheet.Cells["B3"].Value = 4;
-		_worksheet.Cells["A4"].Formula = "SUMPRODUCT(A1:A3,B1:B3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
+		var result = Calculate("A4", "SUMPRODUCT(A1:A3,B1:B3)");
 		Assert.AreEqual(29d, result);
 	}
 
@@ -201,28 +151,18 @@ public class MathExcelRangeTests
 		_worksheet.Cells["B1"].Value = 5;
 		_worksheet.Cells["B2"].Value = 6;
 		_worksheet.Cells["B3"].Value = 4;
-		_worksheet.Cells["A4"].Formula = "SUMPRODUCT(A1:A3,B1:B3,{2,4,1})";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
+		var result = Calculate("A4", "SUMPRODUCT(A1:A3,B1:B3,{2,4,1})");
 		Assert.AreEqual(70d, result);
 	}
 
 	[TestMethod]
-	public void SignShouldReturn1WhenRefIsPositive()
-	{
-		_worksheet.Cells["A4"].Formula = "SIGN(A1)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
-		Assert.AreEqual(1d, result);
-	}
+	public void SignShouldReturn1WhenRefIsPositive() => Assert.AreEqual(1d, Calculate("A4", "SIGN(A1)"));
 
 	[TestMethod]
 	public void SubTotalShouldNotIncludeHiddenRow()
 	{
 		_worksheet.Row(2).Hidden = true;
-		_worksheet.Cells["A4"].Formula = "SUBTOTAL(109,A1:A3)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
+		var result = Calculate("A4", "SUBTOTAL(109,A1:A3)");
 		Assert.AreEqual(7d, result);
 	}
 
@@ -231,18 +171,10 @@ public class MathExcelRangeTests
 	{
 		_worksheet.Cells["A1"].Value = 1;
 		_worksheet.Cells["A2"].Value = 2;
-		_worksheet.Cells["A4"].Formula = "SUMPRODUCT(A1:A1, A2:A2)";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["A4"].Value;
+		var result = Calculate("A4", "SUMPRODUCT(A1:A1, A2:A2)");
 		Assert.AreEqual(2d, result);
 	}
 
 	[TestMethod]
-	public void ShouldIgnoreNullValues()
-	{
-		_worksheet.Cells["B3"].Formula = "C4 + D4";
-		_worksheet.Calculate();
-		var result = _worksheet.Cells["B3"].Value;
-		Assert.AreEqual(0d, result);
-	}
+	public void ShouldIgnoreNullValues() => Assert.AreEqual(0d, Calculate("B3", "C4 + D4"));
 }
