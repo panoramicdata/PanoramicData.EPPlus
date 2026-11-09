@@ -217,23 +217,7 @@ public class ExcelChartSerie : XmlHelper
 		}
 	}
 	ExcelDrawingFill _fill;
-	public ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
+	public ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
 	ExcelDrawingBorder _border;
-	public ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
+	public ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
 }

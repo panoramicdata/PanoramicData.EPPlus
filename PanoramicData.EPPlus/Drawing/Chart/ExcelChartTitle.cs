@@ -73,28 +73,12 @@ public class ExcelChartTitle : XmlHelper
 	/// <summary>
 	/// A reference to the border properties
 	/// </summary>
-	public ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
+	public ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
 	ExcelDrawingFill _fill;
 	/// <summary>
 	/// A reference to the fill properties
 	/// </summary>
-	public ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
+	public ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
 	/// <summary>
 	/// A reference to the font properties
 	/// </summary>

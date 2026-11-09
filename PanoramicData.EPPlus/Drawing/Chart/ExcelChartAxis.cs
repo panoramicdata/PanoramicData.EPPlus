@@ -427,50 +427,17 @@ public sealed class ExcelChartAxis : XmlHelper
 	/// <summary>
 	/// Access to fill properties
 	/// </summary>
-	public ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
+	public ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
 	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access to border properties
 	/// </summary>
-	public ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
+	public ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
 	ExcelTextFont _font;
 	/// <summary>
 	/// Access to font properties
 	/// </summary>
-	public ExcelTextFont Font
-	{
-		get
-		{
-			if (_font == null)
-			{
-				if (TopNode.SelectSingleNode("c:txPr", NameSpaceManager) == null)
-				{
-					CreateNode("c:txPr/a:bodyPr");
-					CreateNode("c:txPr/a:lstStyle");
-				}
-
-				_font = new ExcelTextFont(NameSpaceManager, TopNode, "c:txPr/a:p/a:pPr/a:defRPr", ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
-			}
-
-			return _font;
-		}
-	}
+	public ExcelTextFont Font => ChartStyleAccess.GetFont(this, ref _font, ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
 	/// <summary>
 	/// If the axis is deleted
 	/// </summary>
