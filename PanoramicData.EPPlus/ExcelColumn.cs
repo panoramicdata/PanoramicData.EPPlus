@@ -130,6 +130,7 @@ public class ExcelColumn : IRangeID
 	/// <summary>
 	/// Sets the width of the column in the worksheet
 	/// </summary>
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Zero is assigned exactly to hide a row or column, so an exact test is intended.")]
 	public double Width
 	{
 		get

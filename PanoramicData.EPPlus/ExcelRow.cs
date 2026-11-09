@@ -113,6 +113,7 @@ public class ExcelRow : IRangeID
 	/// <summary>
 	/// Sets the height of the row
 	/// </summary>
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Zero is assigned exactly to hide a row or column, so an exact test is intended.")]
 	public double Height
 	{
 		get

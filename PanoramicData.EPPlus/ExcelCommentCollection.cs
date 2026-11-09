@@ -32,6 +32,7 @@ using OfficeOpenXml.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 namespace OfficeOpenXml;
 
@@ -124,6 +125,7 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 	/// </summary>
 	/// <param name="cell">The cell</param>
 	/// <returns>The comment</returns>
+	[SuppressMessage("Minor Code Smell", "S3876:Strings or integral types should be used for indexers", Justification = "Public API: the cell-address indexer is published.")]
 	public ExcelComment this[ExcelCellAddress cell]
 	{
 		get
