@@ -46,88 +46,108 @@ public partial class ExcelWorksheet
 			_sparklineGroups?.Insert(rowFrom, 0, rows, 0);
 			Workbook.Names.Insert(rowFrom, 0, rows, 0, n => n.Worksheet == this);
 
-			foreach (var f in _sharedFormulas.Values)
-			{
-				if (f.StartRow >= rowFrom)
-				{
-					f.StartRow += rows;
-				}
+			ShiftSharedFormulasForRowInsert(rowFrom, rows);
 
-				var a = new ExcelAddressBase(f.Address);
-				if (a._fromRow >= rowFrom)
-				{
-					a._fromRow += rows;
-					a._toRow += rows;
-				}
-				else if (a._toRow >= rowFrom)
-				{
-					a._toRow += rows;
-				}
-
-				f.Address = ExcelCellBase.GetAddress(a._fromRow, a._fromCol, a._toRow, a._toCol);
-				f.Formula = ExcelCellBase.UpdateFormulaReferences(f.Formula, rows, 0, rowFrom, 0, Name, Name);
-			}
-
-			var cse = new CellsStoreEnumerator<object>(_formulas);
-			while (cse.Next())
-			{
-				if (cse.Value is string)
-				{
-					cse.Value = ExcelCellBase.UpdateFormulaReferences(cse.Value.ToString(), rows, 0, rowFrom, 0, Name, Name);
-				}
-			}
+			UpdateCellFormulaReferences(rows, 0, rowFrom, 0);
 
 			FixMergedCellsRow(rowFrom, rows, false);
 			if (copyStylesFromRow > 0)
 			{
-				var cseS = new CellsStoreEnumerator<ExcelCoreValue>(_values, copyStylesFromRow, 0, copyStylesFromRow, ExcelPackage.MaxColumns); //Fixes issue 15068 , 15090
-				while (cseS.Next())
-				{
-					if (cseS.Value._styleId == 0)
-					{
-						continue;
-					}
-
-					for (var r = 0; r < rows; r++)
-					{
-						SetStyleInner(rowFrom + r, cseS.Column, cseS.Value._styleId);
-					}
-				}
-
-				var newOutlineLevel = Row(copyStylesFromRow + rows).OutlineLevel;
-				for (var r = 0; r < rows; r++)
-				{
-					Row(rowFrom + r).OutlineLevel = newOutlineLevel;
-				}
+				CopyRowStyles(rowFrom, rows, copyStylesFromRow);
 			}
 
-			foreach (var tbl in Tables)
-			{
-				tbl.Address = tbl.Address.AddRow(rowFrom, rows);
-			}
-
-			foreach (var ptbl in PivotTables)
-			{
-				ptbl.Address = ptbl.Address.AddRow(rowFrom, rows);
-				ptbl.CacheDefinition.SourceRange.Address = ptbl.CacheDefinition.SourceRange.AddRow(rowFrom, rows).Address;
-			}
-
-			//Issue 15573
-			foreach (var dv in DataValidations.Cast<ExcelDataValidation>())
-			{
-				var addr = dv.Address;
-				var newAddr = addr.AddRow(rowFrom, rows).Address;
-				if (addr.Address != newAddr)
-				{
-					dv.SetAddress(newAddr);
-				}
-			}
+			InsertRowInTablesAndValidations(rowFrom, rows);
 		}
 
 		// Update cross-sheet references.
 		foreach (var sheet in Workbook.Worksheets.Where(sheet => sheet != this))
 		{
 			sheet.UpdateCrossSheetReferences(Name, rowFrom, rows, 0, 0);
+		}
+	}
+
+	private void ShiftSharedFormulasForRowInsert(int rowFrom, int rows)
+	{
+		foreach (var f in _sharedFormulas.Values)
+		{
+			if (f.StartRow >= rowFrom)
+			{
+				f.StartRow += rows;
+			}
+
+			var a = new ExcelAddressBase(f.Address);
+			if (a._fromRow >= rowFrom)
+			{
+				a._fromRow += rows;
+				a._toRow += rows;
+			}
+			else if (a._toRow >= rowFrom)
+			{
+				a._toRow += rows;
+			}
+
+			f.Address = ExcelCellBase.GetAddress(a._fromRow, a._fromCol, a._toRow, a._toCol);
+			f.Formula = ExcelCellBase.UpdateFormulaReferences(f.Formula, rows, 0, rowFrom, 0, Name, Name);
+		}
+	}
+
+	private void UpdateCellFormulaReferences(int rowIncrement, int colIncrement, int afterRow, int afterColumn)
+	{
+		var cse = new CellsStoreEnumerator<object>(_formulas);
+		while (cse.Next())
+		{
+			if (cse.Value is string)
+			{
+				cse.Value = ExcelCellBase.UpdateFormulaReferences(cse.Value.ToString(), rowIncrement, colIncrement, afterRow, afterColumn, Name, Name);
+			}
+		}
+	}
+
+	private void CopyRowStyles(int rowFrom, int rows, int copyStylesFromRow)
+	{
+		var cseS = new CellsStoreEnumerator<ExcelCoreValue>(_values, copyStylesFromRow, 0, copyStylesFromRow, ExcelPackage.MaxColumns); //Fixes issue 15068 , 15090
+		while (cseS.Next())
+		{
+			if (cseS.Value._styleId == 0)
+			{
+				continue;
+			}
+
+			for (var r = 0; r < rows; r++)
+			{
+				SetStyleInner(rowFrom + r, cseS.Column, cseS.Value._styleId);
+			}
+		}
+
+		var newOutlineLevel = Row(copyStylesFromRow + rows).OutlineLevel;
+		for (var r = 0; r < rows; r++)
+		{
+			Row(rowFrom + r).OutlineLevel = newOutlineLevel;
+		}
+	}
+
+	private void InsertRowInTablesAndValidations(int rowFrom, int rows)
+	{
+		foreach (var tbl in Tables)
+		{
+			tbl.Address = tbl.Address.AddRow(rowFrom, rows);
+		}
+
+		foreach (var ptbl in PivotTables)
+		{
+			ptbl.Address = ptbl.Address.AddRow(rowFrom, rows);
+			ptbl.CacheDefinition.SourceRange.Address = ptbl.CacheDefinition.SourceRange.AddRow(rowFrom, rows).Address;
+		}
+
+		//Issue 15573
+		foreach (var dv in DataValidations.Cast<ExcelDataValidation>())
+		{
+			var addr = dv.Address;
+			var newAddr = addr.AddRow(rowFrom, rows).Address;
+			if (addr.Address != newAddr)
+			{
+				dv.SetAddress(newAddr);
+			}
 		}
 	}
 }

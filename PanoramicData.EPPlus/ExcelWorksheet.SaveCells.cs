@@ -1,5 +1,6 @@
-﻿using OfficeOpenXml.Compatibility;
+﻿using OfficeOpenXml.Style.XmlAccess;
 using OfficeOpenXml.Utils;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace OfficeOpenXml;
@@ -27,107 +28,7 @@ public partial class ExcelWorksheet
 		{
 			if (cse.Column > 0)
 			{
-				var val = cse.Value;
-				var styleID = cellXfs[val._styleId == 0 ? GetStyleIdDefaultWithMemo(cse.Row, cse.Column) : val._styleId].newID;
-				//Add the row element if it's a new row
-				if (cse.Row != row)
-				{
-					WriteRow(cache, cellXfs, row, cse.Row);
-					row = cse.Row;
-				}
-
-				var v = val._value;
-				var formula = _formulas.GetValue(cse.Row, cse.Column);
-				if (formula is int sfId)
-				{
-					var f = _sharedFormulas[sfId];
-					if (f.Address.IndexOf(':') > 0)
-					{
-						if (f.StartCol == cse.Column && f.StartRow == cse.Row)
-						{
-							if (f.IsArray)
-							{
-								cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{5}><f ref=\"{2}\" t=\"array\">{3}</f>{4}</c>", cse.CellAddress, styleID < 0 ? 0 : styleID, f.Address, ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v), GetCellType(v, true));
-							}
-							else
-							{
-								cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{6}><f ref=\"{2}\" t=\"shared\" si=\"{3}\">{4}</f>{5}</c>", cse.CellAddress, styleID < 0 ? 0 : styleID, f.Address, sfId, ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v), GetCellType(v, true));
-							}
-						}
-						else if (f.IsArray)
-						{
-							cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"/>", cse.CellAddress, styleID < 0 ? 0 : styleID);
-						}
-						else
-						{
-							cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{4}><f t=\"shared\" si=\"{2}\"/>{3}</c>", cse.CellAddress, styleID < 0 ? 0 : styleID, sfId, GetFormulaValue(v), GetCellType(v, true));
-						}
-					}
-					else
-					{
-						// We can also have a single cell array formula
-						if (f.IsArray)
-						{
-							cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{5}><f ref=\"{2}\" t=\"array\">{3}</f>{4}</c>", cse.CellAddress, styleID < 0 ? 0 : styleID, string.Format("{0}:{1}", f.Address, f.Address), ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v), GetCellType(v, true));
-						}
-						else
-						{
-							cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{2}>", f.Address, styleID < 0 ? 0 : styleID, GetCellType(v, true));
-							cache.AppendFormat("<f>{0}</f>{1}</c>", ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v));
-						}
-					}
-				}
-				else if (formula != null && formula.ToString() != "")
-				{
-					cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{2}>", cse.CellAddress, styleID < 0 ? 0 : styleID, GetCellType(v, true));
-					cache.AppendFormat("<f>{0}</f>{1}</c>", ConvertUtil.ExcelEscapeString(formula.ToString()), GetFormulaValue(v));
-				}
-				else
-				{
-					if (v == null && styleID > 0)
-					{
-						cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"/>", cse.CellAddress, styleID < 0 ? 0 : styleID);
-					}
-					else if (v != null)
-					{
-						// Fix for issue 15460
-						if (v is System.Collections.IEnumerable enumerableResult and not string)
-						{
-							var enumerator = enumerableResult.GetEnumerator();
-							if (enumerator.MoveNext() && enumerator.Current != null)
-							{
-								v = enumerator.Current;
-							}
-							else
-							{
-								v = string.Empty;
-							}
-						}
-
-						if ((TypeCompat.IsPrimitive(v) || v is double || v is decimal || v is DateTime || v is TimeSpan))
-						{
-							cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{2}>", cse.CellAddress, styleID < 0 ? 0 : styleID, GetCellType(v));
-							cache.AppendFormat("{0}</c>", GetFormulaValue(v));
-						}
-						else
-						{
-							var vString = Convert.ToString(v);
-							int ix;
-							if (!ss.TryGetValue(vString, out var value))
-							{
-								ix = ss.Count;
-								ss.Add(vString, new ExcelWorkbook.SharedStringItem { isRichText = _flags.GetFlagValue(cse.Row, cse.Column, CellFlags.RichText), pos = ix });
-							}
-							else
-							{
-								ix = value.pos;
-							}
-
-							cache.AppendFormat("<c r=\"{0}\" s=\"{1}\" t=\"s\">", cse.CellAddress, styleID < 0 ? 0 : styleID);
-							cache.AppendFormat("<v>{0}</v></c>", ix);
-						}
-					}
-				}
+				WriteCell(cache, cse, cellXfs, ref row, ss);
 			}
 			else  //ExcelRow
 			{
@@ -153,5 +54,80 @@ public partial class ExcelWorksheet
 		cache.Append("</sheetData>");
 		sw.Write(cache.ToString());
 		sw.Flush();
+	}
+
+	private void WriteCell(StringBuilder cache, CellsStoreEnumerator<ExcelCoreValue> cse, ExcelStyleCollection<ExcelXfs> cellXfs, ref int row, Dictionary<string, ExcelWorkbook.SharedStringItem> ss)
+	{
+		var val = cse.Value;
+		var styleID = cellXfs[val._styleId == 0 ? GetStyleIdDefaultWithMemo(cse.Row, cse.Column) : val._styleId].newID;
+		//Add the row element if it's a new row
+		if (cse.Row != row)
+		{
+			WriteRow(cache, cellXfs, row, cse.Row);
+			row = cse.Row;
+		}
+
+		var v = val._value;
+		var formula = _formulas.GetValue(cse.Row, cse.Column);
+		if (formula is int sfId)
+		{
+			WriteSharedFormulaCell(cache, cse, styleID, sfId, v);
+		}
+		else if (formula != null && formula.ToString() != "")
+		{
+			cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{2}>", cse.CellAddress, styleID < 0 ? 0 : styleID, GetCellType(v, true));
+			cache.AppendFormat("<f>{0}</f>{1}</c>", ConvertUtil.ExcelEscapeString(formula.ToString()), GetFormulaValue(v));
+		}
+		else
+		{
+			WriteValueCell(cache, cse, styleID, v, ss);
+		}
+	}
+
+	[SuppressMessage("Minor Bug", "S2692:\"IndexOf\" checks should not be for positive numbers", Justification = "Behaviour-preserving: an address whose first character is ':' is not treated as a range.")]
+	private void WriteSharedFormulaCell(StringBuilder cache, CellsStoreEnumerator<ExcelCoreValue> cse, int styleID, int sfId, object v)
+	{
+		var f = _sharedFormulas[sfId];
+		var s = styleID < 0 ? 0 : styleID;
+		if (f.Address.IndexOf(':') > 0)
+		{
+			WriteRangeSharedFormulaCell(cache, cse, s, f, sfId, v);
+		}
+		else
+		{
+			// We can also have a single cell array formula
+			if (f.IsArray)
+			{
+				cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{5}><f ref=\"{2}\" t=\"array\">{3}</f>{4}</c>", cse.CellAddress, s, string.Format("{0}:{1}", f.Address, f.Address), ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v), GetCellType(v, true));
+			}
+			else
+			{
+				cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{2}>", f.Address, s, GetCellType(v, true));
+				cache.AppendFormat("<f>{0}</f>{1}</c>", ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v));
+			}
+		}
+	}
+
+	private void WriteRangeSharedFormulaCell(StringBuilder cache, CellsStoreEnumerator<ExcelCoreValue> cse, int s, Formulas f, int sfId, object v)
+	{
+		if (f.StartCol == cse.Column && f.StartRow == cse.Row)
+		{
+			if (f.IsArray)
+			{
+				cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{5}><f ref=\"{2}\" t=\"array\">{3}</f>{4}</c>", cse.CellAddress, s, f.Address, ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v), GetCellType(v, true));
+			}
+			else
+			{
+				cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{6}><f ref=\"{2}\" t=\"shared\" si=\"{3}\">{4}</f>{5}</c>", cse.CellAddress, s, f.Address, sfId, ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v), GetCellType(v, true));
+			}
+		}
+		else if (f.IsArray)
+		{
+			cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"/>", cse.CellAddress, s);
+		}
+		else
+		{
+			cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{4}><f t=\"shared\" si=\"{2}\"/>{3}</c>", cse.CellAddress, s, sfId, GetFormulaValue(v), GetCellType(v, true));
+		}
 	}
 }
