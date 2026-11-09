@@ -790,7 +790,7 @@ public class DrawingTest : TestBase
 	//[Ignore]
 	public void ReadDocument()
 	{
-		var fi = new FileInfo(_worksheetPath + "drawing.xlsx");
+		var fi = new FileInfo(_worksheetPath + "Drawing.xlsx");
 		if (!fi.Exists)
 		{
 			Assert.Inconclusive("Drawing.xlsx is not created. Skippng");
