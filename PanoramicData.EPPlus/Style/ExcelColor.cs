@@ -135,7 +135,7 @@ public sealed class ExcelColor : StyleBase, IColor
 			eStyleClass.BorderRight => _styles.Borders[Index].Right.Color,
 			eStyleClass.BorderBottom => _styles.Borders[Index].Bottom.Color,
 			eStyleClass.BorderDiagonal => _styles.Borders[Index].Diagonal.Color,
-			_ => throw (new Exception("Invalid style-class for Color")),
+			_ => throw (new InvalidOperationException("Invalid style-class for Color")),
 		};
 	}
 	internal override void SetIndex(int index) => _parent.Index = index;

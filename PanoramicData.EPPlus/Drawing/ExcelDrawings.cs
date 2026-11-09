@@ -210,7 +210,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	{
 		if (_drawingNames.ContainsKey(Name))
 		{
-			throw new Exception("Name already exists in the drawings collection");
+			throw new InvalidOperationException("Name already exists in the drawings collection");
 		}
 
 		if (ChartType is eChartType.StockHLC or
@@ -341,7 +341,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 		if (_drawingNames.ContainsKey(Name))
 		{
-			throw new Exception("Name already exists in the drawings collection");
+			throw new InvalidOperationException("Name already exists in the drawings collection");
 		}
 
 		var drawNode = CreateDrawingXml();
@@ -394,7 +394,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 		if (_drawingNames.ContainsKey(Name))
 		{
-			throw new Exception("Name already exists in the drawings collection");
+			throw new InvalidOperationException("Name already exists in the drawings collection");
 		}
 
 		var drawNode = CreateDrawingXml();
@@ -424,7 +424,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 		if (_drawingNames.ContainsKey(Name))
 		{
-			throw new Exception("Name already exists in the drawings collection");
+			throw new InvalidOperationException("Name already exists in the drawings collection");
 		}
 
 		var drawNode = CreateDrawingXml();
@@ -453,7 +453,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 		if (_drawingNames.ContainsKey(Name))
 		{
-			throw new Exception("Name already exists in the drawings collection");
+			throw new InvalidOperationException("Name already exists in the drawings collection");
 		}
 
 		var drawNode = CreateDrawingXml();

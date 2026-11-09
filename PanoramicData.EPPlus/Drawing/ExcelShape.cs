@@ -297,7 +297,7 @@ public sealed class ExcelShape : ExcelDrawing
 			}
 			catch
 			{
-				throw (new Exception(string.Format("Invalid shapetype {0}", v)));
+				throw (new InvalidOperationException(string.Format("Invalid shapetype {0}", v)));
 			}
 		}
 		set

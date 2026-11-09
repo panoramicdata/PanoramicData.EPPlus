@@ -85,7 +85,7 @@ internal static class ExcelConditionalFormattingValueObjectType
 			ExcelConditionalFormattingConstants.CfvoType.Formula => eExcelConditionalFormattingValueObjectType.Formula,
 			ExcelConditionalFormattingConstants.CfvoType.Percent => eExcelConditionalFormattingValueObjectType.Percent,
 			ExcelConditionalFormattingConstants.CfvoType.Percentile => eExcelConditionalFormattingValueObjectType.Percentile,
-			_ => throw new Exception(
+			_ => throw new InvalidOperationException(
 				ExcelConditionalFormattingConstants.Errors.UnexistentCfvoTypeAttribute),
 		};
 
@@ -114,7 +114,7 @@ internal static class ExcelConditionalFormattingValueObjectType
 			nameSpaceManager);
 
 		return node == null
-			?         throw new Exception(
+			?         throw new InvalidOperationException(
 	  ExcelConditionalFormattingConstants.Errors.MissingCfvoNode)
 			: node;
 	}

@@ -80,7 +80,7 @@ public class ExcelChartLegend : XmlHelper
 		{
 			if (TopNode == null)
 			{
-				throw (new Exception("Can't set position. Chart has no legend"));
+				throw (new InvalidOperationException("Can't set position. Chart has no legend"));
 			}
 
 			switch (value)
@@ -117,7 +117,7 @@ public class ExcelChartLegend : XmlHelper
 		{
 			if (TopNode == null)
 			{
-				throw (new Exception("Can't set overlay. Chart has no legend"));
+				throw (new InvalidOperationException("Can't set overlay. Chart has no legend"));
 			}
 
 			SetXmlNodeBool(OVERLAY_PATH, value);

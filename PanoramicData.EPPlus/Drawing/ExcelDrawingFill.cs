@@ -142,7 +142,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 			}
 			else if (_style != eFillStyle.SolidFill)
 			{
-				throw new Exception("FillStyle must be set to SolidFill");
+				throw new InvalidOperationException("FillStyle must be set to SolidFill");
 			}
 
 			CreateNode(_fillPath, false);
@@ -169,7 +169,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 			}
 			else if (_style != eFillStyle.SolidFill)
 			{
-				throw new Exception("FillStyle must be set to SolidFill");
+				throw new InvalidOperationException("FillStyle must be set to SolidFill");
 			}
 			SetXmlNodeString(_fillPath + alphaPath, ((100 - value) * 1000).ToString());
 		}

@@ -997,11 +997,11 @@ public class ExcelChart : ExcelDrawing
 				{
 					if (IsTypePieDoughnut())
 					{
-						throw (new Exception("Pie charts do not support axis"));
+						throw (new InvalidOperationException("Pie charts do not support axis"));
 					}
 					else if (HasPrimaryAxis() == false)
 					{
-						throw (new Exception("Can't set to secondary axis when no serie uses the primary axis"));
+						throw (new InvalidOperationException("Can't set to secondary axis when no serie uses the primary axis"));
 					}
 
 					if (Axis.Length == 2)
@@ -1254,7 +1254,7 @@ public class ExcelChart : ExcelDrawing
 	/// </summary>
 	public ExcelView3D View3D => IsType3D()
 				? new ExcelView3D(NameSpaceManager, ChartXml.SelectSingleNode("//c:view3D", NameSpaceManager))
-				: throw (new Exception("Charttype does not support 3D"));
+				: throw (new InvalidOperationException("Charttype does not support 3D"));
 	readonly string _groupingPath = "c:grouping/@val";
 	public eGrouping Grouping
 	{

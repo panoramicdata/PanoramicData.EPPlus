@@ -76,7 +76,7 @@ internal static class ExcelConditionalFormattingRuleType
 							nameSpaceManager),
 		  ExcelConditionalFormattingConstants.RuleType.IconSet => GetIconSetType(topNode, nameSpaceManager),
 		  ExcelConditionalFormattingConstants.RuleType.DataBar => eExcelConditionalFormattingRuleType.DataBar,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.UnexpectedRuleTypeAttribute),
 	  };
 
@@ -94,7 +94,7 @@ internal static class ExcelConditionalFormattingRuleType
 		ExcelConditionalFormattingConstants.Operators.NotBetween => eExcelConditionalFormattingRuleType.NotBetween,
 		ExcelConditionalFormattingConstants.Operators.NotContains => eExcelConditionalFormattingRuleType.NotContains,
 		ExcelConditionalFormattingConstants.Operators.NotEqual => eExcelConditionalFormattingRuleType.NotEqual,
-		_ => throw new Exception(
+		_ => throw new InvalidOperationException(
 						  ExcelConditionalFormattingConstants.Errors.UnexistentOperatorTypeAttribute),
 	};
 	private static eExcelConditionalFormattingRuleType GetIconSetType(XmlNode topNode, XmlNamespaceManager nameSpaceManager)
@@ -150,7 +150,7 @@ internal static class ExcelConditionalFormattingRuleType
 		  || (colorNodes == null) || (colorNodes.Count < 2) || (colorNodes.Count > 3)
 		  || (cfvoNodes.Count != colorNodes.Count))
 		{
-			throw new Exception(
+			throw new InvalidOperationException(
 			  ExcelConditionalFormattingConstants.Errors.WrongNumberCfvoColorNodes);
 		}
 
@@ -296,7 +296,7 @@ internal static class ExcelConditionalFormattingRuleType
 			eExcelConditionalFormattingTimePeriodType.Today => eExcelConditionalFormattingRuleType.Today,
 			eExcelConditionalFormattingTimePeriodType.Tomorrow => eExcelConditionalFormattingRuleType.Tomorrow,
 			eExcelConditionalFormattingTimePeriodType.Yesterday => eExcelConditionalFormattingRuleType.Yesterday,
-			_ => throw new Exception(
+			_ => throw new InvalidOperationException(
 					  ExcelConditionalFormattingConstants.Errors.UnexistentTimePeriodTypeAttribute),
 		};
 	}
@@ -327,7 +327,7 @@ internal static class ExcelConditionalFormattingRuleType
 		  eExcelConditionalFormattingRuleType.NotContainsText => ExcelConditionalFormattingConstants.RuleType.NotContainsText,
 		  eExcelConditionalFormattingRuleType.UniqueValues => ExcelConditionalFormattingConstants.RuleType.UniqueValues,
 		  eExcelConditionalFormattingRuleType.DataBar => ExcelConditionalFormattingConstants.RuleType.DataBar,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingRuleType),
 	  };
 
@@ -342,7 +342,7 @@ internal static class ExcelConditionalFormattingRuleType
 		  eExcelConditionalFormattingRuleType.TwoColorScale or eExcelConditionalFormattingRuleType.ThreeColorScale => ExcelConditionalFormattingConstants.Paths.ColorScale,
 		  eExcelConditionalFormattingRuleType.ThreeIconSet or eExcelConditionalFormattingRuleType.FourIconSet or eExcelConditionalFormattingRuleType.FiveIconSet => ExcelConditionalFormattingConstants.RuleType.IconSet,
 		  eExcelConditionalFormattingRuleType.DataBar => ExcelConditionalFormattingConstants.RuleType.DataBar,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingRuleType),
 	  };
 }

@@ -147,7 +147,7 @@ public sealed class ExcelDrawingBorder : XmlHelper
 			eLineStyle.Dash or eLineStyle.Dot or eLineStyle.DashDot or eLineStyle.Solid => text[..1].ToLower(CultureInfo.InvariantCulture) + text[1..],//First to Lower case.
 			eLineStyle.LongDash or eLineStyle.LongDashDot or eLineStyle.LongDashDotDot => "lg" + text[4..],
 			eLineStyle.SystemDash or eLineStyle.SystemDashDot or eLineStyle.SystemDashDotDot or eLineStyle.SystemDot => "sys" + text[6..],
-			_ => throw (new Exception("Invalid Linestyle")),
+			_ => throw (new InvalidOperationException("Invalid Linestyle")),
 		};
 	}
 	private static eLineStyle TranslateLineStyle(string text) => text switch
@@ -155,7 +155,7 @@ public sealed class ExcelDrawingBorder : XmlHelper
 		"dash" or "dot" or "dashDot" or "solid" => Enum.Parse<eLineStyle>(text, true),
 		"lgDash" or "lgDashDot" or "lgDashDotDot" => Enum.Parse<eLineStyle>("Long" + text[2..]),
 		"sysDash" or "sysDashDot" or "sysDashDotDot" or "sysDot" => Enum.Parse<eLineStyle>("System" + text[3..]),
-		_ => throw (new Exception("Invalid Linestyle")),
+		_ => throw (new InvalidOperationException("Invalid Linestyle")),
 	};
 	private static string TranslateLineCapText(eLineCap value) => value switch
 	{

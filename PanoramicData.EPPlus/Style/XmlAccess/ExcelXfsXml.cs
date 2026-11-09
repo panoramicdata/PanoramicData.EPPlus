@@ -492,7 +492,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 						newXfs.QuotePrefix = (bool)value;
 						break;
 					default:
-						throw (new Exception("Invalid property for class style."));
+						throw (new InvalidOperationException("Invalid property for class style."));
 
 				}
 
@@ -537,12 +537,12 @@ public sealed class ExcelXfs : StyleXmlHelper
 				}
 				else
 				{
-					throw (new Exception("Invalid property for class Border."));
+					throw (new InvalidOperationException("Invalid property for class Border."));
 				}
 
 				break;
 			default:
-				throw (new Exception("Invalid class/property for class Border."));
+				throw (new InvalidOperationException("Invalid class/property for class Border."));
 		}
 
 		int subId;
@@ -561,7 +561,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		{
 			if (excelBorderItem.Style == ExcelBorderStyle.None)
 			{
-				throw (new Exception("Can't set bordercolor when style is not set."));
+				throw (new InvalidOperationException("Can't set bordercolor when style is not set."));
 			}
 
 			excelBorderItem.Color.Rgb = value.ToString();
@@ -731,7 +731,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 		else
 		{
-			throw (new Exception("Invalid property for class Numberformat"));
+			throw (new InvalidOperationException("Invalid property for class Numberformat"));
 		}
 	}
 	private int GetIdFont(eStyleProperty styleProperty, object value)
@@ -777,7 +777,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 				fnt.VerticalAlign = ((ExcelVerticalAlignmentFont)value) == ExcelVerticalAlignmentFont.None ? "" : value.ToString().ToLower(CultureInfo.InvariantCulture);
 				break;
 			default:
-				throw (new Exception("Invalid property for class Font"));
+				throw (new InvalidOperationException("Invalid property for class Font"));
 		}
 
 		int subId;

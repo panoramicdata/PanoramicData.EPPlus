@@ -271,7 +271,7 @@ public sealed class ExcelPicture : ExcelDrawing
 				}
 				catch (Exception ex)
 				{
-					throw new Exception("Can't save image - " + ex.Message, ex);
+					throw new InvalidOperationException("Can't save image - " + ex.Message, ex);
 				}
 			}
 		}

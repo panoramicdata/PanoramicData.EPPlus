@@ -95,7 +95,7 @@ public class ExcelConditionalFormattingIconDataBarValue
 			// Check for en error (rule type does not have <cfvo>)
 			if (parentNodePath == string.Empty)
 			{
-				throw new Exception(
+				throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
 			}
 
@@ -122,7 +122,7 @@ public class ExcelConditionalFormattingIconDataBarValue
 			// Check for en error (rule type does not have <cfvo>)
 			if (itemElementNode == null)
 			{
-				throw new Exception(
+				throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
 			}
 		}
@@ -176,7 +176,7 @@ public class ExcelConditionalFormattingIconDataBarValue
 			// Check for en error (rule type does not have <cfvo>)
 			if (parentNodePath == string.Empty)
 			{
-				throw new Exception(
+				throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
 			}
 		}

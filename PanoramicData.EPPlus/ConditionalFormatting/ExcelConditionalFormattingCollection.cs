@@ -108,7 +108,7 @@ public class ExcelConditionalFormattingCollection
 				// Check if @sqref attribute exists
 				if (conditionalFormattingNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Sqref] == null)
 				{
-					throw new Exception(
+					throw new InvalidOperationException(
 					  ExcelConditionalFormattingConstants.Errors.MissingSqrefAttribute);
 				}
 
@@ -133,14 +133,14 @@ public class ExcelConditionalFormattingCollection
 					// Check if @type attribute exists
 					if (cfRuleNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Type] == null)
 					{
-						throw new Exception(
+						throw new InvalidOperationException(
 						  ExcelConditionalFormattingConstants.Errors.MissingTypeAttribute);
 					}
 
 					// Check if @priority attribute exists
 					if (cfRuleNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Priority] == null)
 					{
-						throw new Exception(
+						throw new InvalidOperationException(
 						  ExcelConditionalFormattingConstants.Errors.MissingPriorityAttribute);
 					}
 
@@ -189,7 +189,7 @@ public class ExcelConditionalFormattingCollection
 		// Find the <worksheet> node
 		if (_worksheet.WorksheetXml.DocumentElement == null)
 		{
-			throw new Exception(
+			throw new InvalidOperationException(
 			  ExcelConditionalFormattingConstants.Errors.MissingWorksheetNode);
 		}
 	}
@@ -323,7 +323,7 @@ public class ExcelConditionalFormattingCollection
 		}
 		catch
 		{
-			throw new Exception(
+			throw new InvalidOperationException(
 			  ExcelConditionalFormattingConstants.Errors.InvalidRemoveRuleOperation);
 		}
 	}
