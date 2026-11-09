@@ -556,48 +556,26 @@ public class ExcelChart : ExcelDrawing
 			YAxis = _axis[1];
 		}
 	}
-	internal virtual eChartType GetChartType(string name)
+	internal virtual eChartType GetChartType(string name) => name switch
 	{
+		"area3DChart" => GetGroupedType(eChartType.AreaStacked3D, eChartType.AreaStacked1003D, eChartType.Area3D),
+		"areaChart" => GetGroupedType(eChartType.AreaStacked, eChartType.AreaStacked100, eChartType.Area),
+		"doughnutChart" => eChartType.Doughnut,
+		"pie3DChart" => eChartType.Pie3D,
+		"pieChart" => eChartType.Pie,
+		"radarChart" => eChartType.Radar,
+		"scatterChart" => eChartType.XYScatter,
+		"surface3DChart" or "surfaceChart" => eChartType.Surface,
+		"stockChart" => eChartType.StockHLC,
+		_ => 0,
+	};
 
-		switch (name)
-		{
-			case "area3DChart":
-				if (Grouping == eGrouping.Stacked)
-				{
-					return eChartType.AreaStacked3D;
-				}
-				else
-				{
-					return Grouping == eGrouping.PercentStacked ? eChartType.AreaStacked1003D : eChartType.Area3D;
-				}
-			case "areaChart":
-				if (Grouping == eGrouping.Stacked)
-				{
-					return eChartType.AreaStacked;
-				}
-				else
-				{
-					return Grouping == eGrouping.PercentStacked ? eChartType.AreaStacked100 : eChartType.Area;
-				}
-			case "doughnutChart":
-				return eChartType.Doughnut;
-			case "pie3DChart":
-				return eChartType.Pie3D;
-			case "pieChart":
-				return eChartType.Pie;
-			case "radarChart":
-				return eChartType.Radar;
-			case "scatterChart":
-				return eChartType.XYScatter;
-			case "surface3DChart":
-			case "surfaceChart":
-				return eChartType.Surface;
-			case "stockChart":
-				return eChartType.StockHLC;
-			default:
-				return 0;
-		}
-	}
+	private eChartType GetGroupedType(eChartType stacked, eChartType percentStacked, eChartType other) => Grouping switch
+	{
+		eGrouping.Stacked => stacked,
+		eGrouping.PercentStacked => percentStacked,
+		_ => other,
+	};
 	#region "Xml init Functions"
 	private string ChartStartXml(eChartType type)
 	{
@@ -1350,58 +1328,39 @@ public class ExcelChart : ExcelDrawing
 			return null;
 		}
 	}
-	internal static ExcelChart GetChart(XmlElement chartNode, ExcelDrawings drawings, XmlNode node, Uri uriChart, Packaging.ZipPackagePart part, XmlDocument chartXml, ExcelChart topChart)
+	internal static ExcelChart GetChart(XmlElement chartNode, ExcelDrawings drawings, XmlNode node, Uri uriChart, Packaging.ZipPackagePart part, XmlDocument chartXml, ExcelChart topChart) => topChart == null
+		? CreateTopChart(chartNode, drawings, node, uriChart, part, chartXml)
+		: CreateSubChart(chartNode, topChart);
+
+	private static ExcelChart CreateTopChart(XmlElement chartNode, ExcelDrawings drawings, XmlNode node, Uri uriChart, Packaging.ZipPackagePart part, XmlDocument chartXml) => chartNode.LocalName switch
 	{
-		switch (chartNode.LocalName)
-		{
-			case "area3DChart":
-			case "areaChart":
-			case "stockChart":
-				return topChart == null ? new ExcelChart(drawings, node, uriChart, part, chartXml, chartNode) : new ExcelChart(topChart, chartNode);
-			case "surface3DChart":
-			case "surfaceChart":
-				return topChart == null
-					? new ExcelSurfaceChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelSurfaceChart(topChart, chartNode);
-			case "radarChart":
-				return topChart == null
-					? new ExcelRadarChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelRadarChart(topChart, chartNode);
-			case "bubbleChart":
-				return topChart == null
-					? new ExcelBubbleChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelBubbleChart(topChart, chartNode);
-			case "barChart":
-			case "bar3DChart":
-				return topChart == null
-					? new ExcelBarChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelBarChart(topChart, chartNode);
-			case "doughnutChart":
-				return topChart == null
-					? new ExcelDoughnutChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelDoughnutChart(topChart, chartNode);
-			case "pie3DChart":
-			case "pieChart":
-				return topChart == null
-					? new ExcelPieChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelPieChart(topChart, chartNode);
-			case "ofPieChart":
-				return topChart == null
-					? new ExcelOfPieChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: new ExcelBarChart(topChart, chartNode);
-			case "lineChart":
-			case "line3DChart":
-				return topChart == null
-					? new ExcelLineChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelLineChart(topChart, chartNode);
-			case "scatterChart":
-				return topChart == null
-					? new ExcelScatterChart(drawings, node, uriChart, part, chartXml, chartNode)
-					: (ExcelChart)new ExcelScatterChart(topChart, chartNode);
-			default:
-				return null;
-		}
-	}
+		"area3DChart" or "areaChart" or "stockChart" => new ExcelChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"surface3DChart" or "surfaceChart" => new ExcelSurfaceChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"radarChart" => new ExcelRadarChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"bubbleChart" => new ExcelBubbleChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"barChart" or "bar3DChart" => new ExcelBarChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"doughnutChart" => new ExcelDoughnutChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"pie3DChart" or "pieChart" => new ExcelPieChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"ofPieChart" => new ExcelOfPieChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"lineChart" or "line3DChart" => new ExcelLineChart(drawings, node, uriChart, part, chartXml, chartNode),
+		"scatterChart" => new ExcelScatterChart(drawings, node, uriChart, part, chartXml, chartNode),
+		_ => null,
+	};
+
+	// An ofPie sub chart is loaded as a bar chart, as published.
+	private static ExcelChart CreateSubChart(XmlElement chartNode, ExcelChart topChart) => chartNode.LocalName switch
+	{
+		"area3DChart" or "areaChart" or "stockChart" => new ExcelChart(topChart, chartNode),
+		"surface3DChart" or "surfaceChart" => new ExcelSurfaceChart(topChart, chartNode),
+		"radarChart" => new ExcelRadarChart(topChart, chartNode),
+		"bubbleChart" => new ExcelBubbleChart(topChart, chartNode),
+		"barChart" or "bar3DChart" or "ofPieChart" => new ExcelBarChart(topChart, chartNode),
+		"doughnutChart" => new ExcelDoughnutChart(topChart, chartNode),
+		"pie3DChart" or "pieChart" => new ExcelPieChart(topChart, chartNode),
+		"lineChart" or "line3DChart" => new ExcelLineChart(topChart, chartNode),
+		"scatterChart" => new ExcelScatterChart(topChart, chartNode),
+		_ => null,
+	};
 	internal static ExcelChart GetNewChart(ExcelDrawings drawings, XmlNode drawNode, eChartType chartType, ExcelChart topChart, ExcelPivotTable PivotTableSource) => chartType switch
 	{
 		eChartType.Pie or eChartType.PieExploded or eChartType.Pie3D or eChartType.PieExploded3D => new ExcelPieChart(drawings, drawNode, chartType, topChart, PivotTableSource),
