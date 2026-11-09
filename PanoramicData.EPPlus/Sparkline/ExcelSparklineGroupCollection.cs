@@ -102,32 +102,16 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 	{
 		var group = NewSparklineGroup();
 		group.Type = type;
-		var row = locationRange._fromRow;
-		var col = locationRange._fromCol;
 
 		var drFromRow = dataRange._fromRow;
 		var drFromCol = dataRange._fromCol;
 		var drToRow = isRows ? dataRange._fromRow : dataRange._toRow;
 		var drToCol = isRows ? dataRange._toCol : dataRange._fromCol;
 
-		var cells = (locationRange._fromRow == locationRange._toRow ? locationRange._toCol - locationRange._fromCol : locationRange._toRow - locationRange._fromRow) + 1;
-		var cell = 0;
-
-		while (cell < cells)
+		foreach (var f in GetLocationCells(locationRange))
 		{
-			var f = new ExcelCellAddress(row, col);
 			var sqref = new ExcelAddressBase(dataRange.WorkSheet, drFromRow, drFromCol, drToRow, drToCol);
 			group.Sparklines.Add(f, dataRange.WorkSheet, sqref);
-			cell++;
-			if (locationRange._fromRow == locationRange._toRow)
-			{
-				col++;
-			}
-			else
-			{
-				row++;
-			}
-
 			if (isRows)
 			{
 				drFromRow++;
@@ -140,6 +124,34 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 			}
 		}
 
+		return AddWithDefaultColors(group);
+	}
+
+	private static List<ExcelCellAddress> GetLocationCells(ExcelAddressBase locationRange)
+	{
+		var isSingleRow = locationRange._fromRow == locationRange._toRow;
+		var cells = (isSingleRow ? locationRange._toCol - locationRange._fromCol : locationRange._toRow - locationRange._fromRow) + 1;
+		var row = locationRange._fromRow;
+		var col = locationRange._fromCol;
+		var result = new List<ExcelCellAddress>();
+		for (var cell = 0; cell < cells; cell++)
+		{
+			result.Add(new ExcelCellAddress(row, col));
+			if (isSingleRow)
+			{
+				col++;
+			}
+			else
+			{
+				row++;
+			}
+		}
+
+		return result;
+	}
+
+	private ExcelSparklineGroup AddWithDefaultColors(ExcelSparklineGroup group)
+	{
 		group.ColorSeries.Rgb = "FF376092";
 		group.ColorNegative.Rgb = "FFD00000";
 		group.ColorMarkers.Rgb = "FFD00000";
@@ -192,38 +204,15 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 	{
 		var group = NewSparklineGroup();
 		group.Type = type;
-		var row = locationRange._fromRow;
-		var col = locationRange._fromCol;
 
-		var cells = (locationRange._fromRow == locationRange._toRow ? locationRange._toCol - locationRange._fromCol : locationRange._toRow - locationRange._fromRow) + 1;
-		var cell = 0;
-
-		while (cell < cells)
+		var cells = GetLocationCells(locationRange);
+		for (var cell = 0; cell < cells.Count; cell++)
 		{
-			var f = new ExcelCellAddress(row, col);
 			var sqref = dataRange[cell];
-			group.Sparklines.Add(f, sqref.WorkSheet, sqref);
-			cell++;
-			if (locationRange._fromRow == locationRange._toRow)
-			{
-				col++;
-			}
-			else
-			{
-				row++;
-			}
+			group.Sparklines.Add(cells[cell], sqref.WorkSheet, sqref);
 		}
 
-		group.ColorSeries.Rgb = "FF376092";
-		group.ColorNegative.Rgb = "FFD00000";
-		group.ColorMarkers.Rgb = "FFD00000";
-		group.ColorAxis.Rgb = "FF000000";
-		group.ColorFirst.Rgb = "FFD00000";
-		group.ColorLast.Rgb = "FFD00000";
-		group.ColorHigh.Rgb = "FFD00000";
-		group.ColorLow.Rgb = "FFD00000";
-		_lst.Add(group);
-		return group;
+		return AddWithDefaultColors(group);
 	}
 
 	internal void Insert(int rowFrom, int colFrom, int rows, int cols)
@@ -232,29 +221,16 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 		{
 			if (slg.DateAxis)
 			{
-				//DateAxisRange insert rows.
-				var address = slg.DateAxisRange;
-				if (rowFrom <= address.Start.Row)
+				var rowShifted = GetRowShiftedAddress(slg.DateAxisRange, rowFrom, rows);
+				if (rowShifted != null)
 				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row + rows, address.Start.Column, address.End.Row + rows, address.End.Column);
-					slg.DateAxisRange = _ws.Cells[BuildNewAddress(address, newAddress)];
+					slg.DateAxisRange = _ws.Cells[rowShifted];
 				}
-				else if (rowFrom <= address.End.Row && address.End.Row + rows <= ExcelPackage.MaxRows)
+
+				var colShifted = GetColumnShiftedAddress(slg.DateAxisRange, colFrom, cols);
+				if (colShifted != null)
 				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column, address.End.Row + rows, address.End.Column);
-					slg.DateAxisRange = _ws.Cells[BuildNewAddress(address, newAddress)];
-				}
-				//DateAxisRange insert cols.
-				address = slg.DateAxisRange;
-				if (colFrom <= address.Start.Column)
-				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column + cols, address.End.Row, address.End.Column + cols);
-					slg.DateAxisRange = _ws.Cells[BuildNewAddress(address, newAddress)];
-				}
-				else if (colFrom <= address.End.Column && address.End.Column + cols < ExcelPackage.MaxColumns)
-				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column + cols);
-					slg.DateAxisRange = _ws.Cells[BuildNewAddress(address, newAddress)];
+					slg.DateAxisRange = _ws.Cells[colShifted];
 				}
 			}
 
@@ -276,19 +252,10 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 			}
 
 			var address = sl.GetRangeAddress(_ws.Names);
-			if (address is not ExcelNamedRange)
+			var shifted = address is ExcelNamedRange ? null : GetRowShiftedAddress(address, rowFrom, rows);
+			if (shifted != null)
 			{
-				if (rowFrom <= address.Start.Row)
-				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row + rows, address.Start.Column, address.End.Row + rows, address.End.Column);
-					var ttt = new ExcelAddress(BuildNewAddress(address, newAddress));
-					sl.RangeAddress = ttt;
-				}
-				else if (rowFrom <= address.End.Row && address.End.Row + rows <= ExcelPackage.MaxRows)
-				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column, address.End.Row + rows, address.End.Column);
-					sl.RangeAddress = new ExcelAddress(BuildNewAddress(address, newAddress));
-				}
+				sl.SetRangeAddress(new ExcelAddress(shifted));
 			}
 		}
 	}
@@ -303,37 +270,56 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 			}
 
 			var address = sl.GetRangeAddress(_ws.Names);
-			if (address is not ExcelNamedRange)
+			var shifted = address is ExcelNamedRange ? null : GetColumnShiftedAddress(address, colFrom, cols);
+			if (shifted != null)
 			{
-				if (colFrom <= address.Start.Column)
-				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column + cols, address.End.Row, address.End.Column + cols);
-					sl.RangeAddress = new ExcelAddress(BuildNewAddress(address, newAddress));
-				}
-				else if (colFrom <= address.End.Column && address.End.Column + cols < ExcelPackage.MaxColumns)
-				{
-					var newAddress = ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column + cols);
-					sl.RangeAddress = new ExcelAddress(BuildNewAddress(address, newAddress));
-				}
+				sl.SetRangeAddress(new ExcelAddress(shifted));
 			}
 		}
 	}
 
-	private static string BuildNewAddress(ExcelAddressBase namedRange, string newAddress)
+	// Returns the address moved by inserted rows, or null when the insert does not touch it.
+	private static string GetRowShiftedAddress(ExcelAddressBase address, int rowFrom, int rows)
 	{
-		if (namedRange.FullAddress.Contains('!'))
+		if (rowFrom <= address.Start.Row)
 		{
-			var worksheet = namedRange.FullAddress.Split('!')[0];
-			worksheet = worksheet.Trim('\'');
-			newAddress = ExcelCellBase.GetFullAddress(worksheet, newAddress);
+			return BuildNewAddress(address, ExcelCellBase.GetAddress(address.Start.Row + rows, address.Start.Column, address.End.Row + rows, address.End.Column));
 		}
 
-		return newAddress;
+		if (rowFrom <= address.End.Row && address.End.Row + rows <= ExcelPackage.MaxRows)
+		{
+			return BuildNewAddress(address, ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column, address.End.Row + rows, address.End.Column));
+		}
+
+		return null;
+	}
+
+	// Returns the address moved by inserted columns, or null when the insert does not touch it.
+	private static string GetColumnShiftedAddress(ExcelAddressBase address, int colFrom, int cols)
+	{
+		if (colFrom <= address.Start.Column)
+		{
+			return BuildNewAddress(address, ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column + cols, address.End.Row, address.End.Column + cols));
+		}
+
+		if (colFrom <= address.End.Column && address.End.Column + cols < ExcelPackage.MaxColumns)
+		{
+			return BuildNewAddress(address, ExcelCellBase.GetAddress(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column + cols));
+		}
+
+		return null;
+	}
+
+	private static string BuildNewAddress(ExcelAddressBase namedRange, string newAddress)
+	{
+		var fullAddress = namedRange.FullAddress;
+		var sheetEnd = fullAddress.IndexOf('!');
+		return sheetEnd < 0 ? newAddress : ExcelCellBase.GetFullAddress(fullAddress[..sheetEnd].Trim('\''), newAddress);
 	}
 
 	private ExcelSparklineGroup NewSparklineGroup()
 	{
-		var xh = new XmlHelperInstance(_ws.NameSpaceManager, _ws.WorksheetXml); //SelectSingleNode("/d:worksheet", _ws.NameSpaceManager)
+		var xh = new XmlHelperInstance(_ws.NameSpaceManager, _ws.WorksheetXml);
 		if (!xh.ExistNode(_extPath + _searchPath))
 		{
 			var ext = xh.CreateNode(_extPath, false, true);
@@ -370,7 +356,7 @@ public class ExcelSparklineGroupCollection : IEnumerable<ExcelSparklineGroup>
 	{
 		get
 		{
-			return (_lst[index]);
+			return _lst[index];
 		}
 	}
 

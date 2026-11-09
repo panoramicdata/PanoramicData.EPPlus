@@ -22,6 +22,7 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
@@ -38,12 +39,13 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 /// </summary>
 public abstract class ExcelFunction
 {
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public ExcelFunction()
 		: this(new ArgumentCollectionUtil(), new ArgumentParsers(), new CompileResultValidators())
 	{
-
 	}
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public ExcelFunction(
 		ArgumentCollectionUtil argumentCollectionUtil,
 		ArgumentParsers argumentParsers,
@@ -76,25 +78,18 @@ public abstract class ExcelFunction
 
 	public virtual bool IsErrorHandlingFunction => false;
 
-	/// <summary>
-	/// Used for some Lookupfunctions to indicate that function arguments should
-	/// not be compiled before the function is called.
-	/// </summary>
-	//public bool SkipArgumentEvaluation { get; set; }
 	protected static object GetFirstValue(IEnumerable<FunctionArgument> val)
 	{
-		var arg = ((IEnumerable<FunctionArgument>)val).FirstOrDefault();
+		var arg = val.FirstOrDefault();
 		if (arg.Value is ExcelDataProvider.IRangeInfo)
 		{
-			//var r=((ExcelDataProvider.IRangeInfo)arg);
 			var r = arg.ValueAsRangeInfo;
 			return r.GetValue(r.Address._fromRow, r.Address._fromCol);
 		}
-		else
-		{
-			return arg?.Value;
-		}
+
+		return arg?.Value;
 	}
+
 	/// <summary>
 	/// This functions validates that the supplied <paramref name="arguments"/> contains at least
 	/// (the value of) <paramref name="minLength"/> elements. If one of the arguments is an
@@ -108,32 +103,7 @@ public abstract class ExcelFunction
 									 eErrorType errorTypeToThrow)
 	{
 		Require.That(arguments).Named("arguments").IsNotNull();
-		ThrowExcelErrorValueExceptionIf(() =>
-			{
-				var nArgs = 0;
-				if (arguments.Any())
-				{
-					foreach (var arg in arguments)
-					{
-						nArgs++;
-						if (nArgs >= minLength)
-						{
-							return false;
-						}
-
-						if (arg.IsExcelRange)
-						{
-							nArgs += arg.ValueAsRangeInfo.GetNCells();
-							if (nArgs >= minLength)
-							{
-								return false;
-							}
-						}
-					}
-				}
-
-				return true;
-			}, errorTypeToThrow);
+		ThrowExcelErrorValueExceptionIf(() => HasFewerArgumentsThan(arguments, minLength), errorTypeToThrow);
 	}
 
 	/// <summary>
@@ -148,33 +118,33 @@ public abstract class ExcelFunction
 	protected void ValidateArguments(IEnumerable<FunctionArgument> arguments, int minLength)
 	{
 		Require.That(arguments).Named("arguments").IsNotNull();
-		ThrowArgumentExceptionIf(() =>
-			{
-				var nArgs = 0;
-				if (arguments.Any())
-				{
-					foreach (var arg in arguments)
-					{
-						nArgs++;
-						if (nArgs >= minLength)
-						{
-							return false;
-						}
-
-						if (arg.IsExcelRange)
-						{
-							nArgs += arg.ValueAsRangeInfo.GetNCells();
-							if (nArgs >= minLength)
-							{
-								return false;
-							}
-						}
-					}
-				}
-
-				return true;
-			}, "Expecting at least {0} arguments", minLength.ToString());
+		ThrowArgumentExceptionIf(() => HasFewerArgumentsThan(arguments, minLength), "Expecting at least {0} arguments", minLength.ToString());
 	}
+
+	private static bool HasFewerArgumentsThan(IEnumerable<FunctionArgument> arguments, int minLength)
+	{
+		var nArgs = 0;
+		foreach (var arg in arguments)
+		{
+			nArgs++;
+			if (nArgs >= minLength)
+			{
+				return false;
+			}
+
+			if (arg.IsExcelRange)
+			{
+				nArgs += arg.ValueAsRangeInfo.GetNCells();
+				if (nArgs >= minLength)
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	protected static string ArgToAddress(IEnumerable<FunctionArgument> arguments, int index) => arguments.ElementAt(index).IsExcelRange ? arguments.ElementAt(index).ValueAsRangeInfo.Address.FullAddress : ArgToString(arguments, index);
 
 	protected string ArgToAddress(IEnumerable<FunctionArgument> arguments, int index, ParsingContext context)
@@ -295,12 +265,6 @@ public abstract class ExcelFunction
 	protected static bool IsNumeric(object val) => val != null
 && (TypeCompat.IsPrimitive(val) || val is double || val is decimal || val is System.DateTime || val is TimeSpan);
 
-	//protected virtual bool IsNumber(object obj)
-	//{
-	//    if (obj == null) return false;
-	//    return (obj is int || obj is double || obj is short || obj is decimal || obj is long);
-	//}
-
 	/// <summary>
 	/// Helper method for comparison of two doubles.
 	/// </summary>
@@ -404,7 +368,7 @@ public abstract class ExcelFunction
 	{
 		if (arg.ValueIsExcelError)
 		{
-			throw (new ExcelErrorValueException(arg.ValueAsExcelErrorValue));
+			throw new ExcelErrorValueException(arg.ValueAsExcelErrorValue);
 		}
 	}
 
@@ -417,8 +381,80 @@ public abstract class ExcelFunction
 	{
 		if (cell.IsExcelError)
 		{
-			throw (new ExcelErrorValueException(ExcelErrorValue.Parse(cell.Value.ToString())));
+			throw new ExcelErrorValueException(ExcelErrorValue.Parse(cell.Value.ToString()));
 		}
+	}
+
+	private protected static bool EvaluateCriteria(ExcelUtilities.ExpressionEvaluator evaluator, object obj, string expression) =>
+		IsNumeric(obj)
+			? evaluator.Evaluate(Utils.ConvertUtil.GetValueDouble(obj), expression)
+			: evaluator.Evaluate(obj, expression);
+
+	private protected CompileResult FindText(IEnumerable<FunctionArgument> arguments, StringComparison comparison)
+	{
+		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
+		ValidateArguments(functionArguments, 2);
+		var search = ArgToString(functionArguments, 0);
+		var searchIn = ArgToString(functionArguments, 1);
+		var startIndex = 0;
+		if (functionArguments.Length > 2)
+		{
+			startIndex = ArgToInt(functionArguments, 2);
+		}
+
+		var result = searchIn.IndexOf(search, startIndex, comparison);
+		if (result == -1)
+		{
+			return CreateResult(ExcelErrorValue.Create(eErrorType.Value), DataType.ExcelError);
+		}
+		// Adding 1 because Excel uses 1-based index
+		return CreateResult(result + 1, DataType.Integer);
+	}
+
+	private protected CompileResult GetValueAtSortedPosition(IEnumerable<FunctionArgument> arguments, ParsingContext context, Func<IEnumerable<ExcelDoubleCellValue>, IEnumerable<ExcelDoubleCellValue>> sort)
+	{
+		ValidateArguments(arguments, 2);
+		var args = arguments.ElementAt(0);
+		var index = ArgToInt(arguments, 1) - 1;
+		var values = ArgsToDoubleEnumerable(new List<FunctionArgument> { args }, context);
+		ThrowExcelErrorValueExceptionIf(() => index < 0 || index >= values.Count(), eErrorType.Num);
+		var result = sort(values).ElementAt(index);
+		return CreateResult(result, DataType.Decimal);
+	}
+
+	private protected int GetFirstArgumentAsFlooredInteger(IEnumerable<FunctionArgument> arguments)
+	{
+		ValidateArguments(arguments, 1);
+		var arg1 = GetFirstValue(arguments);
+		if (!Utils.ConvertUtil.IsNumeric(arg1))
+		{
+			ThrowExcelErrorValueException(eErrorType.Value);
+		}
+
+		return (int)System.Math.Floor(Utils.ConvertUtil.GetValueDouble(arg1));
+	}
+
+	private protected System.DateTime ArgToOADate(IEnumerable<FunctionArgument> arguments, int index) => System.DateTime.FromOADate(ArgToInt(arguments, index));
+
+	private protected System.DateTime ParseFirstArgumentDateInCurrentCulture(IEnumerable<FunctionArgument> arguments)
+	{
+		ValidateArguments(arguments, 1);
+		var dateObj = arguments.ElementAt(0).Value;
+		if (dateObj is string)
+		{
+			return System.DateTime.Parse(dateObj.ToString());
+		}
+
+		var d = ArgToDecimal(arguments, 0);
+		return System.DateTime.FromOADate(d);
+	}
+
+	private protected CompileResult CreateDateResultFromString(string dateString, Func<System.DateTime, double> toSerialNumber)
+	{
+		System.DateTime.TryParse(dateString, out var result);
+		return result != System.DateTime.MinValue ?
+			CreateResult(toSerialNumber(result), DataType.Date) :
+			CreateResult(ExcelErrorValue.Create(eErrorType.Value), DataType.ExcelError);
 	}
 
 	protected CompileResult GetResultByObject(object result)

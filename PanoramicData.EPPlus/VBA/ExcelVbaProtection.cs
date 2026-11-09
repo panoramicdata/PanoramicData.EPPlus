@@ -101,8 +101,4 @@ public class ExcelVbaProtection
 			_project.ProjectID = "{00000000-0000-0000-0000-000000000000}";
 		}
 	}
-	//public void ValidatePassword(string Password)                     
-	//{
-
-	//}        
 }

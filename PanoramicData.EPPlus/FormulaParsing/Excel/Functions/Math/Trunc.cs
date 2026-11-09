@@ -40,7 +40,7 @@ public class Trunc : ExcelFunction
 			return CreateResult(System.Math.Truncate(number), DataType.Decimal);
 		}
 
-		var nDigits = ArgToInt(arguments, 1);
+		ArgToInt(arguments, 1);
 		var func = context.Configuration.FunctionRepository.GetFunction("rounddown");
 		return func.Execute(arguments, context);
 	}

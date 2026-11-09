@@ -175,7 +175,7 @@ public sealed class ExcelColorXml : StyleXmlHelper
 		}
 		else
 		{
-			SetXmlNodeString("@theme", _theme.ToString());
+			SetXmlNodeString("@theme", _theme);
 		}
 
 		if (_tint != decimal.MinValue)

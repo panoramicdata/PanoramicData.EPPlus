@@ -166,6 +166,16 @@ internal class EncryptionInfoAgile : EncryptionInfo
 		_nsm.AddNamespace("c", "http://schemas.microsoft.com/office/2006/keyEncryptor/certificate");
 		_nsm.AddNamespace("p", "http://schemas.microsoft.com/office/2006/keyEncryptor/password");
 	}
+	private static byte[] FromBase64OrNull(string s)
+	{
+		if (string.IsNullOrEmpty(s))
+		{
+			return null;
+		}
+
+		return Convert.FromBase64String(s);
+	}
+
 	internal class EncryptionKeyData : XmlHelper
 	{
 		public EncryptionKeyData(XmlNamespaceManager nsm, XmlNode topNode) :
@@ -177,8 +187,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 		{
 			get
 			{
-				var s = GetXmlNodeString("@saltValue");
-				return !string.IsNullOrEmpty(s) ? Convert.FromBase64String(s) : null;
+				return FromBase64OrNull(GetXmlNodeString("@saltValue"));
 			}
 			set
 			{
@@ -226,25 +235,21 @@ internal class EncryptionInfoAgile : EncryptionInfo
 			eHashAlogorithm.SHA1 => "SHA-1",
 			_ => value.ToString(),
 		};
-		internal eChainingMode CipherChaining
+		internal eChainingMode GetCipherChaining()
 		{
-			get
+			var v = GetXmlNodeString("@cipherChaining");
+			try
 			{
-				var v = GetXmlNodeString("@cipherChaining");
-				try
-				{
-					return Enum.Parse<eChainingMode>(v);
-				}
-				catch
-				{
-					throw (new InvalidDataException("Invalid chaining mode"));
-				}
+				return Enum.Parse<eChainingMode>(v);
 			}
-			set
+			catch
 			{
-				SetXmlNodeString("@cipherChaining", value.ToString());
+				throw (new InvalidDataException("Invalid chaining mode"));
 			}
 		}
+
+		internal void SetCipherChaining(eChainingMode value) => SetXmlNodeString("@cipherChaining", value.ToString());
+
 		internal eCipherAlgorithm CipherAlgorithm
 		{
 			get
@@ -339,8 +344,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 		{
 			get
 			{
-				var s = GetXmlNodeString("@encryptedHmacValue");
-				return !string.IsNullOrEmpty(s) ? Convert.FromBase64String(s) : null;
+				return FromBase64OrNull(GetXmlNodeString("@encryptedHmacValue"));
 			}
 			set
 			{
@@ -351,8 +355,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 		{
 			get
 			{
-				var s = GetXmlNodeString("@encryptedHmacKey");
-				return !string.IsNullOrEmpty(s) ? Convert.FromBase64String(s) : null;
+				return FromBase64OrNull(GetXmlNodeString("@encryptedHmacKey"));
 			}
 			set
 			{
@@ -371,8 +374,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 		{
 			get
 			{
-				var s = GetXmlNodeString("@encryptedKeyValue");
-				return !string.IsNullOrEmpty(s) ? Convert.FromBase64String(s) : null;
+				return FromBase64OrNull(GetXmlNodeString("@encryptedKeyValue"));
 			}
 			set
 			{
@@ -383,8 +385,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 		{
 			get
 			{
-				var s = GetXmlNodeString("@encryptedVerifierHashValue");
-				return !string.IsNullOrEmpty(s) ? Convert.FromBase64String(s) : null;
+				return FromBase64OrNull(GetXmlNodeString("@encryptedVerifierHashValue"));
 			}
 			set
 			{
@@ -395,8 +396,7 @@ internal class EncryptionInfoAgile : EncryptionInfo
 		{
 			get
 			{
-				var s = GetXmlNodeString("@encryptedVerifierHashInput");
-				return !string.IsNullOrEmpty(s) ? Convert.FromBase64String(s) : null;
+				return FromBase64OrNull(GetXmlNodeString("@encryptedVerifierHashInput"));
 			}
 			set
 			{

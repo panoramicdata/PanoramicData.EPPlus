@@ -40,8 +40,7 @@ namespace OfficeOpenXml.FormulaParsing;
 
 public static class CalculationExtension
 {
-
-	public static void Calculate(this ExcelWorkbook workbook) => workbook.Calculate(new ExcelCalculationOption() { AllowCirculareReferences = false });
+	public static void Calculate(this ExcelWorkbook workbook) => workbook.Calculate(new ExcelCalculationOption { AllowCirculareReferences = false });
 	public static void Calculate(this ExcelWorkbook workbook, ExcelCalculationOption options)
 	{
 		Init(workbook);
@@ -54,27 +53,7 @@ public static class CalculationExtension
 			workbook.FormulaParser.Logger.Log(msg);
 		}
 
-		//TODO: Remove when tests are done. Outputs the dc to a text file. 
-		//var fileDc = new System.IO.StreamWriter("c:\\temp\\dc.txt");
-
-		//for (int i = 0; i < dc.list.Count; i++)
-		//{
-		//    fileDc.WriteLine(i.ToString() + "," + dc.list[i].Column.ToString() + "," + dc.list[i].Row.ToString() + "," + (dc.list[i].ws==null ? "" : dc.list[i].ws.Name) + "," + dc.list[i].Formula);
-		//}
-		//fileDc.Close();
-		//fileDc = new System.IO.StreamWriter("c:\\temp\\dcorder.txt");
-		//for (int i = 0; i < dc.CalcOrder.Count; i++)
-		//{
-		//    fileDc.WriteLine(dc.CalcOrder[i].ToString());
-		//}
-		//fileDc.Close();
-		//fileDc = null;
-
-		//TODO: Add calculation here
-
 		CalcChain(workbook, workbook.FormulaParser, dc);
-
-		//workbook._isCalculated = true;
 	}
 	public static void Calculate(this ExcelWorksheet worksheet) => worksheet.Calculate(new ExcelCalculationOption());
 	public static void Calculate(this ExcelWorksheet worksheet, ExcelCalculationOption options)
@@ -164,7 +143,7 @@ public static class CalculationExtension
 	}
 	private static void Init(ExcelWorkbook workbook)
 	{
-		workbook._formulaTokens = new CellStore<List<Token>>(); ;
+		workbook._formulaTokens = new CellStore<List<Token>>();
 		foreach (var ws in workbook.Worksheets)
 		{
 			if (ws is not ExcelChartsheet)

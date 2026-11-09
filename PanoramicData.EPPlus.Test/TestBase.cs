@@ -19,7 +19,7 @@ public abstract class TestBase
 	public void InitBase()
 	{
 		// Make sure the files directories exist
-		foreach (var path in new string[] { _worksheetPath, _testInputPath })
+		foreach (var path in new[] { _worksheetPath, _testInputPath })
 		{
 			var directoryInfo = new DirectoryInfo(path);
 			if (!directoryInfo.Exists)
@@ -61,18 +61,15 @@ public abstract class TestBase
 			}
 		}
 
-		//_worksheetPath = Path.Combine(Path.GetTempPath(), @"EPPlus worksheets");
-		//if (!Directory.Exists(_worksheetPath))
-		//{
-		//    Directory.CreateDirectory(_worksheetPath);
-		//}
 		var di = new DirectoryInfo(_worksheetPath);
 		_worksheetPath = di.FullName + Path.DirectorySeparatorChar;
 
 		_pck = new ExcelPackage();
 	}
 
-	protected ExcelPackage OpenPackage(string name, bool delete = false)
+	protected ExcelPackage OpenPackage(string name) => OpenPackage(name, false);
+
+	protected ExcelPackage OpenPackage(string name, bool delete)
 	{
 		var fi = new FileInfo(_worksheetPath + name);
 		if (delete && fi.Exists)
@@ -101,7 +98,10 @@ public abstract class TestBase
 
 	protected void SaveWorksheet(string name)
 	{
-		if (_pck.Workbook.Worksheets.Count == 0) return;
+		if (_pck.Workbook.Worksheets.Count == 0)
+		{
+			return;
+		}
 		var fi = new FileInfo(_worksheetPath + name);
 		if (fi.Exists)
 		{

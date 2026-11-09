@@ -49,7 +49,6 @@ public class FormulaParser : IDisposable
 	public FormulaParser(ExcelDataProvider excelDataProvider)
 		: this(excelDataProvider, ParsingContext.Create())
 	{
-
 	}
 
 	public FormulaParser(ExcelDataProvider excelDataProvider, ParsingContext parsingContext)
@@ -104,7 +103,6 @@ public class FormulaParser : IDisposable
 	{
 		var rangeAddress = _parsingContext.RangeAddressFactory.Create(worksheet, column, row);
 		using var scope = _parsingContext.Scopes.NewScope(rangeAddress);
-		//    _parsingContext.Dependencies.AddFormulaScope(scope);
 		var graph = _graphBuilder.Build(tokens);
 		if (!graph.Expressions.Any())
 		{
@@ -115,36 +113,9 @@ public class FormulaParser : IDisposable
 		{
 			var compileResult = _compiler.Compile(graph.Expressions);
 			// quick solution for the fact that an excelrange can be returned.
-			if (compileResult.Result is not ExcelDataProvider.IRangeInfo rangeInfo)
-			{
-				return compileResult.Result ?? 0d;
-			}
-			else
-			{
-				if (rangeInfo.IsEmpty)
-				{
-					return 0d;
-				}
-
-				if (!rangeInfo.IsMulti)
-				{
-					return rangeInfo.First().Value ?? 0d;
-				}
-				// ok to return multicell if it is a workbook scoped name.
-				if (string.IsNullOrEmpty(worksheet))
-				{
-					return rangeInfo;
-				}
-
-				if (_parsingContext.Debug)
-				{
-					var msg = string.Format("A range with multiple cell was returned at row {0}, column {1}",
-						row, column);
-					_parsingContext.Configuration.Logger.Log(_parsingContext, msg);
-				}
-
-				return ExcelErrorValue.Create(eErrorType.Value);
-			}
+			return compileResult.Result is not ExcelDataProvider.IRangeInfo rangeInfo
+				? compileResult.Result ?? 0d
+				: GetRangeResult(rangeInfo, worksheet, row, column);
 		}
 		catch (ExcelErrorValueException ex)
 		{
@@ -155,6 +126,33 @@ public class FormulaParser : IDisposable
 
 			return ex.ErrorValue;
 		}
+	}
+
+	private object GetRangeResult(ExcelDataProvider.IRangeInfo rangeInfo, string worksheet, int row, int column)
+	{
+		if (rangeInfo.IsEmpty)
+		{
+			return 0d;
+		}
+
+		if (!rangeInfo.IsMulti)
+		{
+			return rangeInfo.First().Value ?? 0d;
+		}
+		// ok to return multicell if it is a workbook scoped name.
+		if (string.IsNullOrEmpty(worksheet))
+		{
+			return rangeInfo;
+		}
+
+		if (_parsingContext.Debug)
+		{
+			var msg = string.Format("A range with multiple cell was returned at row {0}, column {1}",
+				row, column);
+			_parsingContext.Configuration.Logger.Log(_parsingContext, msg);
+		}
+
+		return ExcelErrorValue.Create(eErrorType.Value);
 	}
 
 	public virtual object Parse(string formula, string address) => Parse(formula, _parsingContext.RangeAddressFactory.Create(address));
@@ -174,15 +172,7 @@ public class FormulaParser : IDisposable
 		return string.IsNullOrEmpty(f)
 			? _excelDataProvider.GetRangeValue(worksheetName, row, col)
 			: Parse(f, _parsingContext.RangeAddressFactory.Create(worksheetName, col, row));
-		//var dataItem = _excelDataProvider.GetRangeValues(address).FirstOrDefault();
-		//if (dataItem == null /*|| (dataItem.Value == null && dataItem.Formula == null)*/) return null;
-		//if (!string.IsNullOrEmpty(dataItem.Formula))
-		//{
-		//    return Parse(dataItem.Formula, _parsingContext.RangeAddressFactory.Create(address));
-		//}
-		//return Parse(dataItem.Value.ToString(), _parsingContext.RangeAddressFactory.Create(address));
 	}
-
 
 	internal void InitNewCalc() => _excelDataProvider?.Reset();
 

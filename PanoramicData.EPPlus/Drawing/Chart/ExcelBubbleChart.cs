@@ -17,20 +17,17 @@ public sealed class ExcelBubbleChart : ExcelChart
 		ShowNegativeBubbles = false;
 		BubbleScale = 100;
 		_chartSeries = new ExcelBubbleChartSeries(this, drawings.NameSpaceManager, _chartNode, PivotTableSource != null);
-		//SetTypeProperties();
 	}
 
 	internal ExcelBubbleChart(ExcelDrawings drawings, XmlNode node, eChartType type, bool isPivot) :
 		base(drawings, node, type, isPivot)
 	{
 		_chartSeries = new ExcelBubbleChartSeries(this, drawings.NameSpaceManager, _chartNode, isPivot);
-		//SetTypeProperties();
 	}
 	internal ExcelBubbleChart(ExcelDrawings drawings, XmlNode node, Uri uriChart, ZipPackagePart part, XmlDocument chartXml, XmlNode chartNode) :
 		base(drawings, node, uriChart, part, chartXml, chartNode)
 	{
 		_chartSeries = new ExcelBubbleChartSeries(this, _drawings.NameSpaceManager, _chartNode, false);
-		//SetTypeProperties();
 	}
 	internal ExcelBubbleChart(ExcelChart topChart, XmlNode chartNode) :
 		base(topChart, chartNode)

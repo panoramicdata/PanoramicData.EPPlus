@@ -99,7 +99,7 @@ public class Issues : TestBase
 	{
 		FileInfo newFile = new(@"C:\Temp\output.xlsx");
 		ExcelPackage excelP = new(newFile);
-		var ws = excelP.Workbook.Worksheets[1];
+		_ = excelP.Workbook.Worksheets[1];
 	}
 	[Ignore]
 	[TestMethod]
@@ -174,9 +174,7 @@ public class Issues : TestBase
 		var p = new ExcelPackage(new FileInfo(@"C:\Temp\bug\pp.xlsx"));
 		var ws = p.Workbook.Worksheets["tum_liste"];
 		var wPvt = p.Workbook.Worksheets.Add("pvtSheet");
-		var pvSh = wPvt.PivotTables.Add(wPvt.Cells["B5"], ws.Cells[ws.Dimension.Address.ToString()], "pvtS");
-
-		//p.Save();
+		wPvt.PivotTables.Add(wPvt.Cells["B5"], ws.Cells[ws.Dimension.Address.ToString()], "pvtS");
 	}
 	[TestMethod]
 	public void Issue15113()
@@ -200,7 +198,7 @@ public class Issues : TestBase
 		sheet.Cells.Style.Fill.BackgroundColor.SetColor(Color.White);
 		sheet.Cells[1, 1, 1, 3].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 		sheet.Cells[1, 5, 2, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-		var column = sheet.Column(3); // fails with exception
+		sheet.Column(3); // fails with exception
 	}
 	[TestMethod, Ignore]
 	public void Issue15145()
@@ -237,7 +235,6 @@ public class Issues : TestBase
 		using var pck = new ExcelPackage(template, false);
 		var ws = pck.Workbook.Worksheets[3];
 
-		//ws.InsertColumn(3, 1);
 		CustomColumnInsert(ws, 3, 1);
 
 		pck.SaveAs(new FileInfo(output));
@@ -320,12 +317,11 @@ public class Issues : TestBase
 		var workBook = package.Workbook;
 		var worksheet = workBook.Worksheets[1];
 
-		//string column = ColumnIndexToColumnLetter(28);
 		worksheet.DeleteColumn(28);
 
 		if (worksheet.Cells["AA19"].Formula != "")
 		{
-			throw new Exception("this cell should not have formula");
+			throw new InvalidOperationException("this cell should not have formula");
 		}
 
 		package.Save();
@@ -346,7 +342,7 @@ public class Issues : TestBase
 		var l = new List<cls1>
 		{
 			new() { prop1 = 1 },
-			new cls2() { prop1 = 1, prop2 = "test1" }
+			new cls2 { prop1 = 1, prop2 = "test1" }
 		};
 
 		var p = new ExcelPackage();
@@ -378,7 +374,6 @@ public class Issues : TestBase
 		}
 
 		fs.Seek(0, SeekOrigin.Begin);
-		var fs2 = fs;
 	}
 	[TestMethod]
 	public void Issue15179()
@@ -389,7 +384,7 @@ public class Issues : TestBase
 		ws.Cells["E3:F3"].Merge = false;
 		ws.DeleteRow(2, 6);
 		ws.Cells["A1"].Value = 0;
-		var s = ws.Cells["A1"].Value.ToString();
+		_ = ws.Cells["A1"].Value.ToString();
 	}
 	[Ignore]
 	[TestMethod]
@@ -404,7 +399,7 @@ public class Issues : TestBase
 			var ws = excelPackage.Workbook.Worksheets[sheetName];
 			excelPackage.Workbook.Worksheets.Delete(ws);
 
-			ws = excelPackage.Workbook.Worksheets.Add(sheetName);
+			excelPackage.Workbook.Worksheets.Add(sheetName);
 
 			excelPackage.SaveAs(new FileInfo(@"C:\temp\bug\issue\output2.xlsx"));
 		}
@@ -455,7 +450,6 @@ public class Issues : TestBase
 		ws.Cells["A1"].Value = "Test";
 		package.Encryption.Password = "Test2";
 		package.Save();
-		//package.SaveAs(new FileInfo(@"c:\temp\test2.xlsx"));
 	}
 
 	[TestMethod, Ignore]
@@ -463,7 +457,6 @@ public class Issues : TestBase
 	{
 		using var pck = new ExcelPackage(new FileInfo(@"c:\temp\EPPlusIssues\Excel01.xlsx"));
 		var sw = new Stopwatch();
-		//pck.Workbook.FormulaParser.Configure(x => x.AttachLogger(LoggerFactory.CreateTextFileLogger(new FileInfo(@"c:\Temp\log1.txt"))));
 		sw.Start();
 		var ws = pck.Workbook.Worksheets.First();
 		pck.Workbook.Calculate();
@@ -483,7 +476,6 @@ public class Issues : TestBase
 		pck.Workbook.FormulaParser.Configure(x => x.AttachLogger(LoggerFactory.CreateTextFileLogger(new FileInfo(@"c:\Temp\log1.txt"))));
 		sw.Start();
 		var ws = pck.Workbook.Worksheets.First();
-		//ws.Calculate();
 		pck.Workbook.Calculate();
 		Assert.AreEqual("20L2300", ws.Cells["F4"].Value);
 		Assert.AreEqual("20K2E01", ws.Cells["F5"].Value);
@@ -494,12 +486,9 @@ public class Issues : TestBase
 	[TestMethod]
 	public void Issue15154() => Directory.EnumerateFiles(@"c:\temp\bug\ConstructorInvokationNotThreadSafe\").AsParallel().ForAll(file =>
 									 {
-										 //lock (_lock)
-										 //{
 										 using var package = new ExcelPackage(new FileStream(file, FileMode.Open));
 										 package.Workbook.Worksheets[1].Cells[1, 1].Value = file;
 										 package.SaveAs(new FileInfo(@"c:\temp\bug\ConstructorInvokationNotThreadSafe\new\" + new FileInfo(file).Name));
-										 //}
 									 });
 	[Ignore]
 	[TestMethod]
@@ -586,7 +575,7 @@ public class Issues : TestBase
 		var workBook = package.Workbook;
 		var worksheet = workBook.Worksheets[1];
 
-		var rt = worksheet.Cells["K31"].RichText.Text;
+		_ = worksheet.Cells["K31"].RichText.Text;
 
 		package.Save();
 	}
@@ -626,7 +615,7 @@ public class Issues : TestBase
 		var ws = p.Workbook.Worksheets.Add("StyleBug");
 		ws.Cells["A1"].Value = 5698633.64;
 		ws.Cells["A1"].Style.Numberformat.Format = s;
-		var t = ws.Cells["A1"].Text;
+		_ = ws.Cells["A1"].Text;
 	}
 	[TestMethod, Ignore]
 	public void Issue15213()
@@ -692,7 +681,6 @@ public class Issues : TestBase
 	/**** Pivottable issue ****/
 	public void Issue()
 	{
-		DirectoryInfo outputDir = new(@"c:\ExcelPivotTest");
 		FileInfo MyFile = new(@"c:\temp\bug\pivottable.xlsx");
 		LoadData(MyFile);
 		BuildPivotTable1(MyFile);
@@ -787,7 +775,7 @@ public class Issues : TestBase
 		var yearField = pivotTable1.Fields.GetDateGroupField(eDateGroupBy.Years);
 		yearField.Name = "Year";
 
-		var rowField2 = pivotTable1.RowFields.Add(pivotTable1.Fields["AUDIT_LINE_STATUS"]);
+		pivotTable1.RowFields.Add(pivotTable1.Fields["AUDIT_LINE_STATUS"]);
 
 		var TotalSpend = pivotTable1.DataFields.Add(pivotTable1.Fields["TOTAL_INVOICE_PRICE"]);
 		TotalSpend.Name = "Total Spend";
@@ -873,7 +861,7 @@ public class Issues : TestBase
 	[TestMethod, Ignore]
 	public void Issues14699()
 	{
-		FileInfo newFile = new(string.Format("c:\\temp\\bug\\EPPlus_Issue14699.xlsx", Directory.GetCurrentDirectory()));
+		FileInfo newFile = new("c:\\temp\\bug\\EPPlus_Issue14699.xlsx");
 		ExcelPackage pkg = new(newFile);
 		var wksheet = pkg.Workbook.Worksheets.Add("Issue14699");
 		// Initialize a small range
@@ -907,7 +895,7 @@ public class Issues : TestBase
 	{
 		using var p = new ExcelPackage(new FileInfo(@"c:\temp\bubble.xlsx"));
 		var c = p.Workbook.Worksheets[1].Drawings[0] as ExcelBubbleChart;
-		var cs = c.Series[0] as ExcelBubbleChartSerie;
+		_ = c.Series[0] as ExcelBubbleChartSerie;
 	}
 	[TestMethod]
 	public void Issue15377()
@@ -915,7 +903,7 @@ public class Issues : TestBase
 		using var p = new ExcelPackage();
 		var ws = p.Workbook.Worksheets.Add("ws1");
 		ws.Cells["A1"].Value = (double?)1;
-		var v = ws.GetValue<double?>(1, 1);
+		_ = ws.GetValue<double?>(1, 1);
 	}
 	[TestMethod]
 	public void Issue15374()
@@ -981,7 +969,7 @@ public class Issues : TestBase
 	public void Issuer15445()
 	{
 		using var p = new ExcelPackage();
-		var ws1 = p.Workbook.Worksheets.Add("ws1");
+		p.Workbook.Worksheets.Add("ws1");
 		var ws2 = p.Workbook.Worksheets.Add("ws2");
 		ws2.View.SelectedRange = "A1:B3 D12:D15";
 		ws2.View.ActiveCell = "D15";
@@ -1041,7 +1029,7 @@ public class Issues : TestBase
 		p.SaveAs(new FileInfo(path2));
 
 		// files are identical?
-		var md5 = System.Security.Cryptography.MD5.Create();
+		var md5 = System.Security.Cryptography.SHA256.Create();
 		using var fs1 = new FileStream(path1, FileMode.Open);
 		using var fs2 = new FileStream(path2, FileMode.Open);
 		var hash1 = string.Join("", md5.ComputeHash(fs1).Select((x) => { return x.ToString(); }));
@@ -1130,7 +1118,9 @@ public class Issues : TestBase
 		try
 		{
 			if (file.Exists)
+			{
 				file.Delete();
+			}
 			using (ExcelPackage package = new(file))
 			{
 				var sheet = package.Workbook.Worksheets.Add("New Sheet");
@@ -1255,7 +1245,9 @@ public class Issues : TestBase
 	{
 		var existingFile = new FileInfo(@"c:\temp\Chart_From_Cell_Union_Selector_Bug_Test.xlsx");
 		if (existingFile.Exists)
+		{
 			existingFile.Delete();
+		}
 
 		using var pck = new ExcelPackage(existingFile);
 		var myWorkSheet = pck.Workbook.Worksheets.Add("Content");
@@ -1460,7 +1452,6 @@ public class Issues : TestBase
 	[TestMethod, Ignore]
 	public void Issue_8()
 	{
-		dynamic c = 1;
 
 		var l = new List<dynamic>
 		{
@@ -1518,13 +1509,12 @@ public class Issues : TestBase
 		using var package = new ExcelPackage(newFile);
 		// Add a new worksheet to the empty workbook
 
-		var worksheet = package.Workbook.Worksheets.Add("Inventory_copied", package.Workbook.Worksheets[1]);
+		package.Workbook.Worksheets.Add("Inventory_copied", package.Workbook.Worksheets[1]);
 
-		//ExcelNamedRange sourceRange = package.Workbook.Names["Body"];
 		var sourceRange = package.Workbook.Names["row"];
 		var sourceRange2 = package.Workbook.Names["roww"];
 		var sourceRange3 = package.Workbook.Names["rowww"];
-		var worksheetFrom = sourceRange.Worksheet;
+		_ = sourceRange.Worksheet;
 
 		var worksheetTo = package.Workbook.Worksheets["Inventory_copied"];
 
@@ -1588,8 +1578,6 @@ public class Issues : TestBase
 		using var p = new ExcelPackage();
 		var ws = p.Workbook.Worksheets.Add("i61");
 		ws.Cells["A1"].LoadFromDataTable(table1, true);
-		//p.SaveAs(new FileInfo(@"c:\temp\issue61.xlsx"));
-
 	}
 
 	[TestMethod, Ignore]
@@ -1598,7 +1586,9 @@ public class Issues : TestBase
 		var fileInfo = new FileInfo(@"C:\Temp\issue58.xlsx");
 		var package = new ExcelPackage(fileInfo);
 		if (package.Workbook.Worksheets.Count > 0)
+		{
 			package.Workbook.Worksheets.Delete("Test");
+		}
 
 		var worksheet = package.Workbook.Worksheets.Add("Test");
 		worksheet.Cells[1, 1].Value = "Name";
@@ -1715,7 +1705,7 @@ public class Issues : TestBase
 		ws.Names.Add("Name2", ws.Cells["A1"]);
 		pck.Save();
 		using var pck2 = new ExcelPackage(pck.Stream);
-		ws = pck2.Workbook.Worksheets["Test!"];
+		_ = pck2.Workbook.Worksheets["Test!"];
 	}
 	[TestMethod, Ignore]
 	public void Issue68()
@@ -1723,7 +1713,7 @@ public class Issues : TestBase
 		using var pck = new ExcelPackage(new FileInfo(@"c:\temp\bug68.xlsx"));
 		var ws = pck.Workbook.Worksheets["Sheet1"];
 		pck.Workbook.Worksheets.Delete(ws);
-		ws = pck.Workbook.Worksheets.Add("Sheet1");
+		pck.Workbook.Worksheets.Add("Sheet1");
 		pck.SaveAs(new FileInfo(@"c:\temp\bug68-2.xlsx"));
 	}
 	[TestMethod, Ignore]
@@ -1768,7 +1758,7 @@ public class Issues : TestBase
 	{
 		using var package = new ExcelPackage(new FileInfo(@"c:\temp\bug\iss94\MergedCellsTemplate.xlsx"));
 		var ws = package.Workbook.Worksheets.First();
-		var copy = package.Workbook.Worksheets.Add("copy", ws);
+		package.Workbook.Worksheets.Add("copy", ws);
 		package.Workbook.Worksheets.Delete(ws);
 		package.SaveAs(new FileInfo(@"c:\temp\bug\iss94\MergedCellsTemplateSaved.xlsx"));
 	}
@@ -1779,7 +1769,7 @@ public class Issues : TestBase
 		using ExcelPackage epOUT = new(new FileInfo(@"C:\temp\bug\pivotbug107.xlsx"));
 		foreach (var sheet in epIN.Workbook.Worksheets)
 		{
-			var newSheet = epOUT.Workbook.Worksheets.Add(sheet.Name, sheet);
+			epOUT.Workbook.Worksheets.Add(sheet.Name, sheet);
 		}
 
 		epIN.Compatibility.IsWorksheets1Based = true;
@@ -1819,7 +1809,7 @@ public class Issues : TestBase
 	{
 		using ExcelPackage xlPackage = new(new FileInfo($@"C:\temp\bug\issue173.xlsx"));
 		var ws = xlPackage.Workbook.Worksheets.First();
-		var r = ws.Cells["A4"].Text;
+		_ = ws.Cells["A4"].Text;
 	}
 	[TestMethod, Ignore]
 	public void Issue176()
@@ -1841,15 +1831,15 @@ public class Issues : TestBase
 		var txt = "\"BillingMonth\",\"SequenceNumber\",\"Level7Code\"\r\n";
 		txt += "\"022018\",\"1\",\"\"\r\n";
 
-		var range = sheet.Cells["A1"].LoadFromText(txt, format, TableStyles.None, true);
+		sheet.Cells["A1"].LoadFromText(txt, format, TableStyles.None, true);
 		Assert.AreEqual(null, sheet.Cells["C2"].Value);
 	}
 	[TestMethod, Ignore]
 	public void Issue181()
 	{
 		using var pck = new ExcelPackage(new FileInfo($@"C:\temp\bug\issue181.xlsx"));
-		var ws = pck.Workbook.Worksheets.First();
-		var a = pck.Workbook.Properties.Author;
+		_ = pck.Workbook.Worksheets.First();
+		_ = pck.Workbook.Properties.Author;
 		pck.SaveAs(new FileInfo($@"C:\temp\bug\issue181-saved.xlsx"));
 	}
 	[TestMethod, Ignore]
@@ -1916,7 +1906,7 @@ public class Issues : TestBase
 		var cell = sheet2.Cells[2, 1];
 		cell.FormulaR1C1 = formula;
 		//Formula should remain the same
-		Assert.AreEqual(formula.ToUpper(), cell.FormulaR1C1.ToUpper());
+		Assert.AreEqual(formula.ToUpperInvariant(), cell.FormulaR1C1.ToUpperInvariant());
 	}
 	[TestMethod]
 	public void Issue170()
@@ -1971,7 +1961,7 @@ public class Issues : TestBase
 		var a = ws.Cells["A:B"];
 		ws.AutoFilterAddress = ws.Cells["A1:C3"];
 		_pck.Workbook.Names.Add("Test", ws.Cells["B1:D2"]);
-		var name = a.WorkSheet;
+		_ = a.WorkSheet;
 
 		var a2 = new ExcelAddress("'Deal''s History'!a1:a3");
 		Assert.AreEqual("Deal's History", a2.WorkSheet);
@@ -2007,7 +1997,7 @@ public class Issues : TestBase
 
 		public Car(int id, string make, string model, int releaseYear)
 		{
-			Id = Id;
+			Id = id;
 			Make = make;
 			Model = model;
 			ReleaseYear = releaseYear;
@@ -2039,7 +2029,7 @@ public class Issues : TestBase
 	{
 		OpenTemplatePackage("Font55.xlsx");
 		var ws = _pck.Workbook.Worksheets["Sheet1"];
-		var d = ws.Drawings.AddShape("Shape1", eShapeStyle.Diamond);
+		ws.Drawings.AddShape("Shape1", eShapeStyle.Diamond);
 		ws.Cells["A1"].Value = "tasetraser";
 		ws.Cells.AutoFitColumns();
 		SaveWorksheet("Font55-Saved.xlsx");
@@ -2057,7 +2047,7 @@ public class Issues : TestBase
 	public void Issue195()
 	{
 		var pkg = new ExcelPackage();
-		var sheet = pkg.Workbook.Worksheets.Add("Sheet1");
+		pkg.Workbook.Worksheets.Add("Sheet1");
 		var defaultStyle = pkg.Workbook.Styles.CreateNamedStyle("Default");
 		defaultStyle.Style.Font.Name = "Arial";
 		defaultStyle.Style.Font.Size = 18;
@@ -2095,13 +2085,13 @@ public class Issues : TestBase
 	public void Issuer246()
 	{
 		InitBase();
-		var pkg = OpenPackage("issue246.xlsx", true);
+		OpenPackage("issue246.xlsx", true);
 		var ws = _pck.Workbook.Worksheets.Add("DateFormat");
 		ws.Cells["A1"].Value = 43465;
 		ws.Cells["A1"].Style.Numberformat.Format = @"[$-F800]dddd,\ mmmm\ dd,\ yyyy";
 		_pck.Save();
 
-		pkg = OpenPackage("issue246.xlsx");
+		OpenPackage("issue246.xlsx");
 		ws = _pck.Workbook.Worksheets["DateFormat"];
 		var pCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
 		System.Threading.Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-SE", false);
@@ -2115,7 +2105,6 @@ public class Issues : TestBase
 	{
 		var package = OpenTemplatePackage("Issue327.xlsx");
 		var templateWS = package.Workbook.Worksheets["Template"];
-		//package.Workbook.Worksheets.Add("NewWs", templateWS);
 		package.Workbook.Worksheets.Delete(templateWS);
 	}
 	[TestMethod]
@@ -2125,9 +2114,9 @@ public class Issues : TestBase
 		var ws = pck.Workbook.Worksheets.Add("S1");
 		var formula = "VLOOKUP(C2,A:B,1,0)";
 		ws.Cells[2, 4].Formula = formula;
-		var t1 = ws.Cells[2, 4].FormulaR1C1; // VLOOKUP(C2,C[-3]:C[-2],1,0)
+		_ = ws.Cells[2, 4].FormulaR1C1; // VLOOKUP(C2,C[-3]:C[-2],1,0)
 		ws.Cells[2, 5].FormulaR1C1 = ws.Cells[2, 4].FormulaR1C1;
-		var t2 = ws.Cells[2, 5].FormulaR1C1; // VLOOKUP(C2,C[-3]**:B:C:C**,1,0)   //unexpected value here
+		_ = ws.Cells[2, 5].FormulaR1C1; // VLOOKUP(C2,C[-3]**:B:C:C**,1,0)   //unexpected value here
 	}
 
 	[TestMethod, Ignore]
@@ -2150,7 +2139,6 @@ public class Issues : TestBase
 	{
 		using var pck = OpenTemplatePackage(@"ProductFunctionTest.xlsx");
 		var sheet = pck.Workbook.Worksheets.First();
-		//sheet.Cells["B13"].Value = null;
 		sheet.Cells["B14"].Value = 11;
 		sheet.Cells["B15"].Value = 13;
 		sheet.Cells["B16"].Formula = "Product(B13:B15)";

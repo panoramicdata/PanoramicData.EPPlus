@@ -113,8 +113,8 @@ public sealed class ExcelColor : StyleBase, IColor
 	/// <param name="blue">Blue component value</param>
 	public void SetColor(int alpha, int red, int green, int blue)
 	{
-		if (alpha < 0 || red < 0 || green < 0 || blue < 0 ||
-		   alpha > 255 || red > 255 || green > 255 || blue > 255)
+		// OR-ing the components is negative if any is negative and above 255 if any is above 255
+		if ((alpha | red | green | blue) is < 0 or > 255)
 		{
 			throw (new ArgumentException("Argument range must be from 0 to 255"));
 		}
@@ -135,7 +135,7 @@ public sealed class ExcelColor : StyleBase, IColor
 			eStyleClass.BorderRight => _styles.Borders[Index].Right.Color,
 			eStyleClass.BorderBottom => _styles.Borders[Index].Bottom.Color,
 			eStyleClass.BorderDiagonal => _styles.Borders[Index].Diagonal.Color,
-			_ => throw (new Exception("Invalid style-class for Color")),
+			_ => throw (new InvalidOperationException("Invalid style-class for Color")),
 		};
 	}
 	internal override void SetIndex(int index) => _parent.Index = index;
@@ -152,7 +152,6 @@ public sealed class ExcelColor : StyleBase, IColor
 	public static string LookupColor(ExcelColor theColor)
 	{
 		//Thanks to neaves for contributing this method.
-		var iTint = 0;
 		var translatedRGB = "";
 
 		// reference extracted from ECMA-376, Part 4, Section 3.8.26 or 18.8.27 SE Part 1
@@ -237,7 +236,6 @@ public sealed class ExcelColor : StyleBase, IColor
 		else
 		{
 			// coloring by shades of grey (-1 -> 0)
-			iTint = ((int)(theColor.Tint * 160) + 0x80);
 			translatedRGB = ((int)(Math.Round(theColor.Tint * -512))).ToString("X");
 			translatedRGB = "#FF" + translatedRGB + translatedRGB + translatedRGB;
 		}

@@ -33,18 +33,13 @@ public class Dsum : DatabaseFunction
 	public Dsum()
 		: this(new RowMatcher())
 	{
-
 	}
 
 	public Dsum(RowMatcher rowMatcher)
 		: base(rowMatcher)
 	{
+	}
 
-	}
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-	{
-		ValidateArguments(arguments, 3);
-		var values = GetMatchingValues(arguments, context);
-		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(values.Sum(), DataType.Integer);
-	}
+		=> ExecuteAggregate(arguments, context, values => values.Sum());
 }

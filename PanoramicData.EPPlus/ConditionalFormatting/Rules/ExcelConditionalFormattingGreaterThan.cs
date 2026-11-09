@@ -55,8 +55,8 @@ public class ExcelConditionalFormattingGreaterThan
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 	  : base(
 		eExcelConditionalFormattingRuleType.GreaterThan,
 		address,
@@ -70,46 +70,6 @@ public class ExcelConditionalFormattingGreaterThan
 			Operator = eExcelConditionalFormattingOperatorType.GreaterThan;
 			Formula = string.Empty;
 		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingGreaterThan(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		itemElementNode,
-		null)
-	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingGreaterThan(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		null,
-		null)
-	{
 	}
 	#endregion Constructors
 

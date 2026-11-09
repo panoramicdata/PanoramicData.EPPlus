@@ -22,6 +22,8 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-19
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.Utils;
 using System.Collections.Generic;
 using System.Globalization;
@@ -33,21 +35,28 @@ public abstract class DatabaseFunction : ExcelFunction
 {
 	protected RowMatcher RowMatcher { get; private set; }
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public DatabaseFunction()
 		: this(new RowMatcher())
 	{
-
 	}
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public DatabaseFunction(RowMatcher rowMatcher)
 	{
 		RowMatcher = rowMatcher;
 	}
 
+	private protected CompileResult ExecuteAggregate(IEnumerable<FunctionArgument> arguments, ParsingContext context, System.Func<IEnumerable<double>, double> aggregate)
+	{
+		ValidateArguments(arguments, 3);
+		var values = GetMatchingValues(arguments, context);
+		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(aggregate(values), DataType.Integer);
+	}
+
 	protected IEnumerable<double> GetMatchingValues(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
 		var dbAddress = arguments.ElementAt(0).ValueAsRangeInfo.Address.Address;
-		//var field = ArgToString(arguments, 1).ToLower(CultureInfo.InvariantCulture);
 		var field = arguments.ElementAt(1).Value;
 		var criteriaRange = arguments.ElementAt(2).ValueAsRangeInfo.Address.Address;
 

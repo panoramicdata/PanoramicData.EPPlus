@@ -21,7 +21,7 @@ public class TokenHandlerTests
 	{
 		var parsingContext = ParsingContext.Create();
 		var tokenFactory = new TokenFactory(parsingContext.Configuration.FunctionRepository, null);
-		_handler = new TokenHandler(_tokenizerContext, tokenFactory, new TokenSeparatorProvider());
+		_handler = new TokenHandler(context, tokenFactory, new TokenSeparatorProvider());
 	}
 
 	[TestMethod]

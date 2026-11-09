@@ -39,7 +39,6 @@ public class DefaultCompiler : FunctionCompiler
 	public DefaultCompiler(ExcelFunction function, ParsingContext context)
 		: base(function, context)
 	{
-
 	}
 
 	public override CompileResult Compile(IEnumerable<Expression> children)

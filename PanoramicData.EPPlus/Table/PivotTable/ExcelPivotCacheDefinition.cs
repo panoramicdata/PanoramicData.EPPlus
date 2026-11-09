@@ -104,7 +104,7 @@ public class ExcelPivotCacheDefinition : XmlHelper
 
 		//CacheRecord. Create an empty one.
 		CacheRecordUri = GetNewUri(pck, "/xl/pivotCache/pivotCacheRecords{0}.xml", ref tblId);
-		var cacheRecord = new XmlDocument();
+		var cacheRecord = new XmlDocument { XmlResolver = null };
 		cacheRecord.LoadXml("<pivotCacheRecords xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" count=\"0\" />");
 		var recPart = pck.CreatePart(CacheRecordUri, ExcelPackage.schemaPivotCacheRecords);
 		cacheRecord.Save(recPart.GetStream());
@@ -172,12 +172,13 @@ public class ExcelPivotCacheDefinition : XmlHelper
 	const string _sourceWorksheetPath = "d:cacheSource/d:worksheetSource/@sheet";
 	internal const string _sourceNamePath = "d:cacheSource/d:worksheetSource/@name";
 	internal const string _sourceAddressPath = "d:cacheSource/d:worksheetSource/@ref";
-	internal ExcelRangeBase _sourceRange = null;
+	internal ExcelRangeBase _sourceRange;
 	/// <summary>
 	/// The source data range when the pivottable has a worksheet datasource. 
 	/// The number of columns in the range must be intact if this property is changed.
 	/// The range must be in the same workbook as the pivottable.
 	/// </summary>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2372:Exceptions should not be thrown from property getters", Justification = "Public API: reading the range of a non-worksheet cache source has always thrown.")]
 	public ExcelRangeBase SourceRange
 	{
 		get
@@ -262,31 +263,31 @@ public class ExcelPivotCacheDefinition : XmlHelper
 	private string GetStartXml(ExcelRangeBase sourceAddress)
 	{
 		var recordCount = sourceAddress._toRow - sourceAddress._fromRow;
-		var xml = $"<pivotCacheDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" r:id=\"\" refreshOnLoad=\"1\" refreshedBy=\"SomeUser\" refreshedDate=\"40504.582403125001\" createdVersion=\"1\" refreshedVersion=\"3\" recordCount=\"{recordCount}\" upgradeOnRefresh=\"1\">";
+		var xml = new StringBuilder($"<pivotCacheDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" r:id=\"\" refreshOnLoad=\"1\" refreshedBy=\"SomeUser\" refreshedDate=\"40504.582403125001\" createdVersion=\"1\" refreshedVersion=\"3\" recordCount=\"{recordCount}\" upgradeOnRefresh=\"1\">");
 
-		xml += "<cacheSource type=\"worksheet\">";
-		xml += string.Format("<worksheetSource ref=\"{0}\" sheet=\"{1}\" /> ", sourceAddress.Address, sourceAddress.WorkSheet);
-		xml += "</cacheSource>";
-		xml += string.Format("<cacheFields count=\"{0}\">", sourceAddress._toCol - sourceAddress._fromCol + 1);
+		xml.Append("<cacheSource type=\"worksheet\">");
+		xml.AppendFormat("<worksheetSource ref=\"{0}\" sheet=\"{1}\" /> ", sourceAddress.Address, sourceAddress.WorkSheet);
+		xml.Append("</cacheSource>");
+		xml.AppendFormat("<cacheFields count=\"{0}\">", sourceAddress._toCol - sourceAddress._fromCol + 1);
 		var sourceWorksheet = PivotTable.WorkSheet.Workbook.Worksheets[sourceAddress.WorkSheet];
 		for (var col = sourceAddress._fromCol; col <= sourceAddress._toCol; col++)
 		{
 			if (sourceWorksheet == null || sourceWorksheet.GetValueInner(sourceAddress._fromRow, col) == null || sourceWorksheet.GetValueInner(sourceAddress._fromRow, col).ToString().Trim() == "")
 			{
-				xml += string.Format("<cacheField name=\"Column{0}\" numFmtId=\"0\">", col - sourceAddress._fromCol + 1);
+				xml.AppendFormat("<cacheField name=\"Column{0}\" numFmtId=\"0\">", col - sourceAddress._fromCol + 1);
 			}
 			else
 			{
-				xml += string.Format("<cacheField name=\"{0}\" numFmtId=\"0\">", SecurityElement.Escape(sourceWorksheet.GetValueInner(sourceAddress._fromRow, col).ToString()));
+				xml.AppendFormat("<cacheField name=\"{0}\" numFmtId=\"0\">", SecurityElement.Escape(sourceWorksheet.GetValueInner(sourceAddress._fromRow, col).ToString()));
 			}
 
-			xml += "<sharedItems containsBlank=\"1\" /> ";
-			xml += "</cacheField>";
+			xml.Append("<sharedItems containsBlank=\"1\" /> ");
+			xml.Append("</cacheField>");
 		}
 
-		xml += "</cacheFields>";
-		xml += "</pivotCacheDefinition>";
+		xml.Append("</cacheFields>");
+		xml.Append("</pivotCacheDefinition>");
 
-		return xml;
+		return xml.ToString();
 	}
 }

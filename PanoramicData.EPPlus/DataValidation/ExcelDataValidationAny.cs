@@ -79,5 +79,6 @@ public class ExcelDataValidationAny : ExcelDataValidation, IExcelDataValidationA
 	/// </summary>
 	public override void Validate()
 	{
+		// Any value is valid, so there is nothing to check
 	}
 }

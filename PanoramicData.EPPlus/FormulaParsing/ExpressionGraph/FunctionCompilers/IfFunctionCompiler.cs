@@ -56,6 +56,38 @@ public class IfFunctionCompiler : FunctionCompiler
 		}
 	}
 
+	private static bool GetLogicalTestValue(object v)
+	{
+		if (v is ExcelDataProvider.INameInfo nameInfo)
+		{
+			v = nameInfo.Value;
+		}
+
+		if (v is ExcelDataProvider.IRangeInfo r)
+		{
+			if (r.GetNCells() > 1)
+			{
+				throw new ArgumentException("Logical can't be more than one cell");
+			}
+
+			v = r.GetOffset(0, 0);
+		}
+
+		if (v is bool boolValue)
+		{
+			return boolValue;
+		}
+
+		if (Utils.ConvertUtil.TryParseBooleanString(v, out var parsed))
+		{
+			return parsed;
+		}
+
+		return Utils.ConvertUtil.IsNumeric(v)
+			? Utils.ConvertUtil.GetValueDouble(v) != 0
+			: throw new ArgumentException("Invalid logical test");
+	}
+
 	public override CompileResult Compile(IEnumerable<Expression> children)
 	{
 		// 2 is allowed, Excel returns FALSE if false is the outcome of the expression
@@ -68,40 +100,7 @@ public class IfFunctionCompiler : FunctionCompiler
 		Function.BeforeInvoke(Context);
 		var firstChild = children.ElementAt(0);
 		var v = firstChild.Compile().Result;
-
-		/****  Handle names and ranges ****/
-		if (v is ExcelDataProvider.INameInfo)
-		{
-			v = ((ExcelDataProvider.INameInfo)v).Value;
-		}
-
-		if (v is ExcelDataProvider.IRangeInfo r)
-		{
-			if (r.GetNCells() > 1)
-			{
-				throw (new ArgumentException("Logical can't be more than one cell"));
-			}
-
-			v = r.GetOffset(0, 0);
-		}
-
-		bool boolVal;
-		if (v is bool)
-		{
-			boolVal = (bool)v;
-		}
-		else if (!Utils.ConvertUtil.TryParseBooleanString(v, out boolVal))
-		{
-			if (Utils.ConvertUtil.IsNumeric(v))
-			{
-				boolVal = Utils.ConvertUtil.GetValueDouble(v) != 0;
-			}
-			else
-			{
-				throw (new ArgumentException("Invalid logical test"));
-			}
-		}
-		/****  End Handle names and ranges ****/
+		var boolVal = GetLogicalTestValue(v);
 
 		args.Add(new FunctionArgument(boolVal));
 		if (boolVal)

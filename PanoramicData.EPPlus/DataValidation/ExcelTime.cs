@@ -46,6 +46,7 @@ public class ExcelTime
 	/// <summary>
 	/// Max number of decimals when rounding.
 	/// </summary>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Public API: changing the constant to a property breaks compiled callers.")]
 	public const int NumberOfDecimals = 15;
 
 	/// <summary>
@@ -235,7 +236,7 @@ public class ExcelTime
 		var result = Hour * SecondsPerHour;
 		result += Minute * SecondsPerMinute;
 		result += Second ?? 0;
-		return (decimal)result;
+		return result;
 	}
 
 	/// <summary>
@@ -245,7 +246,7 @@ public class ExcelTime
 	public decimal ToExcelTime()
 	{
 		var seconds = ToSeconds();
-		return Round(seconds / (decimal)SecondsPerDay);
+		return Round(seconds / SecondsPerDay);
 	}
 
 	/// <summary>

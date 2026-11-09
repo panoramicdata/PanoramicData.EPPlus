@@ -16,8 +16,6 @@ public class ExcelAddressExpressionTests
 	private ParsingContext _parsingContext;
 	private ParsingScope _scope;
 
-	private static ExcelCell CreateItem(object val) => new(val, null, 0, 0);
-
 	[TestInitialize]
 	public void Setup()
 	{
@@ -34,274 +32,101 @@ public class ExcelAddressExpressionTests
 	[TestMethod]
 	public void ConstructorShouldThrowIfParsingContextIsNull() => Assert.ThrowsExactly<ArgumentNullException>(() => new ExcelAddressExpression("A1", A.Fake<ExcelDataProvider>(), null));
 
-	//TODO:Fix Test /Janne
-	//[TestMethod]
-	//public void ShouldCallReturnResultFromProvider()
-	//{
-	//    var expectedAddress = "A1";
-	//    var provider = MockRepository.GenerateStub<ExcelDataProvider>();
-	//    provider
-	//        .Stub(x => x.GetRangeValues(string.Empty, expectedAddress))
-	//        .Return(new object[]{ 1 });
+	private static void CompileAndAssert(string address, Action<CompileResult> assert, bool resolveAsRange = false, Action<ExcelWorksheet>? arrange = null)
+	{
+		var parsingContext = ParsingContext.Create();
+		var file = new FileInfo("filename.xlsx");
+		using var package = new ExcelPackage(file);
+		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
+		using var excelDataProvider = new EpplusExcelDataProvider(package);
+		arrange?.Invoke(sheet);
+		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
+		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
+		{
+			var expression = new ExcelAddressExpression(address, excelDataProvider, parsingContext);
+			if (resolveAsRange)
+			{
+				expression.ResolveAsRange = true;
+			}
 
-	//    var expression = new ExcelAddressExpression(expectedAddress, provider, _parsingContext);
-	//    var result = expression.Compile();
-	//    Assert.AreEqual(1, result.Result);
-	//}
+			assert(expression.Compile());
+		}
+	}
 
-	//TODO:Fix Test /Janne
-	//[TestMethod]
-	//public void CompileShouldReturnAddress()
-	//{
-	//    var expectedAddress = "A1";
-	//    var provider = MockRepository.GenerateStub<ExcelDataProvider>();
-	//    provider
-	//        .Stub(x => x.GetRangeValues(expectedAddress))
-	//        .Return(new ExcelCell[] { CreateItem(1) });
+	private static ExcelDataProvider.IRangeInfo AssertRange(CompileResult result, string expectedAddress)
+	{
+		var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
+		Assert.IsNotNull(rangeInfo);
+		Assert.AreEqual(expectedAddress, rangeInfo.Address.Address);
+		return rangeInfo;
+	}
 
-	//    var expression = new ExcelAddressExpression(expectedAddress, provider, _parsingContext);
-	//    expression.ParentIsLookupFunction = true;
-	//    var result = expression.Compile();
-	//    Assert.AreEqual(expectedAddress, result.Result);
-
-	//}
+	private static void AssertEmptyRange(CompileResult result, string expectedAddress)
+	{
+		var rangeInfo = AssertRange(result, expectedAddress);
+		// Enumerating the range still yields no results.
+		Assert.AreEqual(0, rangeInfo.Count());
+	}
 
 	#region Compile Tests
 	[TestMethod]
 	public void CompileSingleCellReference()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("A1", excelDataProvider, parsingContext);
-			var result = expression.Compile();
-			Assert.IsNull(result.Result);
-		}
-	}
+		=> CompileAndAssert("A1", result => Assert.IsNull(result.Result));
 
 	[TestMethod]
 	public void CompileSingleCellReferenceWithValue()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		sheet.Cells[1, 1].Value = "Value";
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("A1", excelDataProvider, parsingContext);
-			var result = expression.Compile();
-			Assert.AreEqual("Value", result.Result);
-		}
-	}
+		=> CompileAndAssert("A1", result => Assert.AreEqual("Value", result.Result), arrange: sheet => sheet.Cells[1, 1].Value = "Value");
 
 	[TestMethod]
 	public void CompileSingleCellReferenceResolveToRange()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("A1", excelDataProvider, parsingContext)
-			{
-				ResolveAsRange = true
-			};
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("A1", rangeInfo.Address.Address);
-		}
-	}
+		=> CompileAndAssert("A1", result => AssertRange(result, "A1"), resolveAsRange: true);
 
 	[TestMethod]
 	public void CompileSingleCellReferenceResolveToRangeColumnAbsolute()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("$A1", excelDataProvider, parsingContext)
-			{
-				ResolveAsRange = true
-			};
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("$A1", rangeInfo.Address.Address);
-		}
-	}
+		=> CompileAndAssert("$A1", result => AssertRange(result, "$A1"), resolveAsRange: true);
 
 	[TestMethod]
 	public void CompileSingleCellReferenceResolveToRangeRowAbsolute()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("$A1", excelDataProvider, parsingContext)
-			{
-				ResolveAsRange = true
-			};
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("$A1", rangeInfo.Address.Address);
-		}
-	}
+		=> CompileAndAssert("$A1", result => AssertRange(result, "$A1"), resolveAsRange: true);
 
 	[TestMethod]
 	public void CompileSingleCellReferenceResolveToRangeAbsolute()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("$A$1", excelDataProvider, parsingContext)
-			{
-				ResolveAsRange = true
-			};
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("$A$1", rangeInfo.Address.Address);
-		}
-	}
+		=> CompileAndAssert("$A$1", result => AssertRange(result, "$A$1"), resolveAsRange: true);
 
 	[TestMethod]
 	public void CompileMultiCellReference()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("A1:A5", excelDataProvider, parsingContext);
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("A1:A5", rangeInfo.Address.Address);
-			// Enumerating the range still yields no results.
-			Assert.AreEqual(0, rangeInfo.Count());
-		}
-	}
+		=> CompileAndAssert("A1:A5", result => AssertEmptyRange(result, "A1:A5"));
 
 	[TestMethod]
 	public void CompileMultiCellReferenceWithValues()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		sheet.Cells[1, 1].Value = "Value1";
-		sheet.Cells[2, 1].Value = "Value2";
-		sheet.Cells[3, 1].Value = "Value3";
-		sheet.Cells[4, 1].Value = "Value4";
-		sheet.Cells[5, 1].Value = "Value5";
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
+		=> CompileAndAssert("A1:A5", result =>
 		{
-			var expression = new ExcelAddressExpression("A1:A5", excelDataProvider, parsingContext);
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("A1:A5", rangeInfo.Address.Address);
+			var rangeInfo = AssertRange(result, "A1:A5");
 			Assert.AreEqual(5, rangeInfo.Count());
 			for (var i = 1; i <= 5; i++)
 			{
 				var rangeItem = rangeInfo.ElementAt(i - 1);
 				Assert.AreEqual("Value" + i, rangeItem.Value);
 			}
-		}
-	}
+		}, arrange: sheet =>
+		{
+			sheet.Cells[1, 1].Value = "Value1";
+			sheet.Cells[2, 1].Value = "Value2";
+			sheet.Cells[3, 1].Value = "Value3";
+			sheet.Cells[4, 1].Value = "Value4";
+			sheet.Cells[5, 1].Value = "Value5";
+		});
 
 	[TestMethod]
 	public void CompileMultiCellReferenceColumnAbsolute()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("$A1:$A5", excelDataProvider, parsingContext);
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("$A1:$A5", rangeInfo.Address.Address);
-			// Enumerating the range still yields no results.
-			Assert.AreEqual(0, rangeInfo.Count());
-		}
-	}
+		=> CompileAndAssert("$A1:$A5", result => AssertEmptyRange(result, "$A1:$A5"));
 
 	[TestMethod]
 	public void CompileMultiCellReferenceRowAbsolute()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("A$1:A$5", excelDataProvider, parsingContext);
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("A$1:A$5", rangeInfo.Address.Address);
-			// Enumerating the range still yields no results.
-			Assert.AreEqual(0, rangeInfo.Count());
-		}
-	}
+		=> CompileAndAssert("A$1:A$5", result => AssertEmptyRange(result, "A$1:A$5"));
 
 	[TestMethod]
 	public void CompileMultiCellReferenceAbsolute()
-	{
-		var parsingContext = ParsingContext.Create();
-		var file = new FileInfo("filename.xlsx");
-		using var package = new ExcelPackage(file);
-		using var sheet = package.Workbook.Worksheets.Add("NewSheet");
-		using var excelDataProvider = new EpplusExcelDataProvider(package);
-		var rangeAddressFactory = new RangeAddressFactory(excelDataProvider);
-		using (parsingContext.Scopes.NewScope(rangeAddressFactory.Create("NewSheet", 3, 3)))
-		{
-			var expression = new ExcelAddressExpression("$A$1:$A$5", excelDataProvider, parsingContext);
-			var result = expression.Compile();
-			var rangeInfo = result.Result as ExcelDataProvider.IRangeInfo;
-			Assert.IsNotNull(rangeInfo);
-			Assert.AreEqual("$A$1:$A$5", rangeInfo.Address.Address);
-			// Enumerating the range still yields no results.
-			Assert.AreEqual(0, rangeInfo.Count());
-		}
-	}
+		=> CompileAndAssert("$A$1:$A$5", result => AssertEmptyRange(result, "$A$1:$A$5"));
 	#endregion
 }

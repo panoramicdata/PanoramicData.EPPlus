@@ -27,18 +27,7 @@ public class ExcelDxfFontBase : DxfStyleBase<ExcelDxfFontBase>
 	/// Font-Strikeout
 	/// </summary>
 	public bool? Strike { get; set; }
-	//public float? Size { get; set; }
 	public ExcelDxfColor Color { get; set; }
-	//public string Name { get; set; }
-	//public int? Family { get; set; }
-	///// <summary>
-	///// Font-Vertical Align
-	///// </summary>
-	//public ExcelVerticalAlignmentFont? VerticalAlign
-	//{
-	//    get;
-	//    set;
-	//}
 
 	public ExcelUnderLineType? Underline { get; set; }
 

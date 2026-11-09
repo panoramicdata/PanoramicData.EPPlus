@@ -32,6 +32,7 @@
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Style.XmlAccess;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
 
@@ -181,9 +182,10 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	readonly string _nameXPath;
 	protected internal int _id;
 	const float STANDARD_DPI = 96;
+	[SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Published constant; changing it to a static property would break compiled callers.")]
 	public const int EMU_PER_PIXEL = 9525;
 	protected internal int _width = int.MinValue, _height = int.MinValue, _top = int.MinValue, _left = int.MinValue;
-	bool _doNotAdjust = false;
+	bool _doNotAdjust;
 	internal ExcelDrawing(ExcelDrawings drawings, XmlNode node, string nameXPath) :
 		base(drawings.NameSpaceManager, node)
 	{
@@ -307,7 +309,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	/// <summary>
 	/// Bottom right position
 	/// </summary>
-	ExcelPosition _to = null;
+	ExcelPosition _to;
 	public ExcelPosition To
 	{
 		get
@@ -340,7 +342,6 @@ public class ExcelDrawing : XmlHelper, IDisposable
 		{
 			return new ExcelShape(drawings, node);
 		}
-		//}
 		else if (node.SelectSingleNode("xdr:pic", drawings.NameSpaceManager) != null)
 		{
 			return new ExcelPicture(drawings, node);
@@ -447,7 +448,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	private decimal GetColumnWidth(int col)
 	{
 		var ws = _drawings.Worksheet;
-		return ws.GetValueInner(0, col) is not ExcelColumn column ? (decimal)ws.DefaultColWidth : (decimal)ws.Column(col).VisualWidth;
+		return ws.GetValueInner(0, col) is not ExcelColumn ? (decimal)ws.DefaultColWidth : (decimal)ws.Column(col).VisualWidth;
 	}
 	private double GetRowHeight(int row)
 	{
@@ -498,8 +499,8 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	internal void SetPixelTop(int pixels)
 	{
 		_doNotAdjust = true;
-		var ws = _drawings.Worksheet;
-		var mdw = ws.Workbook.MaxFontWidth;
+		// The getter refreshes the workbook's cached font width
+		_ = _drawings.Worksheet.Workbook.MaxFontWidth;
 		var prevPix = 0;
 		var pix = (int)(GetRowHeight(1) / 0.75);
 		var row = 2;
@@ -556,10 +557,8 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	internal void SetPixelHeight(int pixels, float dpi)
 	{
 		_doNotAdjust = true;
-		var ws = _drawings.Worksheet;
-		//decimal mdw = ws.Workbook.MaxFontWidth;
 		pixels = (int)(pixels / (dpi / STANDARD_DPI) + .5);
-		var pixOff = pixels - ((int)(GetRowHeight(From.Row + 1) / 0.75) - (int)(From.RowOff / EMU_PER_PIXEL));
+		var pixOff = pixels - ((int)(GetRowHeight(From.Row + 1) / 0.75) - From.RowOff / EMU_PER_PIXEL);
 		var prevPixOff = pixels;
 		var row = From.Row + 1;
 
@@ -589,8 +588,8 @@ public class ExcelDrawing : XmlHelper, IDisposable
 		var mdw = ws.Workbook.MaxFontWidth;
 
 		pixels = (int)(pixels / (dpi / STANDARD_DPI) + .5);
-		var pixOff = (int)pixels - ((int)decimal.Truncate(((256 * GetColumnWidth(From.Column + 1) + decimal.Truncate(128 / (decimal)mdw)) / 256) * mdw) - From.ColumnOff / EMU_PER_PIXEL);
-		var prevPixOff = From.ColumnOff / EMU_PER_PIXEL + (int)pixels;
+		var pixOff = pixels - ((int)decimal.Truncate(((256 * GetColumnWidth(From.Column + 1) + decimal.Truncate(128 / (decimal)mdw)) / 256) * mdw) - From.ColumnOff / EMU_PER_PIXEL);
+		var prevPixOff = From.ColumnOff / EMU_PER_PIXEL + pixels;
 		var col = From.Column + 2;
 
 		while (pixOff >= 0)

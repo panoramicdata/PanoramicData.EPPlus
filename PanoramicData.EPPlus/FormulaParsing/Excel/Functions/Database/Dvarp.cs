@@ -32,21 +32,15 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 public class Dvarp : DatabaseFunction
 {
 	public Dvarp()
-	   : this(new RowMatcher())
+		: this(new RowMatcher())
 	{
-
 	}
 
 	public Dvarp(RowMatcher rowMatcher)
-	   : base(rowMatcher)
+		: base(rowMatcher)
 	{
-
 	}
 
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-	{
-		ValidateArguments(arguments, 3);
-		var values = GetMatchingValues(arguments, context);
-		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(VarMethods.VarP(values), DataType.Integer);
-	}
+		=> ExecuteAggregate(arguments, context, values => VarMethods.VarP(values));
 }

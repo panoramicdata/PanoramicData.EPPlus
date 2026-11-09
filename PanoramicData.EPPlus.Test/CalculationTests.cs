@@ -13,27 +13,6 @@ namespace PanoramicData.EPPlus.Test;
 [TestClass]
 public class CalculationTests
 {
-	//[TestMethod]
-	//public void Calulation()
-	//{
-	//    var pck = new ExcelPackage(new FileInfo("c:\\temp\\chain.xlsx"));
-	//    pck.Workbook.Calculate();
-	//    Assert.AreEqual(50D, pck.Workbook.Worksheets[1].Cells["C1"].Value);
-	//}
-	//[TestMethod]
-	//public void Calulation2()
-	//{
-	//    var pck = new ExcelPackage(new FileInfo("c:\\temp\\chainTest.xlsx"));
-	//    pck.Workbook.Calculate();
-	//    Assert.AreEqual(1124999960382D, pck.Workbook.Worksheets[1].Cells["C1"].Value);
-	//}
-	//[TestMethod]
-	//public void Calulation3()
-	//{
-	//    var pck = new ExcelPackage(new FileInfo("c:\\temp\\names.xlsx"));
-	//    pck.Workbook.Calculate();
-	//    //Assert.AreEqual(1124999960382D, pck.Workbook.Worksheets[1].Cells["C1"].Value);
-	//}
 	[TestMethod]
 	public void CalulationTestDatatypes()
 	{
@@ -156,7 +135,7 @@ public class CalculationTests
 	public void TestOneCell()
 	{
 		var pck = new ExcelPackage(new FileInfo(@"C:\temp\EPPlusTestark\Test4.xlsm"));
-		var ws = pck.Workbook.Worksheets.First();
+		_ = pck.Workbook.Worksheets.First();
 		pck.Workbook.Worksheets["Räntebärande formaterat utland"].Cells["M13"].Calculate();
 		Assert.AreEqual(0d, pck.Workbook.Worksheets["Räntebärande formaterat utland"].Cells["M13"].Value);
 	}
@@ -175,8 +154,6 @@ public class CalculationTests
 	{
 		var pck = new ExcelPackage(new FileInfo(@"c:\temp\EPPlusTestark\calc_amount.xlsx"));
 		var ws = pck.Workbook.Worksheets.First();
-		//ws.Names.Add("Name1",ws.Cells["A1"]);
-		//ws.Names.Add("Name2", ws.Cells["A2"]);
 		ws.Names["PRICE"].Value = 30;
 		ws.Names["QUANTITY"].Value = 10;
 
@@ -291,7 +268,10 @@ public class CalculationTests
 		StringBuilder sb = new();
 		//Add sheets to test in this directory or change it to your testpath.
 		var path = @"C:\temp\EPPlusTestark\workbooks";
-		if (!Directory.Exists(path)) return;
+		if (!Directory.Exists(path))
+		{
+			return;
+		}
 
 		foreach (var file in Directory.GetFiles(path, "*.xls*"))
 		{
@@ -301,8 +281,7 @@ public class CalculationTests
 		if (sb.Length > 0)
 		{
 			File.WriteAllText(string.Format("TestAllWorkooks{0}.txt", DateTime.Now.ToString("d") + " " + DateTime.Now.ToString("t")), sb.ToString());
-			throw new Exception("Test failed with\r\n\r\n" + sb.ToString());
-
+			throw new InvalidOperationException("Test failed with\r\n\r\n" + sb);
 		}
 	}
 	[TestMethod]
@@ -354,7 +333,6 @@ public class CalculationTests
 
 		pck.Workbook.Calculate();
 		var nErrors = 0;
-		var errors = new List<Tuple<string, object, object>>();
 		ExcelWorksheet sheet = null;
 		var adr = "";
 		var fileErr = new StreamWriter(new FileStream("c:\\temp\\err.txt", FileMode.Append));
@@ -370,14 +348,12 @@ public class CalculationTests
 				{
 					var d1 = Convert.ToDouble(fr[cell]);
 					var d2 = Convert.ToDouble(sheet.Cells[adr].Value);
-					//if (Math.Abs(d1 - d2) < double.Epsilon)
 					if (Equals(d1, d2))
 					{
 						continue;
 					}
 					else
 					{
-						//errors.Add(new Tuple<string, object, object>(adr, fr[cell], sheet.Cells[adr].Value));
 						fileErr.WriteLine("Diff cell " + sheet.Name + "!" + adr + "\t" + d1.ToString("R15") + "\t" + d2.ToString("R15"));
 					}
 				}

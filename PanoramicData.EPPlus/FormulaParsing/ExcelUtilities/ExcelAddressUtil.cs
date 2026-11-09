@@ -32,6 +32,7 @@ using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Bug", "S2692:IndexOf checks should not be for positive numbers", Justification = "A match at index 0 is deliberately ignored; changing the checks would alter which addresses and names validate.")]
 public static class ExcelAddressUtil
 {
 	static readonly char[] SheetNameInvalidChars = ['?', ':', '*', '/', '\\'];

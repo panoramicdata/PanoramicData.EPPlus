@@ -46,7 +46,7 @@ public abstract class ValidationTestBase
 
 	protected void LoadXmlTestData(string address, string validationType, string formula1Value)
 	{
-		var xmlDoc = new XmlDocument();
+		var xmlDoc = new XmlDocument { XmlResolver = null };
 		_namespaceManager = new XmlNamespaceManager(xmlDoc.NameTable);
 		_namespaceManager.AddNamespace("d", "urn:a");
 		var sb = new StringBuilder();
@@ -59,7 +59,7 @@ public abstract class ValidationTestBase
 
 	protected void LoadXmlTestData(string address, string validationType, string operatorName, string formula1Value)
 	{
-		var xmlDoc = new XmlDocument();
+		var xmlDoc = new XmlDocument { XmlResolver = null };
 		_namespaceManager = new XmlNamespaceManager(xmlDoc.NameTable);
 		_namespaceManager.AddNamespace("d", "urn:a");
 		var sb = new StringBuilder();
@@ -72,7 +72,7 @@ public abstract class ValidationTestBase
 
 	protected void LoadXmlTestData(string address, string validationType, string formula1Value, bool showErrorMsg, bool showInputMsg)
 	{
-		var xmlDoc = new XmlDocument();
+		var xmlDoc = new XmlDocument { XmlResolver = null };
 		_namespaceManager = new XmlNamespaceManager(xmlDoc.NameTable);
 		_namespaceManager.AddNamespace("d", "urn:a");
 		var sb = new StringBuilder();
@@ -86,7 +86,7 @@ public abstract class ValidationTestBase
 
 	protected void LoadXmlTestData(string address, string validationType, string formula1Value, string prompt, string promptTitle, string error, string errorTitle)
 	{
-		var xmlDoc = new XmlDocument();
+		var xmlDoc = new XmlDocument { XmlResolver = null };
 		_namespaceManager = new XmlNamespaceManager(xmlDoc.NameTable);
 		_namespaceManager.AddNamespace("d", "urn:a");
 		var sb = new StringBuilder();

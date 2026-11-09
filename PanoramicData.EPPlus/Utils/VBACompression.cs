@@ -57,14 +57,9 @@ internal static class VBACompression
 		while (decompStart < decompEnd && compStart < compEnd)
 		{
 			var chunk = CompressChunk(part, ref decompStart);
-			ushort header;
-			if (chunk == null || chunk.Length == 0)
+			if (chunk != null && chunk.Length > 0)
 			{
-				header = 4096 | 0x600;  //B=011 A=0
-			}
-			else
-			{
-				header = (ushort)(((chunk.Length - 1) & 0xFFF));
+				var header = (ushort)((chunk.Length - 1) & 0xFFF);
 				header |= 0xB000;   //B=011 A=1
 				br.Write(header);
 				br.Write(chunk);
@@ -89,60 +84,9 @@ internal static class VBACompression
 			byte tokenFlags = 0;
 			for (var i = 0; i < 8; i++)
 			{
-				if (dPos - startPos > 0)
+				if (CompressToken(buffer, startPos, dEnd, comprBuffer, ref dPos, ref cPos))
 				{
-					var bestCandidate = -1;
-					var bestLength = 0;
-					var candidate = dPos - 1;
-					var bitCount = GetLengthBits(dPos - startPos);
-					var bits = (16 - bitCount);
-					var lengthMask = (ushort)((0xFFFF) >> bits);
-
-					while (candidate >= startPos)
-					{
-						if (buffer[candidate] == buffer[dPos])
-						{
-							var length = 1;
-
-							while (buffer.Length > dPos + length && buffer[candidate + length] == buffer[dPos + length] && length < lengthMask && dPos + length < dEnd)
-							{
-								length++;
-							}
-
-							if (length > bestLength)
-							{
-								bestCandidate = candidate;
-								bestLength = length;
-								if (bestLength == lengthMask)
-								{
-									break;
-								}
-							}
-						}
-
-						candidate--;
-					}
-
-					if (bestLength >= 3)    //Copy token
-					{
-						tokenFlags |= (byte)(1 << i);
-
-						var offsetMask = (ushort)~lengthMask;
-						var token = (ushort)(((ushort)(dPos - (bestCandidate + 1))) << (bitCount) | (ushort)(bestLength - 3));
-						Array.Copy(BitConverter.GetBytes(token), 0, comprBuffer, cPos, 2);
-						dPos = dPos + bestLength;
-						cPos += 2;
-						//SetCopy Token                        
-					}
-					else
-					{
-						comprBuffer[cPos++] = buffer[dPos++];
-					}
-				}
-
-				else
-				{
-					comprBuffer[cPos++] = buffer[dPos++];
+					tokenFlags |= (byte)(1 << i);
 				}
 
 				if (dPos >= dEnd)
@@ -159,6 +103,63 @@ internal static class VBACompression
 		Array.Copy(comprBuffer, ret, ret.Length);
 		startPos = dEnd;
 		return ret;
+	}
+
+	// Returns true when a copy token was written, false for a literal byte.
+	private static bool CompressToken(byte[] buffer, int startPos, int dEnd, byte[] comprBuffer, ref int dPos, ref int cPos)
+	{
+		if (dPos - startPos > 0)
+		{
+			var bitCount = GetLengthBits(dPos - startPos);
+			var lengthMask = (ushort)(0xFFFF >> (16 - bitCount));
+			var bestLength = FindBestMatch(buffer, startPos, dPos, dEnd, lengthMask, out var bestCandidate);
+			if (bestLength >= 3)
+			{
+				var token = (ushort)((ushort)(dPos - (bestCandidate + 1)) << bitCount | (ushort)(bestLength - 3));
+				Array.Copy(BitConverter.GetBytes(token), 0, comprBuffer, cPos, 2);
+				dPos += bestLength;
+				cPos += 2;
+				return true;
+			}
+		}
+
+		comprBuffer[cPos++] = buffer[dPos++];
+		return false;
+	}
+
+	private static int FindBestMatch(byte[] buffer, int startPos, int dPos, int dEnd, ushort lengthMask, out int bestCandidate)
+	{
+		bestCandidate = -1;
+		var bestLength = 0;
+		for (var candidate = dPos - 1; candidate >= startPos; candidate--)
+		{
+			if (buffer[candidate] == buffer[dPos])
+			{
+				var length = GetMatchLength(buffer, candidate, dPos, dEnd, lengthMask);
+				if (length > bestLength)
+				{
+					bestCandidate = candidate;
+					bestLength = length;
+					if (bestLength == lengthMask)
+					{
+						break;
+					}
+				}
+			}
+		}
+
+		return bestLength;
+	}
+
+	private static int GetMatchLength(byte[] buffer, int candidate, int dPos, int dEnd, ushort lengthMask)
+	{
+		var length = 1;
+		while (buffer.Length > dPos + length && buffer[candidate + length] == buffer[dPos + length] && length < lengthMask && dPos + length < dEnd)
+		{
+			length++;
+		}
+
+		return length;
 	}
 	internal static byte[] DecompressPart(byte[] part) => DecompressPart(part, 0);
 	/// <summary>
@@ -188,126 +189,98 @@ internal static class VBACompression
 	private static void DecompressChunk(MemoryStream ms, byte[] compBuffer, ref int pos)
 	{
 		var header = BitConverter.ToUInt16(compBuffer, pos);
-		var decomprPos = 0;
-		var buffer = new byte[4198]; //Add an extra 100 byte. Some workbooks have overflowing worksheets.
-		var size = (int)(header & 0xFFF) + 3;
+		var size = (header & 0xFFF) + 3;
 		var endPos = pos + size;
-		var a = (int)(header & 0x7000) >> 12;
-		var b = (int)(header & 0x8000) >> 15;
+		var b = (header & 0x8000) >> 15;
 		pos += 2;
 		if (b == 1) //Compressed chunk
 		{
-			while (pos < compBuffer.Length && pos < endPos)
-			{
-				//Decompress token
-				var token = compBuffer[pos++];
-				if (pos >= endPos)
-				{
-					break;
-				}
-
-				for (var i = 0; i < 8; i++)
-				{
-					//Literal token
-					if ((token & (1 << i)) == 0)
-					{
-						ms.WriteByte(compBuffer[pos]);
-						buffer[decomprPos++] = compBuffer[pos++];
-					}
-					else //copy token
-					{
-						var t = BitConverter.ToUInt16(compBuffer, pos);
-						var bitCount = GetLengthBits(decomprPos);
-						var bits = (16 - bitCount);
-						var lengthMask = (ushort)((0xFFFF) >> bits);
-						var offsetMask = (ushort)~lengthMask;
-						var length = (lengthMask & t) + 3;
-						var offset = (offsetMask & t) >> (bitCount);
-						var source = decomprPos - offset - 1;
-						if (decomprPos + length >= buffer.Length)
-						{
-							// Be lenient on decompression, so extend our decompression
-							// buffer. Excel generated VBA projects do encounter this issue.
-							// One would think (not surprisingly that the VBA project spec)
-							// over emphasizes the size restrictions of a DecompressionChunk.
-							var largerBuffer = new byte[buffer.Length + 4098];
-							Array.Copy(buffer, largerBuffer, decomprPos);
-							buffer = largerBuffer;
-						}
-
-						// Even though we've written to the MemoryStream,
-						// We still should decompress the token into this buffer
-						// in case a later token needs to use the bytes we're
-						// about to decompress.
-						for (var c = 0; c < length; c++)
-						{
-							ms.WriteByte(buffer[source]); //Must copy byte-wise because copytokens can overlap compressed buffer.
-							buffer[decomprPos++] = buffer[source++];
-						}
-
-						pos += 2;
-
-					}
-
-					if (pos >= endPos)
-					{
-						break;
-					}
-				}
-			}
-
-			return;
+			DecompressCompressedChunk(ms, compBuffer, ref pos, endPos);
 		}
 		else //Raw chunk
 		{
 			ms.Write(compBuffer, pos, size);
 			pos += size;
-			return;
 		}
 	}
+
+	private static void DecompressCompressedChunk(MemoryStream ms, byte[] compBuffer, ref int pos, int endPos)
+	{
+		var decomprPos = 0;
+		var buffer = new byte[4198]; //Add an extra 100 byte. Some workbooks have overflowing worksheets.
+		while (pos < compBuffer.Length && pos < endPos)
+		{
+			//Decompress token
+			var token = compBuffer[pos++];
+			if (pos >= endPos)
+			{
+				break;
+			}
+
+			for (var i = 0; i < 8; i++)
+			{
+				//Literal token
+				if ((token & (1 << i)) == 0)
+				{
+					ms.WriteByte(compBuffer[pos]);
+					buffer[decomprPos++] = compBuffer[pos++];
+				}
+				else
+				{
+					buffer = DecompressCopyToken(ms, compBuffer, pos, buffer, ref decomprPos);
+					pos += 2;
+				}
+
+				if (pos >= endPos)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	private static byte[] DecompressCopyToken(MemoryStream ms, byte[] compBuffer, int pos, byte[] buffer, ref int decomprPos)
+	{
+		var t = BitConverter.ToUInt16(compBuffer, pos);
+		var bitCount = GetLengthBits(decomprPos);
+		var lengthMask = (ushort)(0xFFFF >> (16 - bitCount));
+		var offsetMask = (ushort)~lengthMask;
+		var length = (lengthMask & t) + 3;
+		var offset = (offsetMask & t) >> bitCount;
+		var source = decomprPos - offset - 1;
+		if (decomprPos + length >= buffer.Length)
+		{
+			// Excel-generated VBA projects can overflow the nominal chunk size, so grow the buffer.
+			var largerBuffer = new byte[buffer.Length + 4098];
+			Array.Copy(buffer, largerBuffer, decomprPos);
+			buffer = largerBuffer;
+		}
+
+		// Byte-wise, and into the buffer too: copy tokens can overlap bytes a later token reads.
+		for (var c = 0; c < length; c++)
+		{
+			ms.WriteByte(buffer[source]);
+			buffer[decomprPos++] = buffer[source++];
+		}
+
+		return buffer;
+	}
+
 	private static int GetLengthBits(int decompPos)
 	{
-		if (decompPos <= 16)
-		{
-			return 12;
-		}
-		else if (decompPos <= 32)
-		{
-			return 11;
-		}
-		else if (decompPos <= 64)
-		{
-			return 10;
-		}
-		else if (decompPos <= 128)
-		{
-			return 9;
-		}
-		else if (decompPos <= 256)
-		{
-			return 8;
-		}
-		else if (decompPos <= 512)
-		{
-			return 7;
-		}
-		else if (decompPos <= 1024)
-		{
-			return 6;
-		}
-		else if (decompPos <= 2048)
-		{
-			return 5;
-		}
-		else if (decompPos <= 4096)
-		{
-			return 4;
-		}
-		else
+		if (decompPos > 4096)
 		{
 			//We should never end up here, but if so this is the formula to calculate the bits...
 			return 12 - (int)Math.Truncate(Math.Log(decompPos - 1 >> 4, 2) + 1);
 		}
+
+		var bits = 12;
+		for (var limit = 16; decompPos > limit; limit <<= 1)
+		{
+			bits--;
+		}
+
+		return bits;
 	}
 	#endregion
 }

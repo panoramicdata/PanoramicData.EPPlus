@@ -72,6 +72,7 @@ public class HolidayWeekdays
 		return resultDate;
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public System.DateTime GetNextWorkday(System.DateTime date, WorkdayCalculationDirection direction = WorkdayCalculationDirection.Forward)
 	{
 		var changeParam = (int)direction;

@@ -28,12 +28,15 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
+
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.CompileStrategy;
 
 public abstract class CompileStrategy
 {
 	protected readonly Expression _expression;
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public CompileStrategy(Expression expression)
 	{
 		_expression = expression;

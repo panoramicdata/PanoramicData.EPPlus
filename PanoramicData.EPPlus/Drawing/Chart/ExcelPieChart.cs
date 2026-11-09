@@ -58,7 +58,7 @@ public class ExcelPieChart : ExcelChart
 		base(topChart, chartNode)
 	{
 	}
-	ExcelChartDataLabel _DataLabel = null;
+	ExcelChartDataLabel _DataLabel;
 	/// <summary>
 	/// Access to datalabel properties
 	/// </summary>

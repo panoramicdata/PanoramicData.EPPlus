@@ -63,34 +63,34 @@ public class ExcelChartAxisTest
 	[TestMethod]
 	public void Gridlines_Set_IsNotNull()
 	{
-		var major = axis.MajorGridlines;
+		_ = axis.MajorGridlines;
 		Assert.IsTrue(axis.ExistNode("c:majorGridlines"));
 
-		var minor = axis.MinorGridlines;
+		_ = axis.MinorGridlines;
 		Assert.IsTrue(axis.ExistNode("c:minorGridlines"));
 	}
 
 	[TestMethod]
 	public void Gridlines_Remove_IsNull()
 	{
-		var major = axis.MajorGridlines;
-		var minor = axis.MinorGridlines;
+		_ = axis.MajorGridlines;
+		_ = axis.MinorGridlines;
 
 		axis.RemoveGridlines();
 
 		Assert.IsFalse(axis.ExistNode("c:majorGridlines"));
 		Assert.IsFalse(axis.ExistNode("c:minorGridlines"));
 
-		major = axis.MajorGridlines;
-		minor = axis.MinorGridlines;
+		_ = axis.MajorGridlines;
+		_ = axis.MinorGridlines;
 
 		axis.RemoveGridlines(true, false);
 
 		Assert.IsFalse(axis.ExistNode("c:majorGridlines"));
 		Assert.IsTrue(axis.ExistNode("c:minorGridlines"));
 
-		major = axis.MajorGridlines;
-		minor = axis.MinorGridlines;
+		_ = axis.MajorGridlines;
+		_ = axis.MinorGridlines;
 
 		axis.RemoveGridlines(false, true);
 

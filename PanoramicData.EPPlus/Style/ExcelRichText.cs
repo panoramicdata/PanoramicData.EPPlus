@@ -147,7 +147,6 @@ public class ExcelRichText : XmlHelper
 	{
 		get
 		{
-			//return GetXmlNodeBool(ITALIC_PATH, false);
 			return ExistNode(ITALIC_PATH);
 		}
 		set

@@ -1,61 +1,31 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 namespace PanoramicData.EPPlus.Test;
 
-/// <summary>
-/// Summary description for Address
-/// </summary>
 [TestClass]
 public class AddressTests
 {
-	public AddressTests()
-	{
-		//
-		// TODO: Add constructor logic here
-		//
-	}
+	public TestContext TestContext { get; set; }
 
-	private TestContext testContextInstance;
-
-	/// <summary>
-	///Gets or sets the test context which provides
-	///information about and functionality for the current test run.
-	///</summary>
-	public TestContext TestContext
+	private static void AssertCellAddressValidity(bool expected, params string[] addresses)
 	{
-		get
+		foreach (var address in addresses)
 		{
-			return testContextInstance;
-		}
-		set
-		{
-			testContextInstance = value;
+			Assert.AreEqual(expected, ExcelCellBase.IsValidCellAddress(address), address);
 		}
 	}
 
-	#region Additional test attributes
-	//
-	// You can use the following additional attributes as you write your tests:
-	//
-	// Use ClassInitialize to run code before running the first test in the class
-	// [ClassInitialize()]
-	// public static void MyClassInitialize(TestContext testContext) { }
-	//
-	// Use ClassCleanup to run code after all tests in a class have run
-	// [ClassCleanup()]
-	// public static void MyClassCleanup() { }
-	//
-	// Use TestInitialize to run code before running each test 
-	// [TestInitialize()]
-	// public void MyTestInitialize() { }
-	//
-	// Use TestCleanup to run code after each test has run
-	// [TestCleanup()]
-	// public void MyTestCleanup() { }
-	//
-	#endregion
-
+	private static string NamedRangeAddressAfter(int fromRow, int fromCol, int toRow, int toCol, Action<ExcelWorksheet> change, bool workbookScope = false)
+	{
+		using var package = new ExcelPackage();
+		var sheet = package.Workbook.Worksheets.Add("NEW");
+		var range = sheet.Cells[fromRow, fromCol, toRow, toCol];
+		var namedRange = workbookScope ? package.Workbook.Names.Add("NewNamedRange", range) : sheet.Names.Add("NewNamedRange", range);
+		change(sheet);
+		return namedRange.Address;
+	}
 	[TestMethod]
 	public void InsertDeleteTest()
 	{
@@ -85,49 +55,33 @@ public class AddressTests
 	[TestMethod]
 	public void Addresses()
 	{
-		var a1 = new ExcelAddress("SalesData!$K$445");
-		var a2 = new ExcelAddress("SalesData!$K$445:$M$449,SalesData!$N$448:$Q$454,SalesData!$L$458:$O$464");
-		var a3 = new ExcelAddress("SalesData!$K$445:$L$448");
-		//var a4 = new ExcelAddress("'[1]Risk]TatTWRForm_TWRWEEKLY20130926090'!$N$527");
-		var a5 = new ExcelAddress("Table1[[#All],[Title]]");
-		var a6 = new ExcelAddress("Table1[#All]");
-		var a7 = new ExcelAddress("Table1[[#Headers],[FirstName]:[LastName]]");
-		var a8 = new ExcelAddress("Table1[#Headers]");
-		var a9 = new ExcelAddress("Table2[[#All],[SubTotal]]");
-		var a10 = new ExcelAddress("Table2[#All]");
-		var a11 = new ExcelAddress("Table1[[#All],[Freight]]");
-		var a12 = new ExcelAddress("[1]!Table1[[LastName]:[Name]]");
-		var a13 = new ExcelAddress("Table1[[#All],[Freight]]");
-		var a14 = new ExcelAddress("SalesData!$N$5+'test''1'!$J$33");
+		string[] addresses =
+		[
+			"SalesData!$K$445",
+			"SalesData!$K$445:$M$449,SalesData!$N$448:$Q$454,SalesData!$L$458:$O$464",
+			"SalesData!$K$445:$L$448",
+			"Table1[[#All],[Title]]",
+			"Table1[#All]",
+			"Table1[[#Headers],[FirstName]:[LastName]]",
+			"Table1[#Headers]",
+			"Table2[[#All],[SubTotal]]",
+			"Table2[#All]",
+			"Table1[[#All],[Freight]]",
+			"[1]!Table1[[LastName]:[Name]]",
+			"Table1[[#All],[Freight]]",
+			"SalesData!$N$5+'test''1'!$J$33",
+		];
+		foreach (var address in addresses)
+		{
+			_ = new ExcelAddress(address);
+		}
 	}
 
 	[TestMethod]
 	public void IsValidCellAdress()
 	{
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("A1"));
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("A1048576"));
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("XFD1"));
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("XFD1048576"));
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("Table1!A1"));
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("Table1!A1048576"));
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("Table1!XFD1"));
-		Assert.IsTrue(ExcelCellBase.IsValidCellAddress("Table1!XFD1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("A"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("A"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("XFD"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("XFD"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("1"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("1"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("A1:A1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("A1:XFD1"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("A1048576:XFD1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("XFD1:XFD1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("Table1!A1:A1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("Table1!A1:XFD1"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("Table1!A1048576:XFD1048576"));
-		Assert.IsFalse(ExcelCellBase.IsValidCellAddress("Table1!XFD1:XFD1048576"));
+		AssertCellAddressValidity(true, "A1", "A1048576", "XFD1", "XFD1048576", "Table1!A1", "Table1!A1048576", "Table1!XFD1", "Table1!XFD1048576");
+		AssertCellAddressValidity(false, "A", "A", "XFD", "XFD", "1", "1048576", "1", "1048576", "A1:A1048576", "A1:XFD1", "A1048576:XFD1048576", "XFD1:XFD1048576", "Table1!A1:A1048576", "Table1!A1:XFD1", "Table1!A1048576:XFD1048576", "Table1!XFD1:XFD1048576");
 	}
 	[TestMethod]
 	public void IsValidName()
@@ -144,109 +98,35 @@ public class AddressTests
 	}
 	[TestMethod]
 	public void NamedRangeMovesDownIfRowInsertedAbove()
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 1, 3, 3];
-		var namedRange = sheet.Names.Add("NewNamedRange", range);
-
-		sheet.InsertRow(1, 1);
-
-		Assert.AreEqual("'NEW'!A3:C4", namedRange.Address);
-	}
+		=> Assert.AreEqual("'NEW'!A3:C4", NamedRangeAddressAfter(2, 1, 3, 3, sheet => sheet.InsertRow(1, 1)));
 
 	[TestMethod]
 	public void NamedRangeDoesNotChangeIfRowInsertedBelow()
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 1, 3, 3];
-		var namedRange = sheet.Names.Add("NewNamedRange", range);
-
-		sheet.InsertRow(4, 1);
-
-		Assert.AreEqual("A2:C3", namedRange.Address);
-	}
+		=> Assert.AreEqual("A2:C3", NamedRangeAddressAfter(2, 1, 3, 3, sheet => sheet.InsertRow(4, 1)));
 
 	[TestMethod]
 	public void NamedRangeExpandsDownIfRowInsertedWithin()
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 1, 3, 3];
-		var namedRange = sheet.Names.Add("NewNamedRange", range);
-
-		sheet.InsertRow(3, 1);
-
-		Assert.AreEqual("'NEW'!A2:C4", namedRange.Address);
-	}
+		=> Assert.AreEqual("'NEW'!A2:C4", NamedRangeAddressAfter(2, 1, 3, 3, sheet => sheet.InsertRow(3, 1)));
 
 	[TestMethod]
 	public void NamedRangeMovesRightIfColInsertedBefore()
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 2, 3, 4];
-		var namedRange = sheet.Names.Add("NewNamedRange", range);
-
-		sheet.InsertColumn(1, 1);
-
-		Assert.AreEqual("'NEW'!C2:E3", namedRange.Address);
-	}
+		=> Assert.AreEqual("'NEW'!C2:E3", NamedRangeAddressAfter(2, 2, 3, 4, sheet => sheet.InsertColumn(1, 1)));
 
 	[TestMethod]
 	public void NamedRangeUnchangedIfColInsertedAfter()
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 2, 3, 4];
-		var namedRange = sheet.Names.Add("NewNamedRange", range);
-
-		sheet.InsertColumn(5, 1);
-
-		Assert.AreEqual("B2:D3", namedRange.Address);
-	}
+		=> Assert.AreEqual("B2:D3", NamedRangeAddressAfter(2, 2, 3, 4, sheet => sheet.InsertColumn(5, 1)));
 
 	[TestMethod]
 	public void NamedRangeExpandsToRightIfColInsertedWithin()
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 2, 3, 4];
-		var namedRange = sheet.Names.Add("NewNamedRange", range);
-
-		sheet.InsertColumn(5, 1);
-
-		Assert.AreEqual("B2:D3", namedRange.Address);
-	}
+		=> Assert.AreEqual("B2:D3", NamedRangeAddressAfter(2, 2, 3, 4, sheet => sheet.InsertColumn(5, 1)));
 
 	[TestMethod]
 	public void NamedRangeWithWorkbookScopeIsMovedDownIfRowInsertedAbove()
-	{
-		using var package = new ExcelPackage();
-		var workbook = package.Workbook;
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 1, 3, 3];
-		var namedRange = workbook.Names.Add("NewNamedRange", range);
-
-		sheet.InsertRow(1, 1);
-
-		Assert.AreEqual("'NEW'!A3:C4", namedRange.Address);
-	}
+		=> Assert.AreEqual("'NEW'!A3:C4", NamedRangeAddressAfter(2, 1, 3, 3, sheet => sheet.InsertRow(1, 1), workbookScope: true));
 
 	[TestMethod]
 	public void NamedRangeWithWorkbookScopeIsMovedRightIfColInsertedBefore()
-	{
-		using var package = new ExcelPackage();
-		var workbook = package.Workbook;
-		var sheet = package.Workbook.Worksheets.Add("NEW");
-		var range = sheet.Cells[2, 2, 3, 3];
-		var namedRange = workbook.Names.Add("NewNamedRange", range);
-
-		sheet.InsertColumn(1, 1);
-
-		Assert.AreEqual("'NEW'!C2:D3", namedRange.Address);
-	}
+		=> Assert.AreEqual("'NEW'!C2:D3", NamedRangeAddressAfter(2, 2, 3, 3, sheet => sheet.InsertColumn(1, 1), workbookScope: true));
 
 	[TestMethod]
 	public void NamedRangeIsUnchangedForOutOfScopeSheet()

@@ -34,6 +34,6 @@ public class Sqrt : ExcelFunction
 		ValidateArguments(arguments, 1);
 		var arg = ArgToDecimal(arguments, 0);
 		var result = System.Math.Sqrt((double)arg);
-		return CreateResult((double)result, DataType.Decimal);
+		return CreateResult(result, DataType.Decimal);
 	}
 }

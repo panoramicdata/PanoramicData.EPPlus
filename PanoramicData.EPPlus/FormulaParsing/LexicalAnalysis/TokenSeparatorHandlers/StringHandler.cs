@@ -34,44 +34,56 @@ public class StringHandler : SeparatorHandler
 {
 	public override bool Handle(char c, Token tokenSeparator, TokenizerContext context, ITokenIndexProvider tokenIndexProvider)
 	{
-		if (context.IsInString)
+		if (context.IsInString && AppendInsideString(c, tokenSeparator, context, tokenIndexProvider))
 		{
-			if (IsDoubleQuote(tokenSeparator, tokenIndexProvider.Index, context))
-			{
-				tokenIndexProvider.MoveIndexPointerForward();
-				context.AppendToCurrentToken(c);
-				return true;
-			}
-
-			if (tokenSeparator.TokenType != TokenType.String)
-			{
-				context.AppendToCurrentToken(c);
-				return true;
-			}
+			return true;
 		}
 
 		if (tokenSeparator.TokenType == TokenType.String)
 		{
-			if (context.LastToken != null && context.LastToken.TokenType == TokenType.OpeningEnumerable)
-			{
-				context.AppendToCurrentToken(c);
-				context.ToggleIsInString();
-				return true;
-			}
-
-			if (context.LastToken != null && context.LastToken.TokenType == TokenType.String)
-			{
-				context.AddToken(!context.CurrentTokenHasValue
-					? new Token(string.Empty, TokenType.StringContent)
-					: new Token(context.CurrentToken, TokenType.StringContent));
-			}
-
-			context.AddToken(new Token("\"", TokenType.String));
-			context.ToggleIsInString();
-			context.NewToken();
+			HandleQuote(c, context);
 			return true;
 		}
 
 		return false;
+	}
+
+	private static bool AppendInsideString(char c, Token tokenSeparator, TokenizerContext context, ITokenIndexProvider tokenIndexProvider)
+	{
+		if (IsDoubleQuote(tokenSeparator, tokenIndexProvider.Index, context))
+		{
+			tokenIndexProvider.MoveIndexPointerForward();
+			context.AppendToCurrentToken(c);
+			return true;
+		}
+
+		if (tokenSeparator.TokenType != TokenType.String)
+		{
+			context.AppendToCurrentToken(c);
+			return true;
+		}
+
+		return false;
+	}
+
+	private static void HandleQuote(char c, TokenizerContext context)
+	{
+		if (context.LastToken != null && context.LastToken.TokenType == TokenType.OpeningEnumerable)
+		{
+			context.AppendToCurrentToken(c);
+			context.ToggleIsInString();
+			return;
+		}
+
+		if (context.LastToken != null && context.LastToken.TokenType == TokenType.String)
+		{
+			context.AddToken(!context.CurrentTokenHasValue
+				? new Token(string.Empty, TokenType.StringContent)
+				: new Token(context.CurrentToken, TokenType.StringContent));
+		}
+
+		context.AddToken(new Token("\"", TokenType.String));
+		context.ToggleIsInString();
+		context.NewToken();
 	}
 }

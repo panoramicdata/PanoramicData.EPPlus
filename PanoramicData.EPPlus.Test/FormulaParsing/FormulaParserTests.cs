@@ -20,13 +20,6 @@ public class FormulaParserTests
 	{
 		var provider = A.Fake<ExcelDataProvider>();
 		_parser = new FormulaParser(provider);
-
-	}
-
-	[TestCleanup]
-	public void Cleanup()
-	{
-
 	}
 
 	[TestMethod]

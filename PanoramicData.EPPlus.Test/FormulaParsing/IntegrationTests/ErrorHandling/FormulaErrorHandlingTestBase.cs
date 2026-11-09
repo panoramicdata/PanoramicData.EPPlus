@@ -19,9 +19,9 @@ public class FormulaErrorHandlingTestBase
 #else
 		var dir = AppContext.BaseDirectory;
 #endif
-		var Package = new ExcelPackage(new FileInfo(Path.Combine(dir, "Workbooks", "FormulaTest.xlsx")));
-		Worksheet = Package.Workbook.Worksheets["ValidateFormulas"];
-		Package.Workbook.Calculate();
+		var package = new ExcelPackage(new FileInfo(Path.Combine(dir, "Workbooks", "FormulaTest.xlsx")));
+		Worksheet = package.Workbook.Worksheets["ValidateFormulas"];
+		package.Workbook.Calculate();
 	}
 
 	public void BaseCleanup() => Package.Dispose();

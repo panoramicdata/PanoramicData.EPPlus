@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Style;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
 namespace OfficeOpenXml.Drawing.Chart;
@@ -168,31 +169,86 @@ public sealed class ExcelChartAxis : XmlHelper
 		SchemaNodeOrder = ["axId", "scaling", "logBase", "orientation", "max", "min", "delete", "axPos", "majorGridlines", "minorGridlines", "title", "numFmt", "majorTickMark", "minorTickMark", "tickLblPos", "spPr", "txPr", "crossAx", "crossesAt", "crosses", "crossBetween", "auto", "lblOffset", "majorUnit", "majorTimeUnit", "minorUnit", "minorTimeUnit", "dispUnits", "spPr", "txPr"];
 	}
 	internal string Id => GetXmlNodeString("c:axId/@val");
+
+	private T GetEnum<T>(string path, T defaultValue, bool ignoreCase) where T : struct, Enum
+	{
+		var v = GetXmlNodeString(path);
+		return !string.IsNullOrEmpty(v) && Enum.TryParse(v, ignoreCase, out T result) ? result : defaultValue;
+	}
+
+	private void SetCamelCaseString(string path, Enum value)
+	{
+		var v = value.ToString();
+		SetXmlNodeString(path, v[..1].ToLower(CultureInfo.InvariantCulture) + v[1..]);
+	}
+
+	private void SetDoubleOrDelete(string path, double? value)
+	{
+		if (value == null)
+		{
+			DeleteNode(path);
+		}
+		else
+		{
+			SetXmlNodeString(path, value.Value.ToString(CultureInfo.InvariantCulture));
+		}
+	}
+
+	private double? GetUnit(string valuePath, string categoryPath) => GetXmlNodeDoubleNull(AxisType == eAxisType.Cat ? categoryPath : valuePath);
+
+	private void SetUnit(string valuePath, string categoryPath, double? value)
+	{
+		if (value == null)
+		{
+			DeleteNode(valuePath);
+			DeleteNode(categoryPath);
+		}
+		else
+		{
+			SetXmlNodeString(AxisType == eAxisType.Cat ? categoryPath : valuePath, value.Value.ToString(CultureInfo.InvariantCulture));
+		}
+	}
+
+	private eTimeUnit? GetTimeUnit(string path) => GetXmlNodeString(path) switch
+	{
+		"years" => eTimeUnit.Years,
+		"months" => eTimeUnit.Months,
+		"days" => eTimeUnit.Days,
+		_ => null,
+	};
+
+	private void SetTimeUnit(string path, eTimeUnit? value)
+	{
+		if (value.HasValue)
+		{
+			SetXmlNodeString(path, value.Value.ToString().ToLower(CultureInfo.InvariantCulture));
+		}
+		else
+		{
+			DeleteNode(path);
+		}
+	}
+
+	private ExcelDrawingBorder GetGridlines(string path)
+	{
+		if (TopNode.SelectSingleNode(path, NameSpaceManager) == null)
+		{
+			CreateNode(path);
+		}
+
+		return new ExcelDrawingBorder(NameSpaceManager, TopNode, $"{path}/c:spPr/a:ln");
+	}
+
 	const string _majorTickMark = "c:majorTickMark/@val";
 	/// <summary>
-	/// majorTickMark 
-	/// This element specifies the major tick marks for the axis. 
+	/// majorTickMark
+	/// This element specifies the major tick marks for the axis.
 	/// </summary>
 	public eAxisTickMark MajorTickMark
 	{
 		get
 		{
-			var v = GetXmlNodeString(_majorTickMark);
-			if (string.IsNullOrEmpty(v))
-			{
-				return eAxisTickMark.Cross;
-			}
-			else
-			{
-				try
-				{
-					return Enum.Parse<eAxisTickMark>(v);
-				}
-				catch
-				{
-					return eAxisTickMark.Cross;
-				}
-			}
+			return GetEnum(_majorTickMark, eAxisTickMark.Cross, false);
 		}
 		set
 		{
@@ -202,29 +258,14 @@ public sealed class ExcelChartAxis : XmlHelper
 
 	const string _minorTickMark = "c:minorTickMark/@val";
 	/// <summary>
-	/// minorTickMark 
-	/// This element specifies the minor tick marks for the axis. 
+	/// minorTickMark
+	/// This element specifies the minor tick marks for the axis.
 	/// </summary>
 	public eAxisTickMark MinorTickMark
 	{
 		get
 		{
-			var v = GetXmlNodeString(_minorTickMark);
-			if (string.IsNullOrEmpty(v))
-			{
-				return eAxisTickMark.Cross;
-			}
-			else
-			{
-				try
-				{
-					return Enum.Parse<eAxisTickMark>(v);
-				}
-				catch
-				{
-					return eAxisTickMark.Cross;
-				}
-			}
+			return GetEnum(_minorTickMark, eAxisTickMark.Cross, false);
 		}
 		set
 		{
@@ -277,30 +318,12 @@ public sealed class ExcelChartAxis : XmlHelper
 	{
 		get
 		{
-			var v = GetXmlNodeString(_crossesPath);
-			if (string.IsNullOrEmpty(v))
-			{
-				return eCrosses.AutoZero;
-			}
-			else
-			{
-				try
-				{
-					return Enum.Parse<eCrosses>(v, true);
-				}
-				catch
-				{
-					return eCrosses.AutoZero;
-				}
-			}
+			return GetEnum(_crossesPath, eCrosses.AutoZero, true);
 		}
 		set
 		{
-			var v = value.ToString();
-			v = v[..1].ToLower(CultureInfo.InvariantCulture) + v[1..];
-			SetXmlNodeString(_crossesPath, v);
+			SetCamelCaseString(_crossesPath, value);
 		}
-
 	}
 	const string _crossBetweenPath = "c:crossBetween/@val";
 	/// <summary>
@@ -310,28 +333,11 @@ public sealed class ExcelChartAxis : XmlHelper
 	{
 		get
 		{
-			var v = GetXmlNodeString(_crossBetweenPath);
-			if (string.IsNullOrEmpty(v))
-			{
-				return eCrossBetween.Between;
-			}
-			else
-			{
-				try
-				{
-					return Enum.Parse<eCrossBetween>(v, true);
-				}
-				catch
-				{
-					return eCrossBetween.Between;
-				}
-			}
+			return GetEnum(_crossBetweenPath, eCrossBetween.Between, true);
 		}
 		set
 		{
-			var v = value.ToString();
-			v = v[..1].ToLower(CultureInfo.InvariantCulture) + v[1..];
-			SetXmlNodeString(_crossBetweenPath, v);
+			SetCamelCaseString(_crossBetweenPath, value);
 		}
 	}
 	const string _crossesAtPath = "c:crossesAt/@val";
@@ -347,14 +353,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		}
 		set
 		{
-			if (value == null)
-			{
-				DeleteNode(_crossesAtPath);
-			}
-			else
-			{
-				SetXmlNodeString(_crossesAtPath, ((double)value).ToString(CultureInfo.InvariantCulture));
-			}
+			SetDoubleOrDelete(_crossesAtPath, value);
 		}
 	}
 	const string _formatPath = "c:numFmt/@formatCode";
@@ -370,14 +369,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		set
 		{
 			SetXmlNodeString(_formatPath, value);
-			if (string.IsNullOrEmpty(value))
-			{
-				SourceLinked = true;
-			}
-			else
-			{
-				SourceLinked = false;
-			}
+			SourceLinked = string.IsNullOrEmpty(value);
 		}
 	}
 	const string _sourceLinkedPath = "c:numFmt/@sourceLinked";
@@ -400,77 +392,28 @@ public sealed class ExcelChartAxis : XmlHelper
 	{
 		get
 		{
-			var v = GetXmlNodeString(_lblPos);
-			if (string.IsNullOrEmpty(v))
-			{
-				return eTickLabelPosition.NextTo;
-			}
-			else
-			{
-				try
-				{
-					return Enum.Parse<eTickLabelPosition>(v, true);
-				}
-				catch
-				{
-					return eTickLabelPosition.NextTo;
-				}
-			}
+			return GetEnum(_lblPos, eTickLabelPosition.NextTo, true);
 		}
 		set
 		{
-			var lp = value.ToString();
-			SetXmlNodeString(_lblPos, lp[..1].ToLower(CultureInfo.InvariantCulture) + lp[1..]);
+			SetCamelCaseString(_lblPos, value);
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Access to fill properties
 	/// </summary>
-	public ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
-	ExcelDrawingBorder _border = null;
+	public ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access to border properties
 	/// </summary>
-	public ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
-	ExcelTextFont _font = null;
+	public ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
+	ExcelTextFont _font;
 	/// <summary>
 	/// Access to font properties
 	/// </summary>
-	public ExcelTextFont Font
-	{
-		get
-		{
-			if (_font == null)
-			{
-				if (TopNode.SelectSingleNode("c:txPr", NameSpaceManager) == null)
-				{
-					CreateNode("c:txPr/a:bodyPr");
-					CreateNode("c:txPr/a:lstStyle");
-				}
-
-				_font = new ExcelTextFont(NameSpaceManager, TopNode, "c:txPr/a:p/a:pPr/a:defRPr", ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
-			}
-
-			return _font;
-		}
-	}
+	public ExcelTextFont Font => ChartStyleAccess.GetFont(this, ref _font, ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
 	/// <summary>
 	/// If the axis is deleted
 	/// </summary>
@@ -498,13 +441,12 @@ public sealed class ExcelChartAxis : XmlHelper
 		}
 		set
 		{
-			var v = value.ToString();
-			v = v[..1].ToLower(CultureInfo.InvariantCulture) + v[1..];
-			SetXmlNodeString(_ticLblPos_Path, v);
+			SetCamelCaseString(_ticLblPos_Path, value);
 		}
 	}
 	const string _displayUnitPath = "c:dispUnits/c:builtInUnit/@val";
 	const string _custUnitPath = "c:dispUnits/c:custUnit/@val";
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Built-in units are exact whole numbers; a tolerance would change which unit is written.")]
 	public double DisplayUnit
 	{
 		get
@@ -549,7 +491,7 @@ public sealed class ExcelChartAxis : XmlHelper
 			}
 		}
 	}
-	ExcelChartTitle _title = null;
+	ExcelChartTitle _title;
 	/// <summary>
 	/// Chart axis title
 	/// </summary>
@@ -587,14 +529,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		}
 		set
 		{
-			if (value == null)
-			{
-				DeleteNode(_minValuePath);
-			}
-			else
-			{
-				SetXmlNodeString(_minValuePath, ((double)value).ToString(CultureInfo.InvariantCulture));
-			}
+			SetDoubleOrDelete(_minValuePath, value);
 		}
 	}
 	const string _maxValuePath = "c:scaling/c:max/@val";
@@ -610,14 +545,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		}
 		set
 		{
-			if (value == null)
-			{
-				DeleteNode(_maxValuePath);
-			}
-			else
-			{
-				SetXmlNodeString(_maxValuePath, ((double)value).ToString(CultureInfo.InvariantCulture));
-			}
+			SetDoubleOrDelete(_maxValuePath, value);
 		}
 	}
 	const string _majorUnitPath = "c:majorUnit/@val";
@@ -630,26 +558,11 @@ public sealed class ExcelChartAxis : XmlHelper
 	{
 		get
 		{
-			return AxisType == eAxisType.Cat ? GetXmlNodeDoubleNull(_majorUnitCatPath) : GetXmlNodeDoubleNull(_majorUnitPath);
+			return GetUnit(_majorUnitPath, _majorUnitCatPath);
 		}
 		set
 		{
-			if (value == null)
-			{
-				DeleteNode(_majorUnitPath);
-				DeleteNode(_majorUnitCatPath);
-			}
-			else
-			{
-				if (AxisType == eAxisType.Cat)
-				{
-					SetXmlNodeString(_majorUnitCatPath, ((double)value).ToString(CultureInfo.InvariantCulture));
-				}
-				else
-				{
-					SetXmlNodeString(_majorUnitPath, ((double)value).ToString(CultureInfo.InvariantCulture));
-				}
-			}
+			SetUnit(_majorUnitPath, _majorUnitCatPath, value);
 		}
 	}
 	const string _majorTimeUnitPath = "c:majorTimeUnit/@val";
@@ -661,24 +574,11 @@ public sealed class ExcelChartAxis : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeString(_majorTimeUnitPath) switch
-			{
-				"years" => (eTimeUnit?)eTimeUnit.Years,
-				"months" => (eTimeUnit?)eTimeUnit.Months,
-				"days" => (eTimeUnit?)eTimeUnit.Days,
-				_ => null,
-			};
+			return GetTimeUnit(_majorTimeUnitPath);
 		}
 		set
 		{
-			if (value.HasValue)
-			{
-				SetXmlNodeString(_majorTimeUnitPath, value.ToString().ToLower());
-			}
-			else
-			{
-				DeleteNode(_majorTimeUnitPath);
-			}
+			SetTimeUnit(_majorTimeUnitPath, value);
 		}
 	}
 	const string _minorUnitPath = "c:minorUnit/@val";
@@ -691,26 +591,11 @@ public sealed class ExcelChartAxis : XmlHelper
 	{
 		get
 		{
-			return AxisType == eAxisType.Cat ? GetXmlNodeDoubleNull(_minorUnitCatPath) : GetXmlNodeDoubleNull(_minorUnitPath);
+			return GetUnit(_minorUnitPath, _minorUnitCatPath);
 		}
 		set
 		{
-			if (value == null)
-			{
-				DeleteNode(_minorUnitPath);
-				DeleteNode(_minorUnitCatPath);
-			}
-			else
-			{
-				if (AxisType == eAxisType.Cat)
-				{
-					SetXmlNodeString(_minorUnitCatPath, ((double)value).ToString(CultureInfo.InvariantCulture));
-				}
-				else
-				{
-					SetXmlNodeString(_minorUnitPath, ((double)value).ToString(CultureInfo.InvariantCulture));
-				}
-			}
+			SetUnit(_minorUnitPath, _minorUnitCatPath, value);
 		}
 	}
 	const string _minorTimeUnitPath = "c:minorTimeUnit/@val";
@@ -722,24 +607,11 @@ public sealed class ExcelChartAxis : XmlHelper
 	{
 		get
 		{
-			return GetXmlNodeString(_minorTimeUnitPath) switch
-			{
-				"years" => (eTimeUnit?)eTimeUnit.Years,
-				"months" => (eTimeUnit?)eTimeUnit.Months,
-				"days" => (eTimeUnit?)eTimeUnit.Days,
-				_ => null,
-			};
+			return GetTimeUnit(_minorTimeUnitPath);
 		}
 		set
 		{
-			if (value.HasValue)
-			{
-				SetXmlNodeString(_minorTimeUnitPath, value.ToString().ToLower());
-			}
-			else
-			{
-				DeleteNode(_minorTimeUnitPath);
-			}
+			SetTimeUnit(_minorTimeUnitPath, value);
 		}
 	}
 	const string _logbasePath = "c:scaling/c:logBase/@val";
@@ -784,9 +656,7 @@ public sealed class ExcelChartAxis : XmlHelper
 		}
 		set
 		{
-			var s = value.ToString();
-			s = s[..1].ToLower(CultureInfo.InvariantCulture) + s[1..];
-			SetXmlNodeString(_orientationPath, s);
+			SetCamelCaseString(_orientationPath, value);
 		}
 	}
 	#endregion
@@ -794,54 +664,20 @@ public sealed class ExcelChartAxis : XmlHelper
 	#region GridLines 
 	//Pull request from aesalazar
 	const string _majorGridlinesPath = "c:majorGridlines";
-	ExcelDrawingBorder _majorGridlines = null;
+	ExcelDrawingBorder _majorGridlines;
 
 	/// <summary> 
 	        /// Major Gridlines for the Axis 
 	        /// </summary> 
-	public ExcelDrawingBorder MajorGridlines
-	{
-		get
-		{
-			if (_majorGridlines == null)
-			{
-				var node = TopNode.SelectSingleNode(_majorGridlinesPath, NameSpaceManager);
-				if (node == null)
-				{
-					CreateNode(_majorGridlinesPath);
-				}
-
-				_majorGridlines = new ExcelDrawingBorder(NameSpaceManager, TopNode, $"{_majorGridlinesPath}/c:spPr/a:ln");
-			}
-
-			return _majorGridlines;
-		}
-	}
+	public ExcelDrawingBorder MajorGridlines => _majorGridlines ??= GetGridlines(_majorGridlinesPath);
 
 	const string _minorGridlinesPath = "c:minorGridlines";
-	ExcelDrawingBorder _minorGridlines = null;
+	ExcelDrawingBorder _minorGridlines;
 
 	/// <summary> 
 	        /// Minor Gridlines for the Axis 
 	        /// </summary> 
-	public ExcelDrawingBorder MinorGridlines
-	{
-		get
-		{
-			if (_minorGridlines == null)
-			{
-				var node = TopNode.SelectSingleNode(_minorGridlinesPath, NameSpaceManager);
-				if (node == null)
-				{
-					CreateNode(_minorGridlinesPath);
-				}
-
-				_minorGridlines = new ExcelDrawingBorder(NameSpaceManager, TopNode, $"{_minorGridlinesPath}/c:spPr/a:ln");
-			}
-
-			return _minorGridlines;
-		}
-	}
+	public ExcelDrawingBorder MinorGridlines => _minorGridlines ??= GetGridlines(_minorGridlinesPath);
 	/// <summary> 
 	        /// Removes Major and Minor gridlines from the Axis 
 	        /// </summary> 

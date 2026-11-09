@@ -138,10 +138,6 @@ public class ExcelSparklineGroup : XmlHelper
 			}
 			else
 			{
-				//var ws = _ws.Workbook.Worksheets[Sparklines[0].RangeAddress.WorkSheet];
-				//return _ws.Cells[Sparklines[0].RangeAddress._fromRow, Sparklines[0].RangeAddress._fromCol, Sparklines[Sparklines.Count - 1].RangeAddress._toRow, Sparklines[Sparklines.Count - 1].RangeAddress._toCol];
-
-
 				int fromRow, fromCol, toRow, toCol;
 				var firstAddress = Sparklines[0].GetRangeAddress(_ws.Names);
 				if (firstAddress.Addresses?.Count > 0)

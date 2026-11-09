@@ -11,10 +11,8 @@ public class Workday : ExcelFunction
 	{
 		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
 		ValidateArguments(functionArguments, 2);
-		var startDate = System.DateTime.FromOADate(ArgToInt(functionArguments, 0));
+		var startDate = ArgToOADate(functionArguments, 0);
 		var nWorkDays = ArgToInt(functionArguments, 1);
-		var resultDate = System.DateTime.MinValue;
-
 		var calculator = new WorkdayCalculator();
 		var result = calculator.CalculateWorkday(startDate, nWorkDays);
 		if (functionArguments.Length > 2)

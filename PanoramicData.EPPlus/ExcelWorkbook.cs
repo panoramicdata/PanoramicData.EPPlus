@@ -44,6 +44,7 @@ using OfficeOpenXml.Utils;
 using OfficeOpenXml.VBA;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -84,7 +85,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	{
 		internal int pos;
 		internal string Text;
-		internal bool isRichText = false;
+		internal bool isRichText;
 	}
 	#region Private Properties
 	internal ExcelPackage _package;
@@ -120,11 +121,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	internal Dictionary<string, SharedStringItem> _sharedStrings = []; //Used when reading cells.
 	internal List<SharedStringItem> _sharedStringsList = []; //Used when reading cells.
 	internal ExcelNamedRangeCollection _names;
-	internal int _nextDrawingID = 0;
+	internal int _nextDrawingID;
 	internal int _nextTableID = int.MinValue;
 	internal int _nextPivotTableID = int.MinValue;
 	internal XmlNamespaceManager _namespaceManager;
-	internal FormulaParser _formulaParser = null;
+	internal FormulaParser _formulaParser;
 	internal FormulaParserManager _parserManager;
 	internal CellStore<List<Token>> _formulaTokens;
 	/// <summary>
@@ -144,11 +145,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					var n = node.SelectSingleNode("d:t", NameSpaceManager);
 					if (n != null)
 					{
-						_sharedStringsList.Add(new SharedStringItem() { Text = ConvertUtil.ExcelDecodeString(n.InnerText) });
+						_sharedStringsList.Add(new SharedStringItem { Text = ConvertUtil.ExcelDecodeString(n.InnerText) });
 					}
 					else
 					{
-						_sharedStringsList.Add(new SharedStringItem() { Text = node.InnerXml, isRichText = true });
+						_sharedStringsList.Add(new SharedStringItem { Text = node.InnerXml, isRichText = true });
 					}
 				}
 			}
@@ -230,15 +231,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					}
 					else
 					{
-						//if (addressType == ExcelAddressBase.AddressType.ExternalAddress || addressType == ExcelAddressBase.AddressType.ExternalName)
-						//{
-						//    var r = new ExcelAddress(fullAddress);
-						//    namedRange.NameFormula = '\'[' + r._wb
-						//}
-						//else
-						//{
 						namedRange.NameFormula = fullAddress;
-						//}
 					}
 				}
 				else
@@ -292,7 +285,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				_worksheets = new ExcelWorksheets(_package, _namespaceManager, sheetsNode);
 			}
 
-			return (_worksheets);
+			return _worksheets;
 		}
 	}
 	#endregion
@@ -361,6 +354,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		}
 	}
 
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "min and max are both dictionary keys, so exact equality is the intended test.")]
 	internal static decimal GetWidthPixels(string fontName, float fontSize)
 	{
 		Dictionary<float, FontSizeInfo> font;
@@ -399,7 +393,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		}
 	}
 
-	ExcelProtection _protection = null;
+	ExcelProtection _protection;
 	/// <summary>
 	/// Access properties to protect or unprotect a workbook
 	/// </summary>
@@ -415,7 +409,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			return _protection;
 		}
 	}
-	ExcelWorkbookView _view = null;
+	ExcelWorkbookView _view;
 	/// <summary>
 	/// Access to workbook view properties
 	/// </summary>
@@ -428,7 +422,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			return _view;
 		}
 	}
-	ExcelVbaProject _vba = null;
+	ExcelVbaProject _vba;
 	/// <summary>
 	/// A reference to the VBA project.
 	/// Null if no project exists.
@@ -457,7 +451,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	{
 		if (_vba != null || _package.Package.PartExists(new Uri(ExcelVbaProject.PartUri, UriKind.Relative)))
 		{
-			throw (new InvalidOperationException("VBA project already exists."));
+			throw new InvalidOperationException("VBA project already exists.");
 		}
 
 		_vba = new ExcelVbaProject(this);
@@ -494,7 +488,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				CreateWorkbookXml(_namespaceManager);
 			}
 
-			return (_workbookXml);
+			return _workbookXml;
 		}
 	}
 	const string codeModuleNamePath = "d:workbookPr/@codeName";
@@ -514,7 +508,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 
 	const string date1904Path = "d:workbookPr/@date1904";
 	internal const double date1904Offset = 365.5 * 4;  // offset to fix 1900 and 1904 differences, 4 OLE years
-	private bool? date1904Cache = null;
+	private bool? date1904Cache;
 
 	internal bool ExistsPivotCache(int cacheID, ref int newID)
 	{
@@ -553,7 +547,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	{
 		get
 		{
-			//return GetXmlNodeBool(date1904Path, false);
 			date1904Cache ??= GetXmlNodeBool(date1904Path, false);
 
 			return date1904Cache.Value;
@@ -611,7 +604,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			// save it to the package
 			StreamWriter stream = new(partWorkbook.GetStream(FileMode.Create, FileAccess.Write));
 			_workbookXml.Save(stream);
-			//stream.Close();
 			Packaging.ZipPackage.Flush();
 		}
 	}
@@ -655,7 +647,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					StreamWriter stream = new(part.GetStream(FileMode.Create, FileAccess.Write));
 
 					_stylesXml.Save(stream);
-					//stream.Close();
 					Packaging.ZipPackage.Flush();
 
 					// create the relationship between the workbook and the new shared strings part
@@ -664,7 +655,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				}
 			}
 
-			return (_stylesXml);
+			return _stylesXml;
 		}
 		set
 		{
@@ -762,6 +753,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	/// Saves the workbook and all its components to the package.
 	/// For internal use only!
 	/// </summary>
+	[SuppressMessage("Major Code Smell", "S3440:Variables should not be checked against the values they're about to be assigned", Justification = "The ContentType setter rewrites the package content-type map, so it is only called when the value changes.")]
 	internal void Save()  // Workbook Save
 	{
 		if (Worksheets.Count == 0)
@@ -827,7 +819,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		}
 
 		part.SaveHandler = SaveSharedStringHandler;
-		//UpdateSharedStringsXml();
 
 		// Data validation
 		ValidateDataValidations();
@@ -872,19 +863,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 
 	private void SaveSharedStringHandler(ZipOutputStream stream, CompressionLevel compressionLevel, string fileName)
 	{
-		//Packaging.ZipPackagePart stringPart;
-		//if (_package.Package.PartExists(SharedStringsUri))
-		//{
-		//    stringPart=_package.Package.GetPart(SharedStringsUri);
-		//}
-		//else
-		//{
-		//    stringPart = _package.Package.CreatePart(SharedStringsUri, @"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml", _package.Compression);
-		//Part.CreateRelationship(UriHelper.GetRelativeUri(WorkbookUri, SharedStringsUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/sharedStrings");
-		//}
-
-		//StreamWriter sw = new StreamWriter(stringPart.GetStream(FileMode.Create, FileAccess.Write));
-		//Init Zip
 		stream.CompressionLevel = (Packaging.DotNetZip.Zlib.CompressionLevel)compressionLevel;
 		stream.PutNextEntry(fileName);
 
@@ -926,9 +904,8 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		cache.Append("</sst>");
 		sw.Write(cache.ToString());
 		sw.Flush();
-		// Issue 15252: Save SharedStrings only once
-		//Part.CreateRelationship(UriHelper.GetRelativeUri(WorkbookUri, SharedStringsUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/sharedStrings");
 	}
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void UpdateDefinedNamesXml()
 	{
 		try
@@ -1012,7 +989,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		{
 			if (string.IsNullOrEmpty(name.NameFormula))
 			{
-				if ((TypeCompat.IsPrimitive(name.NameValue) || name.NameValue is double || name.NameValue is decimal))
+				if (TypeCompat.IsPrimitive(name.NameValue) || name.NameValue is double || name.NameValue is decimal)
 				{
 					elem.InnerText = Convert.ToDouble(name.NameValue, CultureInfo.InvariantCulture).ToString("R15", CultureInfo.InvariantCulture);
 				}
@@ -1103,7 +1080,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		pivotCaches.AppendChild(item);
 	}
 	internal List<string> _externalReferences = [];
-	//internal bool _isCalculated=false;
 	internal void GetExternalReferences()
 	{
 		var nl = WorkbookXml.SelectNodes("//d:externalReferences/d:externalReference", NameSpaceManager);

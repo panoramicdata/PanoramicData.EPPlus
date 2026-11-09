@@ -39,11 +39,10 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 	public static ISourceCodeTokenizer Default => new SourceCodeTokenizer(FunctionNameProvider.Empty, NameValueProvider.Empty, false);
 	public static ISourceCodeTokenizer R1C1 => new SourceCodeTokenizer(FunctionNameProvider.Empty, NameValueProvider.Empty, true);
 
-
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public SourceCodeTokenizer(IFunctionNameProvider functionRepository, INameValueProvider nameValueProvider, bool r1c1 = false)
 		: this(new TokenFactory(functionRepository, nameValueProvider, r1c1), new TokenSeparatorProvider())
 	{
-
 	}
 	public SourceCodeTokenizer(ITokenFactory tokenFactory, ITokenSeparatorProvider tokenProvider)
 	{
@@ -83,110 +82,126 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 		return context.Result;
 	}
 
-
-
-
 	private static void CleanupTokens(TokenizerContext context, IDictionary<string, Token> tokens)
 	{
-		for (var i = 0; i < context.Result.Count; i++)
+		var i = 0;
+		while (i < context.Result.Count)
 		{
-			var token = context.Result[i];
-			if (token.TokenType == TokenType.Unrecognized)
+			// A token that was removed or replaced leaves a new token at the same index, which is examined again.
+			if (!CleanupToken(context, i, tokens))
 			{
-				if (i < context.Result.Count - 1)
-				{
-					if (context.Result[i + 1].TokenType == TokenType.OpeningParenthesis)
-					{
-						token.TokenType = TokenType.Function;
-					}
-					else
-					{
-						token.TokenType = TokenType.NameValue;
-					}
-				}
-				else
-				{
-					token.TokenType = TokenType.NameValue;
-				}
-			}
-			else if (token.TokenType == TokenType.WorksheetName)
-			{
-				// use this and the following three tokens
-				token.TokenType = context.Result[i + 3].TokenType;
-				var sb = new StringBuilder();
-				var nToRemove = 3;
-				if (context.Result.Count < i + nToRemove)
-				{
-					token.TokenType = TokenType.InvalidReference;
-					nToRemove = context.Result.Count - i - 1;
-				}
-				else if (context.Result[i + 3].TokenType is not TokenType.ExcelAddress and
-						not TokenType.ExcelAddressR1C1)
-				{
-					token.TokenType = TokenType.InvalidReference;
-					nToRemove--;
-				}
-				else
-				{
-					for (var ix = 0; ix < 4; ix++)
-					{
-						sb.Append(context.Result[i + ix].Value);
-					}
-				}
-
-				token.Value = sb.ToString();
-				for (var ix = 0; ix < nToRemove; ix++)
-				{
-					context.Result.RemoveAt(i + 1);
-				}
-			}
-			// Clean up leading '+' along with the following operator combinations: ++, --, +-, -+
-			else if ((token.TokenType == TokenType.Operator || token.TokenType == TokenType.Negator) && i < context.Result.Count - 1 &&
-					 (token.Value == "+" || token.Value == "-"))
-			{
-				//Remove '+' from start of formula and formula arguments
-				if (token.Value == "+" && (i == 0 || context.Result[i - 1].TokenType == TokenType.OpeningParenthesis || context.Result[i - 1].TokenType == TokenType.Comma))
-				{
-					context.Result.RemoveAt(i);
-					SetNegatorOperator(context, i, tokens);
-					i--;
-					continue;
-				}
-
-				var nextToken = context.Result[i + 1];
-				if (nextToken.TokenType is TokenType.Operator or TokenType.Negator)
-				{
-					// Remove leading '+' from operator combinations
-					if (token.Value == "+" && (nextToken.Value == "+" || nextToken.Value == "-"))
-					{
-						context.Result.RemoveAt(i);
-						SetNegatorOperator(context, i, tokens);
-						i--;
-					}
-					// Remove trailing '+' from a negator operation
-					else if (token.Value == "-" && nextToken.Value == "+")
-					{
-						context.Result.RemoveAt(i + 1);
-						SetNegatorOperator(context, i, tokens);
-						i--;
-					}
-					// Convert double negator operation to positive declaration
-					else if (token.Value == "-" && nextToken.Value == "-")
-					{
-						context.Result.RemoveAt(i);
-						context.Result[i] = tokens["+"];
-						i--;
-					}
-				}
+				i++;
 			}
 		}
+	}
+
+	private static bool CleanupToken(TokenizerContext context, int i, IDictionary<string, Token> tokens)
+	{
+		var token = context.Result[i];
+		if (token.TokenType == TokenType.Unrecognized)
+		{
+			token.TokenType = i < context.Result.Count - 1 && context.Result[i + 1].TokenType == TokenType.OpeningParenthesis
+				? TokenType.Function
+				: TokenType.NameValue;
+			return false;
+		}
+
+		if (token.TokenType == TokenType.WorksheetName)
+		{
+			MergeWorksheetNameTokens(context, i, token);
+			return false;
+		}
+
+		return IsSignOperator(context, i, token) && CleanupSignOperator(context, i, token, tokens);
+	}
+
+	private static void MergeWorksheetNameTokens(TokenizerContext context, int i, Token token)
+	{
+		// use this and the following three tokens
+		token.TokenType = context.Result[i + 3].TokenType;
+		var sb = new StringBuilder();
+		var nToRemove = 3;
+		if (context.Result.Count < i + nToRemove)
+		{
+			token.TokenType = TokenType.InvalidReference;
+			nToRemove = context.Result.Count - i - 1;
+		}
+		else if (context.Result[i + 3].TokenType is not TokenType.ExcelAddress and
+				not TokenType.ExcelAddressR1C1)
+		{
+			token.TokenType = TokenType.InvalidReference;
+			nToRemove--;
+		}
+		else
+		{
+			for (var ix = 0; ix < 4; ix++)
+			{
+				sb.Append(context.Result[i + ix].Value);
+			}
+		}
+
+		token.Value = sb.ToString();
+		for (var ix = 0; ix < nToRemove; ix++)
+		{
+			context.Result.RemoveAt(i + 1);
+		}
+	}
+
+	private static bool IsSignOperator(TokenizerContext context, int i, Token token) =>
+		(token.TokenType == TokenType.Operator || token.TokenType == TokenType.Negator)
+		&& i < context.Result.Count - 1
+		&& (token.Value == "+" || token.Value == "-");
+
+	// Cleans up a leading plus sign and doubled plus or minus operator pairs; returns true when the token at i changed.
+	private static bool CleanupSignOperator(TokenizerContext context, int i, Token token, IDictionary<string, Token> tokens)
+	{
+		//Remove '+' from start of formula and formula arguments
+		if (token.Value == "+" && (i == 0 || context.Result[i - 1].TokenType == TokenType.OpeningParenthesis || context.Result[i - 1].TokenType == TokenType.Comma))
+		{
+			context.Result.RemoveAt(i);
+			SetNegatorOperator(context, i, tokens);
+			return true;
+		}
+
+		var nextToken = context.Result[i + 1];
+		return nextToken.TokenType is TokenType.Operator or TokenType.Negator
+			&& CombineSignOperators(context, i, token, nextToken, tokens);
+	}
+
+	private static bool CombineSignOperators(TokenizerContext context, int i, Token token, Token nextToken, IDictionary<string, Token> tokens)
+	{
+		// Remove leading '+' from operator combinations
+		if (token.Value == "+" && (nextToken.Value == "+" || nextToken.Value == "-"))
+		{
+			context.Result.RemoveAt(i);
+			SetNegatorOperator(context, i, tokens);
+			return true;
+		}
+
+		// Remove trailing '+' from a negator operation
+		if (token.Value == "-" && nextToken.Value == "+")
+		{
+			context.Result.RemoveAt(i + 1);
+			SetNegatorOperator(context, i, tokens);
+			return true;
+		}
+
+		// Convert double negator operation to positive declaration
+		if (token.Value == "-" && nextToken.Value == "-")
+		{
+			context.Result.RemoveAt(i);
+			context.Result[i] = tokens["+"];
+			return true;
+		}
+
+		return false;
 	}
 
 	private static void SetNegatorOperator(TokenizerContext context, int i, IDictionary<string, Token> tokens)
 	{
 		if (context.Result[i].Value == "-" && i > 0 && (context.Result[i].TokenType == TokenType.Operator || context.Result[i].TokenType == TokenType.Negator))
 		{
-			if (TokenIsNegator(context.Result[i - 1]))
+			if (TokenizerHelper.PrecedesNegator(context.Result[i - 1]))
 			{
 				context.Result[i] = new Token("-", TokenType.Negator);
 			}
@@ -197,29 +212,5 @@ public class SourceCodeTokenizer : ISourceCodeTokenizer
 		}
 	}
 
-	private static bool TokenIsNegator(TokenizerContext context) => TokenIsNegator(context.LastToken);
-	private static bool TokenIsNegator(Token t) => t == null
-					||
-					t.TokenType == TokenType.Operator
-					||
-					t.TokenType == TokenType.OpeningParenthesis
-					||
-					t.TokenType == TokenType.Comma
-					||
-					t.TokenType == TokenType.SemiColon
-					||
-					t.TokenType == TokenType.OpeningEnumerable;
-
-	private Token CreateToken(TokenizerContext context, string worksheet)
-	{
-		if (context.CurrentToken == "-")
-		{
-			if (context.LastToken == null && context.LastToken.TokenType == TokenType.Operator)
-			{
-				return new Token("-", TokenType.Negator);
-			}
-		}
-
-		return _tokenFactory.Create(context.Result, context.CurrentToken, worksheet);
-	}
+	private Token CreateToken(TokenizerContext context, string worksheet) => TokenizerHelper.CreateCurrentToken(_tokenFactory, context, worksheet);
 }

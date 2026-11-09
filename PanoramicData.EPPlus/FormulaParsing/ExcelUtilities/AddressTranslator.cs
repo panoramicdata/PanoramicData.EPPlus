@@ -60,6 +60,7 @@ public class AddressTranslator
 	/// <param name="address"></param>
 	/// <param name="col"></param>
 	/// <param name="row"></param>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3874:out and ref parameters should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public virtual void ToColAndRow(string address, out int col, out int row) => ToColAndRow(address, out col, out row, RangeCalculationBehaviour.FirstPart);
 
 	/// <summary>
@@ -69,6 +70,7 @@ public class AddressTranslator
 	/// <param name="col"></param>
 	/// <param name="row"></param>
 	/// <param name="behaviour"></param>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3874:out and ref parameters should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public virtual void ToColAndRow(string address, out int col, out int row, RangeCalculationBehaviour behaviour)
 	{
 		address = Utils.ConvertUtil._invariantTextInfo.ToUpper(address);
@@ -85,10 +87,7 @@ public class AddressTranslator
 				col += currentNumericValue;
 			}
 		}
-		//col--;
-		//row = GetIntPart(address) - 1 ?? GetRowIndexByBehaviour(behaviour);
 		row = GetIntPart(address) ?? GetRowIndexByBehaviour(behaviour);
-
 	}
 
 	private int GetRowIndexByBehaviour(RangeCalculationBehaviour behaviour) => behaviour == RangeCalculationBehaviour.FirstPart ? 1 : _excelDataProvider.ExcelMaxRows;

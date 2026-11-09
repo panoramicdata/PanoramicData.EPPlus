@@ -65,8 +65,8 @@ public class ExcelConditionalFormattingDataBar
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 		: base(
 		  type,
 		  address,
@@ -81,111 +81,67 @@ public class ExcelConditionalFormattingDataBar
 		s[^1] = "color";
 		SchemaNodeOrder = s;
 
-		//Create the <dataBar> node inside the <cfRule> node
 		if (itemElementNode != null && itemElementNode.HasChildNodes)
 		{
-			var high = false;
-			foreach (XmlNode node in itemElementNode.SelectNodes("d:dataBar/d:cfvo", NameSpaceManager))
-			{
-				if (high == false)
-				{
-					LowValue = new ExcelConditionalFormattingIconDataBarValue(
-							type,
-							address,
-							worksheet,
-							node,
-							namespaceManager);
-					high = true;
-				}
-				else
-				{
-					HighValue = new ExcelConditionalFormattingIconDataBarValue(
-							type,
-							address,
-							worksheet,
-							node,
-							namespaceManager);
-				}
-			}
+			LoadValues(type, address, worksheet, itemElementNode, namespaceManager);
 		}
 		else
 		{
-			var iconSetNode = CreateComplexNode(
+			var dataBarNode = CreateComplexNode(
 			  Node,
 			  ExcelConditionalFormattingConstants.Paths.DataBar);
 
-			var lowNode = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(lowNode);
-			LowValue = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Min,
-					0,
-					"",
-					eExcelConditionalFormattingRuleType.DataBar,
-					address,
-					priority,
-					worksheet,
-					lowNode,
-					namespaceManager);
-
-			var highNode = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(highNode);
-			HighValue = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Max,
-					0,
-					"",
-					eExcelConditionalFormattingRuleType.DataBar,
-					address,
-					priority,
-					worksheet,
-					highNode,
-					namespaceManager);
+			LowValue = AppendValue(dataBarNode, eExcelConditionalFormattingValueObjectType.Min, address, priority, worksheet, namespaceManager);
+			HighValue = AppendValue(dataBarNode, eExcelConditionalFormattingValueObjectType.Max, address, priority, worksheet, namespaceManager);
 		}
 
 		Type = type;
 	}
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="type"></param>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingDataBar(
+	// The first cfvo is the low value; any later one overwrites the high value.
+	private void LoadValues(
 	  eExcelConditionalFormattingRuleType type,
+	  ExcelAddress address,
+	  ExcelWorksheet worksheet,
+	  XmlNode itemElementNode,
+	  XmlNamespaceManager namespaceManager)
+	{
+		var high = false;
+		foreach (XmlNode node in itemElementNode.SelectNodes("d:dataBar/d:cfvo", NameSpaceManager))
+		{
+			var value = new ExcelConditionalFormattingIconDataBarValue(type, address, worksheet, node, namespaceManager);
+			if (high)
+			{
+				HighValue = value;
+			}
+			else
+			{
+				LowValue = value;
+				high = true;
+			}
+		}
+	}
+
+	private static ExcelConditionalFormattingIconDataBarValue AppendValue(
+	  XmlNode dataBarNode,
+	  eExcelConditionalFormattingValueObjectType valueType,
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-		: this(
-		  type,
-		  address,
-		  priority,
-		  worksheet,
-		  itemElementNode,
-		  null)
+	  XmlNamespaceManager namespaceManager)
 	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="type"></param>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingDataBar(
-	  eExcelConditionalFormattingRuleType type,
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-		: this(
-		  type,
-		  address,
-		  priority,
-		  worksheet,
-		  null,
-		  null)
-	{
+		var node = dataBarNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
+		dataBarNode.AppendChild(node);
+		return new ExcelConditionalFormattingIconDataBarValue(
+			valueType,
+			0,
+			"",
+			eExcelConditionalFormattingRuleType.DataBar,
+			address,
+			priority,
+			worksheet,
+			node,
+			namespaceManager);
 	}
 	#endregion Constructors
 	private const string _showValuePath = "d:dataBar/@showValue";

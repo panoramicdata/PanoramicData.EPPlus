@@ -49,86 +49,70 @@ public class AverageA : HiddenValuesHandlingFunction
 			return;
 		}
 
-		if (arg.Value is IEnumerable<FunctionArgument>)
+		if (arg.Value is IEnumerable<FunctionArgument> items)
 		{
-			foreach (var item in (IEnumerable<FunctionArgument>)arg.Value)
+			foreach (var item in items)
 			{
 				Calculate(item, context, ref retVal, ref nValues, true);
 			}
 		}
 		else if (arg.IsExcelRange)
 		{
-			foreach (var c in arg.ValueAsRangeInfo)
-			{
-				if (ShouldIgnore(c, context))
-				{
-					continue;
-				}
-
-				CheckForAndHandleExcelError(c);
-				if (IsNumeric(c.Value) && !(c.Value is bool))
-				{
-					nValues++;
-					retVal += c.ValueDouble;
-				}
-				else if (c.Value is bool)
-				{
-					nValues++;
-					retVal += (bool)c.Value ? 1 : 0;
-				}
-				else if (c.Value is string)
-				{
-					nValues++;
-				}
-			}
+			AddRangeValues(arg.ValueAsRangeInfo, context, ref retVal, ref nValues);
 		}
 		else
 		{
-			var numericValue = GetNumericValue(arg.Value, isInArray);
-			if (numericValue.HasValue)
-			{
-				nValues++;
-				retVal += numericValue.Value;
-			}
-			else if ((arg.Value is string))
-			{
-				if (isInArray)
-				{
-					nValues++;
-				}
-				else
-				{
-					ThrowExcelErrorValueException(eErrorType.Value);
-				}
-			}
+			AddSingleValue(arg.Value, isInArray, ref retVal, ref nValues);
 		}
 
 		CheckForAndHandleExcelError(arg);
 	}
 
-	private static double? GetNumericValue(object obj, bool isInArray)
+	private void AddRangeValues(ExcelDataProvider.IRangeInfo range, ParsingContext context, ref double retVal, ref double nValues)
 	{
-		if (IsNumeric(obj) && !(obj is bool))
+		foreach (var c in range)
 		{
-			return ConvertUtil.GetValueDouble(obj);
-		}
+			if (ShouldIgnore(c, context))
+			{
+				continue;
+			}
 
-		if (!isInArray)
+			CheckForAndHandleExcelError(c);
+			if (IsNumeric(c.Value) && c.Value is not bool)
+			{
+				nValues++;
+				retVal += c.ValueDouble;
+			}
+			else if (c.Value is bool boolValue)
+			{
+				nValues++;
+				retVal += boolValue ? 1 : 0;
+			}
+			else if (c.Value is string)
+			{
+				nValues++;
+			}
+		}
+	}
+
+	private static void AddSingleValue(object value, bool isInArray, ref double retVal, ref double nValues)
+	{
+		var numericValue = GetAverageNumericValue(value, isInArray);
+		if (numericValue.HasValue)
 		{
-			if (obj is bool)
+			nValues++;
+			retVal += numericValue.Value;
+		}
+		else if (value is string)
+		{
+			if (isInArray)
 			{
-				return isInArray ? default(double?) : ConvertUtil.GetValueDouble(obj);
+				nValues++;
 			}
-			else if (ConvertUtil.TryParseNumericString(obj, out var number))
+			else
 			{
-				return number;
-			}
-			else if (ConvertUtil.TryParseDateString(obj, out var date))
-			{
-				return date.ToOADate();
+				ThrowExcelErrorValueException(eErrorType.Value);
 			}
 		}
-
-		return default;
 	}
 }

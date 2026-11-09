@@ -22,12 +22,14 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
 public abstract class TimeBaseFunction : ExcelFunction
 {
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public TimeBaseFunction()
 	{
 		TimeStringParser = new TimeStringParser();
@@ -57,6 +59,7 @@ public abstract class TimeBaseFunction : ExcelFunction
 
 	protected static double GetSeconds(double serialNumber) => serialNumber * SecondsInADay;
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Bug", "S2184:Results of integer division should not be assigned to floating point variables", Justification = "Whole hours are intended; integer division is the published behaviour.")]
 	protected double GetHour(double serialNumber)
 	{
 		var seconds = GetSeconds(serialNumber);

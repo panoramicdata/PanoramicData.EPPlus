@@ -14,6 +14,7 @@ public class SumIfTests
 	private EpplusExcelDataProvider _provider;
 	private ParsingContext _parsingContext;
 	private ExcelWorksheet _worksheet;
+	private CriteriaRangeHelper _criteria;
 
 	[TestInitialize]
 	public void Initialize()
@@ -23,278 +24,59 @@ public class SumIfTests
 		_parsingContext = ParsingContext.Create();
 		_parsingContext.Scopes.NewScope(RangeAddress.Empty);
 		_worksheet = _package.Workbook.Worksheets.Add("testsheet");
+		_criteria = new CriteriaRangeHelper(_provider, _worksheet, _parsingContext);
 	}
 
 	[TestCleanup]
 	public void Cleanup() => _package.Dispose();
 
 	[TestMethod]
-	public void SumIfNumeric()
-	{
-		_worksheet.Cells["A1"].Value = 1d;
-		_worksheet.Cells["A2"].Value = 2d;
-		_worksheet.Cells["A3"].Value = 3d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">1", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(8d, result.Result);
-	}
+	public void SumIfNumeric() => Assert.AreEqual(8d, _criteria.ExecuteWithSumRange(new SumIf(), 1d, 2d, 3d, ">1"));
 
 	[TestMethod]
-	public void SumIfNonNumeric()
-	{
-		_worksheet.Cells["A1"].Value = "Monday";
-		_worksheet.Cells["A2"].Value = "Tuesday";
-		_worksheet.Cells["A3"].Value = "Thursday";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "T*day", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(8d, result.Result);
-	}
+	public void SumIfNonNumeric() => Assert.AreEqual(8d, _criteria.ExecuteWithSumRange(new SumIf(), "Monday", "Tuesday", "Thursday", "T*day"));
 
 	[TestMethod]
-	public void SumIfNumericExpression()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = 1d;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		var func = new SumIf();
-		var range = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var args = FunctionsHelper.CreateArgs(range, 1d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void SumIfNumericExpression() => Assert.AreEqual(1d, _criteria.Execute(new SumIf(), null, 1d, "Not Empty", 1d));
 
 	[TestMethod]
-	public void SumIfEqualToEmptyString()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void SumIfEqualToEmptyString() => Assert.AreEqual(1d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, "Not Empty", ""));
 
 	[TestMethod]
-	public void SumIfNotEqualToNull()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<>", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(8d, result.Result);
-	}
+	public void SumIfNotEqualToNull() => Assert.AreEqual(8d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, "Not Empty", "<>"));
 
 	[TestMethod]
-	public void SumIfEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 0d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfEqualToZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, 0d, "0"));
 
 	[TestMethod]
-	public void SumIfNotEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 0d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<>0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(4d, result.Result);
-	}
+	public void SumIfNotEqualToZero() => Assert.AreEqual(4d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, 0d, "<>0"));
 
 	[TestMethod]
-	public void SumIfGreaterThanZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfGreaterThanZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, 1d, ">0"));
 
 	[TestMethod]
-	public void SumIfGreaterThanOrEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = 1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">=0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfGreaterThanOrEqualToZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, 1d, ">=0"));
 
 	[TestMethod]
-	public void SumIfLessThanZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = -1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfLessThanZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, -1d, "<0"));
 
 	[TestMethod]
-	public void SumIfLessThanOrEqualToZero()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = -1d;
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<=0", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfLessThanOrEqualToZero() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, -1d, "<=0"));
 
 	[TestMethod]
-	public void SumIfLessThanCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void SumIfLessThanCharacter() => Assert.AreEqual(3d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, "Not Empty", "<a"));
 
 	[TestMethod]
-	public void SumIfLessThanOrEqualToCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, "<=a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void SumIfLessThanOrEqualToCharacter() => Assert.AreEqual(3d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, "Not Empty", "<=a"));
 
 	[TestMethod]
-	public void SumIfGreaterThanCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfGreaterThanCharacter() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, "Not Empty", ">a"));
 
 	[TestMethod]
-	public void SumIfGreaterThanOrEqualToCharacter()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">=a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfGreaterThanOrEqualToCharacter() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, "Not Empty", ">=a"));
 
 	[TestMethod]
-	public void SumIfHandleDates()
-	{
-		_worksheet.Cells["A1"].Value = null;
-		_worksheet.Cells["A2"].Value = string.Empty;
-		_worksheet.Cells["A3"].Value = "Not Empty";
-		_worksheet.Cells["B1"].Value = 1d;
-		_worksheet.Cells["B2"].Value = 3d;
-		_worksheet.Cells["B3"].Value = 5d;
-		var func = new SumIf();
-		var range1 = _provider.GetRange(_worksheet.Name, 1, 1, 3, 1);
-		var range2 = _provider.GetRange(_worksheet.Name, 1, 2, 3, 2);
-		var args = FunctionsHelper.CreateArgs(range1, ">=a", range2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumIfHandleDates() => Assert.AreEqual(5d, _criteria.ExecuteWithSumRange(new SumIf(), null, string.Empty, "Not Empty", ">=a"));
 
 	[TestMethod]
 	public void SumIfShouldHandleBooleanArg()

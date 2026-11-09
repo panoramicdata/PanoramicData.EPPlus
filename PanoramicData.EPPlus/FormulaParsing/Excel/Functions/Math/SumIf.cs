@@ -68,58 +68,19 @@ public class SumIf : HiddenValuesHandlingFunction
 		else if (arguments.Count() > 2)
 		{
 			var sumRange = arguments.ElementAt(2).Value as ExcelDataProvider.IRangeInfo;
-			retVal = CalculateWithSumRange(args, criteria, sumRange, context);
+			retVal = CalculateWithSumRange(args, criteria, sumRange);
 		}
 		else
 		{
-			retVal = CalculateSingleRange(args, criteria, context);
+			retVal = CalculateSingleRange(args, criteria);
 		}
 
 		return CreateResult(retVal, DataType.Decimal);
 	}
 
-	private double CalculateWithSumRange(ExcelDataProvider.IRangeInfo range, string criteria, ExcelDataProvider.IRangeInfo sumRange, ParsingContext context)
-	{
-		var retVal = 0d;
-		foreach (var cell in range)
-		{
-			if (criteria != null && _evaluator.Evaluate(cell.Value, criteria))
-			{
-				var or = cell.Row - range.Address._fromRow;
-				var oc = cell.Column - range.Address._fromCol;
-				if (sumRange.Address._fromRow + or <= sumRange.Address._toRow &&
-				   sumRange.Address._fromCol + oc <= sumRange.Address._toCol)
-				{
-					var v = sumRange.GetOffset(or, oc);
-					if (v is ExcelErrorValue)
-					{
-						throw (new ExcelErrorValueException((ExcelErrorValue)v));
-					}
+	private double CalculateWithSumRange(ExcelDataProvider.IRangeInfo range, string criteria, ExcelDataProvider.IRangeInfo sumRange) =>
+		CriteriaRangeSum.SumMatchingOffsets(range, sumRange, value => criteria != null && _evaluator.Evaluate(value, criteria), out _);
 
-					retVal += ConvertUtil.GetValueDouble(v, true);
-				}
-			}
-		}
-
-		return retVal;
-	}
-
-	private double CalculateSingleRange(ExcelDataProvider.IRangeInfo range, string expression, ParsingContext context)
-	{
-		var retVal = 0d;
-		foreach (var candidate in range)
-		{
-			if (expression != null && IsNumeric(candidate.Value) && _evaluator.Evaluate(candidate.Value, expression) && IsNumeric(candidate.Value))
-			{
-				if (candidate.IsExcelError)
-				{
-					throw (new ExcelErrorValueException((ExcelErrorValue)candidate.Value));
-				}
-
-				retVal += candidate.ValueDouble;
-			}
-		}
-
-		return retVal;
-	}
+	private double CalculateSingleRange(ExcelDataProvider.IRangeInfo range, string expression) =>
+		CriteriaRangeSum.SumMatchingCells(range, value => expression != null && IsNumeric(value) && _evaluator.Evaluate(value, expression), out _);
 }

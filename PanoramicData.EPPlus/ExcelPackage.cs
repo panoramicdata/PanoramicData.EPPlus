@@ -39,6 +39,7 @@ using OfficeOpenXml.Utils;
 using OfficeOpenXml.Utils.CompundDocument;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -171,8 +172,8 @@ public enum CompressionLevel
 public sealed class ExcelPackage : IDisposable
 {
 	internal const bool preserveWhitespace = false;
-	Stream _stream = null;
-	private bool _isExternalStream = false;
+	Stream _stream;
+	private bool _isExternalStream;
 	internal class ImageInfo
 	{
 		internal string Hash { get; set; }
@@ -242,10 +243,12 @@ public sealed class ExcelPackage : IDisposable
 	/// <summary>
 	/// Maximum number of columns in a worksheet (16384). 
 	/// </summary>
+	[SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Public API: changing the constant to a property would break callers that use it in constant expressions.")]
 	public const int MaxColumns = 16384;
 	/// <summary>
 	/// Maximum number of rows in a worksheet (1048576). 
 	/// </summary>
+	[SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Public API: changing the constant to a property would break callers that use it in constant expressions.")]
 	public const int MaxRows = 1048576;
 	#endregion
 	#region ExcelPackage Constructors
@@ -356,6 +359,7 @@ public sealed class ExcelPackage : IDisposable
 	/// </summary>
 	/// <param name="newStream">The stream object can be empty or contain a package. The stream must be Read/Write</param>
 	/// <param name="Password">The password to decrypt the document</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelPackage(Stream newStream, string Password)
 	{
 		if (!(newStream.CanRead && newStream.CanWrite))
@@ -381,11 +385,12 @@ public sealed class ExcelPackage : IDisposable
 	/// </summary>
 	/// <param name="newStream">The output stream. Must be an empty read/write stream.</param>
 	/// <param name="templateStream">This stream is copied to the output stream at load</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelPackage(Stream newStream, Stream templateStream)
 	{
 		if (newStream.Length > 0)
 		{
-			throw (new Exception("The output stream must be empty. Length > 0"));
+			throw new Exception("The output stream must be empty. Length > 0");
 		}
 		else if (!(newStream.CanRead && newStream.CanWrite))
 		{
@@ -401,11 +406,12 @@ public sealed class ExcelPackage : IDisposable
 	/// <param name="newStream">The output stream. Must be an empty read/write stream.</param>
 	/// <param name="templateStream">This stream is copied to the output stream at load</param>
 	/// <param name="Password">Password to decrypted the template</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelPackage(Stream newStream, Stream templateStream, string Password)
 	{
 		if (newStream.Length > 0)
 		{
-			throw (new Exception("The output stream must be empty. Length > 0"));
+			throw new Exception("The output stream must be empty. Length > 0");
 		}
 		else if (!(newStream.CanRead && newStream.CanWrite))
 		{
@@ -442,7 +448,7 @@ public sealed class ExcelPackage : IDisposable
 				var stream = imagePart.GetStream(FileMode.Create, FileAccess.Write);
 				stream.Write(image, 0, image.GetLength(0));
 
-				_images.Add(hash, new ImageInfo() { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
+				_images.Add(hash, new ImageInfo { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
 			}
 		}
 
@@ -457,7 +463,7 @@ public sealed class ExcelPackage : IDisposable
 		}
 		else
 		{
-			_images.Add(hash, new ImageInfo() { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
+			_images.Add(hash, new ImageInfo { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
 		}
 
 		return _images[hash];
@@ -483,7 +489,7 @@ public sealed class ExcelPackage : IDisposable
 
 		return _images.TryGetValue(hash, out var value) ? value : null;
 	}
-	internal static int _id = 1;
+	private static int _id = 1;
 	private static Uri GetNewUri(Packaging.ZipPackage package, string sUri)
 	{
 		Uri uri;
@@ -522,6 +528,7 @@ public sealed class ExcelPackage : IDisposable
 	/// <param name="template">An existing xlsx file to use as a template</param>
 	/// <param name="password">The password to decrypt the package.</param>
 	/// <returns></returns>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void CreateFromTemplate(FileInfo template, string password)
 	{
 		template?.Refresh();
@@ -531,39 +538,19 @@ public sealed class ExcelPackage : IDisposable
 			var ms = new MemoryStream();
 			if (password != null)
 			{
-				Encryption.IsEncrypted = true;
-				Encryption.Password = password;
-				var encrHandler = new EncryptedPackageHandler();
-				ms = encrHandler.DecryptPackage(template, Encryption);
-				encrHandler = null;
+				ms = DecryptPackage(template, password);
 			}
 			else
 			{
 				WriteFileToStream(template.FullName, ms);
 			}
 
-			try
-			{
-				//_package = Package.Open(_stream, FileMode.Open, FileAccess.ReadWrite);
-				_package = new Packaging.ZipPackage(ms);
-			}
-			catch (Exception ex)
-			{
-				if (password == null && CompoundDocument.IsCompoundDocument(ms))
-				{
-					throw new Exception("Can not open the package. Package is an OLE compound document. If this is an encrypted package, please supply the password", ex);
-				}
-				else
-				{
-					throw;
-				}
-			}
+			OpenPackage(ms, password, () => CompoundDocument.IsCompoundDocument(ms));
 		}
 		else
 		{
 			throw new Exception("Passed invalid TemplatePath to Excel Template");
 		}
-		//return newFile;
 	}
 	private void ConstructNewFile(string password)
 	{
@@ -574,39 +561,46 @@ public sealed class ExcelPackage : IDisposable
 		{
 			if (password != null)
 			{
-				var encrHandler = new EncryptedPackageHandler();
-				Encryption.IsEncrypted = true;
-				Encryption.Password = password;
-				ms = encrHandler.DecryptPackage(File, Encryption);
-				encrHandler = null;
+				ms = DecryptPackage(File, password);
 			}
 			else
 			{
 				WriteFileToStream(File.FullName, ms);
 			}
 
-			try
-			{
-				//_package = Package.Open(_stream, FileMode.Open, FileAccess.ReadWrite);
-				_package = new Packaging.ZipPackage(ms);
-			}
-			catch (Exception ex)
-			{
-				if (password == null && CompoundDocument.IsCompoundDocument(File))
-				{
-					throw new Exception("Can not open the package. Package is an OLE compound document. If this is an encrypted package, please supply the password", ex);
-				}
-				else
-				{
-					throw;
-				}
-			}
+			OpenPackage(ms, password, () => CompoundDocument.IsCompoundDocument(File));
 		}
 		else
 		{
-			//_package = Package.Open(_stream, FileMode.Create, FileAccess.ReadWrite);
 			_package = new Packaging.ZipPackage(ms);
 			CreateBlankWb();
+		}
+	}
+
+	private MemoryStream DecryptPackage(FileInfo file, string password)
+	{
+		Encryption.IsEncrypted = true;
+		Encryption.Password = password;
+		return new EncryptedPackageHandler().DecryptPackage(file, Encryption);
+	}
+
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
+	private void OpenPackage(Stream ms, string password, Func<bool> isCompoundDocument)
+	{
+		try
+		{
+			_package = new Packaging.ZipPackage(ms);
+		}
+		catch (Exception ex)
+		{
+			if (password == null && isCompoundDocument())
+			{
+				throw new Exception("Can not open the package. Package is an OLE compound document. If this is an encrypted package, please supply the password", ex);
+			}
+			else
+			{
+				throw;
+			}
 		}
 	}
 	/// <summary>
@@ -626,8 +620,7 @@ public sealed class ExcelPackage : IDisposable
 	}
 	private void CreateBlankWb()
 	{
-		var workbook = Workbook.WorkbookXml; // this will create the workbook xml in the package
-											 // create the relationship to the main part
+		_ = Workbook.WorkbookXml; // this will create the workbook xml in the package
 		_package.CreateRelationship(UriHelper.GetRelativeUri(new Uri("/xl", UriKind.Relative), Workbook.WorkbookUri), Packaging.TargetMode.Internal, schemaRelationships + "/officeDocument");
 	}
 
@@ -635,7 +628,7 @@ public sealed class ExcelPackage : IDisposable
 	/// Returns a reference to the package
 	/// </summary>
 	public Packaging.ZipPackage Package => (_package);
-	ExcelEncryption _encryption = null;
+	ExcelEncryption _encryption;
 	/// <summary>
 	/// Information how and if the package is encrypted
 	/// </summary>
@@ -667,7 +660,7 @@ public sealed class ExcelPackage : IDisposable
 
 			}
 
-			return (_workbook);
+			return _workbook;
 		}
 	}
 	/// <summary>
@@ -772,6 +765,7 @@ public sealed class ExcelPackage : IDisposable
 	/// <summary>
 	/// Closes the package.
 	/// </summary>
+	[SuppressMessage("Critical Code Smell", "S1215:GC.Collect should not be called", Justification = "Upstream EPPlus releases large package buffers eagerly on dispose; removing it changes memory behaviour for callers.")]
 	public void Dispose()
 	{
 		if (_package != null)
@@ -802,6 +796,7 @@ public sealed class ExcelPackage : IDisposable
 	/// This method recursively calls the Save method on all sub-components.
 	/// We close the package after the save is done.
 	/// </summary>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public void Save()
 	{
 		try
@@ -844,7 +839,7 @@ public sealed class ExcelPackage : IDisposable
 					}
 					catch (Exception ex)
 					{
-						throw (new Exception(string.Format("Error overwriting file {0}", File.FullName), ex));
+						throw new Exception(string.Format("Error overwriting file {0}", File.FullName), ex);
 					}
 				}
 
@@ -884,7 +879,7 @@ public sealed class ExcelPackage : IDisposable
 			}
 			else
 			{
-				throw (new InvalidOperationException(string.Format("Error saving file {0}", File.FullName), ex));
+				throw new InvalidOperationException(string.Format("Error saving file {0}", File.FullName), ex);
 			}
 		}
 	}
@@ -950,7 +945,7 @@ public sealed class ExcelPackage : IDisposable
 		Encryption.Password = password;
 		SaveAs(OutputStream);
 	}
-	FileInfo _file = null;
+	FileInfo _file;
 
 	/// <summary>
 	/// The output file. Null if no file is used
@@ -1000,7 +995,7 @@ public sealed class ExcelPackage : IDisposable
 			Package.Compression = value;
 		}
 	}
-	CompatibilitySettings _compatibility = null;
+	CompatibilitySettings _compatibility;
 	/// <summary>
 	/// Compatibility settings for older versions of EPPlus.
 	/// </summary>
@@ -1024,7 +1019,7 @@ public sealed class ExcelPackage : IDisposable
 		XmlDocument xml = new();
 		var part = _package.GetPart(uri);
 		XmlHelper.LoadXmlSafe(xml, part.GetStream());
-		return (xml);
+		return xml;
 	}
 	#endregion
 
@@ -1155,44 +1150,29 @@ public sealed class ExcelPackage : IDisposable
 				CopyStream(input, ref ms);
 			}
 
-			try
-			{
-				//this._package = Package.Open(this._stream, FileMode.Open, FileAccess.ReadWrite);
-				_package = new Packaging.ZipPackage(ms);
-			}
-			catch (Exception ex)
-			{
-				EncryptedPackageHandler eph = new();
-				if (Password == null && CompoundDocument.IsCompoundDocument((MemoryStream)_stream))
-				{
-					throw new Exception("Can not open the package. Package is an OLE compound document. If this is an encrypted package, please supply the password", ex);
-				}
-				else
-				{
-					throw;
-				}
-			}
+			OpenPackage(ms, Password, () => CompoundDocument.IsCompoundDocument((MemoryStream)_stream));
 		}
 		//Clear the workbook so that it gets reinitialized next time
 		_workbook = null;
 	}
 	static readonly object _lock = new();
-	internal int _worksheetAdd = 0;
+	internal int _worksheetAdd;
 	/// <summary>
 	/// Copies the input stream to the output stream.
 	/// </summary>
 	/// <param name="inputStream">The input stream.</param>
 	/// <param name="outputStream">The output stream.</param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal static void CopyStream(Stream inputStream, ref Stream outputStream)
 	{
 		if (!inputStream.CanRead)
 		{
-			throw (new Exception("Can not read from inputstream"));
+			throw new Exception("Can not read from inputstream");
 		}
 
 		if (!outputStream.CanWrite)
 		{
-			throw (new Exception("Can not write to outputstream"));
+			throw new Exception("Can not write to outputstream");
 		}
 
 		if (inputStream.CanSeek)

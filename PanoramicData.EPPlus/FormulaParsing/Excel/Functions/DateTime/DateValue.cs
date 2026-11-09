@@ -16,11 +16,5 @@ public class DateValue : ExcelFunction
 		return Execute(dateString);
 	}
 
-	internal CompileResult Execute(string dateString)
-	{
-		System.DateTime.TryParse(dateString, out var result);
-		return result != System.DateTime.MinValue ?
-			CreateResult(result.ToOADate(), DataType.Date) :
-			CreateResult(ExcelErrorValue.Create(eErrorType.Value), DataType.ExcelError);
-	}
+	internal CompileResult Execute(string dateString) => CreateDateResultFromString(dateString, result => result.ToOADate());
 }

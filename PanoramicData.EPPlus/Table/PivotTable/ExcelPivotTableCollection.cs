@@ -44,7 +44,6 @@ public class ExcelPivotTableCollection : IEnumerable<ExcelPivotTable>
 	readonly ExcelWorksheet _ws;
 	internal ExcelPivotTableCollection(ExcelWorksheet ws)
 	{
-		var pck = ws._package.Package;
 		_ws = ws;
 		foreach (var rel in ws.Part.GetRelationships())
 		{

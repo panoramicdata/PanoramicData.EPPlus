@@ -12,54 +12,26 @@ namespace PanoramicData.EPPlus.Test.ConditionalFormatting;
 [TestClass]
 public class ConditionalFormatting
 {
-	private TestContext _testContextInstance;
+	public TestContext TestContext { get; set; }
 	private static ExcelPackage? _excelPackage;
-
-	/// <summary>
-	///Gets or sets the test context which provides
-	///information about and functionality for the current test run.
-	///</summary>
-	public TestContext TestContext
-	{
-		get
-		{
-			return _testContextInstance;
-		}
-		set
-		{
-			_testContextInstance = value;
-		}
-	}
-
 	#region Additional test attributes
 	// You can use the following additional attributes as you write your tests:
 	// Use ClassInitialize to run code before running the first test in the class
-	[ClassInitialize()]
+	[ClassInitialize]
 	public static void MyClassInitialize(TestContext testContext)
 	{
 		if (!Directory.Exists("Test"))
 		{
-			Directory.CreateDirectory(string.Format("Test"));
+			Directory.CreateDirectory("Test");
 		}
 
 		_excelPackage = new ExcelPackage(new FileInfo(Path.Combine("Test", "ConditionalFormatting.xlsx")));
 	}
 
 	// Use ClassCleanup to run code after all tests in a class have run
-	[ClassCleanup()]
+	[ClassCleanup]
 	public static void MyClassCleanup() => _excelPackage = null;
 
-	// //Use TestInitialize to run code before running each test 
-	// [TestInitialize()]
-	// public void MyTestInitialize() 
-	// {
-	// }
-
-	//// Use TestCleanup to run code after each test has run
-	// [TestCleanup()]
-	// public void MyTestCleanup() 
-	// {
-	// }
 	#endregion
 
 	/// <summary>
@@ -90,10 +62,9 @@ public class ConditionalFormatting
 		Assert.IsTrue(ws.ConditionalFormatting.Count == 6);
 		Assert.IsTrue(ws.ConditionalFormatting[0].Type == eExcelConditionalFormattingRuleType.DataBar);
 
-		var cf1 = ws.ConditionalFormatting.AddEqual(ws.Cells["C3"]);
-		//cf1.Formula = "TRUE";
-		var cf2 = ws.Cells["C8:C12"].ConditionalFormatting.AddExpression();
-		var cf3 = ws.Cells["d12:D22,H12:H22"].ConditionalFormatting.AddFourIconSet(eExcelconditionalFormatting4IconsSetType.RedToBlack);
+		ws.ConditionalFormatting.AddEqual(ws.Cells["C3"]);
+		ws.Cells["C8:C12"].ConditionalFormatting.AddExpression();
+		ws.Cells["d12:D22,H12:H22"].ConditionalFormatting.AddFourIconSet(eExcelconditionalFormatting4IconsSetType.RedToBlack);
 		pck.SaveAs(new FileInfo(@"c:\temp\cf2.xlsx"));
 	}
 	/// <summary>
@@ -105,7 +76,7 @@ public class ConditionalFormatting
 	{
 		var pck = new ExcelPackage(new FileInfo(@"c:\temp\CofCTemplate.xlsx"));
 
-		var ws = pck.Workbook.Worksheets[1];
+		_ = pck.Workbook.Worksheets[1];
 		pck.SaveAs(new FileInfo(@"c:\temp\cf2.xlsx"));
 	}
 	/// <summary>
@@ -130,7 +101,7 @@ public class ConditionalFormatting
 	public void Databar()
 	{
 		var ws = _excelPackage.Workbook.Worksheets.Add("Databar");
-		var cf = ws.ConditionalFormatting.AddDatabar(ws.Cells["A1:A5"], Color.BlueViolet);
+		ws.ConditionalFormatting.AddDatabar(ws.Cells["A1:A5"], Color.BlueViolet);
 		ws.SetValue(1, 1, 1);
 		ws.SetValue(2, 1, 2);
 		ws.SetValue(3, 1, 3);
@@ -154,7 +125,7 @@ public class ConditionalFormatting
 	public void IconSet()
 	{
 		var ws = _excelPackage.Workbook.Worksheets.Add("IconSet");
-		var cf = ws.ConditionalFormatting.AddThreeIconSet(ws.Cells["A1:A3"], eExcelconditionalFormatting3IconsSetType.Symbols);
+		ws.ConditionalFormatting.AddThreeIconSet(ws.Cells["A1:A3"], eExcelconditionalFormatting3IconsSetType.Symbols);
 		ws.SetValue(1, 1, 1);
 		ws.SetValue(2, 1, 2);
 		ws.SetValue(3, 1, 3);

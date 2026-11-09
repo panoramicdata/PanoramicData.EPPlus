@@ -76,7 +76,7 @@ internal static class ExcelConditionalFormattingTimePeriodType
 		  ExcelConditionalFormattingConstants.TimePeriods.Today => eExcelConditionalFormattingTimePeriodType.Today,
 		  ExcelConditionalFormattingConstants.TimePeriods.Tomorrow => eExcelConditionalFormattingTimePeriodType.Tomorrow,
 		  ExcelConditionalFormattingConstants.TimePeriods.Yesterday => eExcelConditionalFormattingTimePeriodType.Yesterday,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.UnexistentTimePeriodTypeAttribute),
 	  };
 }
