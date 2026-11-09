@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.DataValidation;
-using System.Collections;
+﻿using OfficeOpenXml.DataValidation;
 
 namespace PanoramicData.EPPlus.Test.DataValidation.Formulas;
 
@@ -37,7 +34,7 @@ public class ListFormulaTests : ValidationTestBase
 		// Act
 		var validation = new ExcelDataValidationList(_sheet, "A1", ExcelDataValidationType.List, _dataValidationNode, _namespaceManager);
 		// Assert
-		CollectionAssert.AreEquivalent(new List<string> { "1", "2" }, (ICollection)validation.Formula.Values);
+		CollectionAssert.AreEquivalent(new List<string> { "1", "2" }, validation.Formula.Values.ToList());
 	}
 
 	[TestMethod]

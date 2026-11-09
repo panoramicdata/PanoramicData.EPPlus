@@ -106,7 +106,6 @@ public partial class CalculationTests
 					{
 						fileErr.WriteLine("String?  cell " + sheet.Name + "!" + adr + "\t" + (fr[cell] ?? "").ToString() + "\t" + (sheet.Cells[adr].Value ?? "").ToString());
 					}
-					//errors.Add(new Tuple<string, object, object>(adr, fr[cell], sheet.Cells[adr].Value));
 				}
 			}
 			catch (Exception e)

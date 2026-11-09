@@ -1,11 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Text;
 using OfficeOpenXml.Utils;
 using OfficeOpenXml;
 using System.Security.Cryptography.X509Certificates;
-using System.IO;
 
 namespace PanoramicData.EPPlus.Test;
 
@@ -44,7 +40,6 @@ public class VBATests
 			File.WriteAllText(string.Format(@"c:\temp\vba\modules\{0}.txt", r.Name), r.Libid + " " + r.ReferenceRecordID.ToString());
 		}
 
-		List<X509Certificate2> ret = [];
 		X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
 		store.Open(OpenFlags.ReadOnly);
 		package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
@@ -103,10 +98,6 @@ public class VBATests
 		code.AppendLine("End Sub");
 		module.Code = code.ToString();
 
-		//X509Store store = new X509Store(StoreLocation.CurrentUser);
-		//store.Open(OpenFlags.ReadOnly);
-		//package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
-
 		package.SaveAs(new FileInfo(@"c:\temp\vbaLong.xlsm"));
 	}
 	[Ignore]
@@ -157,7 +148,6 @@ public class VBATests
 		X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
 		store.Open(OpenFlags.ReadOnly);
 		package.Workbook.VbaProject.Signature.Certificate = store.Certificates[19];
-		//package.Workbook.VbaProject.Protection.SetPassword("");
 		package.SaveAs(new FileInfo(@"c:\temp\vbaSaved.xlsm"));
 	}
 	[TestMethod]

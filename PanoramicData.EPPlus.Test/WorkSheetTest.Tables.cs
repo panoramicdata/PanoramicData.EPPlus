@@ -160,7 +160,10 @@ public partial class WorkSheetTest
 			sheets[1].Tables.Delete(4);
 			Assert.Fail("ArgumentException should have been thrown.");
 		}
-		catch (ArgumentOutOfRangeException) { }
+		catch (ArgumentOutOfRangeException)
+		{
+			// Expected: there is no fifth table.
+		}
 
 		var range = sheets[0].Cells[sheets[0].Tables[1].Address.Address];
 		sheets[0].Tables.Delete(1, true);

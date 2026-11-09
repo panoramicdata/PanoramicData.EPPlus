@@ -71,7 +71,6 @@ public partial class DateAndTimeFunctionsTests : FormulaParserTestBase
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             var pck = new ExcelPackage();
             var ws = pck.Workbook.Worksheets.Add("Calc1");
-            var currentYear = DateTime.Now.Year;
             ws.Cells["A1"].Value = "2:23 pm";
             ws.Cells["B1"].Formula = "TimeValue(A1)";
             ws.Calculate();

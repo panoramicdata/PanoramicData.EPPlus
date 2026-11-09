@@ -261,7 +261,7 @@ public partial class Issues
 		var yearField = pivotTable1.Fields.GetDateGroupField(eDateGroupBy.Years);
 		yearField.Name = "Year";
 
-		var rowField2 = pivotTable1.RowFields.Add(pivotTable1.Fields["AUDIT_LINE_STATUS"]);
+		pivotTable1.RowFields.Add(pivotTable1.Fields["AUDIT_LINE_STATUS"]);
 
 		var TotalSpend = pivotTable1.DataFields.Add(pivotTable1.Fields["TOTAL_INVOICE_PRICE"]);
 		TotalSpend.Name = "Total Spend";

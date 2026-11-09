@@ -26,7 +26,7 @@ public partial class ReadTemplate
 	public void I15038()
 	{
 		using var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\15038.xlsx"));
-		var ws = p.Workbook.Worksheets[1];
+		_ = p.Workbook.Worksheets[1];
 	}
 	[Ignore]
 	[TestMethod]

@@ -129,7 +129,9 @@ public partial class Issues
 		finally
 		{
 			if (file.Exists)
+			{
 				file.Delete();
+			}
 		}
 	}
 
@@ -140,7 +142,9 @@ public partial class Issues
 		try
 		{
 			if (file.Exists)
+			{
 				file.Delete();
+			}
 			using (ExcelPackage package = new(file))
 			{
 				var sheet = package.Workbook.Worksheets.Add("New Sheet");
@@ -157,7 +161,9 @@ public partial class Issues
 		finally
 		{
 			if (file.Exists)
+			{
 				file.Delete();
+			}
 		}
 	}
 
@@ -168,7 +174,9 @@ public partial class Issues
 		try
 		{
 			if (file.Exists)
+			{
 				file.Delete();
+			}
 			using (ExcelPackage package = new(file))
 			{
 				var sheet = package.Workbook.Worksheets.Add("New Sheet");
@@ -185,7 +193,9 @@ public partial class Issues
 		finally
 		{
 			if (file.Exists)
+			{
 				file.Delete();
+			}
 		}
 	}
 	[TestMethod, Ignore]

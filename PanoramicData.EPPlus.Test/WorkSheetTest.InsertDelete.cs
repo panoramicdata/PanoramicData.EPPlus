@@ -77,7 +77,9 @@ public partial class WorkSheetTest
 		var file = _worksheetPath + "test.xlsx";
 
 		if (File.Exists(file))
+		{
 			File.Delete(file);
+		}
 
 		Create(file);
 

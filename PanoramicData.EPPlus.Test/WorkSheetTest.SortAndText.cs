@@ -63,15 +63,15 @@ public partial class WorkSheetTest
 		ws.View.ShowGridLines = true;
 		Assert.IsTrue(ws.View.ShowGridLines);
 	}
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S2197:Modulus results should not be checked for direct equality", Justification = "The row counter starts at a positive row, so the remainder is never negative.")]
 	private static void AddSortingData(ExcelWorksheet ws, int row, int col)
 	{
-		var rand = new Random();
 		var addr = ExcelCellBase.GetAddress(row, col, row + 999, col);
 		ws.Cells[addr].Style.Fill.PatternType = ExcelFillStyle.Solid;
 		ws.Cells[addr].Style.Font.Color.SetColor(Color.White);
 		for (var r = row; r <= row + 999; r++)
 		{
-			var v = rand.NextDouble() * row;
+			var v = Random.Shared.NextDouble() * row;
 			ws.SetValue(r, col, v);
 			ws.SetValue(r, col + 1, $"Rad {r} v={v}");
 			ws.SetValue(r, col + 2, $"Rad {r} v={v}");

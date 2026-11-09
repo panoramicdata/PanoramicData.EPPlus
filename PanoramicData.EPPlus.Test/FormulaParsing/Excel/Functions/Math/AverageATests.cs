@@ -85,6 +85,7 @@ public class AverageATests
 	}
 
 	[TestMethod]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3257:Declarations and initializations should be as concise as possible", Justification = "The explicit array type is what target-types the new() elements; without it the code does not compile.")]
 	public void AverageAArray()
 	{
 		// For arrays, AverageA completely ignores booleans.  It divides by strings and numbers, but only

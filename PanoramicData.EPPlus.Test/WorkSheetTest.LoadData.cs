@@ -251,14 +251,13 @@ public partial class WorkSheetTest
 		var ws = _pck.Workbook.Worksheets.Add("Perf");
 		Console.WriteLine("StartTime {0}", DateTime.Now);
 
-		Random r = new();
 		for (var i = 1; i <= PERF_ROWS; i++)
 		{
 			ws.Cells[i, 1].Value = string.Format("Row {0}\n.Test new row\"' öäåü", i);
 			ws.Cells[i, 2].Value = i;
 			ws.Cells[i, 2].Style.WrapText = true;
 			ws.Cells[i, 3].Value = DateTime.Now;
-			ws.Cells[i, 4].Value = r.NextDouble() * 100000;
+			ws.Cells[i, 4].Value = Random.Shared.NextDouble() * 100000;
 		}
 
 		ws.Cells[1, 2, PERF_ROWS, 2].Style.Numberformat.Format = "#,##0";

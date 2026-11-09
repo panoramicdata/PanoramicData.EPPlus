@@ -55,7 +55,6 @@ public partial class WorkSheetTest
 		_pck ??= new ExcelPackage();
 		var ws = _pck.Workbook.Worksheets.Add("LoadFromEmpyCollection");
 		List<TestDTO> listDTO = [];
-		//List<int> list = new List<int>(0);
 
 		ws.Cells["A1"].LoadFromCollection(listDTO, true);
 		ws.Cells["A5"].LoadFromCollection(listDTO, true, TableStyles.Medium9, BindingFlags.Instance, typeof(TestDTO).GetFields());

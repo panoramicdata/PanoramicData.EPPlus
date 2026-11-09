@@ -12,7 +12,7 @@ public partial class ReadTemplate
 	public void ReadBug9()
 	{
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\CovenantsCheckReportTemplate.xlsx"));
-		var ws = package.Workbook.Worksheets[1];
+		_ = package.Workbook.Worksheets[1];
 		package.SaveAs(new FileInfo(@"c:\temp\2.9 bugs\new_t.xlsx"));
 	}
 	[Ignore]

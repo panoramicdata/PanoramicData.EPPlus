@@ -7,14 +7,13 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.LexicalAnalysis;
 [TestClass]
 public class TokenHandlerTests
 {
-	private TokenizerContext _tokenizerContext;
 	private TokenHandler _handler;
 
 	[TestInitialize]
 	public void Init()
 	{
-		_tokenizerContext = new TokenizerContext("test");
-		InitHandler(_tokenizerContext);
+		var tokenizerContext = new TokenizerContext("test");
+		InitHandler(tokenizerContext);
 	}
 
 	private void InitHandler(TokenizerContext context)

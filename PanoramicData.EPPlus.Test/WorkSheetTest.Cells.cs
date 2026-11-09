@@ -228,7 +228,7 @@ public partial class WorkSheetTest
 		var p = new ExcelPackage(new FileInfo(@"c:\temp\url.xlsx"));
 		foreach (var ws in p.Workbook.Worksheets)
 		{
-
+			// Enumerating must not throw.
 		}
 
 		p.SaveAs(new FileInfo(@"c:\temp\urlsaved.xlsx"));

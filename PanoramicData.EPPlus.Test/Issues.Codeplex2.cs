@@ -242,7 +242,7 @@ public partial class Issues
 			var ws = excelPackage.Workbook.Worksheets[sheetName];
 			excelPackage.Workbook.Worksheets.Delete(ws);
 
-			ws = excelPackage.Workbook.Worksheets.Add(sheetName);
+			excelPackage.Workbook.Worksheets.Add(sheetName);
 
 			excelPackage.SaveAs(new FileInfo(@"c:\temp\bug\output.xlsx"));
 		}

@@ -77,7 +77,8 @@ public partial class FormulaR1C1Tests
 		var c = _sheet.Cells["D2"];
 		c.Formula = formula;
 		Assert.AreEqual("VLOOKUP(RC[-1],C[-3]:C[-2],1,0)", c.FormulaR1C1);
-		c.FormulaR1C1 = c.FormulaR1C1;
+		var r1c1 = c.FormulaR1C1;
+		c.FormulaR1C1 = r1c1;
 		Assert.AreEqual(c.Formula, formula);
 	}
 	[TestMethod]
@@ -87,7 +88,8 @@ public partial class FormulaR1C1Tests
 		var c = _sheet.Cells["D2"];
 		c.Formula = formula;
 		Assert.AreEqual("VLOOKUP(RC[-1],C[-3],1,0)", c.FormulaR1C1);
-		c.FormulaR1C1 = c.FormulaR1C1;
+		var r1c1 = c.FormulaR1C1;
+		c.FormulaR1C1 = r1c1;
 		Assert.AreEqual(c.Formula, formula);
 	}
 	[TestMethod]
@@ -97,7 +99,8 @@ public partial class FormulaR1C1Tests
 		var c = _sheet.Cells["D3"];
 		c.Formula = formula;
 		Assert.AreEqual("VLOOKUP(RC[-1],R[-2]:R[-1],1,0)", c.FormulaR1C1);
-		c.FormulaR1C1 = c.FormulaR1C1;
+		var r1c1 = c.FormulaR1C1;
+		c.FormulaR1C1 = r1c1;
 		Assert.AreEqual(c.Formula, formula);
 	}
 	[TestMethod]

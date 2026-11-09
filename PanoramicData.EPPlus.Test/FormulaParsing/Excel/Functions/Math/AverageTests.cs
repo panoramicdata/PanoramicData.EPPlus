@@ -74,6 +74,7 @@ public class AverageTests
 	}
 
 	[TestMethod]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3257:Declarations and initializations should be as concise as possible", Justification = "The explicit array type is what target-types the new() elements; without it the code does not compile.")]
 	public void AverageArray()
 	{
 		// In the case of arrays, Average DOES NOT parse and include numeric strings, date strings, bools, unparsable strings, etc.

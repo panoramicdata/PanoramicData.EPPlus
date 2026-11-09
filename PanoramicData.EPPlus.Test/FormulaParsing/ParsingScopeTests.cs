@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing.ExcelUtilities;
+﻿using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing;
 using FakeItEasy;
 
@@ -42,7 +40,7 @@ public class ParsingScopeTests
 	public void ScopeShouldCallKillScopeOnDispose()
 	{
 		var scope = new ParsingScope(_parsingScopes, _factory.Create("A1"));
-		((IDisposable)scope).Dispose();
+		scope.Dispose();
 		A.CallTo(() => _parsingScopes.KillScope(scope)).MustHaveHappened();
 	}
 }

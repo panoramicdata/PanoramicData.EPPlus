@@ -135,7 +135,6 @@ public partial class DrawingTest
 		var ws = _pck.Workbook.Worksheets.Add("Scatter");
 		var chrt = ws.Drawings.AddChart("ScatterChart1", eChartType.XYScatterSmoothNoMarkers) as ExcelScatterChart;
 		AddTestSerie(ws, chrt);
-		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.To.Row = 23;
 		chrt.To.Column = 12;
 		var r1 = chrt.Title.RichText.Add("Header");
@@ -189,7 +188,6 @@ public partial class DrawingTest
 		chrt.Series.Add("V19:V24", "U19:U24", "W19:W24");
 		chrt.Style = eChartStyle.Style25;
 
-		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.From.Row = 23;
 		chrt.From.Column = 12;
 		chrt.To.Row = 33;
@@ -208,7 +206,6 @@ public partial class DrawingTest
 		var chrt = ws.Drawings.AddChart("Radar1", eChartType.Radar) as ExcelRadarChart;
 		var s = chrt.Series.Add("V19:V24", "U19:U24");
 		s.Header = "serie1";
-		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.From.Row = 23;
 		chrt.From.Column = 12;
 		chrt.To.Row = 38;
@@ -230,7 +227,6 @@ public partial class DrawingTest
 		rs.Marker = eMarkerStyle.Star;
 		rs.MarkerSize = 14;
 
-		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.From.Row = 63;
 		chrt.From.Column = 12;
 		chrt.To.Row = 78;
@@ -248,7 +244,6 @@ public partial class DrawingTest
 		var s = chrt.Series.Add("V19:V24", "U19:U24");
 		chrt.Series.Add("W19:W24", "U19:U24");
 		s.Header = "serie1";
-		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.From.Row = 23;
 		chrt.From.Column = 12;
 		chrt.To.Row = 38;
@@ -262,7 +257,6 @@ public partial class DrawingTest
 		var ws = _pck.Workbook.Worksheets.Add("Pyramid");
 		var chrt = ws.Drawings.AddChart("Pyramid1", eChartType.PyramidCol) as ExcelBarChart;
 		AddTestSerie(ws, chrt);
-		// chrt.Series[0].Marker = eMarkerStyle.Diamond;
 		chrt.VaryColors = true;
 		chrt.To.Row = 23;
 		chrt.To.Column = 12;

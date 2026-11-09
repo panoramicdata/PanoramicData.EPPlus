@@ -95,9 +95,6 @@ public partial class Issues
 		sourceRange3.Copy(rangeTo3);
 
 		package.Save();
-
-		//}
-
 	}
 	[TestMethod]
 	public void Issue63() // See https://github.com/JanKallman/EPPlus/issues/63
