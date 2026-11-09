@@ -54,26 +54,7 @@ public partial class ExcelWorksheet
 			{
 				if (sr.Peek() != -1)        //Now find the end tag </sheetdata> so we can add the end of the xml document
 				{
-					/**** Fixes issue 14788. Fix by Philip Garrett ****/
-					var endSeekStart = end;
-
-					while (endSeekStart >= 0)
-					{
-						endSeekStart = Math.Max(endSeekStart - BLOCKSIZE, 0);
-						var size = (int)(end - endSeekStart);
-						stream.Seek(endSeekStart, SeekOrigin.Begin);
-						block = new char[size];
-						sr = new StreamReader(stream);
-						pos = sr.ReadBlock(block, 0, size);
-						sb = new StringBuilder();
-						sb.Append(block, 0, pos);
-						s = sb.ToString();
-						endMatch = Regex.Match(s, string.Format("(</[^>]*{0}[^>]*>)", "sheetData"));
-						if (endMatch.Success)
-						{
-							break;
-						}
-					}
+					ReadSheetDataEndBlock(stream, end, ref sr, ref s);
 				}
 
 				endMatch = Regex.Match(s, string.Format("(</[^>]*{0}[^>]*>)", "sheetData"));
@@ -89,6 +70,30 @@ public partial class ExcelWorksheet
 			return xml;
 		}
 	}
+	private static void ReadSheetDataEndBlock(Stream stream, long end, ref StreamReader sr, ref string s)
+	{
+		/**** Fixes issue 14788. Fix by Philip Garrett ****/
+		var endSeekStart = end;
+
+		while (endSeekStart >= 0)
+		{
+			endSeekStart = Math.Max(endSeekStart - BLOCKSIZE, 0);
+			var size = (int)(end - endSeekStart);
+			stream.Seek(endSeekStart, SeekOrigin.Begin);
+			var block = new char[size];
+			sr = new StreamReader(stream);
+			var pos = sr.ReadBlock(block, 0, size);
+			var sb = new StringBuilder();
+			sb.Append(block, 0, pos);
+			s = sb.ToString();
+			var endMatch = Regex.Match(s, string.Format("(</[^>]*{0}[^>]*>)", "sheetData"));
+			if (endMatch.Success)
+			{
+				break;
+			}
+		}
+	}
+
 	private static void GetBlockPos(string xml, string tag, ref int start, ref int end)
 	{
 		Match startmMatch, endMatch;

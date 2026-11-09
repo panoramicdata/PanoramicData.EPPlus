@@ -84,42 +84,52 @@ public partial class ExcelWorksheet
 		}
 		else
 		{
-			var v = xr.ReadElementContentAsString();
-			var nf = Workbook.Styles.CellXfs[styleID].NumberFormatId;
-			if (nf is >= 14 and <= 22 or >= 45 and <= 47)
-			{
-				if (double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var res))
-				{
-					if (Workbook.Date1904)
-					{
-						res += ExcelWorkbook.date1904Offset;
-					}
+			SetNumberValueFromXml(xr, styleID, row, col);
+		}
+	}
 
-					if (res is >= -657435.0 and < 2958465.9999999)
-					{
-						SetValueInner(row, col, DateTime.FromOADate(res));
-					}
-					else
-					{
-						SetValueInner(row, col, res);
-					}
-				}
-				else
-				{
-					SetValueInner(row, col, v);
-				}
+	private void SetNumberValueFromXml(XmlReader xr, int styleID, int row, int col)
+	{
+		var v = xr.ReadElementContentAsString();
+		var nf = Workbook.Styles.CellXfs[styleID].NumberFormatId;
+		if (nf is >= 14 and <= 22 or >= 45 and <= 47)
+		{
+			SetDateValueFromXml(v, row, col);
+		}
+		else
+		{
+			if (double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
+			{
+				SetValueInner(row, col, d);
 			}
 			else
 			{
-				if (double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var d))
-				{
-					SetValueInner(row, col, d);
-				}
-				else
-				{
-					SetValueInner(row, col, double.NaN);
-				}
+				SetValueInner(row, col, double.NaN);
 			}
+		}
+	}
+
+	private void SetDateValueFromXml(string v, int row, int col)
+	{
+		if (double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var res))
+		{
+			if (Workbook.Date1904)
+			{
+				res += ExcelWorkbook.date1904Offset;
+			}
+
+			if (res is >= -657435.0 and < 2958465.9999999)
+			{
+				SetValueInner(row, col, DateTime.FromOADate(res));
+			}
+			else
+			{
+				SetValueInner(row, col, res);
+			}
+		}
+		else
+		{
+			SetValueInner(row, col, v);
 		}
 	}
 

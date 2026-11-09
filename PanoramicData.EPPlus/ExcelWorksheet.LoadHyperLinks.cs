@@ -23,26 +23,7 @@ public partial class ExcelWorksheet
 				ExcelHyperLink hl = null;
 				if (xr.GetAttribute("id", ExcelPackage.schemaRelationships) != null)
 				{
-					var rId = xr.GetAttribute("id", ExcelPackage.schemaRelationships);
-					var uri = Part.GetRelationship(rId).TargetUri;
-					if (uri.IsAbsoluteUri)
-					{
-						try
-						{
-							hl = new ExcelHyperLink(uri.AbsoluteUri);
-						}
-						catch
-						{
-							hl = new ExcelHyperLink(uri.OriginalString, UriKind.Absolute);
-						}
-					}
-					else
-					{
-						hl = new ExcelHyperLink(uri.OriginalString, UriKind.Relative);
-					}
-
-					hl.RId = rId;
-					Part.DeleteRelationship(rId); //Delete the relationship, it is recreated when we save the package.
+					hl = LoadHyperLinkFromRelationship(xr);
 				}
 				else if (xr.GetAttribute("location") != null)
 				{
@@ -71,6 +52,32 @@ public partial class ExcelWorksheet
 				break;
 			}
 		}
+	}
+
+	private ExcelHyperLink LoadHyperLinkFromRelationship(XmlReader xr)
+	{
+		ExcelHyperLink hl;
+		var rId = xr.GetAttribute("id", ExcelPackage.schemaRelationships);
+		var uri = Part.GetRelationship(rId).TargetUri;
+		if (uri.IsAbsoluteUri)
+		{
+			try
+			{
+				hl = new ExcelHyperLink(uri.AbsoluteUri);
+			}
+			catch
+			{
+				hl = new ExcelHyperLink(uri.OriginalString, UriKind.Absolute);
+			}
+		}
+		else
+		{
+			hl = new ExcelHyperLink(uri.OriginalString, UriKind.Relative);
+		}
+
+		hl.RId = rId;
+		Part.DeleteRelationship(rId); //Delete the relationship, it is recreated when we save the package.
+		return hl;
 	}
 
 	private static ExcelHyperLink GetHyperlinkFromRef(XmlReader xr, string refTag, int fromRow = 0, int toRow = 0, int fromCol = 0, int toCol = 0)

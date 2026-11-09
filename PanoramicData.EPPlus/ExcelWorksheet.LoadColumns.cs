@@ -23,26 +23,31 @@ public partial class ExcelWorksheet
 
 				if (xr.NodeType == XmlNodeType.Element)
 				{
-					var min = int.Parse(xr.GetAttribute("min"));
-
-					ExcelColumn col = new(this, min)
-					{
-						ColumnMax = int.Parse(xr.GetAttribute("max")),
-						Width = xr.GetAttribute("width") == null ? 0 : double.Parse(xr.GetAttribute("width"), CultureInfo.InvariantCulture),
-						BestFit = xr.GetAttribute("bestFit") is not null and "1",
-						Collapsed = xr.GetAttribute("collapsed") is not null and "1",
-						Phonetic = xr.GetAttribute("phonetic") is not null and "1",
-						OutlineLevel = (short)(xr.GetAttribute("outlineLevel") == null ? 0 : int.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture)),
-						Hidden = xr.GetAttribute("hidden") is not null and "1"
-					};
-					SetValueInner(0, min, col);
-
-					if (!(xr.GetAttribute("style") == null || !int.TryParse(xr.GetAttribute("style"), NumberStyles.Number, CultureInfo.InvariantCulture, out var style)))
-					{
-						SetStyleInner(0, min, style);
-					}
+					LoadColumn(xr);
 				}
 			}
+		}
+	}
+
+	private void LoadColumn(XmlReader xr)
+	{
+		var min = int.Parse(xr.GetAttribute("min"));
+
+		ExcelColumn col = new(this, min)
+		{
+			ColumnMax = int.Parse(xr.GetAttribute("max")),
+			Width = xr.GetAttribute("width") == null ? 0 : double.Parse(xr.GetAttribute("width"), CultureInfo.InvariantCulture),
+			BestFit = xr.GetAttribute("bestFit") is not null and "1",
+			Collapsed = xr.GetAttribute("collapsed") is not null and "1",
+			Phonetic = xr.GetAttribute("phonetic") is not null and "1",
+			OutlineLevel = (short)(xr.GetAttribute("outlineLevel") == null ? 0 : int.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture)),
+			Hidden = xr.GetAttribute("hidden") is not null and "1"
+		};
+		SetValueInner(0, min, col);
+
+		if (!(xr.GetAttribute("style") == null || !int.TryParse(xr.GetAttribute("style"), NumberStyles.Number, CultureInfo.InvariantCulture, out var style)))
+		{
+			SetStyleInner(0, min, style);
 		}
 	}
 
