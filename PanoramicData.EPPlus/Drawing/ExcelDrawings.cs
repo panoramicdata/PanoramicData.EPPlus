@@ -334,23 +334,13 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 	private ExcelPicture AddPictureCore(string Name, Func<XmlElement, ExcelPicture> create)
 	{
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new InvalidOperationException("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 		drawNode.SetAttribute("editAs", "oneCell");
 		var pic = create(drawNode);
 		pic.Name = Name;
-		_drawings.Add(pic);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return pic;
+		return AddToCollection(pic, Name);
 	}
 
 	/// <summary>
@@ -387,15 +377,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			throw new ArgumentOutOfRangeException(WidthPixels <= 0 ? nameof(WidthPixels) : nameof(HeightPixels), "AddPicture: pixel dimensions must be positive");
 		}
 
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new InvalidOperationException("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 		drawNode.SetAttribute("editAs", "oneCell");
@@ -403,9 +385,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		{
 			Name = Name
 		};
-		_drawings.Add(pic);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return pic;
+		return AddToCollection(pic, Name);
 	}
 
 	/// <summary>
@@ -417,15 +397,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 	public ExcelShape AddShape(string Name, eShapeStyle Style)
 	{
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new InvalidOperationException("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 
@@ -434,9 +406,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			Name = Name,
 			Style = Style
 		};
-		_drawings.Add(shape);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return shape;
+		return AddToCollection(shape, Name);
 	}
 	/// <summary>
 	/// Add a new shape to the worksheet
@@ -446,15 +416,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <returns>The shape object</returns>
 	public ExcelShape AddShape(string Name, ExcelShape Source)
 	{
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new InvalidOperationException("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 		drawNode.InnerXml = Source.TopNode.InnerXml;
@@ -464,10 +426,28 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			Name = Name,
 			Style = Source.Style
 		};
-		_drawings.Add(shape);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return shape;
+		return AddToCollection(shape, Name);
 	}
+	private void EnsureCanAddDrawing(string name)
+	{
+		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
+		{
+			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
+		}
+
+		if (_drawingNames.ContainsKey(name))
+		{
+			throw new InvalidOperationException("Name already exists in the drawings collection");
+		}
+	}
+
+	private T AddToCollection<T>(T drawing, string name) where T : ExcelDrawing
+	{
+		_drawings.Add(drawing);
+		_drawingNames.Add(name, _drawings.Count - 1);
+		return drawing;
+	}
+
 	private XmlElement CreateDrawingXml()
 	{
 		if (DrawingXml.DocumentElement == null)
