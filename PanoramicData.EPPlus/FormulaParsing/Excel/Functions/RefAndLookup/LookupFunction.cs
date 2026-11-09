@@ -76,39 +76,57 @@ public abstract class LookupFunction : ExcelFunction
 		do
 		{
 			var matchResult = IsMatch(navigator.CurrentValue, lookupArgs.SearchedValue);
-			if (matchResult != 0)
-			{
-				if (lastValue != null && navigator.CurrentValue == null)
-				{
-					break;
-				}
-
-				if (!lookupArgs.RangeLookup)
-				{
-					continue;
-				}
-
-				if (lastValue == null && matchResult > 0)
-				{
-					return new CompileResult(eErrorType.NA);
-				}
-
-				if (lastValue != null && matchResult > 0 && lastMatchResult < 0)
-				{
-					return _compileResultFactory.Create(lastLookupValue);
-				}
-
-				lastMatchResult = matchResult;
-				lastValue = navigator.CurrentValue;
-				lastLookupValue = navigator.GetLookupValue();
-			}
-			else
+			if (matchResult == 0)
 			{
 				return _compileResultFactory.Create(navigator.GetLookupValue());
 			}
+
+			if (ReachedEndOfValues(lastValue, navigator))
+			{
+				break;
+			}
+
+			if (!lookupArgs.RangeLookup)
+			{
+				continue;
+			}
+
+			if (TryGetRangeLookupResult(lastValue, matchResult, lastMatchResult, lastLookupValue, out var rangeResult))
+			{
+				return rangeResult;
+			}
+
+			lastMatchResult = matchResult;
+			lastValue = navigator.CurrentValue;
+			lastLookupValue = navigator.GetLookupValue();
 		}
 		while (navigator.MoveNext());
 
 		return lookupArgs.RangeLookup ? _compileResultFactory.Create(lastLookupValue) : new CompileResult(eErrorType.NA);
+	}
+
+	private static bool ReachedEndOfValues(object lastValue, LookupNavigator navigator) => lastValue != null && navigator.CurrentValue == null;
+
+	private bool TryGetRangeLookupResult(object lastValue, int matchResult, int? lastMatchResult, object lastLookupValue, out CompileResult result)
+	{
+		result = null;
+		if (matchResult <= 0)
+		{
+			return false;
+		}
+
+		if (lastValue == null)
+		{
+			result = new CompileResult(eErrorType.NA);
+			return true;
+		}
+
+		if (lastMatchResult < 0)
+		{
+			result = _compileResultFactory.Create(lastLookupValue);
+			return true;
+		}
+
+		return false;
 	}
 }

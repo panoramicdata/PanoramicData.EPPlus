@@ -62,4 +62,28 @@ public abstract class HiddenValuesHandlingFunction : ExcelFunction
 	protected bool ShouldIgnore(ExcelDataProvider.ICellInfo c, ParsingContext context) => CellStateHelper.ShouldIgnore(IgnoreHiddenValues, c, context);
 	protected bool ShouldIgnore(FunctionArgument arg) => IgnoreHiddenValues && arg.ExcelStateFlagIsSet(ExcelCellState.HiddenCell);
 
+	private protected static double? GetAverageNumericValue(object obj, bool isInArray)
+	{
+		if (IsNumeric(obj) && obj is not bool)
+		{
+			return Utils.ConvertUtil.GetValueDouble(obj);
+		}
+
+		if (isInArray)
+		{
+			return default;
+		}
+
+		if (obj is bool)
+		{
+			return Utils.ConvertUtil.GetValueDouble(obj);
+		}
+
+		if (Utils.ConvertUtil.TryParseNumericString(obj, out var number))
+		{
+			return number;
+		}
+
+		return Utils.ConvertUtil.TryParseDateString(obj, out var date) ? date.ToOADate() : default(double?);
+	}
 }

@@ -24,9 +24,18 @@ public class Rank : ExcelFunction
 			asc = ArgToBool(arguments, 2);
 		}
 
-		var l = new List<double>();
+		var l = GetSortedNumbers(refer.ValueAsRangeInfo);
+		var ix = asc ? GetAscendingRank(l, number) : GetDescendingRank(l, number);
 
-		foreach (var c in refer.ValueAsRangeInfo)
+		return ix <= 0 || ix > l.Count
+			? new CompileResult(ExcelErrorValue.Create(eErrorType.NA), DataType.ExcelError)
+			: CreateResult(ix, DataType.Decimal);
+	}
+
+	private static List<double> GetSortedNumbers(ExcelDataProvider.IRangeInfo range)
+	{
+		var l = new List<double>();
+		foreach (var c in range)
 		{
 			var v = Utils.ConvertUtil.GetValueDouble(c.Value, false, true);
 			if (!double.IsNaN(v))
@@ -36,46 +45,46 @@ public class Rank : ExcelFunction
 		}
 
 		l.Sort();
-		double ix;
-		if (asc)
-		{
-			ix = l.IndexOf(number) + 1;
-			if (_isAvg)
-			{
-				var st = Convert.ToInt32(ix);
-				while (l.Count > st && l[st] == number)
-				{
-					st++;
-				}
+		return l;
+	}
 
-				if (st > ix)
-				{
-					ix = ix + ((st - ix) / 2D);
-				}
-			}
-		}
-		else
+	private double GetAscendingRank(List<double> l, double number)
+	{
+		double ix = l.IndexOf(number) + 1;
+		if (_isAvg)
 		{
-			ix = l.LastIndexOf(number);
-			if (_isAvg)
+			var st = Convert.ToInt32(ix);
+			while (l.Count > st && l[st] == number)
 			{
-				var st = Convert.ToInt32(ix) - 1;
-				while (0 <= st && l[st] == number)
-				{
-					st--;
-				}
-
-				if (st + 1 < ix)
-				{
-					ix = ix - ((ix - st - 1) / 2D);
-				}
+				st++;
 			}
 
-			ix = l.Count - ix;
+			if (st > ix)
+			{
+				ix += (st - ix) / 2D;
+			}
 		}
 
-		return ix <= 0 || ix > l.Count
-			? new CompileResult(ExcelErrorValue.Create(eErrorType.NA), DataType.ExcelError)
-			: CreateResult(ix, DataType.Decimal);
+		return ix;
+	}
+
+	private double GetDescendingRank(List<double> l, double number)
+	{
+		double ix = l.LastIndexOf(number);
+		if (_isAvg)
+		{
+			var st = Convert.ToInt32(ix) - 1;
+			while (0 <= st && l[st] == number)
+			{
+				st--;
+			}
+
+			if (st + 1 < ix)
+			{
+				ix -= (ix - st - 1) / 2D;
+			}
+		}
+
+		return l.Count - ix;
 	}
 }

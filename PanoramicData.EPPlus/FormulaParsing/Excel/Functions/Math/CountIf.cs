@@ -46,36 +46,34 @@ public class CountIf : ExcelFunction
 		var result = 0d;
 		if (range.IsExcelRange)
 		{
-			var rangeInfo = range.ValueAsRangeInfo;
-			for (var row = rangeInfo.Address.Start.Row; row < rangeInfo.Address.End.Row + 1; row++)
-			{
-				for (var col = rangeInfo.Address.Start.Column; col < rangeInfo.Address.End.Column + 1; col++)
-				{
-					if (criteria != null && Evaluate(rangeInfo.Worksheet.GetValue(row, col), criteria))
-					{
-						result++;
-					}
-				}
-			}
+			result = CountMatchingCells(range.ValueAsRangeInfo, criteria);
 		}
-		else if (range.Value is IEnumerable<FunctionArgument>)
+		else if (range.Value is IEnumerable<FunctionArgument> values)
 		{
-			foreach (var arg in (IEnumerable<FunctionArgument>)range.Value)
+			result = values.Count(arg => Evaluate(arg.Value, criteria));
+		}
+		else if (Evaluate(range.Value, criteria))
+		{
+			result++;
+		}
+
+		return CreateResult(result, DataType.Integer);
+	}
+
+	private double CountMatchingCells(ExcelDataProvider.IRangeInfo rangeInfo, string criteria)
+	{
+		var result = 0d;
+		for (var row = rangeInfo.Address.Start.Row; row < rangeInfo.Address.End.Row + 1; row++)
+		{
+			for (var col = rangeInfo.Address.Start.Column; col < rangeInfo.Address.End.Column + 1; col++)
 			{
-				if (Evaluate(arg.Value, criteria))
+				if (criteria != null && Evaluate(rangeInfo.Worksheet.GetValue(row, col), criteria))
 				{
 					result++;
 				}
 			}
 		}
-		else
-		{
-			if (Evaluate(range.Value, criteria))
-			{
-				result++;
-			}
-		}
 
-		return CreateResult(result, DataType.Integer);
+		return result;
 	}
 }
