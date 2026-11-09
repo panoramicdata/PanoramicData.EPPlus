@@ -616,7 +616,7 @@ public class ExcelAddressBase : ExcelCellBase
 		}
 		catch
 		{
-			// An unparsable address leaves the range unset, as before
+			// An unparsable address leaves the range unset
 		}
 	}
 
