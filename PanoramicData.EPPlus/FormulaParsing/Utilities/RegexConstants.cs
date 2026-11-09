@@ -30,6 +30,7 @@
  *******************************************************************************/
 namespace OfficeOpenXml.FormulaParsing.Utilities;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2339:Public constant members should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 public static class RegexConstants
 {
 	public const string SingleCellAddress = @"^(('[^/\\?*\[\]]{1,31}'|[A-Za-z_]{1,31})!)?[A-Z]{1,3}[1-9]{1}[0-9]{0,7}$";

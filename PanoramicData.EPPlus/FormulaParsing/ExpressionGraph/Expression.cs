@@ -45,12 +45,11 @@ public abstract class Expression
 	public IOperator Operator { get; set; }
 	public abstract bool IsGroupedExpression { get; }
 
-	public Expression()
+	protected Expression()
 	{
-
 	}
 
-	public Expression(string expression)
+	protected Expression(string expression)
 	{
 		ExpressionString = expression;
 		Operator = null;

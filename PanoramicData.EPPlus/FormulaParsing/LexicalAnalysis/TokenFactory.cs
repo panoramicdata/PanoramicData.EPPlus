@@ -41,10 +41,10 @@ namespace OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
 public class TokenFactory : ITokenFactory
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public TokenFactory(IFunctionNameProvider functionRepository, INameValueProvider nameValueProvider, bool r1c1 = false)
 		: this(new TokenSeparatorProvider(), nameValueProvider, functionRepository, r1c1)
 	{
-
 	}
 
 	public TokenFactory(ITokenSeparatorProvider tokenSeparatorProvider, INameValueProvider nameValueProvider, IFunctionNameProvider functionNameProvider, bool r1c1)

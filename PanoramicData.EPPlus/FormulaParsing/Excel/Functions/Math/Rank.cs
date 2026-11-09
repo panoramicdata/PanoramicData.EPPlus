@@ -8,6 +8,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 public class Rank : ExcelFunction
 {
 	readonly bool _isAvg;
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public Rank(bool isAvg = false)
 	{
 		_isAvg = isAvg;

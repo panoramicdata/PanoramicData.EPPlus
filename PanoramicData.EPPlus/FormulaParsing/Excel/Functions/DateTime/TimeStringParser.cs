@@ -38,7 +38,7 @@ public class TimeStringParser
 		return ((double)hour * 60 * 60 + (double)minute * 60 + (double)second) / secondsInADay;
 	}
 
-	private static void ValidateValues(int hour, int minute, int second)
+	private static void ValidateValues(int minute, int second)
 	{
 		if (second is < 0 or > 59)
 		{
@@ -72,22 +72,21 @@ public class TimeStringParser
 
 	private static double Parse12HourTimeString(string input)
 	{
-		var dayPart = string.Empty;
-		dayPart = input.Substring(input.Length - 2, 2);
+		var dayPart = input.Substring(input.Length - 2, 2);
 		GetValuesFromString(input, out var hour, out var minute, out var second);
 		if (dayPart == "PM")
 		{
 			hour += 12;
 		}
 
-		ValidateValues(hour, minute, second);
+		ValidateValues(minute, second);
 		return GetSerialNumber(hour, minute, second);
 	}
 
 	private static double Parse24HourTimeString(string input)
 	{
 		GetValuesFromString(input, out var hour, out var minute, out var second);
-		ValidateValues(hour, minute, second);
+		ValidateValues(minute, second);
 		return GetSerialNumber(hour, minute, second);
 	}
 

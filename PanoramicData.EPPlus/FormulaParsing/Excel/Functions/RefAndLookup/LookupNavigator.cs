@@ -32,9 +32,7 @@ public abstract class LookupNavigator
 	protected readonly LookupArguments Arguments;
 	protected readonly ParsingContext ParsingContext;
 
-
-
-	public LookupNavigator(LookupDirection direction, LookupArguments arguments, ParsingContext parsingContext)
+	protected LookupNavigator(LookupDirection direction, LookupArguments arguments, ParsingContext parsingContext)
 	{
 		Require.That(arguments).Named("arguments").IsNotNull();
 		Require.That(parsingContext).Named("parsingContext").IsNotNull();

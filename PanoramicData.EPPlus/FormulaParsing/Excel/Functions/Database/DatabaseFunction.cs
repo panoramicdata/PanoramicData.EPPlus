@@ -34,12 +34,12 @@ public abstract class DatabaseFunction : ExcelFunction
 {
 	protected RowMatcher RowMatcher { get; private set; }
 
-	public DatabaseFunction()
+	protected DatabaseFunction()
 		: this(new RowMatcher())
 	{
 	}
 
-	public DatabaseFunction(RowMatcher rowMatcher)
+	protected DatabaseFunction(RowMatcher rowMatcher)
 	{
 		RowMatcher = rowMatcher;
 	}
