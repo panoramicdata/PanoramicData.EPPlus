@@ -499,7 +499,8 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	internal void SetPixelTop(int pixels)
 	{
 		_doNotAdjust = true;
-		var ws = _drawings.Worksheet;
+		// The getter refreshes the workbook's cached font width
+		_ = _drawings.Worksheet.Workbook.MaxFontWidth;
 		var prevPix = 0;
 		var pix = (int)(GetRowHeight(1) / 0.75);
 		var row = 2;

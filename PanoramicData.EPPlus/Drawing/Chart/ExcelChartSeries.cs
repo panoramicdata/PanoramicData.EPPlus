@@ -168,73 +168,27 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 
 	private ExcelChartSerie CreateSerie(XmlElement ser, string seriesAddress, string xSeriesAddress, string bubbleSizeAddress) => Chart.ChartType switch
 	{
-		eChartType.Bubble or
-		eChartType.Bubble3DEffect => new ExcelBubbleChartSerie(this, NameSpaceManager, ser, _isPivot)
+		eChartType.Bubble or eChartType.Bubble3DEffect => new ExcelBubbleChartSerie(this, NameSpaceManager, ser, _isPivot)
 		{
 			Bubble3D = Chart.ChartType == eChartType.Bubble3DEffect,
 			Series = seriesAddress,
 			XSeries = xSeriesAddress,
 			BubbleSize = bubbleSizeAddress
 		},
-		eChartType.XYScatter or
-		eChartType.XYScatterLines or
-		eChartType.XYScatterLinesNoMarkers or
-		eChartType.XYScatterSmooth or
-		eChartType.XYScatterSmoothNoMarkers => new ExcelScatterChartSerie(this, NameSpaceManager, ser, _isPivot),
-		eChartType.Radar or
-		eChartType.RadarFilled or
-		eChartType.RadarMarkers => new ExcelRadarChartSerie(this, NameSpaceManager, ser, _isPivot),
-		eChartType.Surface or
-		eChartType.SurfaceTopView or
-		eChartType.SurfaceTopViewWireframe or
-		eChartType.SurfaceWireframe => new ExcelSurfaceChartSerie(this, NameSpaceManager, ser, _isPivot),
-		eChartType.Pie or
-		eChartType.Pie3D or
-		eChartType.PieExploded or
-		eChartType.PieExploded3D or
-		eChartType.PieOfPie or
-		eChartType.Doughnut or
-		eChartType.DoughnutExploded or
-		eChartType.BarOfPie => new ExcelPieChartSerie(this, NameSpaceManager, ser, _isPivot),
-		eChartType.Line or
-		eChartType.LineMarkers or
-		eChartType.LineMarkersStacked or
-		eChartType.LineMarkersStacked100 or
-		eChartType.LineStacked or
+		eChartType.XYScatter or eChartType.XYScatterLines or eChartType.XYScatterLinesNoMarkers or eChartType.XYScatterSmooth or eChartType.XYScatterSmoothNoMarkers => new ExcelScatterChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Radar or eChartType.RadarFilled or eChartType.RadarMarkers => new ExcelRadarChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Surface or eChartType.SurfaceTopView or eChartType.SurfaceTopViewWireframe or eChartType.SurfaceWireframe => new ExcelSurfaceChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Pie or eChartType.Pie3D or eChartType.PieExploded or eChartType.PieExploded3D or eChartType.PieOfPie or
+		eChartType.Doughnut or eChartType.DoughnutExploded or eChartType.BarOfPie => new ExcelPieChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Line or eChartType.LineMarkers or eChartType.LineMarkersStacked or eChartType.LineMarkersStacked100 or eChartType.LineStacked or
 		eChartType.LineStacked100 => CreateLineSerie(ser),
-		eChartType.BarClustered or
-		eChartType.BarStacked or
-		eChartType.BarStacked100 or
-		eChartType.ColumnClustered or
-		eChartType.ColumnStacked or
-		eChartType.ColumnStacked100 or
-		eChartType.BarClustered3D or
-		eChartType.BarStacked3D or
-		eChartType.BarStacked1003D or
-		eChartType.ColumnClustered3D or
-		eChartType.ColumnStacked3D or
-		eChartType.ColumnStacked1003D or
-		eChartType.ConeBarClustered or
-		eChartType.ConeBarStacked or
-		eChartType.ConeBarStacked100 or
-		eChartType.ConeCol or
-		eChartType.ConeColClustered or
-		eChartType.ConeColStacked or
-		eChartType.ConeColStacked100 or
-		eChartType.CylinderBarClustered or
-		eChartType.CylinderBarStacked or
-		eChartType.CylinderBarStacked100 or
-		eChartType.CylinderCol or
-		eChartType.CylinderColClustered or
-		eChartType.CylinderColStacked or
-		eChartType.CylinderColStacked100 or
-		eChartType.PyramidBarClustered or
-		eChartType.PyramidBarStacked or
-		eChartType.PyramidBarStacked100 or
-		eChartType.PyramidCol or
-		eChartType.PyramidColClustered or
-		eChartType.PyramidColStacked or
-		eChartType.PyramidColStacked100 => new ExcelBarChartSerie(this, NameSpaceManager, ser, _isPivot) { InvertIfNegative = false },
+		eChartType.BarClustered or eChartType.BarStacked or eChartType.BarStacked100 or eChartType.ColumnClustered or eChartType.ColumnStacked or
+		eChartType.ColumnStacked100 or eChartType.BarClustered3D or eChartType.BarStacked3D or eChartType.BarStacked1003D or eChartType.ColumnClustered3D or
+		eChartType.ColumnStacked3D or eChartType.ColumnStacked1003D or eChartType.ConeBarClustered or eChartType.ConeBarStacked or eChartType.ConeBarStacked100 or
+		eChartType.ConeCol or eChartType.ConeColClustered or eChartType.ConeColStacked or eChartType.ConeColStacked100 or eChartType.CylinderBarClustered or
+		eChartType.CylinderBarStacked or eChartType.CylinderBarStacked100 or eChartType.CylinderCol or eChartType.CylinderColClustered or eChartType.CylinderColStacked or
+		eChartType.CylinderColStacked100 or eChartType.PyramidBarClustered or eChartType.PyramidBarStacked or eChartType.PyramidBarStacked100 or eChartType.PyramidCol or
+		eChartType.PyramidColClustered or eChartType.PyramidColStacked or eChartType.PyramidColStacked100 => new ExcelBarChartSerie(this, NameSpaceManager, ser, _isPivot) { InvertIfNegative = false },
 		_ => new ExcelChartSerie(this, NameSpaceManager, ser, _isPivot),
 	};
 
