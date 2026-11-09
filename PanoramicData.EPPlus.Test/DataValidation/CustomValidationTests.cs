@@ -23,7 +23,7 @@ public class CustomValidationTests : ValidationTestBase
 		Assert.IsNotNull(validation.Formula);
 	}
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
+	[TestMethod]
 	public void CustomValidation_ShouldThrowExceptionIfFormulaIsTooLong()
 	{
 		// Arrange
@@ -32,6 +32,6 @@ public class CustomValidationTests : ValidationTestBase
 
 		// Act
 		var validation = _sheet.DataValidations.AddCustomValidation("A1");
-		validation.Formula.ExcelFormula = sb.ToString();
+		Assert.ThrowsExactly<InvalidOperationException>(() => validation.Formula.ExcelFormula = sb.ToString());
 	}
 }

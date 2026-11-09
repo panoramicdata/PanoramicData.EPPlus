@@ -174,7 +174,7 @@ public class RefAndLookupTests
 
 		parsingContext.ExcelDataProvider = provider;
 		var result = func.Execute(args, parsingContext);
-		Assert.AreEqual(result.DataType, DataType.ExcelError);
+		Assert.AreEqual(DataType.ExcelError, result.DataType);
 	}
 
 	[TestMethod]
@@ -470,13 +470,13 @@ public class RefAndLookupTests
 		Assert.AreEqual("Worksheet1!B1", result.Result);
 	}
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
+	[TestMethod]
 	public void AddressShouldThrowIfR1C1FormatIsSpecified()
 	{
 		var func = new AddressFunction();
 		var parsingContext = ParsingContext.Create();
 		parsingContext.ExcelDataProvider = A.Fake<ExcelDataProvider>();
 		A.CallTo(() => parsingContext.ExcelDataProvider.ExcelMaxRows).Returns(10);
-		var result = func.Execute(FunctionsHelper.CreateArgs(1, 2, (int)ExcelReferenceType.RelativeRowAndColumn, false), parsingContext);
+		Assert.ThrowsExactly<InvalidOperationException>(() => func.Execute(FunctionsHelper.CreateArgs(1, 2, (int)ExcelReferenceType.RelativeRowAndColumn, false), parsingContext));
 	}
 }

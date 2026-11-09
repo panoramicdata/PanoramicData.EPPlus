@@ -23,42 +23,42 @@ public class ExcelChartAxisTest
 	public void CrossesAt_SetTo2_Is2()
 	{
 		axis.CrossesAt = 2;
-		Assert.AreEqual(axis.CrossesAt, 2);
+		Assert.AreEqual(2, axis.CrossesAt);
 	}
 
 	[TestMethod]
 	public void CrossesAt_SetTo1EMinus6_Is1EMinus6()
 	{
 		axis.CrossesAt = 1.2e-6;
-		Assert.AreEqual(axis.CrossesAt, 1.2e-6);
+		Assert.AreEqual(1.2e-6, axis.CrossesAt);
 	}
 
 	[TestMethod]
 	public void MinValue_SetTo2_Is2()
 	{
 		axis.MinValue = 2;
-		Assert.AreEqual(axis.MinValue, 2);
+		Assert.AreEqual(2, axis.MinValue);
 	}
 
 	[TestMethod]
 	public void MinValue_SetTo1EMinus6_Is1EMinus6()
 	{
 		axis.MinValue = 1.2e-6;
-		Assert.AreEqual(axis.MinValue, 1.2e-6);
+		Assert.AreEqual(1.2e-6, axis.MinValue);
 	}
 
 	[TestMethod]
 	public void MaxValue_SetTo2_Is2()
 	{
 		axis.MaxValue = 2;
-		Assert.AreEqual(axis.MaxValue, 2);
+		Assert.AreEqual(2, axis.MaxValue);
 	}
 
 	[TestMethod]
 	public void MaxValue_SetTo1EMinus6_Is1EMinus6()
 	{
 		axis.MaxValue = 1.2e-6;
-		Assert.AreEqual(axis.MaxValue, 1.2e-6);
+		Assert.AreEqual(1.2e-6, axis.MaxValue);
 	}
 	[TestMethod]
 	public void Gridlines_Set_IsNotNull()

@@ -45,7 +45,7 @@ public class SparkLineTests : TestBase
 		Assert.AreEqual("'Sparklines'!A20:A23", sg4.DateAxisRange.Address);
 
 		var c1 = sg1.ColorMarkers;
-		Assert.AreEqual(c1.Rgb, "FFD00000");
+		Assert.AreEqual("FFD00000", c1.Rgb);
 		var ec = sg1.DisplayEmptyCellsAs;
 		Assert.AreEqual(eDispBlanksAs.Gap, ec);
 		var t = sg1.Type;

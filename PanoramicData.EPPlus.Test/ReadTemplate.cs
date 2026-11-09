@@ -188,8 +188,9 @@ public class ReadTemplate //: TestBase
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\Model_graphes_MBW.xlsm"));
 
 		var ws = package.Workbook.Worksheets["HTTP_data"];
-		Assert.IsNotNull(ws.Cells["B4"].Style.Fill.BackgroundColor.Indexed);
-		Assert.IsNotNull(ws.Cells["B5"].Style.Fill.BackgroundColor.Indexed);
+		// Indexed is an int, so an IsNotNull on it could never fail (MSTEST0032); the reads are kept.
+		_ = ws.Cells["B4"].Style.Fill.BackgroundColor.Indexed;
+		_ = ws.Cells["B5"].Style.Fill.BackgroundColor.Indexed;
 	}
 	[Ignore]
 	[TestMethod]
@@ -208,7 +209,7 @@ public class ReadTemplate //: TestBase
 		var package = new ExcelPackage(new FileInfo(@"c:\temp\cf2.xlsx"));
 		var ws = package.Workbook.Worksheets[1];
 		ws.Cells["A1"].Value = 1;
-		Assert.AreEqual(ws.ConditionalFormatting[6].Type, eExcelConditionalFormattingRuleType.Equal);
+		Assert.AreEqual(eExcelConditionalFormattingRuleType.Equal, ws.ConditionalFormatting[6].Type);
 		package.SaveAs(new FileInfo(@"c:\temp\condFormTest.xlsx"));
 	}
 	[Ignore]

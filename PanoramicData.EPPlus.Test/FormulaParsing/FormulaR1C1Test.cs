@@ -177,7 +177,7 @@ public class FormulaR1C1Tests
 		var formula = "VLOOKUP(C2,A:B,1,0)";
 		var c = _sheet.Cells["D2"];
 		c.Formula = formula;
-		Assert.AreEqual(c.FormulaR1C1, "VLOOKUP(RC[-1],C[-3]:C[-2],1,0)");
+		Assert.AreEqual("VLOOKUP(RC[-1],C[-3]:C[-2],1,0)", c.FormulaR1C1);
 		c.FormulaR1C1 = c.FormulaR1C1;
 		Assert.AreEqual(c.Formula, formula);
 	}
@@ -187,7 +187,7 @@ public class FormulaR1C1Tests
 		var formula = "VLOOKUP(C2,A:A,1,0)";
 		var c = _sheet.Cells["D2"];
 		c.Formula = formula;
-		Assert.AreEqual(c.FormulaR1C1, "VLOOKUP(RC[-1],C[-3],1,0)");
+		Assert.AreEqual("VLOOKUP(RC[-1],C[-3],1,0)", c.FormulaR1C1);
 		c.FormulaR1C1 = c.FormulaR1C1;
 		Assert.AreEqual(c.Formula, formula);
 	}
@@ -197,7 +197,7 @@ public class FormulaR1C1Tests
 		var formula = "VLOOKUP(C3,1:2,1,0)";
 		var c = _sheet.Cells["D3"];
 		c.Formula = formula;
-		Assert.AreEqual(c.FormulaR1C1, "VLOOKUP(RC[-1],R[-2]:R[-1],1,0)");
+		Assert.AreEqual("VLOOKUP(RC[-1],R[-2]:R[-1],1,0)", c.FormulaR1C1);
 		c.FormulaR1C1 = c.FormulaR1C1;
 		Assert.AreEqual(c.Formula, formula);
 	}
@@ -207,7 +207,7 @@ public class FormulaR1C1Tests
 		var formula = "VLOOKUP(C3,1:1,1,0)";
 		var c = _sheet.Cells["D3"];
 		c.Formula = formula;
-		Assert.AreEqual(c.FormulaR1C1, "VLOOKUP(RC[-1],R[-2],1,0)");
+		Assert.AreEqual("VLOOKUP(RC[-1],R[-2],1,0)", c.FormulaR1C1);
 		c.FormulaR1C1 = c.FormulaR1C1;
 		Assert.AreEqual(c.Formula, formula);
 	}

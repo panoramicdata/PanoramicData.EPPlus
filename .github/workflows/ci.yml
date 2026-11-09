@@ -29,13 +29,13 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
 
-    # Unit tests only (no live services).
+    # Unit tests only (no live services), on Microsoft.Testing.Platform as global.json selects.
     - name: Test with coverage
       run: >
-        dotnet test PanoramicData.EPPlus.Test/PanoramicData.EPPlus.Test.csproj
+        dotnet test --project PanoramicData.EPPlus.Test/PanoramicData.EPPlus.Test.csproj
         --configuration Release --no-build
-        --collect "Code Coverage;Format=Cobertura" --results-directory ./coverage
-        --blame-hang-timeout 5m
+        --coverage --coverage-output-format cobertura
+        --results-directory ${{ github.workspace }}/coverage
 
     - name: Upload coverage to Codacy
       if: ${{ env.CODACY_PROJECT_TOKEN != '' }}

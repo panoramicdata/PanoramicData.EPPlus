@@ -73,7 +73,6 @@ public class LoadFromCollectionTests
 		Assert.AreEqual("Id", sheet.Cells["C1"].Value);
 	}
 	[TestMethod]
-	[ExpectedException(typeof(InvalidCastException))]
 	public void ShouldThrowInvalidCastExceptionIf()
 	{
 		var objs = new List<BaseClass>()
@@ -83,8 +82,6 @@ public class LoadFromCollectionTests
 		var items = objs.Select(x => new { x.Id, x.Name }).ToList();
 		using var pck = new ExcelPackage(new MemoryStream());
 		var sheet = pck.Workbook.Worksheets.Add("sheet");
-		sheet.Cells["C1"].LoadFromCollection(items, true, TableStyles.Dark1, BindingFlags.Public | BindingFlags.Instance, typeof(string).GetMembers());
-
-		Assert.AreEqual("Id", sheet.Cells["C1"].Value);
+		Assert.ThrowsExactly<InvalidCastException>(() => sheet.Cells["C1"].LoadFromCollection(items, true, TableStyles.Dark1, BindingFlags.Public | BindingFlags.Instance, typeof(string).GetMembers()));
 	}
 }

@@ -41,18 +41,18 @@ public class TimeStringParserTests
 		Assert.AreEqual(GetSerialNumber(10, 12, 55), result);
 	}
 
-	[TestMethod, ExpectedException(typeof(FormatException))]
+	[TestMethod]
 	public void ParseShouldThrowExceptionIfSecondIsOutOfRange()
 	{
 		var parser = new TimeStringParser();
-		var result = parser.Parse("10:12:60");
+		Assert.ThrowsExactly<FormatException>(() => parser.Parse("10:12:60"));
 	}
 
-	[TestMethod, ExpectedException(typeof(FormatException))]
+	[TestMethod]
 	public void ParseShouldThrowExceptionIfMinuteIsOutOfRange()
 	{
 		var parser = new TimeStringParser();
-		var result = parser.Parse("10:60:55");
+		Assert.ThrowsExactly<FormatException>(() => parser.Parse("10:60:55"));
 	}
 
 	[TestMethod]

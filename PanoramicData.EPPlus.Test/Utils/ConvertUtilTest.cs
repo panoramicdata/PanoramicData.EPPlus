@@ -122,20 +122,16 @@ public class ConvertUtilTest
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(FormatException))]
-	public void EmptyStringToDecimal() => ConvertUtil.GetTypedCellValue<decimal>("");
+	public void EmptyStringToDecimal() => Assert.ThrowsExactly<FormatException>(() => ConvertUtil.GetTypedCellValue<decimal>(""));
 
 	[TestMethod]
-	[ExpectedException(typeof(FormatException))]
-	public void FloatingPointStringToInt() => ConvertUtil.GetTypedCellValue<int>("1.4");
+	public void FloatingPointStringToInt() => Assert.ThrowsExactly<FormatException>(() => ConvertUtil.GetTypedCellValue<int>("1.4"));
 
 	[TestMethod]
-	[ExpectedException(typeof(InvalidCastException))]
-	public void IntToDateTime() => ConvertUtil.GetTypedCellValue<DateTime>(122);
+	public void IntToDateTime() => Assert.ThrowsExactly<InvalidCastException>(() => ConvertUtil.GetTypedCellValue<DateTime>(122));
 
 	[TestMethod]
-	[ExpectedException(typeof(InvalidCastException))]
-	public void IntToTimeSpan() => ConvertUtil.GetTypedCellValue<TimeSpan>(122);
+	public void IntToTimeSpan() => Assert.ThrowsExactly<InvalidCastException>(() => ConvertUtil.GetTypedCellValue<TimeSpan>(122));
 
 	[TestMethod]
 	public void IntStringToTimeSpan() => Assert.AreEqual(TimeSpan.FromDays(122), ConvertUtil.GetTypedCellValue<TimeSpan>("122"));
@@ -162,8 +158,7 @@ public class ConvertUtilTest
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(FormatException))]
-	public void BadTextToInt() => ConvertUtil.GetTypedCellValue<int>("text1");
+	public void BadTextToInt() => Assert.ThrowsExactly<FormatException>(() => ConvertUtil.GetTypedCellValue<int>("text1"));
 
 	// previous implementation
 	internal static T GetTypedValue<T>(object v)

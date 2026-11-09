@@ -28,11 +28,11 @@ public class ExcelAddressExpressionTests
 	[TestCleanup]
 	public void Cleanup() => _scope.Dispose();
 
-	[TestMethod, ExpectedException(typeof(ArgumentNullException))]
-	public void ConstructorShouldThrowIfExcelDataProviderIsNull() => new ExcelAddressExpression("A1", null, _parsingContext);
+	[TestMethod]
+	public void ConstructorShouldThrowIfExcelDataProviderIsNull() => Assert.ThrowsExactly<ArgumentNullException>(() => new ExcelAddressExpression("A1", null, _parsingContext));
 
-	[TestMethod, ExpectedException(typeof(ArgumentNullException))]
-	public void ConstructorShouldThrowIfParsingContextIsNull() => new ExcelAddressExpression("A1", A.Fake<ExcelDataProvider>(), null);
+	[TestMethod]
+	public void ConstructorShouldThrowIfParsingContextIsNull() => Assert.ThrowsExactly<ArgumentNullException>(() => new ExcelAddressExpression("A1", A.Fake<ExcelDataProvider>(), null));
 
 	//TODO:Fix Test /Janne
 	//[TestMethod]

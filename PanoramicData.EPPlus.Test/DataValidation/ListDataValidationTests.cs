@@ -32,6 +32,6 @@ public class ListDataValidationTests : ValidationTestBase
 		Assert.AreEqual(1, _validation.Formula.Values.Count);
 	}
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
-	public void ListDataValidation_ShouldThrowWhenNoFormulaOrValueIsSet() => _validation.Validate();
+	[TestMethod]
+	public void ListDataValidation_ShouldThrowWhenNoFormulaOrValueIsSet() => Assert.ThrowsExactly<InvalidOperationException>(() => _validation.Validate());
 }

@@ -115,7 +115,7 @@ public class ImageHeaderReaderTests
 		return b;
 	}
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow(true)]
 	[DataRow(false)]
 	public void Tiff_ReadsSizeAndResolutionInBothByteOrders(bool little)
@@ -185,7 +185,7 @@ public class ImageHeaderReaderTests
 	{
 		var tiff = BuildTiff(true, new TiffEntry(256, Double, 8), new TiffEntry(257, Short, 4));
 
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(tiff));
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(tiff));
 	}
 
 	[TestMethod]
@@ -193,7 +193,7 @@ public class ImageHeaderReaderTests
 	{
 		var tiff = BuildTiff(true, new TiffEntry(282, Rational, 0, (72, 1)));
 
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(tiff));
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(tiff));
 	}
 
 	[TestMethod]
@@ -217,16 +217,16 @@ public class ImageHeaderReaderTests
 	{
 		var valid = BuildTiff(true, new TiffEntry(256, Short, 8), new TiffEntry(257, Short, 4), new TiffEntry(282, Rational, 0, (72, 1)));
 
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(valid[..10]), "cut inside the IFD");
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(valid[..^4]), "cut inside the rational data");
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(valid[..10]), "cut inside the IFD");
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(valid[..^4]), "cut inside the rational data");
 
 		var wildIfd = (byte[])valid.Clone();
 		BinaryPrimitives.WriteUInt32LittleEndian(wildIfd.AsSpan(4), 0xFFFFFFF0);
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(wildIfd), "IFD offset beyond the data");
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(wildIfd), "IFD offset beyond the data");
 
 		var wildRational = (byte[])valid.Clone();
 		BinaryPrimitives.WriteUInt32LittleEndian(wildRational.AsSpan(10 + (2 * 12) + 8), 0x7FFFFFF0);
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(wildRational), "rational offset beyond the data");
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(wildRational), "rational offset beyond the data");
 	}
 
 	[TestMethod]
@@ -250,10 +250,10 @@ public class ImageHeaderReaderTests
 		Assert.AreEqual(96, ImageHeaderReader.Read(emf[..44]).Width);
 
 		// Any shorter is no longer recognisable as an EMF and is not a valid image of any kind.
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(emf[..40]));
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(emf[..40]));
 	}
 
-	[DataTestMethod]
+	[TestMethod]
 	[DataRow((ushort)1440)]
 	[DataRow((ushort)0)] // 0 means the default of 1440 units per inch
 	public void Wmf_SizeIsTheBoundingBoxConvertedToPixelsAt96Dpi(ushort unitsPerInch)
@@ -277,13 +277,13 @@ public class ImageHeaderReaderTests
 	[TestMethod]
 	public void Wmf_Truncated_IsRejected()
 	{
-		Assert.ThrowsException<InvalidDataException>(() => ImageHeaderReader.Read(BuildWmf(1440, 720, 1440)[..10]));
+		Assert.ThrowsExactly<InvalidDataException>(() => ImageHeaderReader.Read(BuildWmf(1440, 720, 1440)[..10]));
 	}
 
 	[TestMethod]
 	public void NullBytes_AreRejected()
 	{
-		Assert.ThrowsException<ArgumentNullException>(() => ImageHeaderReader.Read(null));
+		Assert.ThrowsExactly<ArgumentNullException>(() => ImageHeaderReader.Read(null));
 	}
 
 	[TestMethod]
@@ -342,7 +342,7 @@ public class ImageHeaderReaderTests
 		var ws = package.Workbook.Worksheets.Add("HF");
 		ws.HeaderFooter.OddHeader.InsertPicture(OnePixelPng, PictureAlignment.Left);
 
-		Assert.ThrowsException<InvalidOperationException>(() => ws.HeaderFooter.OddHeader.InsertPicture(OnePixelPng, PictureAlignment.Left));
+		Assert.ThrowsExactly<InvalidOperationException>(() => ws.HeaderFooter.OddHeader.InsertPicture(OnePixelPng, PictureAlignment.Left));
 
 		// A different alignment in the same header is a different section.
 		var other = ws.HeaderFooter.OddHeader.InsertPicture(OnePixelPng, PictureAlignment.Right);
@@ -356,8 +356,8 @@ public class ImageHeaderReaderTests
 		var ws = package.Workbook.Worksheets.Add("HF");
 		ws.HeaderFooter.OddHeader.LeftAlignedText = "before";
 
-		Assert.ThrowsException<InvalidDataException>(() => ws.HeaderFooter.OddHeader.InsertPicture(OnePixelPng[..12], PictureAlignment.Left));
-		Assert.ThrowsException<InvalidDataException>(() => ws.HeaderFooter.OddHeader.InsertPicture(new FileInfo(Path.Combine(Path.GetTempPath(), "does-not-exist.png")), PictureAlignment.Left));
+		Assert.ThrowsExactly<InvalidDataException>(() => ws.HeaderFooter.OddHeader.InsertPicture(OnePixelPng[..12], PictureAlignment.Left));
+		Assert.ThrowsExactly<InvalidDataException>(() => ws.HeaderFooter.OddHeader.InsertPicture(new FileInfo(Path.Combine(Path.GetTempPath(), "does-not-exist.png")), PictureAlignment.Left));
 
 		Assert.AreEqual("before", ws.HeaderFooter.OddHeader.LeftAlignedText, "rejected data must not leave a picture placeholder behind");
 	}
@@ -368,9 +368,9 @@ public class ImageHeaderReaderTests
 		using var package = new ExcelPackage();
 		var ws = package.Workbook.Worksheets.Add("HF");
 
-		Assert.ThrowsException<ArgumentNullException>(() => ws.HeaderFooter.OddHeader.InsertPicture((byte[])null, PictureAlignment.Left));
-		Assert.ThrowsException<ArgumentNullException>(() => ws.HeaderFooter.OddHeader.InsertPicture((Stream)null, PictureAlignment.Left));
-		Assert.ThrowsException<ArgumentNullException>(() => ws.HeaderFooter.OddHeader.InsertPicture((FileInfo)null, PictureAlignment.Left));
+		Assert.ThrowsExactly<ArgumentNullException>(() => ws.HeaderFooter.OddHeader.InsertPicture((byte[])null, PictureAlignment.Left));
+		Assert.ThrowsExactly<ArgumentNullException>(() => ws.HeaderFooter.OddHeader.InsertPicture((Stream)null, PictureAlignment.Left));
+		Assert.ThrowsExactly<ArgumentNullException>(() => ws.HeaderFooter.OddHeader.InsertPicture((FileInfo)null, PictureAlignment.Left));
 	}
 
 	[TestMethod]
@@ -379,6 +379,6 @@ public class ImageHeaderReaderTests
 		using var package = new ExcelPackage();
 		var ws = package.Workbook.Worksheets.Add("Pictures");
 
-		Assert.ThrowsException<ArgumentNullException>(() => ws.Drawings.AddPicture("P", (FileInfo)null, null));
+		Assert.ThrowsExactly<ArgumentNullException>(() => ws.Drawings.AddPicture("P", (FileInfo)null, null));
 	}
 }

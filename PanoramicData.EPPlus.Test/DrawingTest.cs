@@ -51,12 +51,12 @@ public class DrawingTest : TestBase
 	{
 		using ExcelPackage pck = new(new FileInfo(_worksheetPath + @"Drawing.xlsx"));
 		var ws = pck.Workbook.Worksheets["Pyramid"];
-		Assert.AreEqual(ws.Cells["V24"].Value, 104D);
+		Assert.AreEqual(104D, ws.Cells["V24"].Value);
 		ws = pck.Workbook.Worksheets["Scatter"];
 		var cht = ws.Drawings["ScatterChart1"] as ExcelScatterChart;
-		Assert.AreEqual(cht.Title.Text, "Header  Text");
+		Assert.AreEqual("Header  Text", cht.Title.Text);
 		cht.Title.Text = "Test";
-		Assert.AreEqual(cht.Title.Text, "Test");
+		Assert.AreEqual("Test", cht.Title.Text);
 	}
 
 	public void Picture()
@@ -462,7 +462,7 @@ public class DrawingTest : TestBase
 		chrt.Series[0].Header = "Serie 1";
 		chrt.Legend.Position = eLegendPosition.Right;
 		chrt.Axis[1].DisplayUnit = 100000;
-		Assert.AreEqual(chrt.Axis[1].DisplayUnit, 100000);
+		Assert.AreEqual(100000, chrt.Axis[1].DisplayUnit);
 	}
 	//[TestMethod]
 	//[Ignore]
@@ -483,7 +483,7 @@ public class DrawingTest : TestBase
 		chrt.Print = false;
 		chrt.EditAs = eEditAs.TwoCell;
 		chrt.Axis[1].DisplayUnit = 10020;
-		Assert.AreEqual(chrt.Axis[1].DisplayUnit, 10020);
+		Assert.AreEqual(10020, chrt.Axis[1].DisplayUnit);
 	}
 	//[TestMethod]
 	//[Ignore]
@@ -928,7 +928,7 @@ public class DrawingTest : TestBase
 		XmlHelper.LoadXmlSafe(drawingsXml, _pck.Package.GetPart(partUri).GetStream());
 
 		// Verify that there are the correct # of drawings:
-		Assert.AreEqual(drawingsXml.SelectNodes("//*[self::xdr:twoCellAnchor or self::xdr:oneCellAnchor or self::xdr:absoluteAnchor]", xmlNsm).Count, 5);
+		Assert.AreEqual(5, drawingsXml.SelectNodes("//*[self::xdr:twoCellAnchor or self::xdr:oneCellAnchor or self::xdr:absoluteAnchor]", xmlNsm).Count);
 
 		// Make unrelated change. (in this case a useless additional worksheet)
 		_pck.Workbook.Worksheets.Add("NewWorksheet");
@@ -951,7 +951,7 @@ public class DrawingTest : TestBase
 		XmlHelper.LoadXmlSafe(drawingsXml, _pck.Package.GetPart(partUri).GetStream());
 
 		// Verify that there are the correct # of drawings:
-		Assert.AreEqual(drawingsXml.SelectNodes("//*[self::xdr:twoCellAnchor or self::xdr:oneCellAnchor or self::xdr:absoluteAnchor]", xmlNsm).Count, 5);
+		Assert.AreEqual(5, drawingsXml.SelectNodes("//*[self::xdr:twoCellAnchor or self::xdr:oneCellAnchor or self::xdr:absoluteAnchor]", xmlNsm).Count);
 		// Verify that the new worksheet exists:
 		Assert.IsNotNull(_pck.Workbook.Worksheets["NewWorksheet"]);
 		// Cleanup:
