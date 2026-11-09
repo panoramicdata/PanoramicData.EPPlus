@@ -73,15 +73,7 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	/// <summary>
 	/// Datalabel
 	/// </summary>
-	public ExcelChartSerieDataLabel DataLabel
-	{
-		get
-		{
-			_DataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
-
-			return _DataLabel;
-		}
-	}
+	public ExcelChartSerieDataLabel DataLabel => GetDataLabel(ref _DataLabel);
 	const string smoothPath = "c:smooth/@val";
 	/// <summary>
 	/// Smooth for scattercharts
@@ -97,7 +89,6 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 			SetXmlNodeString(smoothPath, value.ToString());
 		}
 	}
-	const string markerPath = "c:marker/c:symbol/@val";
 	/// <summary>
 	/// Marker symbol 
 	/// </summary>
@@ -105,12 +96,11 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var marker = GetXmlNodeString(markerPath);
-			return marker == "" ? eMarkerStyle.None : Enum.Parse<eMarkerStyle>(marker, true);
+			return GetMarker();
 		}
 		set
 		{
-			SetXmlNodeString(markerPath, value.ToString().ToLower(CultureInfo.InvariantCulture));
+			SetMarker(value);
 		}
 	}
 
@@ -128,30 +118,13 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var color = GetXmlNodeString(LINECOLOR_PATH);
-			if (color == "")
-			{
-				return Color.Black;
-			}
-			else
-			{
-				var c = Color.FromArgb(Convert.ToInt32(color, 16));
-				var a = getAlphaChannel(LINECOLOR_PATH);
-				if (a != 255)
-				{
-					c = Color.FromArgb(a, c);
-				}
-
-				return c;
-			}
+			return GetColorWithAlpha(LINECOLOR_PATH);
 		}
 		set
 		{
-			SetXmlNodeString(LINECOLOR_PATH, value.ToArgb().ToString("X8")[2..], true);
-			setAlphaChannel(value, LINECOLOR_PATH);
+			SetColorWithAlpha(LINECOLOR_PATH, value);
 		}
 	}
-	readonly string MARKERSIZE_PATH = "c:marker/c:size/@val";
 	/// <summary>
 	/// Gets or sets the size of the marker.
 	/// </summary>
@@ -167,15 +140,11 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var size = GetXmlNodeString(MARKERSIZE_PATH);
-			return size == "" ? 5 : Int32.Parse(GetXmlNodeString(MARKERSIZE_PATH));
+			return GetMarkerSize();
 		}
 		set
 		{
-			var size = value;
-			size = Math.Max(2, size);
-			size = Math.Min(72, size);
-			SetXmlNodeString(MARKERSIZE_PATH, size.ToString(), true);
+			SetMarkerSize(value);
 		}
 	}
 	readonly string MARKERCOLOR_PATH = "c:marker/c:spPr/a:solidFill/a:srgbClr/@val";
@@ -190,31 +159,14 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var color = GetXmlNodeString(MARKERCOLOR_PATH);
-			if (color == "")
-			{
-				return Color.Black;
-			}
-			else
-			{
-				var c = Color.FromArgb(Convert.ToInt32(color, 16));
-				var a = getAlphaChannel(MARKERCOLOR_PATH);
-				if (a != 255)
-				{
-					c = Color.FromArgb(a, c);
-				}
-
-				return c;
-			}
+			return GetColorWithAlpha(MARKERCOLOR_PATH);
 		}
 		set
 		{
-			SetXmlNodeString(MARKERCOLOR_PATH, value.ToArgb().ToString("X8")[2..], true); //.Substring(2) => cut alpha value
-			setAlphaChannel(value, MARKERCOLOR_PATH);
+			SetColorWithAlpha(MARKERCOLOR_PATH, value);
 		}
 	}
 
-	readonly string LINEWIDTH_PATH = "c:spPr/a:ln/@w";
 	/// <summary>
 	/// Gets or sets the width of the line in pt.
 	/// </summary>
@@ -226,12 +178,11 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var size = GetXmlNodeString(LINEWIDTH_PATH);
-			return size == "" ? 2.25 : double.Parse(GetXmlNodeString(LINEWIDTH_PATH)) / 12700;
+			return GetLineWidth();
 		}
 		set
 		{
-			SetXmlNodeString(LINEWIDTH_PATH, ((int)(12700 * value)).ToString(), true);
+			SetLineWidth(value);
 		}
 	}
 	//marker line color
@@ -248,30 +199,34 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var color = GetXmlNodeString(MARKERLINECOLOR_PATH);
-			if (color == "")
-			{
-				return Color.Black;
-			}
-			else
-			{
-				var c = Color.FromArgb(Convert.ToInt32(color, 16));
-				var a = getAlphaChannel(MARKERLINECOLOR_PATH);
-				if (a != 255)
-				{
-					c = Color.FromArgb(a, c);
-				}
-
-				return c;
-			}
+			return GetColorWithAlpha(MARKERLINECOLOR_PATH);
 		}
 		set
 		{
-			SetXmlNodeString(MARKERLINECOLOR_PATH, value.ToArgb().ToString("X8")[2..], true);
-			setAlphaChannel(value, MARKERLINECOLOR_PATH);
+			SetColorWithAlpha(MARKERLINECOLOR_PATH, value);
 		}
 	}
 
+
+	private Color GetColorWithAlpha(string path)
+	{
+		var color = GetXmlNodeString(path);
+		if (color == "")
+		{
+			return Color.Black;
+		}
+
+		var c = Color.FromArgb(Convert.ToInt32(color, 16));
+		var a = getAlphaChannel(path);
+		return a != 255 ? Color.FromArgb(a, c) : c;
+	}
+
+	// The alpha byte is cut from the hex value and written to its own node
+	private void SetColorWithAlpha(string path, Color value)
+	{
+		SetXmlNodeString(path, value.ToArgb().ToString("X8")[2..], true);
+		setAlphaChannel(value, path);
+	}
 
 	/// <summary>
 	/// write alpha value (if Color.A != 255)
@@ -325,12 +280,12 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 	private static string xPath4Alpha(string xPath)
 	{
 		var s = string.Empty;
-		if (xPath.EndsWith("@val"))
+		if (xPath.EndsWith("@val", StringComparison.Ordinal))
 		{
-			xPath = xPath[..xPath.IndexOf("@val")];
+			xPath = xPath[..xPath.IndexOf("@val", StringComparison.Ordinal)];
 		}
 
-		if (xPath.EndsWith("/"))
+		if (xPath.EndsWith('/'))
 		{ //cut tailing slash
 			xPath = xPath[..^1];
 		}
@@ -348,6 +303,4 @@ public sealed class ExcelScatterChartSerie : ExcelChartSerie
 
 		return s;
 	}
-
-
 }

@@ -53,15 +53,7 @@ public sealed class ExcelBarChartSerie : ExcelChartSerie
 	/// <summary>
 	/// Datalabel
 	/// </summary>
-	public ExcelChartSerieDataLabel DataLabel
-	{
-		get
-		{
-			_DataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
-
-			return _DataLabel;
-		}
-	}
+	public ExcelChartSerieDataLabel DataLabel => GetDataLabel(ref _DataLabel);
 	const string INVERTIFNEGATIVE_PATH = "c:invertIfNegative/@val";
 	internal bool InvertIfNegative
 	{

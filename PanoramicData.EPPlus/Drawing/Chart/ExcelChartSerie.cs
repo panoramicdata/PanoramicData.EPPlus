@@ -30,6 +30,7 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
+using System.Globalization;
 using System.Xml;
 
 namespace OfficeOpenXml.Drawing.Chart;
@@ -158,16 +159,12 @@ public class ExcelChartSerie : XmlHelper
 
 			if (_chartSeries.Chart.PivotTableSource != null)
 			{
-				var cache = TopNode.SelectSingleNode(string.Format("{0}/c:numRef/c:numCache", _seriesTopPath), _ns);
-				cache?.ParentNode.RemoveChild(cache);
-
+				RemoveChildNode(string.Format("{0}/c:numRef/c:numCache", _seriesTopPath));
 				SetXmlNodeString(string.Format("{0}/c:numRef/c:numCache", _seriesTopPath), "General");
 			}
 
-			var lit = TopNode.SelectSingleNode(string.Format("{0}/c:numLit", _seriesTopPath), _ns);
-			lit?.ParentNode.RemoveChild(lit);
+			RemoveChildNode(string.Format("{0}/c:numLit", _seriesTopPath));
 		}
-
 	}
 	readonly string _xSeriesTopPath;
 	readonly string _xSeriesPath = "{0}/{1}/c:f";
@@ -185,24 +182,54 @@ public class ExcelChartSerie : XmlHelper
 			CreateNode(_xSeriesPath, true);
 			SetXmlNodeString(_xSeriesPath, ExcelCellBase.GetFullAddress(_chartSeries.Chart.WorkSheet.Name, value));
 
-			if (_xSeriesPath.IndexOf("c:numRef") > 0)
+			if (_xSeriesPath.Contains("c:numRef", StringComparison.Ordinal))
 			{
-				var cache = TopNode.SelectSingleNode(string.Format("{0}/c:numRef/c:numCache", _xSeriesTopPath), _ns);
-				cache?.ParentNode.RemoveChild(cache);
-
-				var lit = TopNode.SelectSingleNode(string.Format("{0}/c:numLit", _xSeriesTopPath), _ns);
-				lit?.ParentNode.RemoveChild(lit);
+				RemoveChildNode(string.Format("{0}/c:numRef/c:numCache", _xSeriesTopPath));
+				RemoveChildNode(string.Format("{0}/c:numLit", _xSeriesTopPath));
 			}
 			else
 			{
-				var cache = TopNode.SelectSingleNode(string.Format("{0}/c:strRef/c:strCache", _xSeriesTopPath), _ns);
-				cache?.ParentNode.RemoveChild(cache);
-
-				var lit = TopNode.SelectSingleNode(string.Format("{0}/c:strLit", _xSeriesTopPath), _ns);
-				lit?.ParentNode.RemoveChild(lit);
+				RemoveChildNode(string.Format("{0}/c:strRef/c:strCache", _xSeriesTopPath));
+				RemoveChildNode(string.Format("{0}/c:strLit", _xSeriesTopPath));
 			}
 		}
 	}
+
+	private protected void RemoveChildNode(string path)
+	{
+		var node = TopNode.SelectSingleNode(path, _ns);
+		node?.ParentNode.RemoveChild(node);
+	}
+
+	private protected ExcelChartSerieDataLabel GetDataLabel(ref ExcelChartSerieDataLabel dataLabel) => dataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
+
+	private const string MarkerPath = "c:marker/c:symbol/@val";
+	private const string MarkerSizePath = "c:marker/c:size/@val";
+	private const string LineWidthPath = "c:spPr/a:ln/@w";
+
+	private protected eMarkerStyle GetMarker()
+	{
+		var marker = GetXmlNodeString(MarkerPath);
+		return marker == "" ? eMarkerStyle.None : Enum.Parse<eMarkerStyle>(marker, true);
+	}
+
+	private protected void SetMarker(eMarkerStyle value) => SetXmlNodeString(MarkerPath, value.ToString().ToLower(CultureInfo.InvariantCulture));
+
+	private protected int GetMarkerSize()
+	{
+		var size = GetXmlNodeString(MarkerSizePath);
+		return size == "" ? 5 : int.Parse(size);
+	}
+
+	private protected void SetMarkerSize(int value) => SetXmlNodeString(MarkerSizePath, Math.Min(72, Math.Max(2, value)).ToString(), true);
+
+	private protected double GetLineWidth()
+	{
+		var size = GetXmlNodeString(LineWidthPath);
+		return size == "" ? 2.25 : double.Parse(size) / 12700;
+	}
+
+	private protected void SetLineWidth(double value) => SetXmlNodeString(LineWidthPath, ((int)(12700 * value)).ToString(), true);
 	ExcelChartTrendlineCollection _trendLines;
 	/// <summary>
 	/// Access to the trendline collection

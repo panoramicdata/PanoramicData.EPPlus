@@ -75,14 +75,6 @@ public sealed class ExcelPieChartSerie : ExcelChartSerie
 	/// <summary>
 	/// DataLabels
 	/// </summary>
-	public ExcelChartSerieDataLabel DataLabel
-	{
-		get
-		{
-			_DataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
-
-			return _DataLabel;
-		}
-	}
+	public ExcelChartSerieDataLabel DataLabel => GetDataLabel(ref _DataLabel);
 
 }
