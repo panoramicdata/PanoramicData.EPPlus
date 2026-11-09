@@ -72,28 +72,9 @@ public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, I
 		}
 	}
 
-	private static string CreateVmlDrawings()
-	{
-		var vml = string.Format("<xml xmlns:v=\"{0}\" xmlns:o=\"{1}\" xmlns:x=\"{2}\">",
-			ExcelPackage.schemaMicrosoftVml,
-			ExcelPackage.schemaMicrosoftOffice,
-			ExcelPackage.schemaMicrosoftExcel);
-
-		vml += "<o:shapelayout v:ext=\"edit\">";
-		vml += "<o:idmap v:ext=\"edit\" data=\"1\"/>";
-		vml += "</o:shapelayout>";
-
-		vml += "<v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\" path=\"m,l,21600r21600,l21600,xe\">";
-		vml += "<v:stroke joinstyle=\"miter\" />";
-		vml += "<v:path gradientshapeok=\"t\" o:connecttype=\"rect\" />";
-		vml += "</v:shapetype>";
-		vml += "</xml>";
-
-		return vml;
-	}
 	internal ExcelVmlDrawingPicture Add(string id, Uri uri, string name, double width, double height)
 	{
-		var node = AddImage(id, uri, name, width, height);
+		var node = AddImage(id, name, width, height);
 		var draw = new ExcelVmlDrawingPicture(node, NameSpaceManager, _ws)
 		{
 			ImageUri = uri
@@ -101,7 +82,7 @@ public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, I
 		_images.Add(draw);
 		return draw;
 	}
-	private XmlNode AddImage(string id, Uri targeUri, string Name, double width, double height)
+	private XmlNode AddImage(string id, string Name, double width, double height)
 	{
 		var node = VmlDrawingXml.CreateElement("v", "shape", ExcelPackage.schemaMicrosoftVml);
 		VmlDrawingXml.DocumentElement.AppendChild(node);
@@ -121,7 +102,7 @@ public class ExcelVmlDrawingPictureCollection : ExcelVmlDrawingBaseCollection, I
 	{
 		get
 		{
-			return _images[Index] as ExcelVmlDrawingPicture;
+			return _images[Index];
 		}
 	}
 	public int Count => _images.Count;

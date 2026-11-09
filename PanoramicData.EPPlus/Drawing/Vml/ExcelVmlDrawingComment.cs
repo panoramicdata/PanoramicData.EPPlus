@@ -30,6 +30,7 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Xml;
@@ -393,6 +394,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 	}
 	#region IRangeID Members
 
+	[SuppressMessage("Major Bug", "S3237:\"value\" contextual keyword should be used", Justification = "The id is derived from the comment's cell, so assignments through IRangeID are ignored.")]
 	ulong IRangeID.RangeID
 	{
 		get
@@ -401,7 +403,7 @@ public class ExcelVmlDrawingComment : ExcelVmlDrawingBase, IRangeID
 		}
 		set
 		{
-
+			// The id is derived from the cell, so there is nothing to store.
 		}
 	}
 
