@@ -64,18 +64,7 @@ public class RefAndLookupTests
 	}
 
 	private static object CalculateLookupOnSheet(string formula, params (string Address, object Value)[] cells)
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add("test");
-		foreach (var (address, value) in cells)
-		{
-			sheet.Cells[address].Value = value;
-		}
-
-		sheet.Cells["D1"].Formula = formula;
-		sheet.Calculate();
-		return sheet.Cells["D1"].Value;
-	}
+		=> SheetFormulaHelper.CalculateOnNewSheet("test", "D1", formula, cells);
 
 	[TestMethod]
 	public void LookupArgumentsShouldSetSearchedValue()

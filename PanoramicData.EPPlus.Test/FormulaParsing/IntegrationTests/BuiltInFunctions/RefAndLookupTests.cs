@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing;
 using FakeItEasy;
+using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 using PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.BuiltInFunctions;
@@ -33,18 +34,7 @@ public class RefAndLookupTests : FormulaParserTestBase
 	private static readonly (string Address, object Value)[] OnesInColumnB = [("B1", 1d), ("B2", 1d), ("B3", 1d)];
 
 	private static object CalculateOnNewSheet(string sheetName, string formulaCell, string formula, params (string Address, object Value)[] cells)
-	{
-		using var package = new ExcelPackage();
-		var sheet = package.Workbook.Worksheets.Add(sheetName);
-		foreach (var (address, value) in cells)
-		{
-			sheet.Cells[address].Value = value;
-		}
-
-		sheet.Cells[formulaCell].Formula = formula;
-		sheet.Calculate();
-		return sheet.Cells[formulaCell].Value;
-	}
+		=> SheetFormulaHelper.CalculateOnNewSheet(sheetName, formulaCell, formula, cells);
 
 	[TestMethod]
 	public void VLookupShouldReturnCorrespondingValue()
