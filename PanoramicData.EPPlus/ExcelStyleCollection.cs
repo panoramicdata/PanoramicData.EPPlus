@@ -71,12 +71,6 @@ public class ExcelStyleCollection<T> : IEnumerable<T>
 		}
 	}
 	public int Count => _list.Count;
-	//internal int Add(T item)
-	//{
-	//    _list.Add(item);
-	//    if (_setNextIdManual) NextId++;
-	//    return _list.Count-1;
-	//}
 	internal int Add(string key, T item)
 	{
 		_list.Add(item);

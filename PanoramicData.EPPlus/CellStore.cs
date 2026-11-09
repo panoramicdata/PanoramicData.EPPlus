@@ -37,7 +37,6 @@ internal class IndexBase : IComparable<IndexBase>
 {
 	internal short Index;
 	public int CompareTo(IndexBase other) =>
-		//return Index < other.Index ? -1 : Index > other.Index ? 1 : 0;
 		Index - other.Index;
 }
 // to compress memory size, use struct
@@ -122,7 +121,6 @@ internal class ColumnIndex : IndexBase, IDisposable
 	}
 	internal int GetNextRow(int row)
 	{
-		//var page = (int)((ulong)row >> CellStore<int>.pageBits);
 		var p = GetPosition(row);
 		if (p < 0)
 		{
@@ -495,11 +493,10 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	{
 		lock (_columnIndex)
 		{
-			var col = GetPosition(Column);          //Array.BinarySearch(_columnIndex, 0, ColumnCount, new IndexBase() { Index = (short)(Column) });
+			var col = GetPosition(Column);
 			var page = (short)(Row >> pageBits);
 			if (col >= 0)
 			{
-				//var pos = Array.BinarySearch(_columnIndex[col].Pages, 0, _columnIndex[col].Count, new IndexBase() { Index = page });
 				var pos = _columnIndex[col].GetPosition(Row);
 				if (pos < 0)
 				{
@@ -585,7 +582,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 			for (var colIx = fromColumn; colIx <= toColumn; colIx++)
 			{
-				//var col = Array.BinarySearch(_columnIndex, 0, ColumnCount, new IndexBase() { Index = (short)(colIx) });
 				var col = GetPosition(colIx);
 
 				foreach (var pair in pages)
@@ -595,7 +591,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					{
 						if (col >= 0)
 						{
-							//var pos = Array.BinarySearch(_columnIndex[col].Pages, 0, _columnIndex[col].Count, new IndexBase() { Index = page });
 							var pos = _columnIndex[col].GetPosition(rowIx);
 							if (pos < 0)
 							{
@@ -663,12 +658,10 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	{
 		lock (_columnIndex)
 		{
-			//var col = Array.BinarySearch(_columnIndex, 0, ColumnCount, new IndexBase() { Index = (short)(Column) });
 			var col = GetPosition(Column);
 			var page = (short)(Row >> pageBits);
 			if (col >= 0)
 			{
-				//var pos = Array.BinarySearch(_columnIndex[col].Pages, 0, _columnIndex[col].Count, new IndexBase() { Index = page });
 				var pos = _columnIndex[col].GetPosition(Row);
 				if (pos < 0)
 				{
@@ -867,7 +860,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 								{
 									pagePos = (delEndRow == fromRow ? pagePos : pagePos + 1);
 									var rowsLeft = CellStore<T>.DeletePage(shift ? fromRow : delEndRow, endRow - delEndRow, column, pagePos, shift);
-									//if (shift) UpdatePageOffset(column, pagePos, endRow - fromRow - rowsLeft);
 									if (rowsLeft > 0)
 									{
 										var fr = shift ? fromRow : endRow - rowsLeft;
@@ -928,25 +920,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				Math.Abs(column._pages[pagePos].Rows[column._pages[pagePos].RowCount - 1].Index) > PageSizeMax) //Split or Merge???
 			{
 				rows = CellStore<T>.ResetPageOffset(column, pagePos, rows);
-				////MergePages
-				//if (column.Pages[pagePos - 1].Index + 1 == column.Pages[pagePos].Index)
-				//{
-				//    if (column.Pages[pagePos].IndexOffset + column.Pages[pagePos].Rows[column.Pages[pagePos].RowCount - 1].Index + rows -
-				//        column.Pages[pagePos - 1].IndexOffset + column.Pages[pagePos - 1].Rows[0].Index <= PageSize)
-				//    {
-				//        //Merge
-				//        MergePage(column, pagePos - 1, -rows);
-				//    }
-				//    else
-				//    {
-				//        //Split
-				//    }
-				//}
-				//rows -= PageSize;
-				//for (int p = pagePos; p < column.PageCount; p++)
-				//{                            
-				//    column.Pages[p].Index -= 1;
-				//}
 				return;
 			}
 		}
@@ -967,14 +940,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					toPage.IndexOffset + toPage.Rows[0].Index <= PageSizeMax)
 				{
 					CellStore<T>.MergePage(column, pagePos - 1);
-					//var newPage = new PageIndex(toPage, 0, GetSize(fromPage.RowCount + toPage.RowCount));
-					//newPage.RowCount = fromPage.RowCount + fromPage.RowCount;
-					//Array.Copy(toPage.Rows, 0, newPage.Rows, 0, toPage.RowCount);
-					//Array.Copy(fromPage.Rows, 0, newPage.Rows, toPage.RowCount, fromPage.RowCount);
-					//for (int r = toPage.RowCount; r < newPage.RowCount; r++)
-					//{
-					//    newPage.Rows[r].Index += (short)(fromPage.IndexOffset - toPage.IndexOffset);
-					//}
 
 				}
 			}
@@ -1035,7 +1000,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			if (column.PageCount > pagePos)
 			{
 				page = column._pages[pagePos];
-				//page.Offset = pagePos == 0 ? 1 : prevOffset;  //First page can only reference to rows starting from Index == 1
 			}
 			else
 			{
@@ -1137,15 +1101,12 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 		if (_columnIndex[fPos].Index >= fromCol && _columnIndex[fPos].Index <= fromCol + columns)
 		{
-			//if (_columnIndex[fPos].Index < ColumnCount)
-			//{
 			if (tPos < ColumnCount)
 			{
 				Array.Copy(_columnIndex, tPos, _columnIndex, fPos, ColumnCount - tPos);
 			}
 
 			ColumnCount -= (tPos - fPos);
-			//}
 		}
 
 		if (shift)
@@ -1230,9 +1191,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				{
 					pagePos = CellStore<T>.SplitPage(column, pagePos);
 				}
-				//IndexItem[] newRows = new IndexItem[GetSize(page.RowCount - page.Rows[r].Index)];
-				//var newPage = new PageIndex(newRows, r);
-				//newPage.Index = (short)(pagePos + 1);
 				//TODO: MoveRows to next page.
 			}
 
@@ -1434,7 +1392,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		Array.Copy(columnIndex._pages, pagePos + 1, columnIndex._pages, pagePos + 2, columnIndex.PageCount - pagePos - 1);
 		columnIndex._pages[pagePos + 1] = nextPage;
 		page = nextPage;
-		//pos -= PageSize;
 		columnIndex.PageCount++;
 		return pagePos + 1;
 	}
@@ -1457,16 +1414,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			page.Index--;
 			page.Offset += PageSize;
 		}
-		//else if (page.Rows[0].Index >= PageSize) //Delete
-		//{
-		//    page.Index++;
-		//    AddPageRowOffset(page, -PageSize);
-		//}
-		//else if (page.Rows[0].Index <= -PageSize)   //Delete
-		//{
-		//    page.Index--;
-		//    AddPageRowOffset(page, PageSize);
-		//}
 		return page;
 	}
 
@@ -1557,13 +1504,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		_columnIndex = null;
 	}
 
-	//object IEnumerator.Current
-	//{
-	//    get 
-	//    {
-	//        return GetValue(_row+1, _columnIndex[_colPos].Index);
-	//    }
-	//}
 	public bool MoveNext() => GetNextCell(ref _row, ref _colPos, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
 	internal bool NextCell(ref int row, ref int col) => NextCell(ref row, ref col, 0, 0, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
 	internal bool NextCell(ref int row, ref int col, int minRow, int minColPos, int maxRow, int maxColPos)
@@ -1840,7 +1780,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		else
 		{
 			if (--colPos >= startColPos)
-			//                if (++colPos < ColumnCount && colPos <= endColPos)
 			{
 				var r = _columnIndex[colPos].GetNextRow(row);
 				if (r == row) //Exists next Row
@@ -1939,17 +1878,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 		_colPos = -1;
 		_row = 0;
 	}
-	//public IEnumerator<ulong> GetEnumerator()
-	//{
-	//    this.Reset();
-	//    return this;
-	//}
-
-	//IEnumerator IEnumerable.GetEnumerator()
-	//{
-	//    this.Reset();
-	//    return this;
-	//}
 
 }
 internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
@@ -2038,7 +1966,6 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 		}
 	}
 	internal bool Next() =>
-		//return _cellStore.GetNextCell(ref row, ref colPos, minColPos, maxRow, maxColPos);
 		_cellStore.GetNextCell(ref _row, ref _colPos, _minColPos, _maxRow, _maxColPos);
 	internal bool Previous()
 	{
@@ -2066,7 +1993,6 @@ internal class CellsStoreEnumerator<T> : IEnumerable<T>, IEnumerator<T>
 
 	public void Dispose()
 	{
-		//_cellStore=null;
 	}
 
 	object IEnumerator.Current

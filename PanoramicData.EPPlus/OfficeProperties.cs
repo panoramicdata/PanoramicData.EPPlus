@@ -119,7 +119,6 @@ public sealed class OfficeProperties : XmlHelper
 			// Save it to the package
 			StreamWriter stream = new(part.GetStream(FileMode.Create, FileAccess.Write));
 			xmlDoc.Save(stream);
-			//stream.Close();
 			Packaging.ZipPackage.Flush();
 
 			// create the relationship between the workbook and the new shared strings part

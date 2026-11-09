@@ -1348,24 +1348,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// WorkSheet object 
 	/// </summary>
 	public ExcelWorksheet Worksheet => _worksheet;
-	///// <summary>
-	///// Address including sheetname
-	///// </summary>
-	//public new string FullAddress
-	//{
-	//    get
-	//    {
-	//        string fullAddress = GetFullAddress(_worksheet.Name, _address);
-	//        if (Addresses != null)
-	//        {
-	//            foreach (var a in Addresses)
-	//            {
-	//                fullAddress += "," + GetFullAddress(_worksheet.Name, a.Address); ;
-	//            }
-	//        }
-	//        return fullAddress;
-	//    }
-	//}
 	/// <summary>
 	/// Address including sheetname
 	/// </summary>
@@ -1478,7 +1460,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	private void SetValue(object value, int row, int col)
 	{
 		_worksheet.SetValue(row, col, value);
-		// if (value is string) _worksheet._types.SetValue(row, col, "S"); else _worksheet._types.SetValue(row, col, "");
 		_worksheet._formulas.SetValue(row, col, "");
 	}
 	internal void SetSharedFormulaID(int id)
@@ -1536,8 +1517,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			SplitFormula(address, ix);
 		}
 
-		////Clear any formula references inside the refered range
-		//_worksheet._formulas.Clear(address._fromRow, address._toRow, address._toRow - address._fromRow + 1, address._toCol - address.column + 1);
 	}
 
 	private void SplitFormula(ExcelAddressBase address, int ix)
@@ -1551,7 +1530,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			_worksheet._sharedFormulas.Remove(ix);
 			return;
-			//fRange.SetSharedFormulaID(int.MinValue); 
 		}
 
 		var firstCellCollide = address.Collide(new ExcelAddressBase(fRange._fromRow, fRange._fromCol, fRange._fromRow, fRange._fromCol));
@@ -2009,7 +1987,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 						header = t.Name.Replace('_', ' ');
 					}
 				}
-				//_worksheet.SetValueInner(row, col++, header);
 				values[row, col++] = header;
 			}
 
@@ -2110,8 +2087,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			lines = GetLines(Text, Format);
 		}
-		//string splitRegex = String.Format("{0}(?=(?:[^{1}]*{1}[^{1}]*{1})*[^{1}]*$)", Format.EOL, Format.TextQualifier);
-		//lines = Regex.Split(Text, splitRegex);
 
 		var row = 0;
 		var col = 0;
@@ -2193,7 +2168,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 					throw (new Exception(string.Format("Text delimiter is not closed in line : {0}", line)));
 				}
 
-				//_worksheet.SetValueInner(row, col, ConvertData(Format, v, col - _fromCol, isText));
 				items.Add(ConvertData(Format, v, col, isText));
 				if (col > maxCol)
 				{
@@ -2258,7 +2232,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		if (prevLineStart >= Format.EOL.Length && IsEOL(text, prevLineStart - Format.EOL.Length, Format.EOL))
 		{
-			//list.Add(text.Substring(prevLineStart- Format.EOL.Length, Format.EOL.Length));
 			list.Add("");
 		}
 		else
@@ -2431,7 +2404,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 					styles = Destination._worksheet.Workbook.Styles;
 		Dictionary<int, int> styleCashe = [];
 
-		//Clear all existing cells; 
+		// Clear all existing cells
 		int toRow = _toRow - _fromRow + 1,
 			toCol = _toCol - _fromCol + 1;
 
@@ -2665,13 +2638,8 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		Set_SharedFormula(this, ArrayFormula, this, true);
 	}
-	//private void Clear(ExcelAddressBase Range)
-	//{
-	//    Clear(Range, true);
-	//}
 	internal void Delete(ExcelAddressBase Range, bool shift)
 	{
-		//DeleteCheckMergedCells(Range);
 		_worksheet.MergedCells.Clear(Range);
 		//First find the start cell
 		int fromRow, fromCol;
@@ -2698,8 +2666,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		var cols = Range._toCol - fromCol + 1;
 
 		_worksheet._values.Delete(fromRow, fromCol, rows, cols, shift);
-		//_worksheet._types.Delete(fromRow, fromCol, rows, cols, shift);
-		//_worksheet._styles.Delete(fromRow, fromCol, rows, cols, shift);
 		_worksheet._formulas.Delete(fromRow, fromCol, rows, cols, shift);
 		_worksheet._hyperLinks.Delete(fromRow, fromCol, rows, cols, shift);
 		_worksheet._flags.Delete(fromRow, fromCol, rows, cols, shift);
@@ -2744,7 +2710,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 	public void Dispose()
 	{
-		//_worksheet = null;            
 	}
 
 	#endregion
@@ -2771,8 +2736,6 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	/// The current range when enumerating
 	/// </summary>
 	object IEnumerator.Current => ((object)(new ExcelRangeBase(_worksheet, GetAddress(_cellEnum.Row, _cellEnum.Column))));
-
-	//public object FormatedText { get; private set; }
 
 	int _enumAddressIx = -1;
 	public bool MoveNext()

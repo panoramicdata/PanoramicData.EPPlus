@@ -97,10 +97,6 @@ public class ExcelRange : ExcelRangeBase
 			if (ixStart >= 0 & ixEnd >= 0)
 			{
 				var external = address.Substring(ixStart + 1, ixEnd - 1);
-				//if (Worksheet.Workbook._externalReferences.Count < external)
-				//{
-				//foreach(var 
-				//}
 			}
 		}
 
@@ -124,7 +120,6 @@ public class ExcelRange : ExcelRangeBase
 			_toRow = Row;
 			_rtc = null;
 			// avoid address re-calculation
-			//base.Address = GetAddress(_fromRow, _fromCol);
 			_start = null;
 			_end = null;
 			_addresses = null;
@@ -154,7 +149,6 @@ public class ExcelRange : ExcelRangeBase
 			_toRow = ToRow;
 			_rtc = null;
 			// avoid address re-calculation
-			//base.Address = GetAddress(_fromRow, _fromCol, _toRow, _toCol);
 			_start = null;
 			_end = null;
 			_addresses = null;

@@ -105,11 +105,9 @@ public abstract class ExcelCellBase
 		var tokens = lexer.Tokenize(value, null);
 		foreach (var token in tokens)
 		{
-			//Console.WriteLine($"{token.TokenType} : {token.Value}");
 			if (token.TokenType == TokenType.ExcelAddress || token.TokenType.Equals(TokenType.NameValue) || token.TokenType == TokenType.ExcelAddressR1C1)
 			{
 				var part = addressTranslator(token.Value, row, col);
-				//Console.Write($"==> " + part);
 				token.Value = part;
 			}
 
@@ -211,8 +209,6 @@ public abstract class ExcelCellBase
 		// Bug
 		var rStart = check.IndexOf("R");
 		var cStart = check.IndexOf("C");
-		//if (rStart != 0)
-		//    return part;
 		if (rStart != 0 && cStart != 0)
 		{
 			return part;
@@ -222,7 +218,6 @@ public abstract class ExcelCellBase
 		{
 			if (rStart == 0)
 			{
-				//return GetAddress(row);
 				return $"{row}:{row}";
 			}
 			else
@@ -384,7 +379,6 @@ public abstract class ExcelCellBase
 
 		if (iColumnNumber < 1)
 		{
-			//throw new Exception("Column number is out of range");
 			return "#REF!";
 		}
 

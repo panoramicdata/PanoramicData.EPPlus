@@ -53,7 +53,6 @@ public sealed class ExcelStyles : XmlHelper
 	const string CellStylesPath = "d:styleSheet/d:cellStyles";
 	const string dxfsPath = "d:styleSheet/d:dxfs";
 
-	//internal Dictionary<int, ExcelXfs> Styles = new Dictionary<int, ExcelXfs>();
 	readonly XmlDocument _styleXml;
 	readonly ExcelWorkbook _wb;
 	readonly XmlNamespaceManager _nameSpaceManager;
@@ -219,7 +218,6 @@ public sealed class ExcelStyles : XmlHelper
 			}
 			else
 			{
-				//column = (ExcelColumn)ws.GetValueInner(0, address.Start.Column);
 				column = (ExcelColumn)o;
 				isNew = false;
 			}
@@ -243,7 +241,6 @@ public sealed class ExcelStyles : XmlHelper
 				var s = ws.GetStyleInner(0, column.ColumnMin);
 				AddNewStyleColumn(sender, e, ws, styleCashe, column, s);
 
-				//index++;
 				prevColumMax = column.ColumnMax;
 				if (!ws._values.NextCell(ref row, ref col) || row > 0)
 				{
@@ -479,7 +476,6 @@ public sealed class ExcelStyles : XmlHelper
 								int r = 0, c = column;
 								if (ws._values.PrevCell(ref r, ref c))
 								{
-									//var val = ws._values.GetValue(0, c);
 									if (!colCache.ContainsKey(c))
 									{
 										colCache.Add(c, ws._values.GetValue(0, c));
@@ -498,7 +494,6 @@ public sealed class ExcelStyles : XmlHelper
 
 					if (tmpCache.TryGetValue(s, out var value))
 					{
-						//ws.SetStyleInner(row, column, tmpCache[s]);
 						list[index] = new ExcelCoreValue { _value = list[index]._value, _styleId = value };
 					}
 					else
@@ -506,7 +501,6 @@ public sealed class ExcelStyles : XmlHelper
 						var st = CellXfs[s];
 						var newId = st.GetNewID(CellXfs, sender, e.StyleClass, e.StyleProperty, e.Value);
 						tmpCache.Add(s, newId);
-						//ws.SetStyleInner(row, column, newId);
 						list[index] = new ExcelCoreValue { _value = list[index]._value, _styleId = newId };
 					}
 				},
@@ -553,12 +547,10 @@ public sealed class ExcelStyles : XmlHelper
 					int r = 0, c = col;
 					if (ws._values.PrevCell(ref r, ref c))
 					{
-						//var column=ws.GetValueInner(0,c) as ExcelColumn;
 						var val = ws._values.GetValue(0, c);
 						var column = (ExcelColumn)(val._value);
 						if (column != null && column.ColumnMax >= col) //Fixes issue 15174
 						{
-							//return ws.GetStyleInner(0, c);
 							return val._styleId;
 						}
 						else
@@ -630,7 +622,6 @@ public sealed class ExcelStyles : XmlHelper
 		ExcelStyles styles;
 		if (Template == null)
 		{
-			//                style.Style = new ExcelStyle(this, NamedStylePropertyChange, -1, name, 0);
 			xfIdCopy = 0;
 			positionID = -1;
 			styles = this;
@@ -643,8 +634,6 @@ public sealed class ExcelStyles : XmlHelper
 
 				positionID = Template.PositionID;
 				styles = this;
-				//style.Style = new ExcelStyle(this, NamedStylePropertyChange, Template.PositionID, name, Template.Index);
-				//style.StyleXfId = Template.Index;
 			}
 			else
 			{
@@ -665,7 +654,6 @@ public sealed class ExcelStyles : XmlHelper
 		style.Name = name;
 		var ix = _wb.Styles.NamedStyles.Add(style.Name, style);
 		style.Style.SetIndex(ix);
-		//style.Style.XfId = ix;
 		return style;
 	}
 	public void UpdateXml()
@@ -735,8 +723,8 @@ public sealed class ExcelStyles : XmlHelper
 		count = 0;
 		var fillsNode = _styleXml.SelectSingleNode(FillsPath, _nameSpaceManager);
 		fillsNode.RemoveAll();
-		Fills[0].useCnt = 1;    //Must exist (none);  
-		Fills[1].useCnt = 1;    //Must exist (gray125);
+		Fills[0].useCnt = 1;    // Must exist (none)  
+		Fills[1].useCnt = 1;    // Must exist (gray125)
 		foreach (var fill in Fills)
 		{
 			if (fill.useCnt > 0)
@@ -753,7 +741,7 @@ public sealed class ExcelStyles : XmlHelper
 		count = 0;
 		var bordersNode = _styleXml.SelectSingleNode(BordersPath, _nameSpaceManager);
 		bordersNode.RemoveAll();
-		Borders[0].useCnt = 1;    //Must exist blank;
+		Borders[0].useCnt = 1;    // Must exist blank
 		foreach (var border in Borders)
 		{
 			if (border.useCnt > 0)
@@ -990,7 +978,6 @@ public sealed class ExcelStyles : XmlHelper
 		else
 		{
 			return 0;
-			//throw(new Exception("Named style does not exist"));        	         
 		}
 	}
 	#region XmlHelpFunctions

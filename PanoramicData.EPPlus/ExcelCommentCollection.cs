@@ -40,7 +40,6 @@ namespace OfficeOpenXml;
 /// </summary>  
 public class ExcelCommentCollection : IEnumerable, IDisposable
 {
-	//internal RangeCollection _comments;
 	readonly List<ExcelComment> _list = [];
 	internal ExcelCommentCollection(ExcelPackage pck, ExcelWorksheet ws, XmlNamespaceManager ns)
 	{
@@ -75,15 +74,12 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 	}
 	private void AddCommentsFromXml()
 	{
-		//var lst = new List<IRangeID>();
 		foreach (XmlElement node in CommentXml.SelectNodes("//d:commentList/d:comment", NameSpaceManager))
 		{
 			var comment = new ExcelComment(NameSpaceManager, node, new ExcelRangeBase(Worksheet, node.GetAttribute("ref")));
-			//lst.Add(comment);
 			_list.Add(comment);
 			Worksheet._commentsStore.SetValue(comment.Range._fromRow, comment.Range._fromCol, _list.Count - 1);
 		}
-		//_comments = new RangeCollection(lst);
 	}
 	/// <summary>
 	/// Access to the comment xml document
@@ -132,15 +128,6 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 	{
 		get
 		{
-			//ulong cellID=ExcelCellBase.GetCellID(Worksheet.SheetID, cell.Row, cell.Column);
-			//if (_comments.IndexOf(cellID) >= 0)
-			//{
-			//    return _comments[cellID] as ExcelComment;
-			//}
-			//else
-			//{
-			//    return null;
-			//}
 			var i = -1;
 			return Worksheet._commentsStore.Exists(cell.Row, cell.Column, ref i) ? _list[i] : null;
 
@@ -156,7 +143,6 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 	public ExcelComment Add(ExcelRangeBase cell, string Text, string author)
 	{
 		var elem = CommentXml.CreateElement("comment", ExcelPackage.schemaMain);
-		//int ix=_comments.IndexOf(ExcelAddress.GetCellID(Worksheet.SheetID, cell._fromRow, cell._fromCol));
 		//Make sure the nodes come on order.
 		int row = cell.Start.Row, column = cell.Start.Column;
 		ExcelComment nextComment = null;
@@ -199,7 +185,6 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 	public void Remove(ExcelComment comment)
 	{
 		var id = ExcelCellBase.GetCellID(Worksheet.SheetID, comment.Range._fromRow, comment.Range._fromCol);
-		//int ix=_comments.IndexOf(id);
 		var i = -1;
 		ExcelComment c = null;
 		if (Worksheet._commentsStore.Exists(comment.Range._fromRow, comment.Range._fromCol, ref i))
@@ -278,7 +263,6 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 	/// <param name="columns">The number of columns to insert.</param>
 	public void Insert(int fromRow, int fromCol, int rows, int columns)
 	{
-		//List<ExcelComment> commentsToShift = new List<ExcelComment>();
 		foreach (var comment in _list)
 		{
 			var address = new ExcelAddressBase(comment.Address);
@@ -292,16 +276,6 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 				comment.Reference = comment.Range.AddColumn(fromCol, columns).Address;
 			}
 		}
-		//foreach (ExcelComment comment in commentsToShift)
-		//{
-		//  Remove(comment);
-		//  var address = new ExcelAddressBase(comment.Address);
-		//  if (address._fromRow >= fromRow)
-		//    address._fromRow += rows;
-		//  if (address._fromCol >= fromCol)
-		//    address._fromCol += columns;
-		//  Add(Worksheet.Cells[address._fromRow, address._fromCol], comment.Text, comment.Author);
-		//}
 	}
 
 	void IDisposable.Dispose()

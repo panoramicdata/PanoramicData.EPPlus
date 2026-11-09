@@ -60,8 +60,6 @@ public abstract class XmlHelper
 		NameSpaceManager = nameSpaceManager;
 	}
 
-	//internal bool ChangedFlag;
-
 	internal XmlNamespaceManager NameSpaceManager { get; set; }
 
 	internal XmlNode? TopNode { get; set; }
@@ -592,7 +590,6 @@ public abstract class XmlHelper
 				CreateNode(path, insertFirst);
 				nameNode = node.SelectSingleNode(path, NameSpaceManager);
 			}
-			//if (nameNode.InnerText != value) HasChanged();
 			nameNode.InnerText = value;
 		}
 	}

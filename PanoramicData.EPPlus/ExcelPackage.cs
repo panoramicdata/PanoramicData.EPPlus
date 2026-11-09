@@ -544,7 +544,6 @@ public sealed class ExcelPackage : IDisposable
 
 			try
 			{
-				//_package = Package.Open(_stream, FileMode.Open, FileAccess.ReadWrite);
 				_package = new Packaging.ZipPackage(ms);
 			}
 			catch (Exception ex)
@@ -563,7 +562,6 @@ public sealed class ExcelPackage : IDisposable
 		{
 			throw new Exception("Passed invalid TemplatePath to Excel Template");
 		}
-		//return newFile;
 	}
 	private void ConstructNewFile(string password)
 	{
@@ -587,7 +585,6 @@ public sealed class ExcelPackage : IDisposable
 
 			try
 			{
-				//_package = Package.Open(_stream, FileMode.Open, FileAccess.ReadWrite);
 				_package = new Packaging.ZipPackage(ms);
 			}
 			catch (Exception ex)
@@ -604,7 +601,6 @@ public sealed class ExcelPackage : IDisposable
 		}
 		else
 		{
-			//_package = Package.Open(_stream, FileMode.Create, FileAccess.ReadWrite);
 			_package = new Packaging.ZipPackage(ms);
 			CreateBlankWb();
 		}
@@ -1157,7 +1153,6 @@ public sealed class ExcelPackage : IDisposable
 
 			try
 			{
-				//this._package = Package.Open(this._stream, FileMode.Open, FileAccess.ReadWrite);
 				_package = new Packaging.ZipPackage(ms);
 			}
 			catch (Exception ex)

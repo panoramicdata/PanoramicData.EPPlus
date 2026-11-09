@@ -226,8 +226,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			//Copy HeaderFooter
 			CopyHeaderFooterPictures(Copy, added);
 
-			//Copy all relationships 
-			//CopyRelationShips(Copy, added);
 			if (Copy.Drawings.Count > 0)
 			{
 				CopyDrawing(Copy, added);
@@ -354,7 +352,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			xmlDoc.SelectSingleNode("//d:table/@displayName", tbl.NameSpaceManager).Value = name;
 			xml = xmlDoc.OuterXml;
 
-			//var uriTbl = new Uri(string.Format("/xl/tables/table{0}.xml", Id), UriKind.Relative);
 			var uriTbl = GetNewUri(_pck.Package, "/xl/tables/table{0}.xml", ref Id);
 			if (_pck.Workbook._nextTableID < Id)
 			{
@@ -364,7 +361,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			var part = _pck.Package.CreatePart(uriTbl, "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml", _pck.Compression);
 			StreamWriter streamTbl = new(part.GetStream(FileMode.Create, FileAccess.Write));
 			streamTbl.Write(xml);
-			//streamTbl.Close();
 			streamTbl.Flush();
 
 			//create the relationship and add the ID to the worksheet xml.
@@ -513,14 +509,13 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			CopyText(Copy.HeaderFooter._firstFooter, added.HeaderFooter.FirstFooter);
 		}
 
-		//Copy any images;
+		// Copy any images
 		if (Copy.HeaderFooter.Pictures.Count > 0)
 		{
 			var source = Copy.HeaderFooter.Pictures.Uri;
 			var dest = GetNewUri(_pck.Package, @"/xl/drawings/vmlDrawing{0}.vml");
 			added.DeleteNode("d:legacyDrawingHF");
 
-			//var part = _pck.Package.CreatePart(dest, "application/vnd.openxmlformats-officedocument.vmlDrawing", _pck.Compression);
 			foreach (ExcelVmlDrawingPicture pic in Copy.HeaderFooter.Pictures)
 			{
 				var item = added.HeaderFooter.Pictures.Add(pic.Id, pic.ImageUri, pic.Title, pic.Width, pic.Height);

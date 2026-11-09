@@ -281,14 +281,7 @@ public class ExcelAddressBase : ExcelCellBase
 		address = address.Trim();
 		if (Utils.ConvertUtil._invariantCompareInfo.IsPrefix(address, "'") || Utils.ConvertUtil._invariantCompareInfo.IsPrefix(address, "["))
 		{
-			//int pos = address.IndexOf("'", 1);
-			//while (pos < address.Length && address[pos + 1] == '\'')
-			//{
-			//    pos = address.IndexOf("'", pos + 2);
-			//}
-			//var wbws = address.Substring(1, pos - 1).Replace("''", "'");
 			SetWbWs(address);
-			//_address = address.Substring(pos + 2);
 		}
 		else
 		{
@@ -758,14 +751,8 @@ public class ExcelAddressBase : ExcelCellBase
 	internal ExcelAddressBase Insert(ExcelAddressBase address, eShiftType Shift/*, out ExcelAddressBase topAddress, out ExcelAddressBase leftAddress, out ExcelAddressBase rightAddress, out ExcelAddressBase bottomAddress*/)
 	{
 		//Before or after, no change
-		//if ((_toRow > address._fromRow && _toCol > address.column) || 
-		//    (_fromRow > address._toRow && column > address._toCol))
 		if (_toRow < address._fromRow || _toCol < address._fromCol || (_fromRow > address._toRow && _fromCol > address._toCol))
 		{
-			//topAddress = null;
-			//leftAddress = null;
-			//rightAddress = null;
-			//bottomAddress = null;
 			return this;
 		}
 
@@ -1037,7 +1024,7 @@ public class ExcelAddressBase : ExcelCellBase
 				{
 					if (Address[i] == '[' && !isText)
 					{
-						if (i > 0) //Table reference return full address;
+						if (i > 0) // Table reference returns the full address
 						{
 							intAddress = Address;
 							return true;

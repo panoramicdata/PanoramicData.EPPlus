@@ -172,22 +172,6 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 			}
 		}
 	}
-	//private void InsertColumns(int colFrom, int cols, ExcelNamedRange namedRange)
-	//{
-	//    if (colFrom > 0)
-	//    {
-	//        if (colFrom <= namedRange.Start.Column)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column +cols, namedRange.End.Row, namedRange.End.Column + cols);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress);
-	//        }
-	//        else if (colFrom <= namedRange.End.Column && namedRange.End.Column + cols < ExcelPackage.MaxColumns)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column, namedRange.End.Row, namedRange.End.Column + cols);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress);
-	//        }
-	//    }
-	//}
 
 	private static void InsertColumns(int colFrom, int cols, ExcelNamedRange namedRange)
 	{
@@ -238,23 +222,6 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 
 		return newAddress;
 	}
-
-	//private void InsertRows(int rowFrom, int rows, ExcelNamedRange namedRange)
-	//{
-	//    if (rows > 0)
-	//    {
-	//        if (rowFrom <= namedRange.Start.Row)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row + rows, namedRange.Start.Column, namedRange.End.Row + rows, namedRange.End.Column);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress); 
-	//        }
-	//        else if (rowFrom <= namedRange.End.Row && namedRange.End.Row+rows <= ExcelPackage.MaxRows)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column, namedRange.End.Row + rows, namedRange.End.Column);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress); 
-	//        }
-	//    }
-	//}
 
 	private static void InsertRows(int rowFrom, int rows, ExcelNamedRange namedRange)
 	{

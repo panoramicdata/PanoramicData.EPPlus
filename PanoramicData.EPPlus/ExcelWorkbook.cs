@@ -230,15 +230,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					}
 					else
 					{
-						//if (addressType == ExcelAddressBase.AddressType.ExternalAddress || addressType == ExcelAddressBase.AddressType.ExternalName)
-						//{
-						//    var r = new ExcelAddress(fullAddress);
-						//    namedRange.NameFormula = '\'[' + r._wb
-						//}
-						//else
-						//{
 						namedRange.NameFormula = fullAddress;
-						//}
 					}
 				}
 				else
@@ -553,7 +545,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	{
 		get
 		{
-			//return GetXmlNodeBool(date1904Path, false);
 			date1904Cache ??= GetXmlNodeBool(date1904Path, false);
 
 			return date1904Cache.Value;
@@ -611,7 +602,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 			// save it to the package
 			StreamWriter stream = new(partWorkbook.GetStream(FileMode.Create, FileAccess.Write));
 			_workbookXml.Save(stream);
-			//stream.Close();
 			Packaging.ZipPackage.Flush();
 		}
 	}
@@ -655,7 +645,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					StreamWriter stream = new(part.GetStream(FileMode.Create, FileAccess.Write));
 
 					_stylesXml.Save(stream);
-					//stream.Close();
 					Packaging.ZipPackage.Flush();
 
 					// create the relationship between the workbook and the new shared strings part
@@ -827,7 +816,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		}
 
 		part.SaveHandler = SaveSharedStringHandler;
-		//UpdateSharedStringsXml();
 
 		// Data validation
 		ValidateDataValidations();
@@ -872,19 +860,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 
 	private void SaveSharedStringHandler(ZipOutputStream stream, CompressionLevel compressionLevel, string fileName)
 	{
-		//Packaging.ZipPackagePart stringPart;
-		//if (_package.Package.PartExists(SharedStringsUri))
-		//{
-		//    stringPart=_package.Package.GetPart(SharedStringsUri);
-		//}
-		//else
-		//{
-		//    stringPart = _package.Package.CreatePart(SharedStringsUri, @"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml", _package.Compression);
-		//Part.CreateRelationship(UriHelper.GetRelativeUri(WorkbookUri, SharedStringsUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/sharedStrings");
-		//}
-
-		//StreamWriter sw = new StreamWriter(stringPart.GetStream(FileMode.Create, FileAccess.Write));
-		//Init Zip
 		stream.CompressionLevel = (Packaging.DotNetZip.Zlib.CompressionLevel)compressionLevel;
 		stream.PutNextEntry(fileName);
 
@@ -926,8 +901,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		cache.Append("</sst>");
 		sw.Write(cache.ToString());
 		sw.Flush();
-		// Issue 15252: Save SharedStrings only once
-		//Part.CreateRelationship(UriHelper.GetRelativeUri(WorkbookUri, SharedStringsUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/sharedStrings");
 	}
 	private void UpdateDefinedNamesXml()
 	{
@@ -1103,7 +1076,6 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 		pivotCaches.AppendChild(item);
 	}
 	internal List<string> _externalReferences = [];
-	//internal bool _isCalculated=false;
 	internal void GetExternalReferences()
 	{
 		var nl = WorkbookXml.SelectNodes("//d:externalReferences/d:externalReference", NameSpaceManager);
