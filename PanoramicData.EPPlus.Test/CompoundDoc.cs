@@ -34,6 +34,7 @@ public class CompoundDoc
 		}
 	}
 	[TestMethod]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1215", Justification = "The stress test collects between iterations to surface leaked compound document streams.")]
 	public void WriteReadCompundDoc()
 	{
 		for (var i = 1; i < 50; i++)
