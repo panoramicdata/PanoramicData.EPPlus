@@ -28,6 +28,7 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
 using System;
 using System.Collections.Generic;
@@ -45,11 +46,13 @@ public abstract class Expression
 	public IOperator Operator { get; set; }
 	public abstract bool IsGroupedExpression { get; }
 
-	protected Expression()
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public Expression()
 	{
 	}
 
-	protected Expression(string expression)
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public Expression(string expression)
 	{
 		ExpressionString = expression;
 		Operator = null;

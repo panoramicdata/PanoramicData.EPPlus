@@ -22,6 +22,7 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using System.Collections.Generic;
@@ -33,12 +34,14 @@ public abstract class LookupFunction : ExcelFunction
 	private readonly ValueMatcher _valueMatcher;
 	private readonly CompileResultFactory _compileResultFactory;
 
-	protected LookupFunction()
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public LookupFunction()
 		: this(new LookupValueMatcher(), new CompileResultFactory())
 	{
 	}
 
-	protected LookupFunction(ValueMatcher valueMatcher, CompileResultFactory compileResultFactory)
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public LookupFunction(ValueMatcher valueMatcher, CompileResultFactory compileResultFactory)
 	{
 		_valueMatcher = valueMatcher;
 		_compileResultFactory = compileResultFactory;

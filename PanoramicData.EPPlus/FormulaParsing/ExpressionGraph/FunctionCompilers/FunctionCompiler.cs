@@ -28,6 +28,7 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using System.Collections.Generic;
@@ -49,7 +50,8 @@ public abstract class FunctionCompiler
 		private set;
 	}
 
-	protected FunctionCompiler(ExcelFunction function, ParsingContext context)
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public FunctionCompiler(ExcelFunction function, ParsingContext context)
 	{
 		Require.That(function).Named("function").IsNotNull();
 		Require.That(context).Named("context").IsNotNull();

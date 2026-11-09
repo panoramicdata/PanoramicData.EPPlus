@@ -22,6 +22,7 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-19
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.Utils;
 using System.Collections.Generic;
@@ -34,12 +35,14 @@ public abstract class DatabaseFunction : ExcelFunction
 {
 	protected RowMatcher RowMatcher { get; private set; }
 
-	protected DatabaseFunction()
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public DatabaseFunction()
 		: this(new RowMatcher())
 	{
 	}
 
-	protected DatabaseFunction(RowMatcher rowMatcher)
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public DatabaseFunction(RowMatcher rowMatcher)
 	{
 		RowMatcher = rowMatcher;
 	}

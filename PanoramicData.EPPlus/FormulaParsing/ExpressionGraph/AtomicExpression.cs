@@ -28,11 +28,14 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
+
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 public abstract class AtomicExpression : Expression
 {
-	protected AtomicExpression(string expression)
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public AtomicExpression(string expression)
 		: base(expression)
 	{
 	}

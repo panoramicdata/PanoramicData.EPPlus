@@ -22,6 +22,7 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.Compatibility;
 using OfficeOpenXml.FormulaParsing.Exceptions;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
@@ -38,12 +39,14 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 /// </summary>
 public abstract class ExcelFunction
 {
-	protected ExcelFunction()
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public ExcelFunction()
 		: this(new ArgumentCollectionUtil(), new ArgumentParsers(), new CompileResultValidators())
 	{
 	}
 
-	protected ExcelFunction(
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public ExcelFunction(
 		ArgumentCollectionUtil argumentCollectionUtil,
 		ArgumentParsers argumentParsers,
 		CompileResultValidators compileResultValidators)

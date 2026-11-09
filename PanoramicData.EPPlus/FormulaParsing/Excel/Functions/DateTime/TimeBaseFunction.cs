@@ -22,13 +22,15 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
 public abstract class TimeBaseFunction : ExcelFunction
 {
-	protected TimeBaseFunction()
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
+	public TimeBaseFunction()
 	{
 		TimeStringParser = new TimeStringParser();
 	}
