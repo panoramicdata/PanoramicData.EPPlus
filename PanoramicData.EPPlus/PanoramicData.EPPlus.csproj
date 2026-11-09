@@ -18,14 +18,12 @@
     <PackageReleaseNotes>
 			# Panoramic Data's EPPlus Free Edition
 			# LGPL License continue
-			Large workbooks can now be saved. A workbook that exceeded the classic ZIP limits, being 4 GB of size or offset or 65,534 internal entries, previously threw while saving, after all of its content had been built. Zip64 is now used automatically when, and only when, a workbook needs it, so files that fit the classic format are written exactly as before and remain readable by older tools.
-
-			This release targets .NET 10. The previous release, 10.1.1, targeted .NET 9.
-
-			11.0 - BREAKING: fully cross-platform. System.Drawing.Common (GDI+) is no longer used, so the library runs the same on Windows, Linux and macOS.
-			Removed: ExcelDrawings.AddPicture(string, Image[, Uri]); ExcelPicture.Image and ExcelPicture.ImageFormat; ExcelBackgroundImage.Image; ExcelVmlDrawingPicture.Image; ExcelHeaderFooterText.InsertPicture(Image, PictureAlignment); ExcelFont.SetFromFont(Font), ExcelTextFont.SetFromFont(Font) and ExcelFontXml.SetFromFont(Font); the [SupportedOSPlatform("windows")] attributes.
-			Added: ExcelDrawings.AddPicture(string, byte[]) and AddPicture(string, Stream) (with optional hyperlink); ExcelPicture.ImageBytes and ExcelPicture.ContentType; ExcelBackgroundImage.ImageBytes and SetFromStream; ExcelVmlDrawingPicture.ImageBytes; ExcelHeaderFooterText.InsertPicture(byte[], ...) and InsertPicture(Stream, ...). Image size and resolution are read from the PNG, JPEG, GIF, BMP, TIFF, EMF or WMF header and the file bytes are stored unchanged (pictures are no longer re-encoded as JPEG).
-			AutoFitColumns now measures text with SkiaSharp (MIT) instead of GDI+. Results can differ slightly from earlier versions, and on a machine without the named font the platform default font is measured.
+			11.0 - BREAKING. Full details: https://github.com/panoramicdata/PanoramicData.EPPlus/blob/main/CHANGELOG.md
+			Targets .NET 11 (net11.0).
+			System.Drawing.Common (GDI+) is no longer used: the Image and Font based members are replaced by byte[] and Stream overloads, and AutoFitColumns measures text with SkiaSharp.
+			The bundled DotNetZip code is removed and packages are read and written with System.IO.Compression. The 22 public types in OfficeOpenXml.Packaging.DotNetZip and OfficeOpenXml.Packaging.DotNetZip.Zlib are gone; use System.IO.Compression instead. Zip64 is still used only when a workbook needs it.
+			Some methods in Drawing, Style and ConditionalFormatting now throw InvalidOperationException or ArgumentException instead of System.Exception, with the same messages.
+			double to decimal conversions keep the .NET 10 rounding to 15 significant digits on .NET 11.
 		</PackageReleaseNotes>
     <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenOfficeXml.Rimland.snk</AssemblyOriginatorKeyFile>
@@ -47,9 +45,6 @@
   <PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\EPPlusFree.xml</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Packaging\DotNetZip\ZipFile.SaveSelfExtractor.cs" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Nerdbank.GitVersioning">

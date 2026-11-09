@@ -1,5 +1,4 @@
-﻿using OfficeOpenXml.Packaging.DotNetZip;
-using OfficeOpenXml.Utils;
+﻿using OfficeOpenXml.Utils;
 using OfficeOpenXml.VBA;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -129,11 +128,8 @@ public sealed partial class ExcelWorkbook
 		}
 	}
 
-	private void SaveSharedStringHandler(ZipOutputStream stream, CompressionLevel compressionLevel, string fileName)
+	private void SaveSharedStringHandler(Stream stream)
 	{
-		stream.CompressionLevel = (Packaging.DotNetZip.Zlib.CompressionLevel)compressionLevel;
-		stream.PutNextEntry(fileName);
-
 		var cache = new StringBuilder();
 		var sw = new StreamWriter(stream);
 		cache.AppendFormat("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?><sst xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" count=\"{0}\" uniqueCount=\"{0}\">", _sharedStrings.Count);

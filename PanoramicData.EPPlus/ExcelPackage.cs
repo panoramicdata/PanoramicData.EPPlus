@@ -48,7 +48,7 @@ using System.Xml;
 namespace OfficeOpenXml;
 
 /// <summary>
-/// Maps to DotNetZips CompressionLevel enum
+/// Compression level for the package's zip entries. Level1 to Level3 map to Fastest, Level9 to SmallestSize, and the others (including None) to Optimal.
 /// </summary>
 public enum CompressionLevel
 {
