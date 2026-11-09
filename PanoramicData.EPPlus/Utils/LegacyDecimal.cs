@@ -57,8 +57,13 @@ internal static class LegacyDecimal
 			throw new OverflowException("Value was either too large or too small for a Decimal.");
 		}
 
-		var negative = value < 0;
-		var scaled = Math.Abs(value);
+		var (scaled, power) = ScaleToDigits(Math.Abs(value), exponent, digits);
+		var mantissa = (ulong)(long)Math.Round(scaled);
+		return mantissa == 0 ? 0m : Compose(mantissa, power, digits, value < 0);
+	}
+
+	private static (double Scaled, int Power) ScaleToDigits(double scaled, int exponent, int digits)
+	{
 		var limit = _powersOfTen[digits];
 		var power = digits - 1 - (exponent * 19728 >> 16);
 		if (power >= 0)
@@ -81,12 +86,11 @@ internal static class LegacyDecimal
 			power++;
 		}
 
-		var mantissa = (ulong)(long)Math.Round(scaled);
-		if (mantissa == 0)
-		{
-			return 0m;
-		}
+		return (scaled, power);
+	}
 
+	private static decimal Compose(ulong mantissa, int power, int digits, bool negative)
+	{
 		if (power < 0)
 		{
 			var result = (decimal)mantissa;
