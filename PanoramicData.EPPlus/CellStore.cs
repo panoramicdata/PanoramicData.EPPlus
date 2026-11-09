@@ -888,12 +888,12 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			if (Math.Abs(column._pages[pagePos].Offset) > PageSize ||
 				Math.Abs(column._pages[pagePos].Rows[column._pages[pagePos].RowCount - 1].Index) > PageSizeMax) //Split or Merge???
 			{
-				CellStore<T>.ResetPageOffset(column, pagePos, rows);
+				CellStore<T>.ResetPageOffset(column, pagePos);
 			}
 		}
 	}
 
-	private static int ResetPageOffset(ColumnIndex column, int pagePos, int rows)
+	private static void ResetPageOffset(ColumnIndex column, int pagePos)
 	{
 		var fromPage = column._pages[pagePos];
 		PageIndex toPage;
@@ -926,8 +926,6 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				fromPage.Offset += PageSize;
 			}
 		}
-
-		return rows;
 	}
 
 	private static int DeletePage(int fromRow, int rows, ColumnIndex column, int pagePos, bool shift)
