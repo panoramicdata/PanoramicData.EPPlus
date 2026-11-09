@@ -16,17 +16,7 @@ public partial class WorkSheetTest
 			newFile.Delete();  // ensures we create a new workbook
 		}
 
-		ExcelPackage package = new();
-		//Load the sheet with one string column, one date column and a few random numbers.
-		var ws = package.Workbook.Worksheets.Add("First line test");
-
-		ws.Cells[1, 1].Value = "1; 1";
-		ws.Cells[2, 1].Value = "2; 1";
-		ws.Cells[1, 2].Value = "1; 2";
-		ws.Cells[2, 2].Value = "2; 2";
-
-		ws.Row(1).Style.Font.Bold = true;
-		ws.Column(1).Style.Font.Bold = true;
+		var package = SharedTestData.CreateFirstLinePackage();
 		package.SaveAs(newFile);
 
 	}
@@ -131,12 +121,7 @@ public partial class WorkSheetTest
 		wsSheet.Cells["D:E"].StyleName = "ColumnStyle";
 
 		//Verify that cloned styles works.
-		var defaultStyle = _pck.Workbook.Styles.CreateNamedStyle("Default");
-		defaultStyle.Style.Font.Name = "Arial";
-		defaultStyle.Style.Font.Size = 18;
-		defaultStyle.Style.Font.UnderLine = true;
-		var boldStyle = _pck.Workbook.Styles.CreateNamedStyle("Bold", defaultStyle.Style);
-		boldStyle.Style.Font.Color.SetColor(Color.Red);
+		var (defaultStyle, boldStyle) = SharedTestData.AddArialDefaultAndRedBoldStyles(_pck.Workbook);
 
 		Assert.AreEqual("Arial", defaultStyle.Style.Font.Name);
 		Assert.AreEqual(18, defaultStyle.Style.Font.Size);

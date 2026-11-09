@@ -142,16 +142,21 @@ public partial class Issues
 		package.Save();
 	}
 
+	private static void CalculateAndAssertPanelCodes(ExcelPackage pck)
+	{
+		var ws = pck.Workbook.Worksheets.First();
+		pck.Workbook.Calculate();
+		Assert.AreEqual("20L2300", ws.Cells["F4"].Value);
+		Assert.AreEqual("20K2E01", ws.Cells["F5"].Value);
+	}
+
 	[TestMethod, Ignore]
 	public void Issue15173_1()
 	{
 		using var pck = new ExcelPackage(new FileInfo(@"c:\temp\EPPlusIssues\Excel01.xlsx"));
 		var sw = new Stopwatch();
 		sw.Start();
-		var ws = pck.Workbook.Worksheets.First();
-		pck.Workbook.Calculate();
-		Assert.AreEqual("20L2300", ws.Cells["F4"].Value);
-		Assert.AreEqual("20K2E01", ws.Cells["F5"].Value);
+		CalculateAndAssertPanelCodes(pck);
 		var f7Val = pck.Workbook.Worksheets["MODELLO-TIPO PANNELLO"].Cells["F7"].Value;
 		Assert.AreEqual(13.445419, Math.Round((double)f7Val, 6));
 		sw.Stop();
@@ -165,10 +170,7 @@ public partial class Issues
 		var sw = new Stopwatch();
 		pck.Workbook.FormulaParser.Configure(x => x.AttachLogger(LoggerFactory.CreateTextFileLogger(new FileInfo(@"c:\Temp\log1.txt"))));
 		sw.Start();
-		var ws = pck.Workbook.Worksheets.First();
-		pck.Workbook.Calculate();
-		Assert.AreEqual("20L2300", ws.Cells["F4"].Value);
-		Assert.AreEqual("20K2E01", ws.Cells["F5"].Value);
+		CalculateAndAssertPanelCodes(pck);
 		sw.Stop();
 		Console.WriteLine(sw.Elapsed.TotalSeconds); // approx. 10 seconds
 	}

@@ -206,7 +206,11 @@ public partial class Issues
 		wsData.Cells.AutoFitColumns(0);
 		EP.Save();
 	}
-	private static void BuildPivotTable1(FileInfo MyFile)
+	private static void BuildPivotTable1(FileInfo MyFile) => BuildAuditPivotTable(MyFile, "Pivot1", "PivotAudit1");
+
+	private static void BuildPivotTable2(FileInfo MyFile) => BuildAuditPivotTable(MyFile, "Pivot2", "PivotAudit2");
+
+	private static void BuildAuditPivotTable(FileInfo MyFile, string sheetName, string tableName)
 	{
 		using ExcelPackage ep = new(MyFile);
 
@@ -214,45 +218,9 @@ public partial class Issues
 		var totalRows = wsData.Dimension.Address;
 		var data = wsData.Cells[totalRows];
 
-		var wsAuditPivot = ep.Workbook.Worksheets.Add("Pivot1");
+		var wsAuditPivot = ep.Workbook.Worksheets.Add(sheetName);
 
-		var pivotTable1 = wsAuditPivot.PivotTables.Add(wsAuditPivot.Cells["A7:C30"], data, "PivotAudit1");
-		pivotTable1.ColumnGrandTotals = true;
-		var rowField = pivotTable1.RowFields.Add(pivotTable1.Fields["INVOICE_DATE"]);
-
-
-		rowField.AddDateGrouping(eDateGroupBy.Years);
-		var yearField = pivotTable1.Fields.GetDateGroupField(eDateGroupBy.Years);
-		yearField.Name = "Year";
-
-		pivotTable1.RowFields.Add(pivotTable1.Fields["AUDIT_LINE_STATUS"]);
-
-		var TotalSpend = pivotTable1.DataFields.Add(pivotTable1.Fields["TOTAL_INVOICE_PRICE"]);
-		TotalSpend.Name = "Total Spend";
-		TotalSpend.Format = "$##,##0";
-
-
-		var CountInvoicePrice = pivotTable1.DataFields.Add(pivotTable1.Fields["COUNT"]);
-		CountInvoicePrice.Name = "Total Lines";
-		CountInvoicePrice.Format = "##,##0";
-
-		pivotTable1.DataOnRows = false;
-		ep.Save();
-		ep.Dispose();
-
-	}
-
-	private static void BuildPivotTable2(FileInfo MyFile)
-	{
-		using ExcelPackage ep = new(MyFile);
-
-		var wsData = ep.Workbook.Worksheets["Data"];
-		var totalRows = wsData.Dimension.Address;
-		var data = wsData.Cells[totalRows];
-
-		var wsAuditPivot = ep.Workbook.Worksheets.Add("Pivot2");
-
-		var pivotTable1 = wsAuditPivot.PivotTables.Add(wsAuditPivot.Cells["A7:C30"], data, "PivotAudit2");
+		var pivotTable1 = wsAuditPivot.PivotTables.Add(wsAuditPivot.Cells["A7:C30"], data, tableName);
 		pivotTable1.ColumnGrandTotals = true;
 		var rowField = pivotTable1.RowFields.Add(pivotTable1.Fields["INVOICE_DATE"]);
 

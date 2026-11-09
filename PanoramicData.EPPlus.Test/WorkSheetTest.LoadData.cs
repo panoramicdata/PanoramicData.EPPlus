@@ -89,20 +89,7 @@ public partial class WorkSheetTest
 		ws.Cells["T24"].Value = new TimeSpan(33, 30, 30);
 		ws.Cells["T19:T24"].Style.Numberformat.Format = "hh:mm:ss";
 
-		ws.Cells["U19"].Value = new DateTime(2009, 12, 31);
-		ws.Cells["U20"].Value = new DateTime(2010, 1, 1);
-		ws.Cells["U21"].Value = new DateTime(2010, 1, 2);
-		ws.Cells["U22"].Value = new DateTime(2010, 1, 3);
-		ws.Cells["U23"].Value = new DateTime(2010, 1, 4);
-		ws.Cells["U24"].Value = new DateTime(2010, 1, 5);
-		ws.Cells["U19:U24"].Style.Numberformat.Format = "yyyy-mm-dd";
-
-		ws.Cells["V19"].Value = 100;
-		ws.Cells["V20"].Value = 102;
-		ws.Cells["V21"].Value = 101;
-		ws.Cells["V22"].Value = 103;
-		ws.Cells["V23"].Value = 105;
-		ws.Cells["V24"].Value = 104;
+		SharedTestData.AddDatesAndValues(ws);
 		ws.Cells["v19:v24"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 		ws.Cells["v19:v24"].Style.Numberformat.Format = @"$#,##0.00_);($#,##0.00)";
 

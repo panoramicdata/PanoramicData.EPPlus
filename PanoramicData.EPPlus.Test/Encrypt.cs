@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml;
-using System.IO;
+﻿using OfficeOpenXml;
 
 namespace PanoramicData.EPPlus.Test;
 
@@ -40,17 +38,7 @@ public class Encrypt : TestBase
 	[Ignore]
 	public void WriteEncrypt()
 	{
-		ExcelPackage package = new();
-		//Load the sheet with one string column, one date column and a few random numbers.
-		var ws = package.Workbook.Worksheets.Add("First line test");
-
-		ws.Cells[1, 1].Value = "1; 1";
-		ws.Cells[2, 1].Value = "2; 1";
-		ws.Cells[1, 2].Value = "1; 2";
-		ws.Cells[2, 2].Value = "2; 2";
-
-		ws.Row(1).Style.Font.Bold = true;
-		ws.Column(1).Style.Font.Bold = true;
+		var package = SharedTestData.CreateFirstLinePackage();
 
 		package.Encryption.Password = "test";
 		package.Encryption.IsEncrypted = true;

@@ -1,7 +1,6 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.FormulaParsing;
-using System.Drawing;
 using System.Globalization;
 using System.Text;
 
@@ -120,12 +119,7 @@ public partial class Issues
 	{
 		var pkg = new ExcelPackage();
 		pkg.Workbook.Worksheets.Add("Sheet1");
-		var defaultStyle = pkg.Workbook.Styles.CreateNamedStyle("Default");
-		defaultStyle.Style.Font.Name = "Arial";
-		defaultStyle.Style.Font.Size = 18;
-		defaultStyle.Style.Font.UnderLine = true;
-		var boldStyle = pkg.Workbook.Styles.CreateNamedStyle("Bold", defaultStyle.Style);
-		boldStyle.Style.Font.Color.SetColor(Color.Red);
+		var (defaultStyle, boldStyle) = SharedTestData.AddArialDefaultAndRedBoldStyles(pkg.Workbook);
 
 		Assert.AreEqual("Arial", defaultStyle.Style.Font.Name);
 		Assert.AreEqual(18, defaultStyle.Style.Font.Size);

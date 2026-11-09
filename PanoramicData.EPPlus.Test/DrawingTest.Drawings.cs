@@ -190,18 +190,12 @@ public partial class DrawingTest
 		ws.Drawings.Remove("Pic1");
 
 		ws = _pck.Workbook.Worksheets.Add("DeleteDrawing2");
-		ws.Drawings.AddChart("Chart1", eChartType.Line);
-		ws.Drawings.AddChart("Chart2", eChartType.Line);
-		ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
-		ws.Drawings.AddPicture("Pic1", Resources.Test1);
+		AddTwoChartsAShapeAndAPicture(ws);
 
 		ws.Drawings.Remove("chart1");
 
 		ws = _pck.Workbook.Worksheets.Add("ClearDrawing2");
-		ws.Drawings.AddChart("Chart1", eChartType.Line);
-		ws.Drawings.AddChart("Chart2", eChartType.Line);
-		ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
-		ws.Drawings.AddPicture("Pic1", Resources.Test1);
+		AddTwoChartsAShapeAndAPicture(ws);
 		ws.Drawings.Clear();
 	}
 	//[TestMethod]
@@ -321,5 +315,13 @@ public partial class DrawingTest
 	public void DrawingWidthAdjust()
 	{
 		// Needs a local customer template that is not in the repository.
+	}
+
+	private static void AddTwoChartsAShapeAndAPicture(ExcelWorksheet ws)
+	{
+		ws.Drawings.AddChart("Chart1", eChartType.Line);
+		ws.Drawings.AddChart("Chart2", eChartType.Line);
+		ws.Drawings.AddShape("Shape1", eShapeStyle.ActionButtonBackPrevious);
+		ws.Drawings.AddPicture("Pic1", Resources.Test1);
 	}
 }

@@ -62,28 +62,7 @@ public partial class Issues
 		ws.InsertColumn(1, 1);
 		pkg.Save();
 	}
-	public static byte[] ReadTemplateFile(string templateName)
-	{
-		byte[] templateFIle;
-		using (MemoryStream ms = new())
-		{
-			using (var sw = new FileStream(templateName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-			{
-				var buffer = new byte[2048];
-				int bytesRead;
-				while ((bytesRead = sw.Read(buffer, 0, buffer.Length)) > 0)
-				{
-					ms.Write(buffer, 0, bytesRead);
-				}
-			}
-
-			ms.Position = 0;
-			templateFIle = ms.ToArray();
-		}
-
-		return templateFIle;
-
-	}
+	public static byte[] ReadTemplateFile(string templateName) => ReadTemplate.ReadTemplateFile(templateName);
 
 	[TestMethod]
 	public void Issue15455()
@@ -103,8 +82,7 @@ public partial class Issues
 		Assert.AreEqual("dg", c3);
 	}
 
-	[TestMethod]
-	public void Issue15460WithString()
+	private static object SaveAndReloadC3(object value)
 	{
 		FileInfo file = new("report.xlsx");
 		try
@@ -116,14 +94,14 @@ public partial class Issues
 			using (ExcelPackage package = new(file))
 			{
 				var sheet = package.Workbook.Worksheets.Add("New Sheet");
-				sheet.Cells[3, 3].Value = new[] { "value1", "value2", "value3" };
+				sheet.Cells[3, 3].Value = value;
 				package.Save();
 			}
 
 			using (ExcelPackage package = new(file))
 			{
 				var sheet = package.Workbook.Worksheets["New Sheet"];
-				Assert.AreEqual("value1", sheet.Cells[3, 3].Value);
+				return sheet.Cells[3, 3].Value;
 			}
 		}
 		finally
@@ -133,70 +111,24 @@ public partial class Issues
 				file.Delete();
 			}
 		}
+	}
+
+	[TestMethod]
+	public void Issue15460WithString()
+	{
+		Assert.AreEqual("value1", SaveAndReloadC3(new[] { "value1", "value2", "value3" }));
 	}
 
 	[TestMethod]
 	public void Issue15460WithNull()
 	{
-		FileInfo file = new("report.xlsx");
-		try
-		{
-			if (file.Exists)
-			{
-				file.Delete();
-			}
-			using (ExcelPackage package = new(file))
-			{
-				var sheet = package.Workbook.Worksheets.Add("New Sheet");
-				sheet.Cells[3, 3].Value = new[] { null, "value2", "value3" };
-				package.Save();
-			}
-
-			using (ExcelPackage package = new(file))
-			{
-				var sheet = package.Workbook.Worksheets["New Sheet"];
-				Assert.AreEqual(string.Empty, sheet.Cells[3, 3].Value);
-			}
-		}
-		finally
-		{
-			if (file.Exists)
-			{
-				file.Delete();
-			}
-		}
+		Assert.AreEqual(string.Empty, SaveAndReloadC3(new[] { null, "value2", "value3" }));
 	}
 
 	[TestMethod]
 	public void Issue15460WithNonStringPrimitive()
 	{
-		FileInfo file = new("report.xlsx");
-		try
-		{
-			if (file.Exists)
-			{
-				file.Delete();
-			}
-			using (ExcelPackage package = new(file))
-			{
-				var sheet = package.Workbook.Worksheets.Add("New Sheet");
-				sheet.Cells[3, 3].Value = new[] { 5, 6, 7 };
-				package.Save();
-			}
-
-			using (ExcelPackage package = new(file))
-			{
-				var sheet = package.Workbook.Worksheets["New Sheet"];
-				Assert.AreEqual((double)5, sheet.Cells[3, 3].Value);
-			}
-		}
-		finally
-		{
-			if (file.Exists)
-			{
-				file.Delete();
-			}
-		}
+		Assert.AreEqual((double)5, SaveAndReloadC3(new[] { 5, 6, 7 }));
 	}
 	[TestMethod, Ignore]
 	public void MergeIssue()

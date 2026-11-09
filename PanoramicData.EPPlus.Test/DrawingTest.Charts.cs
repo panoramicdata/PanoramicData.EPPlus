@@ -41,20 +41,7 @@ public partial class DrawingTest
 
 	private static void AddTestData(ExcelWorksheet ws)
 	{
-		ws.Cells["U19"].Value = new DateTime(2009, 12, 31);
-		ws.Cells["U20"].Value = new DateTime(2010, 1, 1);
-		ws.Cells["U21"].Value = new DateTime(2010, 1, 2);
-		ws.Cells["U22"].Value = new DateTime(2010, 1, 3);
-		ws.Cells["U23"].Value = new DateTime(2010, 1, 4);
-		ws.Cells["U24"].Value = new DateTime(2010, 1, 5);
-		ws.Cells["U19:U24"].Style.Numberformat.Format = "yyyy-mm-dd";
-
-		ws.Cells["V19"].Value = 100;
-		ws.Cells["V20"].Value = 102;
-		ws.Cells["V21"].Value = 101;
-		ws.Cells["V22"].Value = 103;
-		ws.Cells["V23"].Value = 105;
-		ws.Cells["V24"].Value = 104;
+		SharedTestData.AddDatesAndValues(ws);
 
 		ws.Cells["W19"].Value = 105;
 		ws.Cells["W20"].Value = 108;
@@ -77,16 +64,7 @@ public partial class DrawingTest
 	{
 		var ws = _pck.Workbook.Worksheets.Add("PieChart");
 		var chrt = ws.Drawings.AddChart("pieChart", eChartType.Pie) as ExcelPieChart;
-
-		AddTestSerie(ws, chrt);
-
-		chrt.To.Row = 25;
-		chrt.To.Column = 12;
-
-		chrt.DataLabel.ShowPercent = true;
-		chrt.Legend.Font.Color = Color.SteelBlue;
-		chrt.Title.Border.Fill.Style = eFillStyle.SolidFill;
-		chrt.Legend.Position = eLegendPosition.TopRight;
+		AddTestSerieAsPie(ws, chrt);
 		Assert.IsTrue(chrt.ChartType == eChartType.Pie, "Invalid Charttype");
 		Assert.IsTrue(chrt.VaryColors);
 		chrt.Title.Text = "Piechart";
@@ -95,16 +73,7 @@ public partial class DrawingTest
 	{
 		var ws = _pck.Workbook.Worksheets.Add("PieOfChart");
 		var chrt = ws.Drawings.AddChart("pieOfChart", eChartType.BarOfPie) as ExcelOfPieChart;
-
-		AddTestSerie(ws, chrt);
-
-		chrt.To.Row = 25;
-		chrt.To.Column = 12;
-
-		chrt.DataLabel.ShowPercent = true;
-		chrt.Legend.Font.Color = Color.SteelBlue;
-		chrt.Title.Border.Fill.Style = eFillStyle.SolidFill;
-		chrt.Legend.Position = eLegendPosition.TopRight;
+		AddTestSerieAsPie(ws, chrt);
 		Assert.IsTrue(chrt.ChartType == eChartType.BarOfPie, "Invalid Charttype");
 		chrt.Title.Text = "Piechart";
 	}
@@ -337,5 +306,18 @@ public partial class DrawingTest
 		chrt.Title.Text = "Doughnut Exploded";
 		chrt.Series[0].Header = "Serie 1";
 		chrt.EditAs = eEditAs.Absolute;
+	}
+
+	private static void AddTestSerieAsPie(ExcelWorksheet ws, ExcelPieChart chrt)
+	{
+		AddTestSerie(ws, chrt);
+
+		chrt.To.Row = 25;
+		chrt.To.Column = 12;
+
+		chrt.DataLabel.ShowPercent = true;
+		chrt.Legend.Font.Color = Color.SteelBlue;
+		chrt.Title.Border.Fill.Style = eFillStyle.SolidFill;
+		chrt.Legend.Position = eLegendPosition.TopRight;
 	}
 }

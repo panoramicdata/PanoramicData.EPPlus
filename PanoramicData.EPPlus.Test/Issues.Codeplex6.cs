@@ -160,8 +160,7 @@ public partial class Issues
 
 	}
 
-	[TestMethod]
-	public void Issue15548_SumIfsShouldHandleGaps()
+	private static int SumIfsOverColumnA(object a2)
 	{
 		using var package = new ExcelPackage();
 		var test = package.Workbook.Worksheets.Add("Test");
@@ -169,7 +168,11 @@ public partial class Issues
 		test.Cells["A1"].Value = 1;
 		test.Cells["B1"].Value = "A";
 
-		//test.Cells["A2"] is default
+		if (a2 != null)
+		{
+			test.Cells["A2"].Value = a2;
+		}
+
 		test.Cells["B2"].Value = "A";
 
 		test.Cells["A3"].Value = 1;
@@ -179,30 +182,21 @@ public partial class Issues
 
 		test.Calculate();
 
-		var result = test.Cells["D2"].GetValue<int>();
+		return test.Cells["D2"].GetValue<int>();
+	}
+
+	[TestMethod]
+	public void Issue15548_SumIfsShouldHandleGaps()
+	{
+		// A2 is left at its default.
+		var result = SumIfsOverColumnA(null);
 
 		Assert.AreEqual(1, result, string.Format("Expected 1, got {0}", result));
 	}
 	[TestMethod]
 	public void Issue15548_SumIfsShouldHandleBadData()
 	{
-		using var package = new ExcelPackage();
-		var test = package.Workbook.Worksheets.Add("Test");
-
-		test.Cells["A1"].Value = 1;
-		test.Cells["B1"].Value = "A";
-
-		test.Cells["A2"].Value = "Not a number";
-		test.Cells["B2"].Value = "A";
-
-		test.Cells["A3"].Value = 1;
-		test.Cells["B4"].Value = "B";
-
-		test.Cells["D2"].Formula = "SUMIFS(A1:A3,B1:B3,\"A\")";
-
-		test.Calculate();
-
-		var result = test.Cells["D2"].GetValue<int>();
+		var result = SumIfsOverColumnA("Not a number");
 
 		Assert.AreEqual(1, result, string.Format("Expected 1, got {0}", result));
 	}
