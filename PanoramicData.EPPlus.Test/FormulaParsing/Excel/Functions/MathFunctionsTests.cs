@@ -25,76 +25,30 @@ public class MathFunctionsTests
 		_parsingContext.Scopes.NewScope(RangeAddress.Empty);
 	}
 
+	private object ExecuteFunction(ExcelFunction func, params object[] args)
+		=> func.Execute(FunctionsHelper.CreateArgs(args), _parsingContext).Result;
+
+	private double ExecuteFunctionRounded(ExcelFunction func, int digits, params object[] args)
+		=> System.Math.Round((double)ExecuteFunction(func, args), digits);
 	[TestMethod]
-	public void PiShouldReturnPIConstant()
-	{
-		var expectedValue = System.Math.Round(System.Math.PI, 14);
-		var func = new Pi();
-		var args = FunctionsHelper.CreateArgs(0);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void PiShouldReturnPIConstant() => Assert.AreEqual(System.Math.Round(System.Math.PI, 14), ExecuteFunction(new Pi(), 0));
 
 	[TestMethod]
-	public void AbsShouldReturnCorrectResult()
-	{
-		var expectedValue = 3d;
-		var func = new Abs();
-		var args = FunctionsHelper.CreateArgs(-3d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void AbsShouldReturnCorrectResult() => Assert.AreEqual(3d, ExecuteFunction(new Abs(), -3d));
 
 	[TestMethod]
-	public void AsinShouldReturnCorrectResult()
-	{
-		const double expectedValue = 1.5708;
-		var func = new Asin();
-		var args = FunctionsHelper.CreateArgs(1d);
-		var result = func.Execute(args, _parsingContext);
-		var rounded = System.Math.Round((double)result.Result, 4);
-		Assert.AreEqual(expectedValue, rounded);
-	}
+	public void AsinShouldReturnCorrectResult() => Assert.AreEqual(1.5708, ExecuteFunctionRounded(new Asin(), 4, 1d));
 
 	[TestMethod]
-	public void AsinhShouldReturnCorrectResult()
-	{
-		const double expectedValue = 0.0998;
-		var func = new Asinh();
-		var args = FunctionsHelper.CreateArgs(0.1d);
-		var result = func.Execute(args, _parsingContext);
-		var rounded = System.Math.Round((double)result.Result, 4);
-		Assert.AreEqual(expectedValue, rounded);
-	}
+	public void AsinhShouldReturnCorrectResult() => Assert.AreEqual(0.0998, ExecuteFunctionRounded(new Asinh(), 4, 0.1d));
 
 	[TestMethod]
-	public void CeilingShouldRoundUpAccordingToParamsSignificanceLowerThan0()
-	{
-		var expectedValue = 22.36d;
-		var func = new Ceiling();
-		var args = FunctionsHelper.CreateArgs(22.35d, 0.01);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void CeilingShouldRoundUpAccordingToParamsSignificanceLowerThan0() => Assert.AreEqual(22.36d, ExecuteFunction(new Ceiling(), 22.35d, 0.01));
 
 	[TestMethod]
-	public void CeilingBugTest1()
-	{
-		var expectedValue = 100d;
-		var func = new Ceiling();
-		var args = FunctionsHelper.CreateArgs(100d, 100d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void CeilingBugTest1() => Assert.AreEqual(100d, ExecuteFunction(new Ceiling(), 100d, 100d));
 	[TestMethod]
-	public void CeilingBugTest2()
-	{
-		var expectedValue = 12000d;
-		var func = new Ceiling();
-		var args = FunctionsHelper.CreateArgs(12000d, 1000d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void CeilingBugTest2() => Assert.AreEqual(12000d, ExecuteFunction(new Ceiling(), 12000d, 1000d));
 
 	[TestMethod]
 	public void CeilingShouldRoundTowardsZeroIfSignificanceAndNumberIsMinus0point1()
@@ -107,34 +61,13 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void CeilingShouldRoundUpAccordingToParamsSignificanceIs1()
-	{
-		var expectedValue = 23d;
-		var func = new Ceiling();
-		var args = FunctionsHelper.CreateArgs(22.35d, 1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void CeilingShouldRoundUpAccordingToParamsSignificanceIs1() => Assert.AreEqual(23d, ExecuteFunction(new Ceiling(), 22.35d, 1));
 
 	[TestMethod]
-	public void CeilingShouldRoundUpAccordingToParamsSignificanceIs10()
-	{
-		var expectedValue = 30d;
-		var func = new Ceiling();
-		var args = FunctionsHelper.CreateArgs(22.35d, 10);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void CeilingShouldRoundUpAccordingToParamsSignificanceIs10() => Assert.AreEqual(30d, ExecuteFunction(new Ceiling(), 22.35d, 10));
 
 	[TestMethod]
-	public void CeilingShouldRoundTowardsZeroIfSignificanceAndNumberIsNegative()
-	{
-		var expectedValue = -30d;
-		var func = new Ceiling();
-		var args = FunctionsHelper.CreateArgs(-22.35d, -10);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void CeilingShouldRoundTowardsZeroIfSignificanceAndNumberIsNegative() => Assert.AreEqual(-30d, ExecuteFunction(new Ceiling(), -22.35d, -10));
 
 	[TestMethod]
 	public void CeilingShouldThrowExceptionIfNumberIsPositiveAndSignificanceIsNegative()
@@ -145,22 +78,10 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void SumShouldCalculate2Plus3AndReturn5()
-	{
-		var func = new Sum();
-		var args = FunctionsHelper.CreateArgs(2, 3);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void SumShouldCalculate2Plus3AndReturn5() => Assert.AreEqual(5d, ExecuteFunction(new Sum(), 2, 3));
 
 	[TestMethod]
-	public void SumShouldCalculateEnumerableOf2Plus5Plus3AndReturn10()
-	{
-		var func = new Sum();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(2, 5), 3);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(10d, result.Result);
-	}
+	public void SumShouldCalculateEnumerableOf2Plus5Plus3AndReturn10() => Assert.AreEqual(10d, ExecuteFunction(new Sum(), FunctionsHelper.CreateArgs(2, 5), 3));
 
 	[TestMethod]
 	public void SumShouldIgnoreHiddenValuesWhenIgnoreHiddenValuesIsSet()
@@ -176,40 +97,16 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void SumSqShouldCalculateArray()
-	{
-		var func = new Sumsq();
-		var args = FunctionsHelper.CreateArgs(2, 4);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(20d, result.Result);
-	}
+	public void SumSqShouldCalculateArray() => Assert.AreEqual(20d, ExecuteFunction(new Sumsq(), 2, 4));
 
 	[TestMethod]
-	public void SumSqShouldIncludeTrueAsOne()
-	{
-		var func = new Sumsq();
-		var args = FunctionsHelper.CreateArgs(2, 4, true);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(21d, result.Result);
-	}
+	public void SumSqShouldIncludeTrueAsOne() => Assert.AreEqual(21d, ExecuteFunction(new Sumsq(), 2, 4, true));
 
 	[TestMethod]
-	public void SumSqShouldNoCountTrueTrueInArray()
-	{
-		var func = new Sumsq();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(2, 4, true));
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(20d, result.Result);
-	}
+	public void SumSqShouldNoCountTrueTrueInArray() => Assert.AreEqual(20d, ExecuteFunction(new Sumsq(), FunctionsHelper.CreateArgs(2, 4, true)));
 
 	[TestMethod]
-	public void StdevShouldCalculateCorrectResult()
-	{
-		var func = new Stdev();
-		var args = FunctionsHelper.CreateArgs(1, 3, 5);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(2d, result.Result);
-	}
+	public void StdevShouldCalculateCorrectResult() => Assert.AreEqual(2d, ExecuteFunction(new Stdev(), 1, 3, 5));
 
 	[TestMethod]
 	public void StdevShouldIgnoreHiddenValuesWhenIgnoreHiddenValuesIsSet()
@@ -256,13 +153,7 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void MaxShouldCalculateCorrectResult()
-	{
-		var func = new Max();
-		var args = FunctionsHelper.CreateArgs(4, 2, 5, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void MaxShouldCalculateCorrectResult() => Assert.AreEqual(5d, ExecuteFunction(new Max(), 4, 2, 5, 2));
 
 	[TestMethod]
 	public void MaxShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
@@ -278,40 +169,16 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void MaxaShouldCalculateCorrectResult()
-	{
-		var func = new Maxa();
-		var args = FunctionsHelper.CreateArgs(-1, 0, 1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void MaxaShouldCalculateCorrectResult() => Assert.AreEqual(1d, ExecuteFunction(new Maxa(), -1, 0, 1));
 
 	[TestMethod]
-	public void MaxaShouldCalculateCorrectResultUsingBool()
-	{
-		var func = new Maxa();
-		var args = FunctionsHelper.CreateArgs(-1, 0, true);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void MaxaShouldCalculateCorrectResultUsingBool() => Assert.AreEqual(1d, ExecuteFunction(new Maxa(), -1, 0, true));
 
 	[TestMethod]
-	public void MaxaShouldCalculateCorrectResultUsingString()
-	{
-		var func = new Maxa();
-		var args = FunctionsHelper.CreateArgs(-1, "test");
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(0d, result.Result);
-	}
+	public void MaxaShouldCalculateCorrectResultUsingString() => Assert.AreEqual(0d, ExecuteFunction(new Maxa(), -1, "test"));
 
 	[TestMethod]
-	public void MinShouldCalculateCorrectResult()
-	{
-		var func = new Min();
-		var args = FunctionsHelper.CreateArgs(4, 2, 5, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(2d, result.Result);
-	}
+	public void MinShouldCalculateCorrectResult() => Assert.AreEqual(2d, ExecuteFunction(new Min(), 4, 2, 5, 2));
 
 	[TestMethod]
 	public void MinShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
@@ -408,85 +275,29 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void AverageAShouldCountValueAs0IfNonNumericTextIsSuppliedInArray()
-	{
-		var func = new AverageA();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(1d, 2d, 3d, "ABC"));
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1.5d, result.Result);
-	}
+	public void AverageAShouldCountValueAs0IfNonNumericTextIsSuppliedInArray() => Assert.AreEqual(1.5d, ExecuteFunction(new AverageA(), FunctionsHelper.CreateArgs(1d, 2d, 3d, "ABC")));
 
 	[TestMethod]
-	public void AverageAShouldCountNumericStringWithValue()
-	{
-		var func = new AverageA();
-		var args = FunctionsHelper.CreateArgs(4d, 2d, "9");
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void AverageAShouldCountNumericStringWithValue() => Assert.AreEqual(5d, ExecuteFunction(new AverageA(), 4d, 2d, "9"));
 
 	[TestMethod]
-	public void RoundShouldReturnCorrectResult()
-	{
-		var func = new Round();
-		var args = FunctionsHelper.CreateArgs(2.3433, 3);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(2.343d, result.Result);
-	}
+	public void RoundShouldReturnCorrectResult() => Assert.AreEqual(2.343d, ExecuteFunction(new Round(), 2.3433, 3));
 
 	[TestMethod]
-	public void RoundShouldReturnCorrectResultWhenNbrOfDecimalsIsNegative()
-	{
-		var func = new Round();
-		var args = FunctionsHelper.CreateArgs(9333, -3);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(9000d, result.Result);
-	}
+	public void RoundShouldReturnCorrectResultWhenNbrOfDecimalsIsNegative() => Assert.AreEqual(9000d, ExecuteFunction(new Round(), 9333, -3));
 
 	[TestMethod]
-	public void FloorShouldReturnCorrectResultWhenSignificanceIsBetween0And1()
-	{
-		var func = new Floor();
-		var args = FunctionsHelper.CreateArgs(26.75d, 0.1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(26.7d, result.Result);
-	}
+	public void FloorShouldReturnCorrectResultWhenSignificanceIsBetween0And1() => Assert.AreEqual(26.7d, ExecuteFunction(new Floor(), 26.75d, 0.1));
 
 	[TestMethod]
-	public void FloorShouldReturnCorrectResultWhenSignificanceIs1()
-	{
-		var func = new Floor();
-		var args = FunctionsHelper.CreateArgs(26.75d, 1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(26d, result.Result);
-	}
+	public void FloorShouldReturnCorrectResultWhenSignificanceIs1() => Assert.AreEqual(26d, ExecuteFunction(new Floor(), 26.75d, 1));
 
 	[TestMethod]
-	public void FloorShouldReturnCorrectResultWhenSignificanceIsMinus1()
-	{
-		var func = new Floor();
-		var args = FunctionsHelper.CreateArgs(-26.75d, -1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(-26d, result.Result);
-	}
+	public void FloorShouldReturnCorrectResultWhenSignificanceIsMinus1() => Assert.AreEqual(-26d, ExecuteFunction(new Floor(), -26.75d, -1));
 	[TestMethod]
-	public void FloorBugTest1()
-	{
-		var expectedValue = 100d;
-		var func = new Floor();
-		var args = FunctionsHelper.CreateArgs(100d, 100d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void FloorBugTest1() => Assert.AreEqual(100d, ExecuteFunction(new Floor(), 100d, 100d));
 	[TestMethod]
-	public void FloorBugTest2()
-	{
-		var expectedValue = 12000d;
-		var func = new Floor();
-		var args = FunctionsHelper.CreateArgs(12000d, 1000d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(expectedValue, result.Result);
-	}
+	public void FloorBugTest2() => Assert.AreEqual(12000d, ExecuteFunction(new Floor(), 12000d, 1000d));
 
 	[TestMethod]
 	public void RandShouldReturnAValueBetween0and1()
@@ -519,32 +330,14 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void CountShouldReturnNumberOfNumericItems()
-	{
-		var func = new Count();
-		var args = FunctionsHelper.CreateArgs(1d, 2m, 3, new DateTime(2012, 4, 1), "4");
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void CountShouldReturnNumberOfNumericItems() => Assert.AreEqual(5d, ExecuteFunction(new Count(), 1d, 2m, 3, new DateTime(2012, 4, 1), "4"));
 
 	[TestMethod]
-	public void CountShouldIncludeNumericStringsAndDatesInArray()
-	{
-		var func = new Count();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(1d, 2m, 3, new DateTime(2012, 4, 1), "4"));
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void CountShouldIncludeNumericStringsAndDatesInArray() => Assert.AreEqual(5d, ExecuteFunction(new Count(), FunctionsHelper.CreateArgs(1d, 2m, 3, new DateTime(2012, 4, 1), "4")));
 
 
 	[TestMethod]
-	public void CountShouldIncludeEnumerableMembers()
-	{
-		var func = new Count();
-		var args = FunctionsHelper.CreateArgs(1d, FunctionsHelper.CreateArgs(12, 13));
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void CountShouldIncludeEnumerableMembers() => Assert.AreEqual(3d, ExecuteFunction(new Count(), 1d, FunctionsHelper.CreateArgs(12, 13)));
 
 	[TestMethod, Ignore]
 	public void CountShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
@@ -560,22 +353,10 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void CountAShouldReturnNumberOfNonWhitespaceItems()
-	{
-		var func = new CountA();
-		var args = FunctionsHelper.CreateArgs(1d, 2m, 3, new DateTime(2012, 4, 1), "4", null, string.Empty);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(5d, result.Result);
-	}
+	public void CountAShouldReturnNumberOfNonWhitespaceItems() => Assert.AreEqual(5d, ExecuteFunction(new CountA(), 1d, 2m, 3, new DateTime(2012, 4, 1), "4", null, string.Empty));
 
 	[TestMethod]
-	public void CountAShouldIncludeEnumerableMembers()
-	{
-		var func = new CountA();
-		var args = FunctionsHelper.CreateArgs(1d, FunctionsHelper.CreateArgs(12, 13));
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void CountAShouldIncludeEnumerableMembers() => Assert.AreEqual(3d, ExecuteFunction(new CountA(), 1d, FunctionsHelper.CreateArgs(12, 13)));
 
 	[TestMethod]
 	public void CountAShouldIgnoreHiddenValuesIfIgnoreHiddenValuesIsTrue()
@@ -591,22 +372,10 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void ProductShouldMultiplyArguments()
-	{
-		var func = new Product();
-		var args = FunctionsHelper.CreateArgs(2d, 2d, 4d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(16d, result.Result);
-	}
+	public void ProductShouldMultiplyArguments() => Assert.AreEqual(16d, ExecuteFunction(new Product(), 2d, 2d, 4d));
 
 	[TestMethod]
-	public void ProductShouldHandleEnumerable()
-	{
-		var func = new Product();
-		var args = FunctionsHelper.CreateArgs(2d, 2d, FunctionsHelper.CreateArgs(4d, 2d));
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(32d, result.Result);
-	}
+	public void ProductShouldHandleEnumerable() => Assert.AreEqual(32d, ExecuteFunction(new Product(), 2d, 2d, FunctionsHelper.CreateArgs(4d, 2d)));
 
 	[TestMethod]
 	public void ProductShouldIgnoreHiddenValuesIfIgnoreHiddenIsTrue()
@@ -622,13 +391,7 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void ProductShouldHandleFirstItemIsEnumerable()
-	{
-		var func = new Product();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4d, 2d), 2d, 2d);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(32d, result.Result);
-	}
+	public void ProductShouldHandleFirstItemIsEnumerable() => Assert.AreEqual(32d, ExecuteFunction(new Product(), FunctionsHelper.CreateArgs(4d, 2d), 2d, 2d));
 
 	[TestMethod]
 	public void VarShouldReturnCorrectResult()
@@ -653,13 +416,7 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void VarPShouldReturnCorrectResult()
-	{
-		var func = new VarP();
-		var args = FunctionsHelper.CreateArgs(1, 2, 3, 4);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1.25d, result.Result);
-	}
+	public void VarPShouldReturnCorrectResult() => Assert.AreEqual(1.25d, ExecuteFunction(new VarP(), 1, 2, 3, 4));
 
 	[TestMethod]
 	public void VarPShouldIgnoreHiddenValuesIfIgnoreHiddenIsTrue()
@@ -675,172 +432,55 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void ModShouldReturnCorrectResult()
-	{
-		var func = new Mod();
-		var args = FunctionsHelper.CreateArgs(5, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void ModShouldReturnCorrectResult() => Assert.AreEqual(1d, ExecuteFunction(new Mod(), 5, 2));
 
 	[TestMethod]
-	public void CosShouldReturnCorrectResult()
-	{
-		var func = new Cos();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(-0.416146837d, roundedResult);
-	}
+	public void CosShouldReturnCorrectResult() => Assert.AreEqual(-0.416146837d, ExecuteFunctionRounded(new Cos(), 9, 2));
 
 	[TestMethod]
-	public void CosHShouldReturnCorrectResult()
-	{
-		var func = new Cosh();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(3.762195691, roundedResult);
-	}
+	public void CosHShouldReturnCorrectResult() => Assert.AreEqual(3.762195691, ExecuteFunctionRounded(new Cosh(), 9, 2));
 
 	[TestMethod]
-	public void AcosShouldReturnCorrectResult()
-	{
-		var func = new Acos();
-		var args = FunctionsHelper.CreateArgs(0.1);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 4);
-		Assert.AreEqual(1.4706, roundedResult);
-	}
+	public void AcosShouldReturnCorrectResult() => Assert.AreEqual(1.4706, ExecuteFunctionRounded(new Acos(), 4, 0.1));
 
 	[TestMethod]
-	public void ACosHShouldReturnCorrectResult()
-	{
-		var func = new Acosh();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 3);
-		Assert.AreEqual(1.317, roundedResult);
-	}
+	public void ACosHShouldReturnCorrectResult() => Assert.AreEqual(1.317, ExecuteFunctionRounded(new Acosh(), 3, 2));
 
 	[TestMethod]
-	public void SinShouldReturnCorrectResult()
-	{
-		var func = new Sin();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(0.909297427, roundedResult);
-	}
+	public void SinShouldReturnCorrectResult() => Assert.AreEqual(0.909297427, ExecuteFunctionRounded(new Sin(), 9, 2));
 
 	[TestMethod]
-	public void SinhShouldReturnCorrectResult()
-	{
-		var func = new Sinh();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(3.626860408d, roundedResult);
-	}
+	public void SinhShouldReturnCorrectResult() => Assert.AreEqual(3.626860408d, ExecuteFunctionRounded(new Sinh(), 9, 2));
 
 	[TestMethod]
-	public void TanShouldReturnCorrectResult()
-	{
-		var func = new Tan();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(-2.185039863d, roundedResult);
-	}
+	public void TanShouldReturnCorrectResult() => Assert.AreEqual(-2.185039863d, ExecuteFunctionRounded(new Tan(), 9, 2));
 
 	[TestMethod]
-	public void TanhShouldReturnCorrectResult()
-	{
-		var func = new Tanh();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(0.96402758d, roundedResult);
-	}
+	public void TanhShouldReturnCorrectResult() => Assert.AreEqual(0.96402758d, ExecuteFunctionRounded(new Tanh(), 9, 2));
 
 	[TestMethod]
-	public void AtanShouldReturnCorrectResult()
-	{
-		var func = new Atan();
-		var args = FunctionsHelper.CreateArgs(10);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(1.471127674d, roundedResult);
-	}
+	public void AtanShouldReturnCorrectResult() => Assert.AreEqual(1.471127674d, ExecuteFunctionRounded(new Atan(), 9, 10));
 
 	[TestMethod]
-	public void Atan2ShouldReturnCorrectResult()
-	{
-		var func = new Atan2();
-		var args = FunctionsHelper.CreateArgs(1, 2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(1.107148718d, roundedResult);
-	}
+	public void Atan2ShouldReturnCorrectResult() => Assert.AreEqual(1.107148718d, ExecuteFunctionRounded(new Atan2(), 9, 1, 2));
 
 	[TestMethod]
-	public void AtanhShouldReturnCorrectResult()
-	{
-		var func = new Atanh();
-		var args = FunctionsHelper.CreateArgs(0.1);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 4);
-		Assert.AreEqual(0.1003d, roundedResult);
-	}
+	public void AtanhShouldReturnCorrectResult() => Assert.AreEqual(0.1003d, ExecuteFunctionRounded(new Atanh(), 4, 0.1));
 
 	[TestMethod]
-	public void LogShouldReturnCorrectResult()
-	{
-		var func = new Log();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(0.301029996d, roundedResult);
-	}
+	public void LogShouldReturnCorrectResult() => Assert.AreEqual(0.301029996d, ExecuteFunctionRounded(new Log(), 9, 2));
 
 	[TestMethod]
-	public void LogShouldReturnCorrectResultWithBase()
-	{
-		var func = new Log();
-		var args = FunctionsHelper.CreateArgs(2, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void LogShouldReturnCorrectResultWithBase() => Assert.AreEqual(1d, ExecuteFunction(new Log(), 2, 2));
 
 	[TestMethod]
-	public void Log10ShouldReturnCorrectResult()
-	{
-		var func = new Log10();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(0.301029996d, roundedResult);
-	}
+	public void Log10ShouldReturnCorrectResult() => Assert.AreEqual(0.301029996d, ExecuteFunctionRounded(new Log10(), 9, 2));
 
 	[TestMethod]
-	public void LnShouldReturnCorrectResult()
-	{
-		var func = new Ln();
-		var args = FunctionsHelper.CreateArgs(5);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 5);
-		Assert.AreEqual(1.60944d, roundedResult);
-	}
+	public void LnShouldReturnCorrectResult() => Assert.AreEqual(1.60944d, ExecuteFunctionRounded(new Ln(), 5, 5));
 
 	[TestMethod]
-	public void SqrtPiShouldReturnCorrectResult()
-	{
-		var func = new SqrtPi();
-		var args = FunctionsHelper.CreateArgs(2);
-		var result = func.Execute(args, _parsingContext);
-		var roundedResult = System.Math.Round((double)result.Result, 9);
-		Assert.AreEqual(2.506628275d, roundedResult);
-	}
+	public void SqrtPiShouldReturnCorrectResult() => Assert.AreEqual(2.506628275d, ExecuteFunctionRounded(new SqrtPi(), 9, 2));
 
 	[TestMethod]
 	public void SignShouldReturnMinus1IfArgIsNegative()
@@ -861,94 +501,34 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void RounddownShouldReturnCorrectResultWithPositiveNumber()
-	{
-		var func = new Rounddown();
-		var args = FunctionsHelper.CreateArgs(9.999, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(9.99, result.Result);
-	}
+	public void RounddownShouldReturnCorrectResultWithPositiveNumber() => Assert.AreEqual(9.99, ExecuteFunction(new Rounddown(), 9.999, 2));
 
 	[TestMethod]
-	public void RounddownShouldHandleNegativeNumber()
-	{
-		var func = new Rounddown();
-		var args = FunctionsHelper.CreateArgs(-9.999, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(-9.99, result.Result);
-	}
+	public void RounddownShouldHandleNegativeNumber() => Assert.AreEqual(-9.99, ExecuteFunction(new Rounddown(), -9.999, 2));
 
 	[TestMethod]
-	public void RounddownShouldHandleNegativeNumDigits()
-	{
-		var func = new Rounddown();
-		var args = FunctionsHelper.CreateArgs(999.999, -2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(900d, result.Result);
-	}
+	public void RounddownShouldHandleNegativeNumDigits() => Assert.AreEqual(900d, ExecuteFunction(new Rounddown(), 999.999, -2));
 
 	[TestMethod]
-	public void RounddownShouldReturn0IfNegativeNumDigitsIsTooLarge()
-	{
-		var func = new Rounddown();
-		var args = FunctionsHelper.CreateArgs(999.999, -4);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(0d, result.Result);
-	}
+	public void RounddownShouldReturn0IfNegativeNumDigitsIsTooLarge() => Assert.AreEqual(0d, ExecuteFunction(new Rounddown(), 999.999, -4));
 
 	[TestMethod]
-	public void RounddownShouldHandleZeroNumDigits()
-	{
-		var func = new Rounddown();
-		var args = FunctionsHelper.CreateArgs(999.999, 0);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(999d, result.Result);
-	}
+	public void RounddownShouldHandleZeroNumDigits() => Assert.AreEqual(999d, ExecuteFunction(new Rounddown(), 999.999, 0));
 
 	[TestMethod]
-	public void RoundupShouldReturnCorrectResultWithPositiveNumber()
-	{
-		var func = new Roundup();
-		var args = FunctionsHelper.CreateArgs(9.9911, 3);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(9.992, result.Result);
-	}
+	public void RoundupShouldReturnCorrectResultWithPositiveNumber() => Assert.AreEqual(9.992, ExecuteFunction(new Roundup(), 9.9911, 3));
 
 	[TestMethod]
-	public void RoundupShouldHandleNegativeNumDigits()
-	{
-		var func = new Roundup();
-		var args = FunctionsHelper.CreateArgs(99123, -2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(99200d, result.Result);
-	}
+	public void RoundupShouldHandleNegativeNumDigits() => Assert.AreEqual(99200d, ExecuteFunction(new Roundup(), 99123, -2));
 
 	[TestMethod]
-	public void RoundupShouldHandleZeroNumDigits()
-	{
-		var func = new Roundup();
-		var args = FunctionsHelper.CreateArgs(999.999, 0);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1000d, result.Result);
-	}
+	public void RoundupShouldHandleZeroNumDigits() => Assert.AreEqual(1000d, ExecuteFunction(new Roundup(), 999.999, 0));
 
 	[TestMethod]
-	public void TruncShouldReturnCorrectResult()
-	{
-		var func = new Trunc();
-		var args = FunctionsHelper.CreateArgs(99.99);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(99d, result.Result);
-	}
+	public void TruncShouldReturnCorrectResult() => Assert.AreEqual(99d, ExecuteFunction(new Trunc(), 99.99));
 
 	[TestMethod]
-	public void FactShouldRoundDownAndReturnCorrectResult()
-	{
-		var func = new Fact();
-		var args = FunctionsHelper.CreateArgs(5.99);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(120d, result.Result);
-	}
+	public void FactShouldRoundDownAndReturnCorrectResult() => Assert.AreEqual(120d, ExecuteFunction(new Fact(), 5.99));
 
 	[TestMethod]
 	public void FactShouldThrowWhenNegativeNumber()
@@ -959,13 +539,7 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void QuotientShouldReturnCorrectResult()
-	{
-		var func = new Quotient();
-		var args = FunctionsHelper.CreateArgs(5, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(2, result.Result);
-	}
+	public void QuotientShouldReturnCorrectResult() => Assert.AreEqual(2, ExecuteFunction(new Quotient(), 5, 2));
 
 	[TestMethod]
 	public void QuotientShouldThrowWhenDenomIs0()
@@ -976,22 +550,10 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void LargeShouldReturnTheLargestNumberIf1()
-	{
-		var func = new Large();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(1, 2, 3), 1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void LargeShouldReturnTheLargestNumberIf1() => Assert.AreEqual(3d, ExecuteFunction(new Large(), FunctionsHelper.CreateArgs(1, 2, 3), 1));
 
 	[TestMethod]
-	public void LargeShouldReturnTheSecondLargestNumberIf2()
-	{
-		var func = new Large();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4, 1, 2, 3), 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void LargeShouldReturnTheSecondLargestNumberIf2() => Assert.AreEqual(3d, ExecuteFunction(new Large(), FunctionsHelper.CreateArgs(4, 1, 2, 3), 2));
 
 	[TestMethod]
 	public void LargeShouldThrowIfIndexOutOfBounds()
@@ -1002,22 +564,10 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void SmallShouldReturnTheSmallestNumberIf1()
-	{
-		var func = new Small();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(1, 2, 3), 1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void SmallShouldReturnTheSmallestNumberIf1() => Assert.AreEqual(1d, ExecuteFunction(new Small(), FunctionsHelper.CreateArgs(1, 2, 3), 1));
 
 	[TestMethod]
-	public void SmallShouldReturnTheSecondSmallestNumberIf2()
-	{
-		var func = new Small();
-		var args = FunctionsHelper.CreateArgs(FunctionsHelper.CreateArgs(4, 1, 2, 3), 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(2d, result.Result);
-	}
+	public void SmallShouldReturnTheSecondSmallestNumberIf2() => Assert.AreEqual(2d, ExecuteFunction(new Small(), FunctionsHelper.CreateArgs(4, 1, 2, 3), 2));
 
 	[TestMethod]
 	public void SmallShouldThrowIfIndexOutOfBounds()
@@ -1036,31 +586,13 @@ public class MathFunctionsTests
 	}
 
 	[TestMethod]
-	public void MedianShouldCalculateCorrectlyWithOneMember()
-	{
-		var func = new Median();
-		var args = FunctionsHelper.CreateArgs(1);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(1d, result.Result);
-	}
+	public void MedianShouldCalculateCorrectlyWithOneMember() => Assert.AreEqual(1d, ExecuteFunction(new Median(), 1));
 
 	[TestMethod]
-	public void MedianShouldCalculateCorrectlyWithOddMembers()
-	{
-		var func = new Median();
-		var args = FunctionsHelper.CreateArgs(3, 5, 1, 4, 2);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(3d, result.Result);
-	}
+	public void MedianShouldCalculateCorrectlyWithOddMembers() => Assert.AreEqual(3d, ExecuteFunction(new Median(), 3, 5, 1, 4, 2));
 
 	[TestMethod]
-	public void MedianShouldCalculateCorrectlyWithEvenMembers()
-	{
-		var func = new Median();
-		var args = FunctionsHelper.CreateArgs(1, 2, 3, 4);
-		var result = func.Execute(args, _parsingContext);
-		Assert.AreEqual(2.5d, result.Result);
-	}
+	public void MedianShouldCalculateCorrectlyWithEvenMembers() => Assert.AreEqual(2.5d, ExecuteFunction(new Median(), 1, 2, 3, 4));
 
 	[TestMethod]
 	public void CountIfShouldHandleNegativeCriteria()
