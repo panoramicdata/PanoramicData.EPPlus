@@ -35,6 +35,7 @@ using OfficeOpenXml.Style.Dxf;
 using OfficeOpenXml.Style.XmlAccess;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml;
 namespace OfficeOpenXml;
@@ -42,6 +43,8 @@ namespace OfficeOpenXml;
 /// <summary>
 /// Containts all shared cell styles for a workbook
 /// </summary>
+[SuppressMessage("Minor Code Smell", "S1104:Fields should not have public accessibility", Justification = "Public API: the style collections are published fields; converting them to properties would break binary compatibility.")]
+[SuppressMessage("Minor Code Smell", "S2357:Fields should be private", Justification = "Public API: the style collections are published fields; converting them to properties would break binary compatibility.")]
 public sealed class ExcelStyles : XmlHelper
 {
 	const string NumberFormatsPath = "d:styleSheet/d:numFmts";
@@ -234,7 +237,7 @@ public sealed class ExcelStyles : XmlHelper
 
 				if (column.ColumnMax > address.End.Column)
 				{
-					var newCol = ws.CopyColumn(column, address.End.Column + 1, column.ColumnMax);
+					ws.CopyColumn(column, address.End.Column + 1, column.ColumnMax);
 					column.ColumnMax = address.End.Column;
 				}
 
@@ -449,7 +452,7 @@ public sealed class ExcelStyles : XmlHelper
 			var rowCache = new Dictionary<int, int>(address.End.Row - address.Start.Row + 1);
 			var colCache = new Dictionary<int, ExcelCoreValue>(address.End.Column - address.Start.Column + 1);
 			ws._values.SetRangeValueSpecial(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column,
-				(List<ExcelCoreValue> list, int index, int row, int column, object args) =>
+				(List<ExcelCoreValue> list, int index, int row, int column, object _) =>
 				{
 					// Optimized GetStyleID
 					var s = list[index]._styleId;
@@ -656,6 +659,21 @@ public sealed class ExcelStyles : XmlHelper
 		style.Style.SetIndex(ix);
 		return style;
 	}
+	private void AppendUsedStyles<T>(XmlNode parent, ExcelStyleCollection<T> styles, string elementName, int count) where T : StyleXmlHelper
+	{
+		foreach (var style in styles)
+		{
+			if (style.useCnt > 0)
+			{
+				parent.AppendChild(style.CreateXmlNode(_styleXml.CreateElement(elementName, ExcelPackage.schemaMain)));
+				style.newID = count;
+				count++;
+			}
+		}
+
+		(parent as XmlElement).SetAttribute("count", count.ToString());
+	}
+
 	public void UpdateXml()
 	{
 		RemoveUnusedStyles();
@@ -683,7 +701,7 @@ public sealed class ExcelStyles : XmlHelper
 
 		foreach (var nf in NumberFormats)
 		{
-			if (!nf.BuildIn /*&& nf.newID<0*/) //Buildin formats are not updated.
+			if (!nf.BuildIn) //Buildin formats are not updated.
 			{
 				nfNode.AppendChild(nf.CreateXmlNode(_styleXml.CreateElement("numFmt", ExcelPackage.schemaMain)));
 				nf.newID = count;
@@ -706,53 +724,20 @@ public sealed class ExcelStyles : XmlHelper
 			fnt.newID = count++;
 		}
 
-		foreach (var fnt in Fonts)
-		{
-			if (fnt.useCnt > 0/* && fnt.newID<0*/)
-			{
-				fntNode.AppendChild(fnt.CreateXmlNode(_styleXml.CreateElement("font", ExcelPackage.schemaMain)));
-				fnt.newID = count;
-				count++;
-			}
-		}
-
-		(fntNode as XmlElement).SetAttribute("count", count.ToString());
-
+		AppendUsedStyles(fntNode, Fonts, "font", count);
 
 		//Fills
-		count = 0;
 		var fillsNode = _styleXml.SelectSingleNode(FillsPath, _nameSpaceManager);
 		fillsNode.RemoveAll();
-		Fills[0].useCnt = 1;    // Must exist (none)  
+		Fills[0].useCnt = 1;    // Must exist (none)
 		Fills[1].useCnt = 1;    // Must exist (gray125)
-		foreach (var fill in Fills)
-		{
-			if (fill.useCnt > 0)
-			{
-				fillsNode.AppendChild(fill.CreateXmlNode(_styleXml.CreateElement("fill", ExcelPackage.schemaMain)));
-				fill.newID = count;
-				count++;
-			}
-		}
-
-		(fillsNode as XmlElement).SetAttribute("count", count.ToString());
+		AppendUsedStyles(fillsNode, Fills, "fill", 0);
 
 		//Borders
-		count = 0;
 		var bordersNode = _styleXml.SelectSingleNode(BordersPath, _nameSpaceManager);
 		bordersNode.RemoveAll();
 		Borders[0].useCnt = 1;    // Must exist blank
-		foreach (var border in Borders)
-		{
-			if (border.useCnt > 0)
-			{
-				bordersNode.AppendChild(border.CreateXmlNode(_styleXml.CreateElement("border", ExcelPackage.schemaMain)));
-				border.newID = count;
-				count++;
-			}
-		}
-
-		(bordersNode as XmlElement).SetAttribute("count", count.ToString());
+		AppendUsedStyles(bordersNode, Borders, "border", 0);
 
 		var styleXfsNode = _styleXml.SelectSingleNode(CellStyleXfsPath, _nameSpaceManager);
 		if (styleXfsNode == null && NamedStyles.Count > 0)
@@ -1105,7 +1090,7 @@ public sealed class ExcelStyles : XmlHelper
 						}
 						else
 						{
-							var ns = CreateNamedStyle(st.Name, st.Style);
+							CreateNamedStyle(st.Name, st.Style);
 							newXfs.XfId = NamedStyles.Count - 1;
 						}
 					}
