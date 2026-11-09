@@ -1,4 +1,4 @@
-﻿using OfficeOpenXml.ConditionalFormatting.Rules;
+using OfficeOpenXml.ConditionalFormatting.Rules;
 using OfficeOpenXml.Style.XmlAccess;
 using System.Xml;
 
@@ -25,6 +25,30 @@ public sealed partial class ExcelStyles
 	{
 		RemoveUnusedStyles();
 
+		var normalIx = NamedStyles.FindIndexByID("Normal");
+		UpdateNumberFormatsXml(normalIx);
+		UpdateFontsXml(normalIx);
+
+		//Fills
+		var fillsNode = _styleXml.SelectSingleNode(FillsPath, _nameSpaceManager);
+		fillsNode.RemoveAll();
+		Fills[0].useCnt = 1;    // Must exist (none)
+		Fills[1].useCnt = 1;    // Must exist (gray125)
+		AppendUsedStyles(fillsNode, Fills, "fill", 0);
+
+		//Borders
+		var bordersNode = _styleXml.SelectSingleNode(BordersPath, _nameSpaceManager);
+		bordersNode.RemoveAll();
+		Borders[0].useCnt = 1;    // Must exist blank
+		AppendUsedStyles(bordersNode, Borders, "border", 0);
+
+		var count = UpdateNamedStylesXml(normalIx, out var cellXfsNode);
+		UpdateCellXfsXml(normalIx, count, cellXfsNode);
+		UpdateDxfsXml();
+	}
+
+	private void UpdateNumberFormatsXml(int normalIx)
+	{
 		//NumberFormat
 		var nfNode = _styleXml.SelectSingleNode(NumberFormatsPath, _nameSpaceManager);
 		if (nfNode == null)
@@ -38,7 +62,6 @@ public sealed partial class ExcelStyles
 		}
 
 		var count = 0;
-		var normalIx = NamedStyles.FindIndexByID("Normal");
 		if (NamedStyles.Count > 0 && normalIx >= 0 && NamedStyles[normalIx].Style.Numberformat.NumFmtID >= 164)
 		{
 			var nf = NumberFormats[NumberFormats.FindIndexByID(NamedStyles[normalIx].Style.Numberformat.Id)];
@@ -57,9 +80,12 @@ public sealed partial class ExcelStyles
 		}
 
 		(nfNode as XmlElement).SetAttribute("count", count.ToString());
+	}
 
+	private void UpdateFontsXml(int normalIx)
+	{
 		//Font
-		count = 0;
+		var count = 0;
 		var fntNode = _styleXml.SelectSingleNode(FontsPath, _nameSpaceManager);
 		fntNode.RemoveAll();
 
@@ -72,20 +98,10 @@ public sealed partial class ExcelStyles
 		}
 
 		AppendUsedStyles(fntNode, Fonts, "font", count);
+	}
 
-		//Fills
-		var fillsNode = _styleXml.SelectSingleNode(FillsPath, _nameSpaceManager);
-		fillsNode.RemoveAll();
-		Fills[0].useCnt = 1;    // Must exist (none)
-		Fills[1].useCnt = 1;    // Must exist (gray125)
-		AppendUsedStyles(fillsNode, Fills, "fill", 0);
-
-		//Borders
-		var bordersNode = _styleXml.SelectSingleNode(BordersPath, _nameSpaceManager);
-		bordersNode.RemoveAll();
-		Borders[0].useCnt = 1;    // Must exist blank
-		AppendUsedStyles(bordersNode, Borders, "border", 0);
-
+	private int UpdateNamedStylesXml(int normalIx, out XmlNode cellXfsNode)
+	{
 		var styleXfsNode = _styleXml.SelectSingleNode(CellStyleXfsPath, _nameSpaceManager);
 		if (styleXfsNode == null && NamedStyles.Count > 0)
 		{
@@ -98,12 +114,12 @@ public sealed partial class ExcelStyles
 			styleXfsNode.RemoveAll();
 		}
 		//NamedStyles
-		count = normalIx > -1 ? 1 : 0;  //If we have a normal style, we make sure it's added first.
+		var count = normalIx > -1 ? 1 : 0;  //If we have a normal style, we make sure it's added first.
 
 		var cellStyleNode = _styleXml.SelectSingleNode(CellStylesPath, _nameSpaceManager);
 		cellStyleNode?.RemoveAll();
 
-		var cellXfsNode = _styleXml.SelectSingleNode(CellXfsPath, _nameSpaceManager);
+		cellXfsNode = _styleXml.SelectSingleNode(CellXfsPath, _nameSpaceManager);
 		cellXfsNode.RemoveAll();
 
 		if (NamedStyles.Count > 0 && normalIx >= 0)
@@ -136,6 +152,11 @@ public sealed partial class ExcelStyles
 			(styleXfsNode as XmlElement).SetAttribute("count", count.ToString());
 		}
 
+		return count;
+	}
+
+	private void UpdateCellXfsXml(int normalIx, int count, XmlNode cellXfsNode)
+	{
 		//CellStyle
 		var xfix = 0;
 		foreach (var xf in CellXfs)
@@ -151,7 +172,10 @@ public sealed partial class ExcelStyles
 		}
 
 		(cellXfsNode as XmlElement).SetAttribute("count", count.ToString());
+	}
 
+	private void UpdateDxfsXml()
+	{
 		//Set dxf styling for conditional Formatting
 		var dxfsNode = _styleXml.SelectSingleNode(dxfsPath, _nameSpaceManager);
 		foreach (var ws in _wb.Worksheets)
@@ -187,7 +211,6 @@ public sealed partial class ExcelStyles
 			(dxfsNode as XmlElement).SetAttribute("count", Dxfs.Count.ToString());
 		}
 	}
-
 	private void AddNamedStyle(int id, XmlNode styleXfsNode, XmlNode cellXfsNode, ExcelNamedStyleXml style)
 	{
 		var styleXfs = CellStyleXfs[style.StyleXfId];
@@ -243,28 +266,13 @@ public sealed partial class ExcelStyles
 			CellStyleXfs[ns.StyleXfId].useCnt++;
 		}
 
-		foreach (var xf in CellXfs)
-		{
-			if (xf.useCnt > 0)
-			{
-				if (xf.FontId >= 0)
-				{
-					Fonts[xf.FontId].useCnt++;
-				}
+		CountUsedStyleParts(CellXfs);
+		CountUsedStyleParts(CellStyleXfs);
+	}
 
-				if (xf.FillId >= 0)
-				{
-					Fills[xf.FillId].useCnt++;
-				}
-
-				if (xf.BorderId >= 0)
-				{
-					Borders[xf.BorderId].useCnt++;
-				}
-			}
-		}
-
-		foreach (var xf in CellStyleXfs)
+	private void CountUsedStyleParts(ExcelStyleCollection<ExcelXfs> xfs)
+	{
+		foreach (var xf in xfs)
 		{
 			if (xf.useCnt > 0)
 			{

@@ -74,6 +74,14 @@ public sealed partial class ExcelStyles : XmlHelper
 	/// </summary>
 	private void LoadFromDocument()
 	{
+		LoadNumberFormatsAndFonts();
+		LoadFillsAndBorders();
+		LoadXfs();
+		LoadNamedStylesAndDxfs();
+	}
+
+	private void LoadNumberFormatsAndFonts()
+	{
 		//NumberFormats
 		ExcelNumberFormatXml.AddBuildIn(NameSpaceManager, NumberFormats);
 		var numNode = _styleXml.SelectSingleNode(NumberFormatsPath, _nameSpaceManager);
@@ -97,7 +105,10 @@ public sealed partial class ExcelStyles : XmlHelper
 			ExcelFontXml f = new(_nameSpaceManager, n);
 			Fonts.Add(f.Id, f);
 		}
+	}
 
+	private void LoadFillsAndBorders()
+	{
 		//Fills
 		var fillNode = _styleXml.SelectSingleNode(FillsPath, _nameSpaceManager);
 		foreach (XmlNode n in fillNode)
@@ -122,7 +133,10 @@ public sealed partial class ExcelStyles : XmlHelper
 			ExcelBorderXml b = new(_nameSpaceManager, n);
 			Borders.Add(b.Id, b);
 		}
+	}
 
+	private void LoadXfs()
+	{
 		//cellStyleXfs
 		var styleXfsNode = _styleXml.SelectSingleNode(CellStyleXfsPath, _nameSpaceManager);
 		if (styleXfsNode != null)
@@ -141,7 +155,10 @@ public sealed partial class ExcelStyles : XmlHelper
 			ExcelXfs item = new(_nameSpaceManager, n, this);
 			CellXfs.Add(item.Id, item);
 		}
+	}
 
+	private void LoadNamedStylesAndDxfs()
+	{
 		//cellStyle
 		var namedStyleNode = _styleXml.SelectSingleNode(CellStylesPath, _nameSpaceManager);
 		if (namedStyleNode != null)
