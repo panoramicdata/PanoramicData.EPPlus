@@ -50,17 +50,7 @@ public class AverageIf : HiddenValuesHandlingFunction
 	}
 
 	private bool Evaluate(object obj, string expression)
-	{
-		var candidate = default(double?);
-		if (IsNumeric(obj))
-		{
-			candidate = ConvertUtil.GetValueDouble(obj);
-		}
-
-		return candidate.HasValue
-			? _expressionEvaluator.Evaluate(candidate.Value, expression)
-			: _expressionEvaluator.Evaluate(obj, expression);
-	}
+		=> EvaluateCriteria(_expressionEvaluator, obj, expression);
 
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{

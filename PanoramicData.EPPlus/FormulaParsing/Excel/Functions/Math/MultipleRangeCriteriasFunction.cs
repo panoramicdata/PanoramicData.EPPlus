@@ -48,17 +48,7 @@ public abstract class MultipleRangeCriteriasFunction : ExcelFunction
 	}
 
 	protected bool Evaluate(object obj, string expression)
-	{
-		var candidate = default(double?);
-		if (IsNumeric(obj))
-		{
-			candidate = ConvertUtil.GetValueDouble(obj);
-		}
-
-		return candidate.HasValue
-			? _expressionEvaluator.Evaluate(candidate.Value, expression)
-			: _expressionEvaluator.Evaluate(obj, expression);
-	}
+		=> EvaluateCriteria(_expressionEvaluator, obj, expression);
 
 	protected List<int> GetMatchIndexes(ExcelDataProvider.IRangeInfo rangeInfo, string searched)
 	{

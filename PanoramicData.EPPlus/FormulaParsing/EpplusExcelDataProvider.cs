@@ -224,9 +224,11 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		var ws = _package.Workbook.Worksheets[wsName];
 		return new RangeInfo(ws, fromRow, fromCol, toRow, toCol);
 	}
-	public override IRangeInfo GetRange(string worksheet, int row, int column, string address) => GetRange(worksheet, address);
+	public override IRangeInfo GetRange(string worksheet, int row, int column, string address) => GetAddressRange(worksheet, address);
 
-	public override IRangeInfo GetRange(string worksheet, string address)
+	public override IRangeInfo GetRange(string worksheet, string address) => GetAddressRange(worksheet, address);
+
+	private RangeInfo GetAddressRange(string worksheet, string address)
 	{
 		var addr = new ExcelAddress(worksheet, address);
 		if (addr.Table != null)
@@ -263,7 +265,7 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 			return value;
 		}
 
-		var ni = new NameInfo()
+		var ni = new NameInfo
 		{
 			Id = id,
 			Name = name,

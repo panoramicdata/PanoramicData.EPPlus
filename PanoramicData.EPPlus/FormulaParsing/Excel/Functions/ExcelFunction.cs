@@ -382,6 +382,11 @@ public abstract class ExcelFunction
 		}
 	}
 
+	private protected static bool EvaluateCriteria(ExcelUtilities.ExpressionEvaluator evaluator, object obj, string expression) =>
+		IsNumeric(obj)
+			? evaluator.Evaluate(Utils.ConvertUtil.GetValueDouble(obj), expression)
+			: evaluator.Evaluate(obj, expression);
+
 	private protected CompileResult FindText(IEnumerable<FunctionArgument> arguments, StringComparison comparison)
 	{
 		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
