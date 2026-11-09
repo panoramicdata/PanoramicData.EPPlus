@@ -25,53 +25,52 @@ public partial class ExcelWorksheet
 
 			if (uri is ExcelHyperLink && !string.IsNullOrEmpty((uri as ExcelHyperLink).ReferenceAddress))
 			{
-				var hl = uri as ExcelHyperLink;
-				sw.Write("<hyperlink ref=\"{0}\" location=\"{1}\"{2}{3}/>",
-						Cells[cse.Row, cse.Column, cse.Row + hl.RowSpann, cse.Column + hl.ColSpann].Address,
-						ExcelCellBase.GetFullAddress(SecurityElement.Escape(Name), SecurityElement.Escape(hl.ReferenceAddress)),
-							string.IsNullOrEmpty(hl.Display) ? "" : " display=\"" + SecurityElement.Escape(hl.Display) + "\"",
-							string.IsNullOrEmpty(hl.ToolTip) ? "" : " tooltip=\"" + SecurityElement.Escape(hl.ToolTip) + "\"");
+				WriteInternalHyperLink(sw, cse.Row, cse.Column, uri as ExcelHyperLink);
 			}
 			else if (uri != null)
 			{
-				string id;
-				Uri hyp;
-				if (uri is ExcelHyperLink link)
-				{
-					hyp = link.OriginalUri;
-				}
-				else
-				{
-					hyp = uri;
-				}
-
-				if (hyps.TryGetValue(hyp.OriginalString, out var value))
-				{
-					id = value;
-				}
-				else
-				{
-					var relationship = Part.CreateRelationship(hyp, Packaging.TargetMode.External, ExcelPackage.schemaHyperlink);
-					if (uri is ExcelHyperLink)
-					{
-						var hl = uri as ExcelHyperLink;
-						sw.Write("<hyperlink ref=\"{0}\"{2}{3} r:id=\"{1}\"/>", ExcelCellBase.GetAddress(cse.Row, cse.Column), relationship.Id,
-							string.IsNullOrEmpty(hl.Display) ? "" : " display=\"" + SecurityElement.Escape(hl.Display) + "\"",
-							string.IsNullOrEmpty(hl.ToolTip) ? "" : " tooltip=\"" + SecurityElement.Escape(hl.ToolTip) + "\"");
-					}
-					else
-					{
-						sw.Write("<hyperlink ref=\"{0}\" r:id=\"{1}\"/>", ExcelCellBase.GetAddress(cse.Row, cse.Column), relationship.Id);
-					}
-
-					id = relationship.Id;
-				}
+				WriteExternalHyperLink(sw, hyps, cse.Row, cse.Column, uri);
 			}
 		}
 
 		if (!first)
 		{
 			sw.Write("</hyperlinks>");
+		}
+	}
+
+	private void WriteInternalHyperLink(StreamWriter sw, int row, int column, ExcelHyperLink hl) =>
+		sw.Write("<hyperlink ref=\"{0}\" location=\"{1}\"{2}{3}/>",
+				Cells[row, column, row + hl.RowSpann, column + hl.ColSpann].Address,
+				ExcelCellBase.GetFullAddress(SecurityElement.Escape(Name), SecurityElement.Escape(hl.ReferenceAddress)),
+					string.IsNullOrEmpty(hl.Display) ? "" : " display=\"" + SecurityElement.Escape(hl.Display) + "\"",
+					string.IsNullOrEmpty(hl.ToolTip) ? "" : " tooltip=\"" + SecurityElement.Escape(hl.ToolTip) + "\"");
+
+	private void WriteExternalHyperLink(StreamWriter sw, Dictionary<string, string> hyps, int row, int column, Uri uri)
+	{
+		Uri hyp;
+		if (uri is ExcelHyperLink link)
+		{
+			hyp = link.OriginalUri;
+		}
+		else
+		{
+			hyp = uri;
+		}
+
+		if (!hyps.ContainsKey(hyp.OriginalString))
+		{
+			var relationship = Part.CreateRelationship(hyp, Packaging.TargetMode.External, ExcelPackage.schemaHyperlink);
+			if (uri is ExcelHyperLink hl)
+			{
+				sw.Write("<hyperlink ref=\"{0}\"{2}{3} r:id=\"{1}\"/>", ExcelCellBase.GetAddress(row, column), relationship.Id,
+					string.IsNullOrEmpty(hl.Display) ? "" : " display=\"" + SecurityElement.Escape(hl.Display) + "\"",
+					string.IsNullOrEmpty(hl.ToolTip) ? "" : " tooltip=\"" + SecurityElement.Escape(hl.ToolTip) + "\"");
+			}
+			else
+			{
+				sw.Write("<hyperlink ref=\"{0}\" r:id=\"{1}\"/>", ExcelCellBase.GetAddress(row, column), relationship.Id);
+			}
 		}
 	}
 	/// <summary>

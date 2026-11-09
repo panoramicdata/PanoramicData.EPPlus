@@ -49,25 +49,30 @@ public partial class ExcelWorksheet
 
 		if (Drawings.UriDrawing != null)
 		{
-			if (Drawings.Count == 0)
-			{
-				Part.DeleteRelationship(Drawings._drawingRelation.Id);
-				_package.Package.DeletePart(Drawings.UriDrawing);
-			}
-			else
-			{
-				foreach (ExcelDrawing d in Drawings)
-				{
-					d.AdjustPositionAndSize();
-					if (d is ExcelChart c)
-					{
-						c.ChartXml.Save(c.Part.GetStream(FileMode.Create, FileAccess.Write));
-					}
-				}
+			SaveDrawingsPart();
+		}
+	}
 
-				var partPack = Drawings.Part;
-				Drawings.DrawingXml.Save(partPack.GetStream(FileMode.Create, FileAccess.Write));
+	private void SaveDrawingsPart()
+	{
+		if (Drawings.Count == 0)
+		{
+			Part.DeleteRelationship(Drawings._drawingRelation.Id);
+			_package.Package.DeletePart(Drawings.UriDrawing);
+		}
+		else
+		{
+			foreach (ExcelDrawing d in Drawings)
+			{
+				d.AdjustPositionAndSize();
+				if (d is ExcelChart c)
+				{
+					c.ChartXml.Save(c.Part.GetStream(FileMode.Create, FileAccess.Write));
+				}
 			}
+
+			var partPack = Drawings.Part;
+			Drawings.DrawingXml.Save(partPack.GetStream(FileMode.Create, FileAccess.Write));
 		}
 	}
 	internal void SaveHandler(ZipOutputStream stream, CompressionLevel compressionLevel, string fileName)

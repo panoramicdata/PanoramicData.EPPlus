@@ -5,7 +5,6 @@ namespace OfficeOpenXml;
 
 public partial class ExcelWorksheet
 {
-	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal void SetTableTotalFunction(ExcelTable tbl, ExcelTableColumn col, int colNum = -1)
 	{
 		if (tbl.ShowTotal == false)
@@ -30,35 +29,9 @@ public partial class ExcelWorksheet
 		}
 		else if (col.TotalsRowFunction != RowFunctions.None)
 		{
-			switch (col.TotalsRowFunction)
-			{
-				case RowFunctions.Average:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "101"));
-					break;
-				case RowFunctions.CountNums:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "102"));
-					break;
-				case RowFunctions.Count:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "103"));
-					break;
-				case RowFunctions.Max:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "104"));
-					break;
-				case RowFunctions.Min:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "105"));
-					break;
-				case RowFunctions.StdDev:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "107"));
-					break;
-				case RowFunctions.Var:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "110"));
-					break;
-				case RowFunctions.Sum:
-					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "109"));
-					break;
-				default:
-					throw new Exception("Unknown RowFunction enum");
-			}
+			var functionNumber = GetSubtotalFunctionNumber(col.TotalsRowFunction);
+			SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, functionNumber));
+
 		}
 		else
 		{
@@ -66,6 +39,20 @@ public partial class ExcelWorksheet
 
 		}
 	}
+
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
+	private static string GetSubtotalFunctionNumber(RowFunctions totalsRowFunction) => totalsRowFunction switch
+	{
+		RowFunctions.Average => "101",
+		RowFunctions.CountNums => "102",
+		RowFunctions.Count => "103",
+		RowFunctions.Max => "104",
+		RowFunctions.Min => "105",
+		RowFunctions.StdDev => "107",
+		RowFunctions.Var => "110",
+		RowFunctions.Sum => "109",
+		_ => throw new Exception("Unknown RowFunction enum")
+	};
 
 	internal void SetFormula(int row, int col, object value)
 	{

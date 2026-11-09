@@ -17,26 +17,31 @@ public partial class ExcelWorksheet
 			var shIx = _formulas.GetValue(addr._fromRow, addr._fromCol);
 			if (shIx is not int || (shIx is int v && v != f.Index))
 			{
-				for (var row = addr._fromRow; row <= addr._toRow; row++)
-				{
-					for (var col = addr._fromCol; col <= addr._toCol; col++)
-					{
-						if (!(addr._fromRow == row && addr._fromCol == col))
-						{
-							var fIx = _formulas.GetValue(row, col);
-							if (fIx is int v1 && v1 == f.Index)
-							{
-								_formulas.SetValue(row, col, f.GetFormula(row, col, Name));
-							}
-						}
-					}
-				}
+				ReplaceSharedFormulaWithCellFormulas(f, addr);
 
 				remove.Add(f.Index);
 			}
 		}
 
 		remove.ForEach(i => _sharedFormulas.Remove(i));
+	}
+
+	private void ReplaceSharedFormulaWithCellFormulas(Formulas f, ExcelAddressBase addr)
+	{
+		for (var row = addr._fromRow; row <= addr._toRow; row++)
+		{
+			for (var col = addr._fromCol; col <= addr._toCol; col++)
+			{
+				if (!(addr._fromRow == row && addr._fromCol == col))
+				{
+					var fIx = _formulas.GetValue(row, col);
+					if (fIx is int v1 && v1 == f.Index)
+					{
+						_formulas.SetValue(row, col, f.GetFormula(row, col, Name));
+					}
+				}
+			}
+		}
 	}
 
 	private object GetFormulaValue(object v)

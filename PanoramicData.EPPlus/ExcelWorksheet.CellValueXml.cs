@@ -12,17 +12,21 @@ public partial class ExcelWorksheet
 		{
 			return " t=\"b\"";
 		}
-		else if ((v is double v1 && double.IsInfinity(v1)) || v is ExcelErrorValue)
+		else if (IsErrorCellValue(v))
 		{
 			return " t=\"e\"";
 		}
 		else
 		{
-			return allowStr && v != null && !(TypeCompat.IsPrimitive(v) || v is double || v is decimal || v is DateTime || v is TimeSpan)
+			return allowStr && v != null && !IsNumericOrDateValue(v)
 				? " t=\"str\""
 				: "";
 		}
 	}
+
+	private static bool IsErrorCellValue(object v) => (v is double v1 && double.IsInfinity(v1)) || v is ExcelErrorValue;
+
+	private static bool IsNumericOrDateValue(object v) => TypeCompat.IsPrimitive(v) || v is double || v is decimal || v is DateTime || v is TimeSpan;
 
 	private string GetValueForXml(object v)
 	{
@@ -46,18 +50,7 @@ public partial class ExcelWorksheet
 			}
 			else if (TypeCompat.IsPrimitive(v) || v is double || v is decimal)
 			{
-				if (v is double v1 && double.IsNaN(v1))
-				{
-					s = "";
-				}
-				else if (v is double v2 && double.IsInfinity(v2))
-				{
-					s = "#NUM!";
-				}
-				else
-				{
-					s = Convert.ToDouble(v, CultureInfo.InvariantCulture).ToString("R15", CultureInfo.InvariantCulture);
-				}
+				s = GetNumericValueForXml(v);
 			}
 			else
 			{
@@ -68,6 +61,25 @@ public partial class ExcelWorksheet
 		catch
 		{
 			s = "0";
+		}
+
+		return s;
+	}
+
+	private static string GetNumericValueForXml(object v)
+	{
+		string s;
+		if (v is double v1 && double.IsNaN(v1))
+		{
+			s = "";
+		}
+		else if (v is double v2 && double.IsInfinity(v2))
+		{
+			s = "#NUM!";
+		}
+		else
+		{
+			s = Convert.ToDouble(v, CultureInfo.InvariantCulture).ToString("R15", CultureInfo.InvariantCulture);
 		}
 
 		return s;
