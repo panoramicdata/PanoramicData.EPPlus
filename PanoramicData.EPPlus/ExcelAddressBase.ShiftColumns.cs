@@ -11,8 +11,8 @@ public partial class ExcelAddressBase
 		else
 		{
 			return col <= _fromCol
-				? new ExcelAddressBase(_fromRow, (setFixed && _fromColFixed ? _fromCol : _fromCol + cols), _toRow, (setFixed && _toColFixed ? _toCol : _toCol + cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
-				: new ExcelAddressBase(_fromRow, _fromCol, _toRow, (setFixed && _toColFixed ? _toCol : _toCol + cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+				? new ExcelAddressBase(_fromRow, ShiftIndex(_fromCol, _fromColFixed, setFixed, cols), _toRow, ShiftIndex(_toCol, _toColFixed, setFixed, cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
+				: new ExcelAddressBase(_fromRow, _fromCol, _toRow, ShiftIndex(_toCol, _toColFixed, setFixed, cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 	}
 	internal ExcelAddressBase DeleteColumn(int col, int cols, bool setFixed = false)
@@ -23,7 +23,7 @@ public partial class ExcelAddressBase
 		}
 		else if (col + cols <= _fromCol) //Before
 		{
-			return new ExcelAddressBase(_fromRow, (setFixed && _fromColFixed ? _fromCol : _fromCol - cols), _toRow, (setFixed && _toColFixed ? _toCol : _toCol - cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+			return new ExcelAddressBase(_fromRow, ShiftIndex(_fromCol, _fromColFixed, setFixed, -cols), _toRow, ShiftIndex(_toCol, _toColFixed, setFixed, -cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 		else if (col <= _fromCol && col + cols > _toCol) //Inside
 		{
@@ -32,8 +32,8 @@ public partial class ExcelAddressBase
 		else  //Partly
 		{
 			return col <= _fromCol
-				? new ExcelAddressBase(_fromRow, col, _toRow, (setFixed && _toColFixed ? _toCol : _toCol - cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
-				: new ExcelAddressBase(_fromRow, _fromCol, _toRow, (setFixed && _toColFixed ? _toCol : _toCol - cols < col ? col - 1 : _toCol - cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+				? new ExcelAddressBase(_fromRow, col, _toRow, ShiftIndex(_toCol, _toColFixed, setFixed, -cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
+				: new ExcelAddressBase(_fromRow, _fromCol, _toRow, ShrinkEnd(_toCol, _toColFixed, setFixed, cols, col), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 	}
 }

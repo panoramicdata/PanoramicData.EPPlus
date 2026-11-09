@@ -32,13 +32,16 @@ public partial class ExcelAddressBase
 			toCol = fromCol;
 		}
 
-		return fromRow <= toRow &&
+		return IsAddressInBounds(fromRow, fromCol, toRow, toCol);
+	}
+
+	private static bool IsAddressInBounds(int fromRow, int fromCol, int toRow, int toCol)
+		=> fromRow <= toRow &&
 			fromCol <= toCol &&
 			fromCol > -1 &&
 			toCol <= ExcelPackage.MaxColumns &&
 			fromRow > -1 &&
 			toRow <= ExcelPackage.MaxRows;
-	}
 
 	private static readonly HashSet<char> _formulaCharacters = new(['(', ')', '+', '-', '*', '/', '=', '^', '&', '%', '\"']);
 

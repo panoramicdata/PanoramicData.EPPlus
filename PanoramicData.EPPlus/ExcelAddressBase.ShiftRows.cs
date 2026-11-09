@@ -13,8 +13,8 @@ public partial class ExcelAddressBase
 		else
 		{
 			return row <= _fromRow
-				? new ExcelAddressBase((setFixed && _fromRowFixed ? _fromRow : _fromRow + rows), _fromCol, (setFixed && _toRowFixed ? _toRow : _toRow + rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
-				: new ExcelAddressBase(_fromRow, _fromCol, (setFixed && _toRowFixed ? _toRow : _toRow + rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+				? new ExcelAddressBase(ShiftIndex(_fromRow, _fromRowFixed, setFixed, rows), _fromCol, ShiftIndex(_toRow, _toRowFixed, setFixed, rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
+				: new ExcelAddressBase(_fromRow, _fromCol, ShiftIndex(_toRow, _toRowFixed, setFixed, rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 	}
 	internal ExcelAddressBase DeleteRow(int row, int rows, bool setFixed = false)
@@ -25,7 +25,7 @@ public partial class ExcelAddressBase
 		}
 		else if (row + rows <= _fromRow) //Before
 		{
-			return new ExcelAddressBase((setFixed && _fromRowFixed ? _fromRow : _fromRow - rows), _fromCol, (setFixed && _toRowFixed ? _toRow : _toRow - rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+			return new ExcelAddressBase(ShiftIndex(_fromRow, _fromRowFixed, setFixed, -rows), _fromCol, ShiftIndex(_toRow, _toRowFixed, setFixed, -rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 		else if (row <= _fromRow && row + rows > _toRow) //Inside
 		{
@@ -34,10 +34,17 @@ public partial class ExcelAddressBase
 		else  //Partly
 		{
 			return row <= _fromRow
-				? new ExcelAddressBase(row, _fromCol, (setFixed && _toRowFixed ? _toRow : _toRow - rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
-				: new ExcelAddressBase(_fromRow, _fromCol, (setFixed && _toRowFixed ? _toRow : _toRow - rows < row ? row - 1 : _toRow - rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+				? new ExcelAddressBase(row, _fromCol, ShiftIndex(_toRow, _toRowFixed, setFixed, -rows), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed)
+				: new ExcelAddressBase(_fromRow, _fromCol, ShrinkEnd(_toRow, _toRowFixed, setFixed, rows, row), _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 	}
+
+	private static int ShiftIndex(int value, bool isFixed, bool setFixed, int delta)
+		=> setFixed && isFixed ? value : value + delta;
+
+	private static int ShrinkEnd(int end, bool isFixed, bool setFixed, int count, int start)
+		=> setFixed && isFixed ? end : end - count < start ? start - 1 : end - count;
+
 	[SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "Signature kept for existing callers and tests that pass a shift type.")]
 	internal ExcelAddressBase Insert(ExcelAddressBase address, eShiftType Shift)
 	{

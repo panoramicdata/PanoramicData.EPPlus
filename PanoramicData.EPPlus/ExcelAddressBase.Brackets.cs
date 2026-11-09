@@ -14,37 +14,42 @@ public partial class ExcelAddressBase
 			{
 				if (s.IndexOf('[') < 0)
 				{
-					switch (s.ToLower(CultureInfo.InvariantCulture))
-					{
-						case "#all":
-							_table.IsAll = true;
-							break;
-						case "#headers":
-							_table.IsHeader = true;
-							break;
-						case "#data":
-							_table.IsData = true;
-							break;
-						case "#totals":
-							_table.IsTotals = true;
-							break;
-						case "#this row":
-							_table.IsThisRow = true;
-							break;
-						default:
-							if (string.IsNullOrEmpty(_table.ColumnSpan))
-							{
-								_table.ColumnSpan = s;
-							}
-							else
-							{
-								_table.ColumnSpan += ":" + s;
-							}
-
-							break;
-					}
+					ApplyTableSpecifier(s);
 				}
 			}
+		}
+	}
+
+	private void ApplyTableSpecifier(string s)
+	{
+		switch (s.ToLower(CultureInfo.InvariantCulture))
+		{
+			case "#all":
+				_table.IsAll = true;
+				break;
+			case "#headers":
+				_table.IsHeader = true;
+				break;
+			case "#data":
+				_table.IsData = true;
+				break;
+			case "#totals":
+				_table.IsTotals = true;
+				break;
+			case "#this row":
+				_table.IsThisRow = true;
+				break;
+			default:
+				if (string.IsNullOrEmpty(_table.ColumnSpan))
+				{
+					_table.ColumnSpan = s;
+				}
+				else
+				{
+					_table.ColumnSpan += ":" + s;
+				}
+
+				break;
 		}
 	}
 }

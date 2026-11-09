@@ -7,10 +7,8 @@ public partial class ExcelAddressBase
 {
 	private void ExtractAddress(string fullAddress)
 	{
-		var brackPos = new Stack<int>();
-		var bracketParts = new List<string>();
 		string first = "", second = "";
-		bool isText = false, hasSheet = false;
+		bool hasSheet = false;
 		try
 		{
 			if (fullAddress == "#REF!")
@@ -25,85 +23,9 @@ public partial class ExcelAddressBase
 			}
 
 			var isMulti = false;
-			for (var i = 0; i < fullAddress.Length; i++)
+			if (!ParseAddressCharacters(fullAddress, ref first, ref second, ref hasSheet, ref isMulti))
 			{
-				var c = fullAddress[i];
-				if (c == '\'')
-				{
-					if (isText && i + 1 < fullAddress.Length && fullAddress[i] == '\'')
-					{
-						if (hasSheet)
-						{
-							second += c;
-						}
-						else
-						{
-							first += c;
-						}
-					}
-
-					isText = !isText;
-				}
-				else
-				{
-					if (brackPos.Count > 0)
-					{
-						if (c == '[' && !isText)
-						{
-							brackPos.Push(i);
-						}
-						else if (c == ']' && !isText)
-						{
-							if (brackPos.Count > 0)
-							{
-								var from = brackPos.Pop();
-								bracketParts.Add(fullAddress.Substring(from + 1, i - from - 1));
-
-								if (brackPos.Count == 0)
-								{
-									HandleBrackets(first, bracketParts);
-								}
-							}
-							else
-							{
-								//Invalid address!
-								return;
-							}
-						}
-					}
-					else if (c == '[' && !isText)
-					{
-						brackPos.Push(i);
-					}
-					else if (c == '!' && !isText && !first.EndsWith("#REF") && !second.EndsWith("#REF"))
-					{
-						// the following is to handle addresses that specifies the
-						// same worksheet twice: Sheet1!A1:Sheet1:A3
-						// They will be converted to: Sheet1!A1:A3
-						if (hasSheet && second != null && second.ToLower(CultureInfo.CurrentCulture).EndsWith(first.ToLower(CultureInfo.CurrentCulture)))
-						{
-							second = Regex.Replace(second, $"{first}$", string.Empty);
-						}
-
-						hasSheet = true;
-					}
-					else if (c == ',' && !isText)
-					{
-						isMulti = true;
-						SetAddress(ref first, ref second, ref hasSheet, isMulti);
-					}
-					else
-					{
-						if (hasSheet)
-						{
-							second += c;
-						}
-						else
-						{
-							first += c;
-						}
-					}
-				}
+				return;
 			}
 
 			if (Table == null)
@@ -116,6 +38,123 @@ public partial class ExcelAddressBase
 			// An unparsable address leaves the range unset
 		}
 	}
+
+	private bool ParseAddressCharacters(string fullAddress, ref string first, ref string second, ref bool hasSheet, ref bool isMulti)
+	{
+		var brackPos = new Stack<int>();
+		var bracketParts = new List<string>();
+		var isText = false;
+		for (var i = 0; i < fullAddress.Length; i++)
+		{
+			var c = fullAddress[i];
+			if (c == '\'')
+			{
+				isText = ParseQuote(fullAddress, i, isText, ref first, ref second, hasSheet);
+			}
+			else if (brackPos.Count > 0)
+			{
+				if (!ParseCharInBrackets(fullAddress, i, isText, first, brackPos, bracketParts))
+				{
+					//Invalid address!
+					return false;
+				}
+			}
+			else
+			{
+				isMulti = ParseCharOutsideBrackets(c, i, isText, ref first, ref second, ref hasSheet, isMulti, brackPos);
+			}
+		}
+
+		return true;
+	}
+
+	private static bool ParseQuote(string fullAddress, int i, bool isText, ref string first, ref string second, bool hasSheet)
+	{
+		if (isText && i + 1 < fullAddress.Length && fullAddress[i] == '\'')
+		{
+			AppendAddressChar(ref first, ref second, hasSheet, fullAddress[i]);
+		}
+
+		return !isText;
+	}
+
+	private bool ParseCharInBrackets(string fullAddress, int i, bool isText, string first, Stack<int> brackPos, List<string> bracketParts)
+	{
+		var c = fullAddress[i];
+		if (c == '[' && !isText)
+		{
+			brackPos.Push(i);
+		}
+		else if (c == ']' && !isText)
+		{
+			if (brackPos.Count > 0)
+			{
+				var from = brackPos.Pop();
+				bracketParts.Add(fullAddress.Substring(from + 1, i - from - 1));
+
+				if (brackPos.Count == 0)
+				{
+					HandleBrackets(first, bracketParts);
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private bool ParseCharOutsideBrackets(char c, int i, bool isText, ref string first, ref string second, ref bool hasSheet, bool isMulti, Stack<int> brackPos)
+	{
+		if (c == '[' && !isText)
+		{
+			brackPos.Push(i);
+		}
+		else if (IsSheetSeparator(c, isText, first, second))
+		{
+			second = RemoveRepeatedSheetName(first, second, hasSheet);
+			hasSheet = true;
+		}
+		else if (c == ',' && !isText)
+		{
+			isMulti = true;
+			SetAddress(ref first, ref second, ref hasSheet, isMulti);
+		}
+		else
+		{
+			AppendAddressChar(ref first, ref second, hasSheet, c);
+		}
+
+		return isMulti;
+	}
+
+	// Sheet1!A1:Sheet1:A3 names the same worksheet twice and becomes Sheet1!A1:A3.
+	private static string RemoveRepeatedSheetName(string first, string second, bool hasSheet)
+	{
+		if (hasSheet && second != null && second.ToLower(CultureInfo.CurrentCulture).EndsWith(first.ToLower(CultureInfo.CurrentCulture)))
+		{
+			second = Regex.Replace(second, $"{first}$", string.Empty);
+		}
+
+		return second;
+	}
+	private static bool IsSheetSeparator(char c, bool isText, string first, string second)
+		=> c == '!' && !isText && !first.EndsWith("#REF") && !second.EndsWith("#REF");
+
+	private static void AppendAddressChar(ref string first, ref string second, bool hasSheet, char c)
+	{
+		if (hasSheet)
+		{
+			second += c;
+		}
+		else
+		{
+			first += c;
+		}
+	}
+
 	private void SetAddress(ref string first, ref string second, ref bool hasSheet, bool isMulti)
 	{
 		string ws, address;

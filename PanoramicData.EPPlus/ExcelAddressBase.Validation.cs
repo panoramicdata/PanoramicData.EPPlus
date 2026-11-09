@@ -29,37 +29,44 @@ public partial class ExcelAddressBase
 		{
 			return AddressType.Formula;
 		}
-
+		else if (r1c1 && IsR1C1(Address))
+		{
+			return AddressType.R1C1;
+		}
 		else
 		{
-			if (r1c1 && IsR1C1(Address))
-			{
-				return AddressType.R1C1;
-			}
-			else
-			{
-				if (SplitAddress(Address, out var wb, out var ws, out var intAddress))
-				{
-					if (intAddress.Contains('[')) //Table reference
-					{
-						return string.IsNullOrEmpty(wb) ? AddressType.InternalAddress : AddressType.ExternalAddress;
-					}
-					else if (intAddress.Contains(','))
-					{
-						intAddress = intAddress[..intAddress.IndexOf(',')];
-					}
-
-					return IsAddress(intAddress)
-						? string.IsNullOrEmpty(wb) ? AddressType.InternalAddress : AddressType.ExternalAddress
-						: string.IsNullOrEmpty(wb) ? AddressType.InternalName : AddressType.ExternalName;
-				}
-				else
-				{
-					return AddressType.Invalid;
-				}
-			}
+			return GetAddressOrNameType(Address);
 		}
 	}
+
+	private static AddressType GetAddressOrNameType(string Address)
+	{
+		if (TrySplitAddress(Address, out var wb, out var ws, out var intAddress))
+		{
+			if (intAddress.Contains('[')) //Table reference
+			{
+				return GetAddressType(wb);
+			}
+			else if (intAddress.Contains(','))
+			{
+				intAddress = intAddress[..intAddress.IndexOf(',')];
+			}
+
+			return IsAddress(intAddress)
+				? GetAddressType(wb)
+				: GetNameType(wb);
+		}
+		else
+		{
+			return AddressType.Invalid;
+		}
+	}
+
+	private static AddressType GetAddressType(string wb)
+		=> string.IsNullOrEmpty(wb) ? AddressType.InternalAddress : AddressType.ExternalAddress;
+
+	private static AddressType GetNameType(string wb)
+		=> string.IsNullOrEmpty(wb) ? AddressType.InternalName : AddressType.ExternalName;
 
 	private static bool IsR1C1(string address)
 	{
@@ -68,7 +75,7 @@ public partial class ExcelAddressBase
 			address = address[1..];
 		}
 
-		address = address.ToUpper();
+		address = address.ToUpper(CultureInfo.CurrentCulture);
 		if (string.IsNullOrEmpty(address) || (address[0] != 'R' && address[0] != 'C'))
 		{
 			return false;
@@ -78,53 +85,54 @@ public partial class ExcelAddressBase
 		var startBracket = false;
 		foreach (var c in address)
 		{
-			switch (c)
+			if (!IsValidR1C1Char(c, ref isC, ref isROrC, ref startBracket))
 			{
-				case 'C':
-					isC = true;
-					isROrC = true;
-					break;
-				case 'R':
-					if (isC)
-					{
-						return false;
-					}
-
-					isROrC = true;
-					break;
-				case '[':
-					startBracket = true;
-					break;
-				case ']':
-					if (startBracket == false)
-					{
-						return false;
-					}
-
-					isROrC = false;
-					break;
-				case ':':
-					isC = false;
-					startBracket = false;
-					isROrC = false;
-					break;
-				default:
-					if (c is >= '0' and <= '9' or '-')
-					{
-						if (isROrC == false)
-						{
-							return false;
-						}
-					}
-					else
-					{
-						return false;
-					}
-
-					break;
+				return false;
 			}
 		}
 
 		return true;
 	}
+
+	private static bool IsValidR1C1Char(char c, ref bool isC, ref bool isROrC, ref bool startBracket)
+	{
+		switch (c)
+		{
+			case 'C':
+				isC = true;
+				isROrC = true;
+				break;
+			case 'R':
+				if (isC)
+				{
+					return false;
+				}
+
+				isROrC = true;
+				break;
+			case '[':
+				startBracket = true;
+				break;
+			case ']':
+				if (startBracket == false)
+				{
+					return false;
+				}
+
+				isROrC = false;
+				break;
+			case ':':
+				isC = false;
+				startBracket = false;
+				isROrC = false;
+				break;
+			default:
+				return IsR1C1Number(c, isROrC);
+		}
+
+		return true;
+	}
+
+	private static bool IsR1C1Number(char c, bool isROrC)
+		=> (c is >= '0' and <= '9' or '-') && isROrC;
 }
