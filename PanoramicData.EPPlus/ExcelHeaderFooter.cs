@@ -35,6 +35,7 @@ using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Vml;
 using OfficeOpenXml.Utils;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml;
 
@@ -62,6 +63,8 @@ public enum PictureAlignment
 /// <summary>
 /// Print header and footer 
 /// </summary>
+[SuppressMessage("Minor Code Smell", "S1104:Fields should not have public accessibility", Justification = "Public API: the text fields are published; converting them to properties would break binary compatibility.")]
+[SuppressMessage("Minor Code Smell", "S2357:Fields should be private", Justification = "Public API: the text fields are published; converting them to properties would break binary compatibility.")]
 public class ExcelHeaderFooterText
 {
 	readonly ExcelWorksheet _ws;
@@ -78,7 +81,8 @@ public class ExcelHeaderFooterText
 		var text = TextNode.InnerText;
 		var code = text[..2];
 		var startPos = 2;
-		for (var pos = startPos; pos < text.Length - 2; pos++)
+		var pos = startPos;
+		while (pos < text.Length - 2)
 		{
 			var newCode = text.Substring(pos, 2);
 			if (newCode is "&C" or "&R")
@@ -88,6 +92,8 @@ public class ExcelHeaderFooterText
 				pos = startPos;
 				code = newCode;
 			}
+
+			pos++;
 		}
 
 		SetText(code, text[startPos..]);
@@ -110,15 +116,15 @@ public class ExcelHeaderFooterText
 	/// <summary>
 	/// Get/set the text to appear on the left hand side of the header (or footer) on the worksheet.
 	/// </summary>
-	public string LeftAlignedText = null;
+	public string LeftAlignedText;
 	/// <summary>
 	/// Get/set the text to appear in the center of the header (or footer) on the worksheet.
 	/// </summary>
-	public string CenteredText = null;
+	public string CenteredText;
 	/// <summary>
 	/// Get/set the text to appear on the right hand side of the header (or footer) on the worksheet.
 	/// </summary>
-	public string RightAlignedText = null;
+	public string RightAlignedText;
 	/// <summary>
 	/// Inserts a picture at the end of the text in the header or footer
 	/// </summary>
@@ -163,7 +169,7 @@ public class ExcelHeaderFooterText
 		{
 			if (!PictureFile.Exists)
 			{
-				throw (new FileNotFoundException(string.Format("{0} is missing", PictureFile.FullName)));
+				throw new FileNotFoundException(string.Format("{0} is missing", PictureFile.FullName));
 			}
 
 			imgBytes = File.ReadAllBytes(PictureFile.FullName);
@@ -171,7 +177,7 @@ public class ExcelHeaderFooterText
 		}
 		catch (Exception ex)
 		{
-			throw (new InvalidDataException("File is not a supported image-file or is corrupt", ex));
+			throw new InvalidDataException("File is not a supported image-file or is corrupt", ex);
 		}
 
 		var id = ValidateImage(Alignment);
@@ -199,7 +205,7 @@ public class ExcelHeaderFooterText
 		{
 			if (image.Id == id)
 			{
-				throw (new InvalidOperationException("A picture already exists in this section"));
+				throw new InvalidOperationException("A picture already exists in this section");
 			}
 		}
 		//Add the image placeholder to the end of the text
@@ -225,6 +231,7 @@ public class ExcelHeaderFooterText
 /// <summary>
 /// Represents the Header and Footer on an Excel Worksheet
 /// </summary>
+[SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Public API: the format codes are published constants used in constant expressions by callers.")]
 public sealed class ExcelHeaderFooter : XmlHelper
 {
 	#region Static Properties
@@ -396,7 +403,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 		{
 			if (_oddFooter == null)
 			{
-				_oddFooter = new ExcelHeaderFooterText(TopNode.SelectSingleNode("d:oddFooter", NameSpaceManager), _ws, "F"); ;
+				_oddFooter = new ExcelHeaderFooterText(TopNode.SelectSingleNode("d:oddFooter", NameSpaceManager), _ws, "F");
 			}
 
 			return _oddFooter;
@@ -467,7 +474,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			return _firstFooter;
 		}
 	}
-	private ExcelVmlDrawingPictureCollection _vmlDrawingsHF = null;
+	private ExcelVmlDrawingPictureCollection _vmlDrawingsHF;
 	/// <summary>
 	/// Vml drawings. Underlaying object for Header footer images
 	/// </summary>
@@ -507,42 +514,29 @@ public sealed class ExcelHeaderFooter : XmlHelper
 	/// </summary>
 	internal void Save()
 	{
-		if (_oddHeader != null)
-		{
-			SetXmlNodeString("d:oddHeader", GetText(OddHeader));
-		}
+		SaveText("d:oddHeader", _oddHeader);
+		SaveText("d:oddFooter", _oddFooter);
 
-		if (_oddFooter != null)
-		{
-			SetXmlNodeString("d:oddFooter", GetText(OddFooter));
-		}
-
-		// only set evenHeader and evenFooter 
+		// only set evenHeader and evenFooter
 		if (differentOddEven)
 		{
-			if (_evenHeader != null)
-			{
-				SetXmlNodeString("d:evenHeader", GetText(EvenHeader));
-			}
-
-			if (_evenFooter != null)
-			{
-				SetXmlNodeString("d:evenFooter", GetText(EvenFooter));
-			}
+			SaveText("d:evenHeader", _evenHeader);
+			SaveText("d:evenFooter", _evenFooter);
 		}
 
 		// only set firstHeader and firstFooter
 		if (differentFirst)
 		{
-			if (_firstHeader != null)
-			{
-				SetXmlNodeString("d:firstHeader", GetText(FirstHeader));
-			}
+			SaveText("d:firstHeader", _firstHeader);
+			SaveText("d:firstFooter", _firstFooter);
+		}
+	}
 
-			if (_firstFooter != null)
-			{
-				SetXmlNodeString("d:firstFooter", GetText(FirstFooter));
-			}
+	private void SaveText(string path, ExcelHeaderFooterText? text)
+	{
+		if (text != null)
+		{
+			SetXmlNodeString(path, GetText(text));
 		}
 	}
 	internal void SaveHeaderFooterImages()

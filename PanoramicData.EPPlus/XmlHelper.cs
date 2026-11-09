@@ -48,25 +48,23 @@ public abstract class XmlHelper
 {
 	internal delegate int ChangedEventHandler(StyleBase sender, Style.StyleChangeEventArgs e);
 
-	internal XmlHelper(XmlNamespaceManager nameSpaceManager)
+	private protected XmlHelper(XmlNamespaceManager nameSpaceManager)
 	{
 		TopNode = null;
 		NameSpaceManager = nameSpaceManager;
 	}
 
-	internal XmlHelper(XmlNamespaceManager nameSpaceManager, XmlNode? topNode)
+	private protected XmlHelper(XmlNamespaceManager nameSpaceManager, XmlNode? topNode)
 	{
 		TopNode = topNode;
 		NameSpaceManager = nameSpaceManager;
 	}
 
-	//internal bool ChangedFlag;
-
 	internal XmlNamespaceManager NameSpaceManager { get; set; }
 
 	internal XmlNode? TopNode { get; set; }
 
-	string[]? _schemaNodeOrder = null;
+	string[]? _schemaNodeOrder;
 
 	/// <summary>
 	/// Schema order list
@@ -375,7 +373,6 @@ public abstract class XmlHelper
 						string nodeName;
 						string nodePrefix;
 						var nameSplit = subPath.Split(':');
-						nameSpaceURI = string.Empty;
 
 						// Check if the name has a prefix like "d:nodeName"
 						if (nameSplit.Length > 1)
@@ -426,7 +423,7 @@ public abstract class XmlHelper
 						if (nodeInsertOrder == eNodeInsertOrder.SchemaOrder)
 						{
 							// Check if the Schema Order List is empty
-							if ((SchemaNodeOrder == null) || (SchemaNodeOrder.Length == 0))
+							if (SchemaNodeOrder == null || SchemaNodeOrder.Length == 0)
 							{
 								// Use the "Insert Last" option when Schema Order List is empty
 								nodeInsertOrder = eNodeInsertOrder.Last;
@@ -465,6 +462,9 @@ public abstract class XmlHelper
 
 							case eNodeInsertOrder.Last:
 								node.AppendChild(subNode);
+								break;
+
+							default:
 								break;
 						}
 					}
@@ -538,9 +538,9 @@ public abstract class XmlHelper
 			node = node.SelectSingleNode(s, NameSpaceManager);
 			if (node != null)
 			{
-				if (node is XmlAttribute)
+				if (node is XmlAttribute attribute)
 				{
-					(node as XmlAttribute).OwnerElement.Attributes.Remove(node as XmlAttribute);
+					attribute.OwnerElement.Attributes.Remove(attribute);
 				}
 				else
 				{
@@ -592,7 +592,7 @@ public abstract class XmlHelper
 				CreateNode(path, insertFirst);
 				nameNode = node.SelectSingleNode(path, NameSpaceManager);
 			}
-			//if (nameNode.InnerText != value) HasChanged();
+
 			nameNode.InnerText = value;
 		}
 	}
@@ -604,9 +604,9 @@ public abstract class XmlHelper
 			var node = TopNode.SelectSingleNode(path, NameSpaceManager);
 			if (node != null)
 			{
-				if (node is XmlAttribute)
+				if (node is XmlAttribute attribute)
 				{
-					var elem = (node as XmlAttribute).OwnerElement;
+					var elem = attribute.OwnerElement;
 					elem.ParentNode.RemoveChild(elem);
 				}
 				else

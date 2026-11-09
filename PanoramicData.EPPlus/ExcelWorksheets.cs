@@ -38,6 +38,7 @@ using OfficeOpenXml.VBA;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -142,7 +143,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			Name = ValidateFixSheetName(Name);
 			if (GetByName(Name) != null)
 			{
-				throw (new InvalidOperationException(ERR_DUP_WORKSHEET + " : " + Name));
+				throw new InvalidOperationException(ERR_DUP_WORKSHEET + " : " + Name);
 			}
 
 			GetSheetURI(ref Name, out var sheetID, out var uriWorksheet, isChart);
@@ -190,12 +191,12 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			if (Copy is ExcelChartsheet)
 			{
-				throw (new ArgumentException("Can not copy a chartsheet"));
+				throw new ArgumentException("Can not copy a chartsheet");
 			}
 
 			if (GetByName(Name) != null)
 			{
-				throw (new InvalidOperationException(ERR_DUP_WORKSHEET));
+				throw new InvalidOperationException(ERR_DUP_WORKSHEET);
 			}
 
 			GetSheetURI(ref Name, out var sheetID, out var uriWorksheet, false);
@@ -226,8 +227,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			//Copy HeaderFooter
 			CopyHeaderFooterPictures(Copy, added);
 
-			//Copy all relationships 
-			//CopyRelationShips(Copy, added);
 			if (Copy.Drawings.Count > 0)
 			{
 				CopyDrawing(Copy, added);
@@ -268,7 +267,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 				var attr = (XmlAttribute)pageSetup.Attributes.GetNamedItem("id", ExcelPackage.schemaRelationships);
 				if (attr != null)
 				{
-					relID = attr.Value;
 					// first delete the attribute from the XML
 					pageSetup.Attributes.Remove(attr);
 				}
@@ -354,7 +352,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			xmlDoc.SelectSingleNode("//d:table/@displayName", tbl.NameSpaceManager).Value = name;
 			xml = xmlDoc.OuterXml;
 
-			//var uriTbl = new Uri(string.Format("/xl/tables/table{0}.xml", Id), UriKind.Relative);
 			var uriTbl = GetNewUri(_pck.Package, "/xl/tables/table{0}.xml", ref Id);
 			if (_pck.Workbook._nextTableID < Id)
 			{
@@ -364,7 +361,6 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			var part = _pck.Package.CreatePart(uriTbl, "application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml", _pck.Compression);
 			StreamWriter streamTbl = new(part.GetStream(FileMode.Create, FileAccess.Write));
 			streamTbl.Write(xml);
-			//streamTbl.Close();
 			streamTbl.Flush();
 
 			//create the relationship and add the ID to the worksheet xml.
@@ -513,14 +509,11 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			CopyText(Copy.HeaderFooter._firstFooter, added.HeaderFooter.FirstFooter);
 		}
 
-		//Copy any images;
+		// Copy any images
 		if (Copy.HeaderFooter.Pictures.Count > 0)
 		{
-			var source = Copy.HeaderFooter.Pictures.Uri;
-			var dest = GetNewUri(_pck.Package, @"/xl/drawings/vmlDrawing{0}.vml");
 			added.DeleteNode("d:legacyDrawingHF");
 
-			//var part = _pck.Package.CreatePart(dest, "application/vnd.openxmlformats-officedocument.vmlDrawing", _pck.Compression);
 			foreach (ExcelVmlDrawingPicture pic in Copy.HeaderFooter.Pictures)
 			{
 				var item = added.HeaderFooter.Pictures.Add(pic.Id, pic.ImageUri, pic.Title, pic.Width, pic.Height);
@@ -657,7 +650,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		streamDrawing.Flush();
 
 		//Add the relationship ID to the worksheet xml.
-		var commentRelation = workSheet.Part.CreateRelationship(UriHelper.GetRelativeUri(workSheet.WorksheetUri, uriComment), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/comments");
+		workSheet.Part.CreateRelationship(UriHelper.GetRelativeUri(workSheet.WorksheetUri, uriComment), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/comments");
 
 		xml = Copy.VmlDrawingsComments.VmlDrawingXml.InnerXml;
 
@@ -684,9 +677,8 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 
 		e.SetAttribute("id", ExcelPackage.schemaRelationships, newVmlRel.Id);
 	}
-	private void CopyDrawing(ExcelWorksheet Copy, ExcelWorksheet workSheet/*, PackageRelationship r*/)
+	private void CopyDrawing(ExcelWorksheet Copy, ExcelWorksheet workSheet)
 	{
-
 		//First copy the drawing XML                
 		var xml = Copy.Drawings.DrawingXml.OuterXml;
 		var uriDraw = new Uri(string.Format("/xl/drawings/drawing{0}.xml", workSheet.SheetID), UriKind.Relative);
@@ -706,9 +698,8 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			var draw = Copy.Drawings[i];
 			draw.AdjustPositionAndSize();       //Adjust position for any change in normal style font/row size etc.
-			if (draw is ExcelChart)
+			if (draw is ExcelChart chart)
 			{
-				var chart = draw as ExcelChart;
 				xml = chart.ChartXml.InnerXml;
 
 				var UriChart = GetNewUri(_pck.Package, "/xl/charts/chart{0}.xml");
@@ -722,9 +713,8 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 				var relAtt = drawXml.SelectSingleNode(string.Format("//c:chart/@r:id[.='{0}']", prevRelID), Copy.Drawings.NameSpaceManager) as XmlAttribute;
 				relAtt.Value = rel.Id;
 			}
-			else if (draw is ExcelPicture)
+			else if (draw is ExcelPicture pic)
 			{
-				var pic = draw as ExcelPicture;
 				var uri = pic.UriPic;
 				if (!workSheet.Workbook._package.Package.PartExists(uri))
 				{
@@ -950,7 +940,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
             */
 		foreach (var ws in _worksheets)
 		{
-			var drawings = ws.Value.Drawings;
+			_ = ws.Value.Drawings;
 		}
 
 		var worksheet = _worksheets[Index];
@@ -960,14 +950,13 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 
 		//Remove all comments
-		if (!(worksheet is ExcelChartsheet) && worksheet.Comments.Count > 0)
+		if (worksheet is not ExcelChartsheet && worksheet.Comments.Count > 0)
 		{
 			worksheet.Comments.Clear();
 		}
 
 		//Delete any parts still with relations to the Worksheet.
 		DeleteRelationsAndParts(worksheet.Part);
-
 
 		//Delete the worksheet part and relation from the package 
 		_pck.Workbook.Part.DeleteRelationship(worksheet.RelationshipID);
@@ -987,18 +976,21 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		_pck.Workbook.VbaProject?.Modules.Remove(worksheet.CodeModule);
 
 		ReindexWorksheetDictionary();
+		UpdateActiveTabAfterDelete(worksheet.SheetID);
+	}
+
+	private void UpdateActiveTabAfterDelete(int deletedSheetId)
+	{
 		//If the active sheet is deleted, set the first tab as active.
 		if (_pck.Workbook.View.ActiveTab >= _pck.Workbook.Worksheets.Count)
 		{
 			_pck.Workbook.View.ActiveTab = _pck.Workbook.View.ActiveTab - 1;
 		}
 
-		if (_pck.Workbook.View.ActiveTab == worksheet.SheetID)
+		if (_pck.Workbook.View.ActiveTab == deletedSheetId)
 		{
 			_pck.Workbook.Worksheets[_pck._worksheetAdd].View.TabSelected = true;
 		}
-
-		worksheet = null;
 	}
 
 	private void DeleteRelationsAndParts(Packaging.ZipPackagePart part)
@@ -1044,7 +1036,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 		else
 		{
-			throw (new ArgumentException("Worksheet is not in the collection."));
+			throw new ArgumentException("Worksheet is not in the collection.");
 		}
 	}
 	#endregion
@@ -1067,13 +1059,14 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// <param name="PositionID">The position of the worksheet. Collection is zero-based or one-base depending on the Package.Compatibility.IsWorksheets1Based propery. Default is Zero based</param>
 	/// <seealso cref="ExcelPackage.Compatibility"/>
 	/// <returns></returns>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelWorksheet this[int PositionID]
 	{
 		get
 		{
 			return _worksheets.TryGetValue(PositionID, out var value)
 				? value
-				: throw (new IndexOutOfRangeException("Worksheet position out of range."));
+				: throw new IndexOutOfRangeException("Worksheet position out of range.");
 		}
 	}
 
@@ -1135,7 +1128,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			}
 		}
 
-		return (xlWorksheet);
+		return xlWorksheet;
 	}
 	#region MoveBefore and MoveAfter Methods
 	/// <summary>
@@ -1170,6 +1163,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// 
 	/// </summary>
 	/// <param name="sourceName"></param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public void MoveToStart(string sourceName)
 	{
 		var sourceSheet = this[sourceName];
@@ -1191,6 +1185,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// 
 	/// </summary>
 	/// <param name="sourceName"></param>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public void MoveToEnd(string sourceName)
 	{
 		var sourceSheet = this[sourceName];
@@ -1208,6 +1203,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 	/// <param name="sourcePositionId"></param>
 	public void MoveToEnd(int sourcePositionId) => Move(sourcePositionId, _worksheets.Count + (_pck._worksheetAdd - 1), true);
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void Move(string sourceName, string targetName, bool placeAfter)
 	{
 		var sourceSheet = this[sourceName];
@@ -1225,6 +1221,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		Move(sourceSheet.PositionID, targetSheet.PositionID, placeAfter);
 	}
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void Move(int sourcePositionId, int targetPositionId, bool placeAfter)
 	{
 		// Bugfix: if source and target are the same worksheet the following code will create a duplicate
@@ -1291,6 +1288,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 	}
 
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void MoveSheetXmlNode(ExcelWorksheet sourceSheet, ExcelWorksheet targetSheet, bool placeAfter)
 	{
 		lock (TopNode.OwnerDocument)
@@ -1320,7 +1318,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			foreach (var sheet in _worksheets.Values)
 			{
-				((IDisposable)sheet).Dispose();
+				sheet.Dispose();
 			}
 
 			_worksheets = null;

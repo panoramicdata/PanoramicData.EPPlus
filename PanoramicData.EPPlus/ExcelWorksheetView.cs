@@ -30,6 +30,7 @@
  * Jan Källman		    License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace OfficeOpenXml;
@@ -44,7 +45,7 @@ public class ExcelWorksheetView : XmlHelper
 	/// </summary>
 	public class ExcelWorksheetPanes : XmlHelper
 	{
-		XmlElement _selectionNode = null;
+		XmlElement _selectionNode;
 		internal ExcelWorksheetPanes(XmlNamespaceManager ns, XmlNode topNode) :
 			base(ns, topNode)
 		{
@@ -168,19 +169,17 @@ public class ExcelWorksheetView : XmlHelper
 	protected internal XmlElement SheetViewElement => (XmlElement)TopNode;
 	#endregion
 	#region TabSelected
-	private XmlElement _selectionNode = null;
 	private XmlElement SelectionNode
 	{
 		get
 		{
-			_selectionNode = SheetViewElement.SelectSingleNode("//d:selection", _worksheet.NameSpaceManager) as XmlElement;
-			if (_selectionNode == null)
+			if (SheetViewElement.SelectSingleNode("//d:selection", _worksheet.NameSpaceManager) is not XmlElement selectionNode)
 			{
-				_selectionNode = _worksheet.WorksheetXml.CreateElement("selection", ExcelPackage.schemaMain);
-				SheetViewElement.AppendChild(_selectionNode);
+				selectionNode = _worksheet.WorksheetXml.CreateElement("selection", ExcelPackage.schemaMain);
+				SheetViewElement.AppendChild(selectionNode);
 			}
 
-			return _selectionNode;
+			return selectionNode;
 		}
 	}
 	#endregion
@@ -200,7 +199,7 @@ public class ExcelWorksheetView : XmlHelper
 			var ac = new ExcelAddressBase(value);
 			if (ac.IsSingleCell == false)
 			{
-				throw (new InvalidOperationException("ActiveCell must be a single cell."));
+				throw new InvalidOperationException("ActiveCell must be a single cell.");
 			}
 
 			/*** Active cell must be inside SelectedRange ***/
@@ -276,7 +275,7 @@ public class ExcelWorksheetView : XmlHelper
 		}
 		set
 		{
-			SetTabSelected(value, false);
+			SetTabSelected(value);
 		}
 	}
 
@@ -300,6 +299,7 @@ public class ExcelWorksheetView : XmlHelper
 	/// </summary>
 	/// <param name="isSelected">Whether the tab is selected, defaults to true.</param>
 	/// <param name="allowMultiple">Whether to allow multiple active tabs, defaults to false.</param>
+	[SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameters with overloads would break binary compatibility.")]
 	public void SetTabSelected(bool isSelected = true, bool allowMultiple = false)
 	{
 		if (isSelected)
@@ -307,7 +307,7 @@ public class ExcelWorksheetView : XmlHelper
 			SheetViewElement.SetAttribute("tabSelected", "1");
 			if (!allowMultiple)
 			{
-				//    // ensure no other worksheet has its tabSelected attribute set to 1
+				// ensure no other worksheet has its tabSelected attribute set to 1
 				foreach (var sheet in _worksheet._package.Workbook.Worksheets)
 				{
 					sheet.View.TabSelected = false;

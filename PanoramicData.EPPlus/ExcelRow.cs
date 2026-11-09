@@ -32,6 +32,7 @@
 
 using OfficeOpenXml.Style;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 namespace OfficeOpenXml;
 
@@ -63,6 +64,7 @@ internal class RowInternal
 public class ExcelRow : IRangeID
 {
 	private readonly ExcelWorksheet _worksheet;
+	[SuppressMessage("Minor Code Smell", "S3052:Members should not be initialized to default values", Justification = "The field is never assigned; without the initialiser CS0649 fails the build.")]
 	private readonly XmlElement _rowElement = null;
 	/// <summary>
 	/// Internal RowID.
@@ -86,7 +88,7 @@ public class ExcelRow : IRangeID
 	/// <summary>
 	/// Provides access to the node representing the row.
 	/// </summary>
-	internal XmlNode Node => (_rowElement);
+	internal XmlNode Node => _rowElement;
 
 	#region ExcelRow Hidden
 	/// <summary>
@@ -111,6 +113,7 @@ public class ExcelRow : IRangeID
 	/// <summary>
 	/// Sets the height of the row
 	/// </summary>
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Zero is assigned exactly to hide a row or column, so an exact test is intended.")]
 	public double Height
 	{
 		get
@@ -278,6 +281,7 @@ public class ExcelRow : IRangeID
 			r.PageBreak = value;
 		}
 	}
+	[SuppressMessage("Major Bug", "S3237:value contextual keyword should be used", Justification = "Public API: assigning any value merges the whole row or column, as in upstream EPPlus.")]
 	public bool Merged
 	{
 		get
@@ -289,7 +293,7 @@ public class ExcelRow : IRangeID
 			_worksheet.MergedCells.Add(new ExcelAddressBase(Row, 1, Row, ExcelPackage.MaxColumns), true);
 		}
 	}
-	internal static ulong GetRowID(int sheetID, int row) => ((ulong)sheetID) + (((ulong)row) << 29);
+	internal static ulong GetRowID(int sheetID, int row) => (ulong)sheetID + ((ulong)row << 29);
 
 	#region IRangeID Members
 
@@ -302,7 +306,7 @@ public class ExcelRow : IRangeID
 		}
 		set
 		{
-			Row = ((int)(value >> 29));
+			Row = (int)(value >> 29);
 		}
 	}
 
@@ -316,7 +320,6 @@ public class ExcelRow : IRangeID
 		var newRow = added.Row(Row);
 		newRow.Collapsed = Collapsed;
 		newRow.Height = Height;
-		newRow.CustomHeight = newRow.CustomHeight;
 		newRow.Hidden = Hidden;
 		newRow.OutlineLevel = OutlineLevel;
 		newRow.PageBreak = PageBreak;

@@ -35,6 +35,7 @@ using OfficeOpenXml.Style.Dxf;
 using OfficeOpenXml.Style.XmlAccess;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Xml;
 namespace OfficeOpenXml;
@@ -42,6 +43,8 @@ namespace OfficeOpenXml;
 /// <summary>
 /// Containts all shared cell styles for a workbook
 /// </summary>
+[SuppressMessage("Minor Code Smell", "S1104:Fields should not have public accessibility", Justification = "Public API: the style collections are published fields; converting them to properties would break binary compatibility.")]
+[SuppressMessage("Minor Code Smell", "S2357:Fields should be private", Justification = "Public API: the style collections are published fields; converting them to properties would break binary compatibility.")]
 public sealed class ExcelStyles : XmlHelper
 {
 	const string NumberFormatsPath = "d:styleSheet/d:numFmts";
@@ -53,7 +56,6 @@ public sealed class ExcelStyles : XmlHelper
 	const string CellStylesPath = "d:styleSheet/d:cellStyles";
 	const string dxfsPath = "d:styleSheet/d:dxfs";
 
-	//internal Dictionary<int, ExcelXfs> Styles = new Dictionary<int, ExcelXfs>();
 	readonly XmlDocument _styleXml;
 	readonly ExcelWorkbook _wb;
 	readonly XmlNamespaceManager _nameSpaceManager;
@@ -198,11 +200,12 @@ public sealed class ExcelStyles : XmlHelper
 
 		return 0;
 	}
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	private void SetStyleAddress(StyleBase sender, Style.StyleChangeEventArgs e, ExcelAddressBase address, ExcelWorksheet ws, ref Dictionary<int, int> styleCashe)
 	{
 		if (address.Start.Column == 0 || address.Start.Row == 0)
 		{
-			throw (new Exception("error address"));
+			throw new Exception("error address");
 		}
 		//Columns
 		else if (address.Start.Row == 1 && address.End.Row == ExcelPackage.MaxRows)
@@ -219,7 +222,6 @@ public sealed class ExcelStyles : XmlHelper
 			}
 			else
 			{
-				//column = (ExcelColumn)ws.GetValueInner(0, address.Start.Column);
 				column = (ExcelColumn)o;
 				isNew = false;
 			}
@@ -236,14 +238,13 @@ public sealed class ExcelStyles : XmlHelper
 
 				if (column.ColumnMax > address.End.Column)
 				{
-					var newCol = ws.CopyColumn(column, address.End.Column + 1, column.ColumnMax);
+					ws.CopyColumn(column, address.End.Column + 1, column.ColumnMax);
 					column.ColumnMax = address.End.Column;
 				}
 
 				var s = ws.GetStyleInner(0, column.ColumnMin);
 				AddNewStyleColumn(sender, e, ws, styleCashe, column, s);
 
-				//index++;
 				prevColumMax = column.ColumnMax;
 				if (!ws._values.NextCell(ref row, ref col) || row > 0)
 				{
@@ -452,7 +453,7 @@ public sealed class ExcelStyles : XmlHelper
 			var rowCache = new Dictionary<int, int>(address.End.Row - address.Start.Row + 1);
 			var colCache = new Dictionary<int, ExcelCoreValue>(address.End.Column - address.Start.Column + 1);
 			ws._values.SetRangeValueSpecial(address.Start.Row, address.Start.Column, address.End.Row, address.End.Column,
-				(List<ExcelCoreValue> list, int index, int row, int column, object args) =>
+				(List<ExcelCoreValue> list, int index, int row, int column, object _) =>
 				{
 					// Optimized GetStyleID
 					var s = list[index]._styleId;
@@ -479,7 +480,6 @@ public sealed class ExcelStyles : XmlHelper
 								int r = 0, c = column;
 								if (ws._values.PrevCell(ref r, ref c))
 								{
-									//var val = ws._values.GetValue(0, c);
 									if (!colCache.ContainsKey(c))
 									{
 										colCache.Add(c, ws._values.GetValue(0, c));
@@ -498,7 +498,6 @@ public sealed class ExcelStyles : XmlHelper
 
 					if (tmpCache.TryGetValue(s, out var value))
 					{
-						//ws.SetStyleInner(row, column, tmpCache[s]);
 						list[index] = new ExcelCoreValue { _value = list[index]._value, _styleId = value };
 					}
 					else
@@ -506,7 +505,6 @@ public sealed class ExcelStyles : XmlHelper
 						var st = CellXfs[s];
 						var newId = st.GetNewID(CellXfs, sender, e.StyleClass, e.StyleProperty, e.Value);
 						tmpCache.Add(s, newId);
-						//ws.SetStyleInner(row, column, newId);
 						list[index] = new ExcelCoreValue { _value = list[index]._value, _styleId = newId };
 					}
 				},
@@ -553,12 +551,10 @@ public sealed class ExcelStyles : XmlHelper
 					int r = 0, c = col;
 					if (ws._values.PrevCell(ref r, ref c))
 					{
-						//var column=ws.GetValueInner(0,c) as ExcelColumn;
 						var val = ws._values.GetValue(0, c);
 						var column = (ExcelColumn)(val._value);
 						if (column != null && column.ColumnMax >= col) //Fixes issue 15174
 						{
-							//return ws.GetStyleInner(0, c);
 							return val._styleId;
 						}
 						else
@@ -617,6 +613,7 @@ public sealed class ExcelStyles : XmlHelper
 	internal static string Id => "";
 
 	public ExcelNamedStyleXml CreateNamedStyle(string name) => CreateNamedStyle(name, null);
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public ExcelNamedStyleXml CreateNamedStyle(string name, ExcelStyle Template)
 	{
 		if (_wb.Styles.NamedStyles.ExistsKey(name))
@@ -630,7 +627,6 @@ public sealed class ExcelStyles : XmlHelper
 		ExcelStyles styles;
 		if (Template == null)
 		{
-			//                style.Style = new ExcelStyle(this, NamedStylePropertyChange, -1, name, 0);
 			xfIdCopy = 0;
 			positionID = -1;
 			styles = this;
@@ -643,8 +639,6 @@ public sealed class ExcelStyles : XmlHelper
 
 				positionID = Template.PositionID;
 				styles = this;
-				//style.Style = new ExcelStyle(this, NamedStylePropertyChange, Template.PositionID, name, Template.Index);
-				//style.StyleXfId = Template.Index;
 			}
 			else
 			{
@@ -665,9 +659,23 @@ public sealed class ExcelStyles : XmlHelper
 		style.Name = name;
 		var ix = _wb.Styles.NamedStyles.Add(style.Name, style);
 		style.Style.SetIndex(ix);
-		//style.Style.XfId = ix;
 		return style;
 	}
+	private void AppendUsedStyles<T>(XmlNode parent, ExcelStyleCollection<T> styles, string elementName, int count) where T : StyleXmlHelper
+	{
+		foreach (var style in styles)
+		{
+			if (style.useCnt > 0)
+			{
+				parent.AppendChild(style.CreateXmlNode(_styleXml.CreateElement(elementName, ExcelPackage.schemaMain)));
+				style.newID = count;
+				count++;
+			}
+		}
+
+		(parent as XmlElement).SetAttribute("count", count.ToString());
+	}
+
 	public void UpdateXml()
 	{
 		RemoveUnusedStyles();
@@ -695,7 +703,7 @@ public sealed class ExcelStyles : XmlHelper
 
 		foreach (var nf in NumberFormats)
 		{
-			if (!nf.BuildIn /*&& nf.newID<0*/) //Buildin formats are not updated.
+			if (!nf.BuildIn) //Buildin formats are not updated.
 			{
 				nfNode.AppendChild(nf.CreateXmlNode(_styleXml.CreateElement("numFmt", ExcelPackage.schemaMain)));
 				nf.newID = count;
@@ -718,53 +726,20 @@ public sealed class ExcelStyles : XmlHelper
 			fnt.newID = count++;
 		}
 
-		foreach (var fnt in Fonts)
-		{
-			if (fnt.useCnt > 0/* && fnt.newID<0*/)
-			{
-				fntNode.AppendChild(fnt.CreateXmlNode(_styleXml.CreateElement("font", ExcelPackage.schemaMain)));
-				fnt.newID = count;
-				count++;
-			}
-		}
-
-		(fntNode as XmlElement).SetAttribute("count", count.ToString());
-
+		AppendUsedStyles(fntNode, Fonts, "font", count);
 
 		//Fills
-		count = 0;
 		var fillsNode = _styleXml.SelectSingleNode(FillsPath, _nameSpaceManager);
 		fillsNode.RemoveAll();
-		Fills[0].useCnt = 1;    //Must exist (none);  
-		Fills[1].useCnt = 1;    //Must exist (gray125);
-		foreach (var fill in Fills)
-		{
-			if (fill.useCnt > 0)
-			{
-				fillsNode.AppendChild(fill.CreateXmlNode(_styleXml.CreateElement("fill", ExcelPackage.schemaMain)));
-				fill.newID = count;
-				count++;
-			}
-		}
-
-		(fillsNode as XmlElement).SetAttribute("count", count.ToString());
+		Fills[0].useCnt = 1;    // Must exist (none)
+		Fills[1].useCnt = 1;    // Must exist (gray125)
+		AppendUsedStyles(fillsNode, Fills, "fill", 0);
 
 		//Borders
-		count = 0;
 		var bordersNode = _styleXml.SelectSingleNode(BordersPath, _nameSpaceManager);
 		bordersNode.RemoveAll();
-		Borders[0].useCnt = 1;    //Must exist blank;
-		foreach (var border in Borders)
-		{
-			if (border.useCnt > 0)
-			{
-				bordersNode.AppendChild(border.CreateXmlNode(_styleXml.CreateElement("border", ExcelPackage.schemaMain)));
-				border.newID = count;
-				count++;
-			}
-		}
-
-		(bordersNode as XmlElement).SetAttribute("count", count.ToString());
+		Borders[0].useCnt = 1;    // Must exist blank
+		AppendUsedStyles(bordersNode, Borders, "border", 0);
 
 		var styleXfsNode = _styleXml.SelectSingleNode(CellStyleXfsPath, _nameSpaceManager);
 		if (styleXfsNode == null && NamedStyles.Count > 0)
@@ -990,7 +965,6 @@ public sealed class ExcelStyles : XmlHelper
 		else
 		{
 			return 0;
-			//throw(new Exception("Named style does not exist"));        	         
 		}
 	}
 	#region XmlHelpFunctions
@@ -1118,7 +1092,7 @@ public sealed class ExcelStyles : XmlHelper
 						}
 						else
 						{
-							var ns = CreateNamedStyle(st.Name, st.Style);
+							CreateNamedStyle(st.Name, st.Style);
 							newXfs.XfId = NamedStyles.Count - 1;
 						}
 					}

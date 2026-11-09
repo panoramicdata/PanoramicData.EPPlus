@@ -31,7 +31,9 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OfficeOpenXml;
@@ -281,14 +283,7 @@ public class ExcelAddressBase : ExcelCellBase
 		address = address.Trim();
 		if (Utils.ConvertUtil._invariantCompareInfo.IsPrefix(address, "'") || Utils.ConvertUtil._invariantCompareInfo.IsPrefix(address, "["))
 		{
-			//int pos = address.IndexOf("'", 1);
-			//while (pos < address.Length && address[pos + 1] == '\'')
-			//{
-			//    pos = address.IndexOf("'", pos + 2);
-			//}
-			//var wbws = address.Substring(1, pos - 1).Replace("''", "'");
 			SetWbWs(address);
-			//_address = address.Substring(pos + 2);
 		}
 		else
 		{
@@ -330,21 +325,9 @@ public class ExcelAddressBase : ExcelCellBase
 			_ws = address;
 		}
 
-		if (_ws.StartsWith('\''))
+		if (TrySetQuotedWorksheet())
 		{
-			pos = _ws.IndexOf('\'', 1);
-			while (pos > 0 && pos + 1 < _ws.Length && _ws[pos + 1] == '\'')
-			{
-				_ws = _ws[..pos] + _ws[(pos + 1)..];
-				pos = _ws.IndexOf('\'', pos + 1);
-			}
-
-			if (pos > 0)
-			{
-				_address = _ws[(pos + 2)..];
-				_ws = _ws[1..pos];
-				return;
-			}
+			return;
 		}
 
 		pos = _ws.IndexOf('!');
@@ -365,6 +348,30 @@ public class ExcelAddressBase : ExcelCellBase
 			_address = address;
 		}
 	}
+
+	private bool TrySetQuotedWorksheet()
+	{
+		if (!_ws.StartsWith('\''))
+		{
+			return false;
+		}
+
+		var pos = _ws.IndexOf('\'', 1);
+		while (pos > 0 && pos + 1 < _ws.Length && _ws[pos + 1] == '\'')
+		{
+			_ws = _ws[..pos] + _ws[(pos + 1)..];
+			pos = _ws.IndexOf('\'', pos + 1);
+		}
+
+		if (pos > 0)
+		{
+			_address = _ws[(pos + 2)..];
+			_ws = _ws[1..pos];
+			return true;
+		}
+
+		return false;
+	}
 	internal void ChangeWorksheet(string wsName, string newWs)
 	{
 		if (_ws == wsName)
@@ -372,7 +379,7 @@ public class ExcelAddressBase : ExcelCellBase
 			_ws = newWs;
 		}
 
-		var fullAddress = GetAddress();
+		var fullAddress = new StringBuilder(GetAddress());
 
 		if (Addresses != null)
 		{
@@ -381,16 +388,16 @@ public class ExcelAddressBase : ExcelCellBase
 				if (a._ws == wsName)
 				{
 					a._ws = newWs;
-					fullAddress += "," + a.GetAddress();
+					fullAddress.Append(',').Append(a.GetAddress());
 				}
 				else
 				{
-					fullAddress += "," + a._address;
+					fullAddress.Append(',').Append(a._address);
 				}
 			}
 		}
 
-		_address = fullAddress;
+		_address = fullAddress.ToString();
 	}
 
 	private string GetAddress()
@@ -418,7 +425,7 @@ public class ExcelAddressBase : ExcelCellBase
 		return adr;
 	}
 	#endregion
-	protected ExcelCellAddress? _start = null;
+	protected ExcelCellAddress? _start;
 	/// <summary>
 	/// Gets the row and column of the top left cell.
 	/// </summary>
@@ -432,7 +439,7 @@ public class ExcelAddressBase : ExcelCellBase
 			return _start;
 		}
 	}
-	protected ExcelCellAddress? _end = null;
+	protected ExcelCellAddress? _end;
 	/// <summary>
 	/// Gets the row and column of the bottom right cell.
 	/// </summary>
@@ -446,7 +453,7 @@ public class ExcelAddressBase : ExcelCellBase
 			return _end;
 		}
 	}
-	protected ExcelTableAddress? _table = null;
+	protected ExcelTableAddress? _table;
 	public ExcelTableAddress? Table => _table;
 
 	/// <summary>
@@ -457,20 +464,18 @@ public class ExcelAddressBase : ExcelCellBase
 	{
 		get
 		{
-			var a = "";
-			if (_addresses != null)
+			if (_addresses == null)
 			{
-				foreach (var sa in _addresses)
-				{
-					a += "," + sa.GetAddress();
-				}
-			}
-			else
-			{
-				a = GetAddress();
+				return GetAddress();
 			}
 
-			return a;
+			var a = new StringBuilder();
+			foreach (var sa in _addresses)
+			{
+				a.Append(',').Append(sa.GetAddress());
+			}
+
+			return a.ToString();
 		}
 	}
 	/// <summary>
@@ -500,10 +505,10 @@ public class ExcelAddressBase : ExcelCellBase
 		}
 	}
 	internal string WorkSheet => _ws;
-	internal protected List<ExcelAddress>? _addresses = null;
+	internal protected List<ExcelAddress>? _addresses;
 	internal virtual List<ExcelAddress>? Addresses => _addresses;
 
-	private bool ExtractAddress(string fullAddress)
+	private void ExtractAddress(string fullAddress)
 	{
 		var brackPos = new Stack<int>();
 		var bracketParts = new List<string>();
@@ -514,12 +519,12 @@ public class ExcelAddressBase : ExcelCellBase
 			if (fullAddress == "#REF!")
 			{
 				SetAddress(ref fullAddress, ref second, ref hasSheet, false);
-				return true;
+				return;
 			}
 			else if (Utils.ConvertUtil._invariantCompareInfo.IsPrefix(fullAddress, "!"))
 			{
 				// invalid address!
-				return false;
+				return;
 			}
 
 			var isMulti = false;
@@ -559,13 +564,13 @@ public class ExcelAddressBase : ExcelCellBase
 
 								if (brackPos.Count == 0)
 								{
-									HandleBrackets(first, second, bracketParts);
+									HandleBrackets(first, bracketParts);
 								}
 							}
 							else
 							{
 								//Invalid address!
-								return false;
+								return;
 							}
 						}
 					}
@@ -578,7 +583,7 @@ public class ExcelAddressBase : ExcelCellBase
 						// the following is to handle addresses that specifies the
 						// same worksheet twice: Sheet1!A1:Sheet1:A3
 						// They will be converted to: Sheet1!A1:A3
-						if (hasSheet && second != null && second.ToLower().EndsWith(first.ToLower()))
+						if (hasSheet && second != null && second.ToLower(CultureInfo.CurrentCulture).EndsWith(first.ToLower(CultureInfo.CurrentCulture)))
 						{
 							second = Regex.Replace(second, $"{first}$", string.Empty);
 						}
@@ -608,16 +613,14 @@ public class ExcelAddressBase : ExcelCellBase
 			{
 				SetAddress(ref first, ref second, ref hasSheet, isMulti);
 			}
-
-			return true;
 		}
 		catch
 		{
-			return false;
+			// An unparsable address leaves the range unset
 		}
 	}
 
-	private void HandleBrackets(string first, string second, List<string> bracketParts)
+	private void HandleBrackets(string first, List<string> bracketParts)
 	{
 		if (!string.IsNullOrEmpty(first))
 		{
@@ -755,45 +758,13 @@ public class ExcelAddressBase : ExcelCellBase
 				: new ExcelAddressBase(_fromRow, _fromCol, _toRow, (setFixed && _toColFixed ? _toCol : _toCol - cols < col ? col - 1 : _toCol - cols), _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
 		}
 	}
-	internal ExcelAddressBase Insert(ExcelAddressBase address, eShiftType Shift/*, out ExcelAddressBase topAddress, out ExcelAddressBase leftAddress, out ExcelAddressBase rightAddress, out ExcelAddressBase bottomAddress*/)
+	[SuppressMessage("Major Code Smell", "S1172:Unused method parameters should be removed", Justification = "Signature kept for existing callers and tests that pass a shift type.")]
+	internal ExcelAddressBase Insert(ExcelAddressBase address, eShiftType Shift)
 	{
 		//Before or after, no change
-		//if ((_toRow > address._fromRow && _toCol > address.column) || 
-		//    (_fromRow > address._toRow && column > address._toCol))
 		if (_toRow < address._fromRow || _toCol < address._fromCol || (_fromRow > address._toRow && _fromCol > address._toCol))
 		{
-			//topAddress = null;
-			//leftAddress = null;
-			//rightAddress = null;
-			//bottomAddress = null;
 			return this;
-		}
-
-		var rows = address.Rows;
-		var cols = address.Columns;
-		var retAddress = "";
-		if (Shift == eShiftType.Right)
-		{
-			if (address._fromRow > _fromRow)
-			{
-				retAddress = GetAddress(_fromRow, _fromCol, address._fromRow, _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
-			}
-
-			if (address._fromCol > _fromCol)
-			{
-				retAddress = GetAddress(_fromRow < address._fromRow ? _fromRow : address._fromRow, _fromCol, address._fromRow, _toCol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
-			}
-		}
-
-		if (_toRow < address._fromRow)
-		{
-			if (_fromRow < address._fromRow)
-			{
-
-			}
-			else
-			{
-			}
 		}
 
 		return null;
@@ -1003,7 +974,7 @@ public class ExcelAddressBase : ExcelCellBase
 		wb = "";
 		ws = "";
 		intAddress = "";
-		var text = "";
+		var text = new StringBuilder();
 		var isText = false;
 		var brackPos = -1;
 		for (var i = 0; i < Address.Length; i++)
@@ -1013,21 +984,22 @@ public class ExcelAddressBase : ExcelCellBase
 				isText = !isText;
 				if (i > 0 && Address[i - 1] == '\'')
 				{
-					text += "'";
+					text.Append('\'');
 				}
 			}
 			else
 			{
 				if (Address[i] == '!' && !isText)
 				{
-					if (text.Length > 0 && text[0] == '[')
+					var s = text.ToString();
+					if (s.Length > 0 && s[0] == '[')
 					{
-						wb = text[1..text.IndexOf(']')];
-						ws = text[(text.IndexOf(']') + 1)..];
+						wb = s[1..s.IndexOf(']')];
+						ws = s[(s.IndexOf(']') + 1)..];
 					}
 					else
 					{
-						ws = text;
+						ws = s;
 					}
 
 					intAddress = Address[(i + 1)..];
@@ -1037,7 +1009,7 @@ public class ExcelAddressBase : ExcelCellBase
 				{
 					if (Address[i] == '[' && !isText)
 					{
-						if (i > 0) //Table reference return full address;
+						if (i > 0) // Table reference returns the full address
 						{
 							intAddress = Address;
 							return true;
@@ -1049,8 +1021,8 @@ public class ExcelAddressBase : ExcelCellBase
 					{
 						if (brackPos > -1)
 						{
-							wb = text;
-							text = "";
+							wb = text.ToString();
+							text.Clear();
 						}
 						else
 						{
@@ -1059,13 +1031,13 @@ public class ExcelAddressBase : ExcelCellBase
 					}
 					else
 					{
-						text += Address[i];
+						text.Append(Address[i]);
 					}
 				}
 			}
 		}
 
-		intAddress = text;
+		intAddress = text.ToString();
 		return true;
 	}
 
@@ -1168,7 +1140,6 @@ public class ExcelAddressBase : ExcelCellBase
 		{
 			return "";
 		}
-
 	}
 	internal static void SplitAddress(string fullAddress, out string wb, out string ws, out string address, string defaultWorksheet = "")
 	{
@@ -1193,12 +1164,10 @@ public class ExcelAddressBase : ExcelCellBase
 	}
 	private static string GetString(string address, int ix, out int endIx)
 	{
-		var strIx = address.IndexOf("''");
-		var prevStrIx = ix;
+		var strIx = address.IndexOf("''", StringComparison.CurrentCulture);
 		while (strIx > -1)
 		{
-			prevStrIx = strIx;
-			strIx = address.IndexOf("''");
+			strIx = address.IndexOf("''", StringComparison.CurrentCulture);
 		}
 
 		endIx = address.IndexOf('\'');
@@ -1218,9 +1187,7 @@ public class ExcelAddressBase : ExcelCellBase
 public class ExcelAddress : ExcelAddressBase
 {
 	internal ExcelAddress()
-		: base()
 	{
-
 	}
 
 	public ExcelAddress(int fromRow, int fromCol, int toRow, int toColumn)
@@ -1280,7 +1247,6 @@ public class ExcelAddress : ExcelAddressBase
 public class ExcelFormulaAddress : ExcelAddressBase
 {
 	internal ExcelFormulaAddress()
-		: base()
 	{
 	}
 
@@ -1427,15 +1393,15 @@ public class ExcelFormulaAddress : ExcelAddressBase
 			tocol = fromCol;
 		}
 
-		var a = GetAddress(fromRow, fromCol, toRow, tocol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed);
+		var a = new StringBuilder(GetAddress(fromRow, fromCol, toRow, tocol, _fromRowFixed, _fromColFixed, _toRowFixed, _toColFixed));
 		if (Addresses != null)
 		{
 			foreach (var sa in Addresses)
 			{
-				a += "," + sa.GetOffset(row, column);
+				a.Append(',').Append(sa.GetOffset(row, column));
 			}
 		}
 
-		return a;
+		return a.ToString();
 	}
 }

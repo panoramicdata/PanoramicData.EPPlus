@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Style;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 namespace OfficeOpenXml;
 
@@ -40,6 +41,7 @@ namespace OfficeOpenXml;
 public class ExcelColumn : IRangeID
 {
 	private readonly ExcelWorksheet _worksheet;
+	[SuppressMessage("Minor Code Smell", "S3052:Members should not be initialized to default values", Justification = "The field is never assigned; without the initialiser CS0649 fails the build.")]
 	private readonly XmlElement _colElement = null;
 
 	#region ExcelColumn Constructor
@@ -67,6 +69,7 @@ public class ExcelColumn : IRangeID
 	/// <summary>
 	/// Sets the last column the definition refers to.
 	/// </summary>
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	public int ColumnMax
 	{
 		get { return _columnMax; }
@@ -98,7 +101,7 @@ public class ExcelColumn : IRangeID
 	/// <summary>
 	/// Allows the column to be hidden in the worksheet
 	/// </summary>
-	internal bool _hidden = false;
+	internal bool _hidden;
 	public bool Hidden
 	{
 		get
@@ -127,6 +130,7 @@ public class ExcelColumn : IRangeID
 	/// <summary>
 	/// Sets the width of the column in the worksheet
 	/// </summary>
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Zero is assigned exactly to hide a row or column, so an exact test is intended.")]
 	public double Width
 	{
 		get
@@ -226,6 +230,7 @@ public class ExcelColumn : IRangeID
 		get;
 		set;
 	}
+	[SuppressMessage("Major Bug", "S3237:value contextual keyword should be used", Justification = "Public API: assigning any value merges the whole row or column, as in upstream EPPlus.")]
 	public bool Merged
 	{
 		get
