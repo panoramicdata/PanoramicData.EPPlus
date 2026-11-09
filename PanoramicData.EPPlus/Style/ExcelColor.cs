@@ -152,7 +152,6 @@ public sealed class ExcelColor : StyleBase, IColor
 	public static string LookupColor(ExcelColor theColor)
 	{
 		//Thanks to neaves for contributing this method.
-		var iTint = 0;
 		var translatedRGB = "";
 
 		// reference extracted from ECMA-376, Part 4, Section 3.8.26 or 18.8.27 SE Part 1
@@ -237,7 +236,6 @@ public sealed class ExcelColor : StyleBase, IColor
 		else
 		{
 			// coloring by shades of grey (-1 -> 0)
-			iTint = ((int)(theColor.Tint * 160) + 0x80);
 			translatedRGB = ((int)(Math.Round(theColor.Tint * -512))).ToString("X");
 			translatedRGB = "#FF" + translatedRGB + translatedRGB + translatedRGB;
 		}

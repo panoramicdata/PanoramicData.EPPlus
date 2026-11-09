@@ -446,7 +446,7 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	private decimal GetColumnWidth(int col)
 	{
 		var ws = _drawings.Worksheet;
-		return ws.GetValueInner(0, col) is not ExcelColumn column ? (decimal)ws.DefaultColWidth : (decimal)ws.Column(col).VisualWidth;
+		return ws.GetValueInner(0, col) is not ExcelColumn ? (decimal)ws.DefaultColWidth : (decimal)ws.Column(col).VisualWidth;
 	}
 	private double GetRowHeight(int row)
 	{
@@ -498,7 +498,6 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	{
 		_doNotAdjust = true;
 		var ws = _drawings.Worksheet;
-		var mdw = ws.Workbook.MaxFontWidth;
 		var prevPix = 0;
 		var pix = (int)(GetRowHeight(1) / 0.75);
 		var row = 2;
@@ -555,7 +554,6 @@ public class ExcelDrawing : XmlHelper, IDisposable
 	internal void SetPixelHeight(int pixels, float dpi)
 	{
 		_doNotAdjust = true;
-		var ws = _drawings.Worksheet;
 		pixels = (int)(pixels / (dpi / STANDARD_DPI) + .5);
 		var pixOff = pixels - ((int)(GetRowHeight(From.Row + 1) / 0.75) - (int)(From.RowOff / EMU_PER_PIXEL));
 		var prevPixOff = pixels;

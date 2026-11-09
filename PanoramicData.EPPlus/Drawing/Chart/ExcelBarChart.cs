@@ -42,36 +42,24 @@ namespace OfficeOpenXml.Drawing.Chart;
 public sealed class ExcelBarChart : ExcelChart
 {
 	#region "Constructors"
-
 	internal ExcelBarChart(ExcelDrawings drawings, XmlNode node, eChartType type, ExcelChart topChart, ExcelPivotTable PivotTableSource) :
 		base(drawings, node, type, topChart, PivotTableSource)
 	{
-		SetChartNodeText("");
-
-		SetTypeProperties(drawings, type);
+		SetTypeProperties(type);
 	}
 
 	internal ExcelBarChart(ExcelDrawings drawings, XmlNode node, Uri uriChart, Packaging.ZipPackagePart part, XmlDocument chartXml, XmlNode chartNode) :
 	   base(drawings, node, uriChart, part, chartXml, chartNode)
 	{
-		SetChartNodeText(chartNode.Name);
 	}
 
 	internal ExcelBarChart(ExcelChart topChart, XmlNode chartNode) :
 		base(topChart, chartNode)
 	{
-		SetChartNodeText(chartNode.Name);
 	}
 	#endregion
 	#region "Private functions"
-	private void SetChartNodeText(string chartNodeText)
-	{
-		if (string.IsNullOrEmpty(chartNodeText))
-		{
-			chartNodeText = GetChartNodeText();
-		}
-	}
-	private void SetTypeProperties(ExcelDrawings drawings, eChartType type)
+	private void SetTypeProperties(eChartType type)
 	{
 		/******* Bar direction *******/
 		if (type is eChartType.BarClustered or

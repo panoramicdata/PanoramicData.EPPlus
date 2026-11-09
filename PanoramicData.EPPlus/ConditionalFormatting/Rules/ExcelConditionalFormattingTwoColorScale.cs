@@ -83,7 +83,7 @@ public class ExcelConditionalFormattingTwoColorScale
 		if (itemElementNode == null)
 		{
 			// Create the <colorScale> node inside the <cfRule> node
-			var colorScaleNode = CreateComplexNode(
+			CreateComplexNode(
 			  Node,
 			  ExcelConditionalFormattingConstants.Paths.ColorScale);
 

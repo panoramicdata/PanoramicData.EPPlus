@@ -181,7 +181,6 @@ public abstract class ExcelConditionalFormattingRule
 			if (Address.Address != value.Address)
 			{
 				// Save the old parente node
-				var oldNode = Node;
 				var oldParentNode = Node.ParentNode;
 
 				// Create/Get the new <conditionalFormatting> parent node
@@ -588,7 +587,7 @@ public abstract class ExcelConditionalFormattingRule
 		set
 		{
 			// Create/Get the first <formula> node (ensure that it exists)
-			var firstNode = CreateComplexNode(
+			CreateComplexNode(
 			  TopNode,
 			  string.Format(
 				"{0}[position()=1]",

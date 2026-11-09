@@ -142,7 +142,6 @@ public class ExcelParagraphCollection : XmlHelper, IEnumerable<ExcelParagraph>
 			else
 			{
 				this[0].Text = value;
-				var count = Count;
 				for (var ix = Count - 1; ix > 0; ix--)
 				{
 					RemoveAt(ix);

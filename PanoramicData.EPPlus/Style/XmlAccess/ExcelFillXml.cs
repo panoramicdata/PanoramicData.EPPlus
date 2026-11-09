@@ -142,7 +142,6 @@ public class ExcelFillXml : StyleXmlHelper
 		SetXmlNodeString(fillPatternTypePath, SetPatternString(_fillPatternType));
 		if (PatternType != ExcelFillStyle.None)
 		{
-			var pattern = topNode.SelectSingleNode(fillPatternTypePath, NameSpaceManager);
 			if (BackgroundColor.Exists)
 			{
 				CreateNode(_backgroundColorPath);

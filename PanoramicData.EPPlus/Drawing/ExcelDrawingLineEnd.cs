@@ -176,7 +176,6 @@ public sealed class ExcelDrawingLineEnd : XmlHelper
 
 	private static string TranslateEndSizeText(eEndSize value)
 	{
-		var text = value.ToString();
 		return value switch
 		{
 			eEndSize.Small => "sm",
