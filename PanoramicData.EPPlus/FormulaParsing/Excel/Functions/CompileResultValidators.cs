@@ -38,9 +38,14 @@ public class CompileResultValidators
 			return value;
 		}
 
-		return dataType == DataType.Decimal
-			? (_validators[DataType.Decimal] = new DecimalCompileResultValidator())
-			: CompileResultValidator.Empty;
+		if (dataType != DataType.Decimal)
+		{
+			return CompileResultValidator.Empty;
+		}
+
+		var validator = new DecimalCompileResultValidator();
+		_validators[DataType.Decimal] = validator;
+		return validator;
 	}
 
 	public CompileResultValidator GetValidator(DataType dataType) => CreateOrGet(dataType);

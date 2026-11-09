@@ -42,7 +42,7 @@ public class ExpressionGraphBuilder : IExpressionGraphBuilder
 	private readonly ExpressionGraph _graph = new();
 	private readonly IExpressionFactory _expressionFactory;
 	private readonly ParsingContext _parsingContext;
-	private int _tokenIndex = 0;
+	private int _tokenIndex;
 	private bool _negateNextExpression;
 
 	public ExpressionGraphBuilder(ExcelDataProvider excelDataProvider, ParsingContext parsingContext)

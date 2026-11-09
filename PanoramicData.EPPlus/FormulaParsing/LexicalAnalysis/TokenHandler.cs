@@ -106,11 +106,9 @@ public class TokenHandler : ITokenIndexProvider
 	private bool CharIsTokenSeparator(char c, out Token token)
 	{
 		var result = _tokenProvider.Tokens.ContainsKey(c.ToString());
-		token = result ? token = _tokenProvider.Tokens[c.ToString()] : null;
+		token = result ? _tokenProvider.Tokens[c.ToString()] : null;
 		return result;
 	}
-
-
 
 	private static bool TokenIsNegator(TokenizerContext context) => TokenIsNegator(context.LastToken);
 	private static bool TokenIsNegator(Token t) => t == null

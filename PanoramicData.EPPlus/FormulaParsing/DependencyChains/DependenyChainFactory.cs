@@ -105,7 +105,7 @@ internal static class DependencyChainFactory
 		var id = ExcelCellBase.GetCellID(ws == null ? 0 : ws.SheetID, name.Index, 0);
 		if (!depChain.index.ContainsKey(id))
 		{
-			var f = new FormulaCell() { SheetID = ws == null ? 0 : ws.SheetID, Row = name.Index, Column = 0, Formula = name.NameFormula };
+			var f = new FormulaCell { SheetID = ws == null ? 0 : ws.SheetID, Row = name.Index, Column = 0, Formula = name.NameFormula };
 			if (!string.IsNullOrEmpty(f.Formula))
 			{
 				f.Tokens = lexer.Tokenize(f.Formula, ws?.Name).ToList();
@@ -154,7 +154,7 @@ internal static class DependencyChainFactory
 			var id = ExcelCellBase.GetCellID(ws.SheetID, fs.Row, fs.Column);
 			if (!depChain.index.ContainsKey(id))
 			{
-				var f = new FormulaCell() { SheetID = ws.SheetID, Row = fs.Row, Column = fs.Column };
+				var f = new FormulaCell { SheetID = ws.SheetID, Row = fs.Row, Column = fs.Column };
 				if (fs.Value is int v)
 				{
 					f.Formula = ws._sharedFormulas[v].GetFormula(fs.Row, fs.Column, ws.Name);
@@ -342,7 +342,7 @@ internal static class DependencyChainFactory
 			var id = ExcelCellBase.GetCellID(f.ws.SheetID, f.iterator.Row, f.iterator.Column);
 			if (!depChain.index.ContainsKey(id))
 			{
-				var rf = new FormulaCell() { SheetID = f.ws.SheetID, Row = f.iterator.Row, Column = f.iterator.Column };
+				var rf = new FormulaCell { SheetID = f.ws.SheetID, Row = f.iterator.Row, Column = f.iterator.Column };
 				if (f.iterator.Value is int)
 				{
 					rf.Formula = f.ws._sharedFormulas[(int)v].GetFormula(f.iterator.Row, f.iterator.Column, ws.Name);

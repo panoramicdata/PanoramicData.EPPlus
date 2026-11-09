@@ -77,13 +77,13 @@ public class RangeAddressFactory
 		var adr = new ExcelAddressBase(address);
 		var sheet = string.IsNullOrEmpty(adr.WorkSheet) ? worksheetName : adr.WorkSheet;
 		var dim = _excelDataProvider.GetDimensionEnd(sheet);
-		var rangeAddress = new RangeAddress()
+		var rangeAddress = new RangeAddress
 		{
 			Address = adr.Address,
 			Worksheet = sheet,
 			FromRow = adr._fromRow,
 			FromCol = adr._fromCol,
-			ToRow = (dim != null && adr._toRow > dim.Row) ? dim.Row : adr._toRow,
+			ToRow = dim != null && adr._toRow > dim.Row ? dim.Row : adr._toRow,
 			ToCol = adr._toCol
 		};
 

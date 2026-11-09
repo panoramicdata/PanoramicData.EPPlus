@@ -40,33 +40,7 @@ public class SumProduct : ExcelFunction
 		foreach (var arg in arguments)
 		{
 			results.Add([]);
-			var currentResult = results.Last();
-			if (arg.Value is IEnumerable<FunctionArgument>)
-			{
-				foreach (var val in (IEnumerable<FunctionArgument>)arg.Value)
-				{
-					AddValue(val.Value, currentResult);
-				}
-			}
-			else if (arg.Value is FunctionArgument)
-			{
-				AddValue(arg.Value, currentResult);
-			}
-			else if (arg.IsExcelRange)
-			{
-				var r = arg.ValueAsRangeInfo;
-				for (var col = r.Address._fromCol; col <= r.Address._toCol; col++)
-				{
-					for (var row = r.Address._fromRow; row <= r.Address._toRow; row++)
-					{
-						AddValue(r.GetValue(row, col), currentResult);
-					}
-				}
-			}
-			else if (IsNumeric(arg.Value))
-			{
-				AddValue(arg.Value, currentResult);
-			}
+			AddArgumentValues(arg, results.Last());
 		}
 		// Validate that all supplied lists have the same length
 		var arrayLength = results.First().Count;
@@ -92,15 +66,45 @@ public class SumProduct : ExcelFunction
 		return CreateResult(result, DataType.Decimal);
 	}
 
+	private static void AddArgumentValues(FunctionArgument arg, List<double> currentResult)
+	{
+		if (arg.Value is IEnumerable<FunctionArgument> values)
+		{
+			foreach (var val in values)
+			{
+				AddValue(val.Value, currentResult);
+			}
+		}
+		else if (arg.Value is FunctionArgument)
+		{
+			AddValue(arg.Value, currentResult);
+		}
+		else if (arg.IsExcelRange)
+		{
+			var r = arg.ValueAsRangeInfo;
+			for (var col = r.Address._fromCol; col <= r.Address._toCol; col++)
+			{
+				for (var row = r.Address._fromRow; row <= r.Address._toRow; row++)
+				{
+					AddValue(r.GetValue(row, col), currentResult);
+				}
+			}
+		}
+		else if (IsNumeric(arg.Value))
+		{
+			AddValue(arg.Value, currentResult);
+		}
+	}
+
 	private static void AddValue(object convertVal, List<double> currentResult)
 	{
 		if (IsNumeric(convertVal))
 		{
 			currentResult.Add(Convert.ToDouble(convertVal));
 		}
-		else if (convertVal is ExcelErrorValue)
+		else if (convertVal is ExcelErrorValue errorValue)
 		{
-			throw (new ExcelErrorValueException((ExcelErrorValue)convertVal));
+			throw new ExcelErrorValueException(errorValue);
 		}
 		else
 		{

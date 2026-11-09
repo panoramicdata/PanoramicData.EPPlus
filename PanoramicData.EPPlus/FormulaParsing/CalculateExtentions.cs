@@ -40,8 +40,7 @@ namespace OfficeOpenXml.FormulaParsing;
 
 public static class CalculationExtension
 {
-
-	public static void Calculate(this ExcelWorkbook workbook) => workbook.Calculate(new ExcelCalculationOption() { AllowCirculareReferences = false });
+	public static void Calculate(this ExcelWorkbook workbook) => workbook.Calculate(new ExcelCalculationOption { AllowCirculareReferences = false });
 	public static void Calculate(this ExcelWorkbook workbook, ExcelCalculationOption options)
 	{
 		Init(workbook);
@@ -144,7 +143,7 @@ public static class CalculationExtension
 	}
 	private static void Init(ExcelWorkbook workbook)
 	{
-		workbook._formulaTokens = new CellStore<List<Token>>(); ;
+		workbook._formulaTokens = new CellStore<List<Token>>();
 		foreach (var ws in workbook.Worksheets)
 		{
 			if (ws is not ExcelChartsheet)

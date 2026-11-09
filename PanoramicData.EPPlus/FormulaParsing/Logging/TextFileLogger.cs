@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing.Logging;
 
-internal class TextFileLogger : IFormulaParserLogger
+internal class TextFileLogger : IFormulaParserLogger, IDisposable
 {
 	private readonly StreamWriter _sw;
 	private const string Separator = "=================================";
@@ -80,7 +80,6 @@ internal class TextFileLogger : IFormulaParserLogger
 
 			_sw.WriteLine();
 			_funcs.Clear();
-
 		}
 	}
 
@@ -92,7 +91,7 @@ internal class TextFileLogger : IFormulaParserLogger
 			_funcs.Add(func, value);
 		}
 
-		_funcs[func] = ++value;
+		_funcs[func] = value + 1;
 	}
 
 	public void LogFunction(string func, long milliseconds)

@@ -77,17 +77,16 @@ public abstract class ExcelFunction
 
 	protected static object GetFirstValue(IEnumerable<FunctionArgument> val)
 	{
-		var arg = ((IEnumerable<FunctionArgument>)val).FirstOrDefault();
+		var arg = val.FirstOrDefault();
 		if (arg.Value is ExcelDataProvider.IRangeInfo)
 		{
 			var r = arg.ValueAsRangeInfo;
 			return r.GetValue(r.Address._fromRow, r.Address._fromCol);
 		}
-		else
-		{
-			return arg?.Value;
-		}
+
+		return arg?.Value;
 	}
+
 	/// <summary>
 	/// This functions validates that the supplied <paramref name="arguments"/> contains at least
 	/// (the value of) <paramref name="minLength"/> elements. If one of the arguments is an

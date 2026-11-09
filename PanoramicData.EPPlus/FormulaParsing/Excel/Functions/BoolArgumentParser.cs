@@ -32,10 +32,10 @@ public class BoolArgumentParser : ArgumentParser
 {
 	public override object Parse(object obj)
 	{
-		if (obj is ExcelDataProvider.IRangeInfo)
+		if (obj is ExcelDataProvider.IRangeInfo rangeInfo)
 		{
-			var r = ((ExcelDataProvider.IRangeInfo)obj).FirstOrDefault();
-			obj = (r?.Value);
+			var r = rangeInfo.FirstOrDefault();
+			obj = r?.Value;
 		}
 
 		if (obj == null)
@@ -43,9 +43,9 @@ public class BoolArgumentParser : ArgumentParser
 			return false;
 		}
 
-		if (obj is bool)
+		if (obj is bool boolValue)
 		{
-			return (bool)obj;
+			return boolValue;
 		}
 
 		if (obj.IsNumeric())

@@ -30,9 +30,9 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 	public class RangeInfo : IRangeInfo
 	{
 		internal ExcelWorksheet _ws;
-		readonly CellsStoreEnumerator<ExcelCoreValue> _values = null;
+		readonly CellsStoreEnumerator<ExcelCoreValue> _values;
 		readonly int _fromRow, _toRow, _fromCol, _toCol;
-		int _cellCount = 0;
+		int _cellCount;
 		readonly ExcelAddressBase _address;
 		readonly ICellInfo _cell;
 
@@ -64,7 +64,7 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 			_cell = new CellInfo(_ws, _values);
 		}
 
-		public int GetNCells() => ((_toRow - _fromRow) + 1) * ((_toCol - _fromCol) + 1);
+		public int GetNCells() => (_toRow - _fromRow + 1) * (_toCol - _fromCol + 1);
 
 		public bool IsEmpty
 		{
@@ -91,7 +91,8 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 			{
 				if (_cellCount == 0)
 				{
-					if (_values.Next() && _values.Next())
+					var hasFirstCell = _values.Next();
+					if (hasFirstCell && _values.Next())
 					{
 						_values.Reset();
 						return true;
@@ -223,17 +224,8 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		var ws = _package.Workbook.Worksheets[wsName];
 		return new RangeInfo(ws, fromRow, fromCol, toRow, toCol);
 	}
-	public override IRangeInfo GetRange(string worksheet, int row, int column, string address)
-	{
-		var addr = new ExcelAddress(worksheet, address);
-		if (addr.Table != null)
-		{
-			addr = ConvertToA1C1(addr);
-		}
-		var wsName = string.IsNullOrEmpty(addr.WorkSheet) ? _currentWorksheet.Name : addr.WorkSheet;
-		var ws = _package.Workbook.Worksheets[wsName];
-		return new RangeInfo(ws, addr);
-	}
+	public override IRangeInfo GetRange(string worksheet, int row, int column, string address) => GetRange(worksheet, address);
+
 	public override IRangeInfo GetRange(string worksheet, string address)
 	{
 		var addr = new ExcelAddress(worksheet, address);
@@ -259,74 +251,68 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 
 	public override INameInfo GetName(string worksheet, string name)
 	{
-		ExcelNamedRange nameItem;
-		ulong id;
-		ExcelWorksheet ws;
-		if (string.IsNullOrEmpty(worksheet))
+		if (!TryFindNamedRange(worksheet, name, out var nameItem, out var ws))
 		{
-			if (_package._workbook.Names.ContainsKey(name))
-			{
-				nameItem = _package._workbook.Names[name];
-			}
-			else
-			{
-				return null;
-			}
-
-			ws = null;
-		}
-		else
-		{
-			ws = _package._workbook.Worksheets[worksheet];
-			if (ws != null && ws.Names.ContainsKey(name))
-			{
-				nameItem = ws.Names[name];
-			}
-			else if (_package._workbook.Names.ContainsKey(name))
-			{
-				nameItem = _package._workbook.Names[name];
-			}
-			else
-			{
-				return null;
-			}
+			return null;
 		}
 
-		id = ExcelCellBase.GetCellID(nameItem.LocalSheetId, nameItem.Index, 0);
+		var id = ExcelCellBase.GetCellID(nameItem.LocalSheetId, nameItem.Index, 0);
 
 		if (_names.TryGetValue(id, out var value))
 		{
 			return value;
 		}
+
+		var ni = new NameInfo()
+		{
+			Id = id,
+			Name = name,
+			Worksheet = nameItem.Worksheet == null ? nameItem._ws : nameItem.Worksheet.Name,
+			Formula = nameItem.Formula
+		};
+		if (nameItem._fromRow > 0)
+		{
+			ni.Value = new RangeInfo(nameItem.Worksheet ?? ws, nameItem._fromRow, nameItem._fromCol, nameItem._toRow, nameItem._toCol);
+		}
 		else
 		{
-			var ni = new NameInfo()
-			{
-				Id = id,
-				Name = name,
-				Worksheet = nameItem.Worksheet == null ? nameItem._ws : nameItem.Worksheet.Name,
-				Formula = nameItem.Formula
-			};
-			if (nameItem._fromRow > 0)
-			{
-				ni.Value = new RangeInfo(nameItem.Worksheet ?? ws, nameItem._fromRow, nameItem._fromCol, nameItem._toRow, nameItem._toCol);
-			}
-			else
-			{
-				ni.Value = nameItem.Value;
-			}
-
-			_names.Add(id, ni);
-			return ni;
+			ni.Value = nameItem.Value;
 		}
+
+		_names.Add(id, ni);
+		return ni;
 	}
+
+	private bool TryFindNamedRange(string worksheet, string name, out ExcelNamedRange nameItem, out ExcelWorksheet ws)
+	{
+		nameItem = null;
+		ws = null;
+		if (!string.IsNullOrEmpty(worksheet))
+		{
+			ws = _package._workbook.Worksheets[worksheet];
+			if (ws != null && ws.Names.ContainsKey(name))
+			{
+				nameItem = ws.Names[name];
+				return true;
+			}
+		}
+
+		if (_package._workbook.Names.ContainsKey(name))
+		{
+			nameItem = _package._workbook.Names[name];
+			return true;
+		}
+
+		return false;
+	}
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S1944:Invalid casts should be avoided", Justification = "Long-standing public behaviour; changing the returned type would alter the API contract.")]
 	public override IEnumerable<object> GetRangeValues(string address)
 	{
 		SetCurrentWorksheet(ExcelAddressInfo.Parse(address));
 		var addr = new ExcelAddress(address);
 		var wsName = string.IsNullOrEmpty(addr.WorkSheet) ? _currentWorksheet.Name : addr.WorkSheet;
 		var ws = _package.Workbook.Worksheets[wsName];
-		return (IEnumerable<object>)(new CellsStoreEnumerator<ExcelCoreValue>(ws._values, addr._fromRow, addr._fromCol, addr._toRow, addr._toCol));
+		return (IEnumerable<object>)new CellsStoreEnumerator<ExcelCoreValue>(ws._values, addr._fromRow, addr._fromCol, addr._toRow, addr._toCol);
 	}
 
 	public object GetValue(int row, int column) => _currentWorksheet.GetValueInner(row, column);
@@ -350,7 +336,10 @@ public class EpplusExcelDataProvider : ExcelDataProvider
 		{
 			address = _package.Workbook.Worksheets[worksheet].Dimension.End;
 		}
-		catch { }
+		catch
+		{
+			// A missing worksheet or an empty dimension means there is no end address.
+		}
 
 		return address;
 	}
