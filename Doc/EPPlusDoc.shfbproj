@@ -41,12 +41,8 @@ EPPlus started with the source from the ExcelPackage project hosted on CodePlex.
 <NamespaceSummaryItem name="OfficeOpenXml.ConditionalFormatting.Contracts" isDocumented="True">Contains interfaces for Conditional formatting</NamespaceSummaryItem>
 <NamespaceSummaryItem name="OfficeOpenXml.DataValidation.Contracts" isDocumented="True">Contains interfaces for data validation</NamespaceSummaryItem>
 <NamespaceSummaryItem name="OfficeOpenXml.DataValidation.Formulas.Contracts" isDocumented="True">Contains interfaces for data validation formulas</NamespaceSummaryItem>
-<NamespaceSummaryItem name="Ionic.Zip" isDocumented="False">Internal zip handling for packaging. This is code comes from the DotNetZip library... http://dotnetzip.codeplex.com</NamespaceSummaryItem>
-<NamespaceSummaryItem name="Ionic.Zlib" isDocumented="False">Internal zip handling for packaging. This is code comes from the DotNetZip library... http://dotnetzip.codeplex.com</NamespaceSummaryItem>
 <NamespaceSummaryItem name="OfficeOpenXml.FormulaParsing" isDocumented="True">Top namesspace for formula parsing</NamespaceSummaryItem>
 <NamespaceSummaryItem name="OfficeOpenXml.Packaging" isDocumented="True">Contains classes to handle OOXML packaging. Uses the DotNetZip library to handle compression.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="OfficeOpenXml.Packaging.Ionic.Zip" isDocumented="True">Internal zip handling for packaging. This is code comes from the DotNetZip library... http://dotnetzip.codeplex.com</NamespaceSummaryItem>
-<NamespaceSummaryItem name="OfficeOpenXml.Packaging.Ionic.Zlib" isDocumented="True">Internal zip handling for packaging. This is code comes from the DotNetZip library... http://dotnetzip.codeplex.com</NamespaceSummaryItem>
 <NamespaceSummaryItem name="OfficeOpenXml.FormulaParsing.Excel.Functions" isDocumented="True">Formula parsing buildin functions</NamespaceSummaryItem>
 <NamespaceSummaryItem name="OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime" isDocumented="True">Formula parsing buildin date and time functions</NamespaceSummaryItem>
 <NamespaceSummaryItem name="OfficeOpenXml.FormulaParsing.Excel.Functions.Information" isDocumented="False">Formula parsing buildin information functions</NamespaceSummaryItem>
