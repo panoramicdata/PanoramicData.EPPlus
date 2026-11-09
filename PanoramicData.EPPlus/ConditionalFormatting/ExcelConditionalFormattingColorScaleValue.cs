@@ -188,6 +188,35 @@ public class ExcelConditionalFormattingColorScaleValue
 			namespaceManager)
 	{
 	}
+	internal static ExcelConditionalFormattingColorScaleValue CreateDefaultLow(
+		eExcelConditionalFormattingRuleType ruleType,
+		ExcelAddress address,
+		int priority,
+		ExcelWorksheet worksheet,
+		XmlNamespaceManager namespaceManager) => new(
+			eExcelConditionalFormattingValueObjectPosition.Low,
+			eExcelConditionalFormattingValueObjectType.Min,
+			ExcelConditionalFormattingConstants.Colors.CfvoLowValue,
+			ruleType,
+			address,
+			priority,
+			worksheet,
+			namespaceManager);
+
+	internal static ExcelConditionalFormattingColorScaleValue CreateDefaultHigh(
+		eExcelConditionalFormattingRuleType ruleType,
+		ExcelAddress address,
+		int priority,
+		ExcelWorksheet worksheet,
+		XmlNamespaceManager namespaceManager) => new(
+			eExcelConditionalFormattingValueObjectPosition.High,
+			eExcelConditionalFormattingValueObjectType.Max,
+			ExcelConditionalFormattingConstants.Colors.CfvoHighValue,
+			ruleType,
+			address,
+			priority,
+			worksheet,
+			namespaceManager);
 	#endregion Constructors
 
 	/****************************************************************************************/

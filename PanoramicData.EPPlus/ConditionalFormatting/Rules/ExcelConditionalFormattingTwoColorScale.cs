@@ -87,27 +87,8 @@ public class ExcelConditionalFormattingTwoColorScale
 			  Node,
 			  ExcelConditionalFormattingConstants.Paths.ColorScale);
 
-			// LowValue default
-			LowValue = new ExcelConditionalFormattingColorScaleValue(
-			  eExcelConditionalFormattingValueObjectPosition.Low,
-			  eExcelConditionalFormattingValueObjectType.Min,
-			  ExcelConditionalFormattingConstants.Colors.CfvoLowValue,
-			  eExcelConditionalFormattingRuleType.TwoColorScale,
-			  address,
-			  priority,
-			  worksheet,
-			  NameSpaceManager);
-
-			// HighValue default
-			HighValue = new ExcelConditionalFormattingColorScaleValue(
-			  eExcelConditionalFormattingValueObjectPosition.High,
-			  eExcelConditionalFormattingValueObjectType.Max,
-			  ExcelConditionalFormattingConstants.Colors.CfvoHighValue,
-			  eExcelConditionalFormattingRuleType.TwoColorScale,
-			  address,
-			  priority,
-			  worksheet,
-			  NameSpaceManager);
+			LowValue = ExcelConditionalFormattingColorScaleValue.CreateDefaultLow(eExcelConditionalFormattingRuleType.TwoColorScale, address, priority, worksheet, NameSpaceManager);
+			HighValue = ExcelConditionalFormattingColorScaleValue.CreateDefaultHigh(eExcelConditionalFormattingRuleType.TwoColorScale, address, priority, worksheet, NameSpaceManager);
 		}
 	}
 	#endregion Constructors

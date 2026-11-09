@@ -91,18 +91,7 @@ public class ExcelConditionalFormattingThreeColorScale
 			  Node,
 			  ExcelConditionalFormattingConstants.Paths.ColorScale);
 
-			// LowValue default
-			LowValue = new ExcelConditionalFormattingColorScaleValue(
-			  eExcelConditionalFormattingValueObjectPosition.Low,
-			  eExcelConditionalFormattingValueObjectType.Min,
-			  ExcelConditionalFormattingConstants.Colors.CfvoLowValue,
-			  eExcelConditionalFormattingRuleType.ThreeColorScale,
-			  address,
-			  priority,
-			  worksheet,
-			  NameSpaceManager);
-
-			// MiddleValue default
+			LowValue = ExcelConditionalFormattingColorScaleValue.CreateDefaultLow(eExcelConditionalFormattingRuleType.ThreeColorScale, address, priority, worksheet, NameSpaceManager);
 			MiddleValue = new ExcelConditionalFormattingColorScaleValue(
 			  eExcelConditionalFormattingValueObjectPosition.Middle,
 			  eExcelConditionalFormattingValueObjectType.Percent,
@@ -115,16 +104,7 @@ public class ExcelConditionalFormattingThreeColorScale
 			  worksheet,
 			  NameSpaceManager);
 
-			// HighValue default
-			HighValue = new ExcelConditionalFormattingColorScaleValue(
-			  eExcelConditionalFormattingValueObjectPosition.High,
-			  eExcelConditionalFormattingValueObjectType.Max,
-			  ExcelConditionalFormattingConstants.Colors.CfvoHighValue,
-			  eExcelConditionalFormattingRuleType.ThreeColorScale,
-			  address,
-			  priority,
-			  worksheet,
-			  NameSpaceManager);
+			HighValue = ExcelConditionalFormattingColorScaleValue.CreateDefaultHigh(eExcelConditionalFormattingRuleType.ThreeColorScale, address, priority, worksheet, NameSpaceManager);
 		}
 	}
 	#endregion Constructors

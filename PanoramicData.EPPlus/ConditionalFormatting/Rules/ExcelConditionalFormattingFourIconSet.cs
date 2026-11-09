@@ -72,30 +72,12 @@ public class ExcelConditionalFormattingFourIconSet
 	{
 		if (itemElementNode != null && itemElementNode.HasChildNodes)
 		{
-			var iconNode4 = TopNode.SelectSingleNode("d:iconSet/d:cfvo[position()=4]", NameSpaceManager);
-			Icon4 = new ExcelConditionalFormattingIconDataBarValue(
-					eExcelConditionalFormattingRuleType.FourIconSet,
-					address,
-					worksheet,
-					iconNode4,
-					namespaceManager);
+			Icon4 = LoadIcon(4, eExcelConditionalFormattingRuleType.FourIconSet, address, worksheet, namespaceManager);
 		}
 		else
 		{
 			var iconSetNode = TopNode.SelectSingleNode("d:iconSet", NameSpaceManager);
-			var iconNode4 = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(iconNode4);
-
-
-			Icon4 = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Percent,
-					75,
-					"",
-					eExcelConditionalFormattingRuleType.ThreeIconSet,
-					address,
-					priority,
-					worksheet,
-					iconNode4,
-					namespaceManager);
+			Icon4 = AppendDefaultIcon(iconSetNode, 75, address, priority, worksheet, namespaceManager);
 		}
 	}
 	#endregion Constructors

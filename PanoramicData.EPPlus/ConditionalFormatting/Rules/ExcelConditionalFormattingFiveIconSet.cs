@@ -72,50 +72,14 @@ public class ExcelConditionalFormattingFiveIconSet
 	{
 		if (itemElementNode != null && itemElementNode.HasChildNodes)
 		{
-			var iconNode4 = TopNode.SelectSingleNode("d:iconSet/d:cfvo[position()=4]", NameSpaceManager);
-			Icon4 = new ExcelConditionalFormattingIconDataBarValue(
-					eExcelConditionalFormattingRuleType.FiveIconSet,
-					address,
-					worksheet,
-					iconNode4,
-					namespaceManager);
-
-			var iconNode5 = TopNode.SelectSingleNode("d:iconSet/d:cfvo[position()=5]", NameSpaceManager);
-			Icon5 = new ExcelConditionalFormattingIconDataBarValue(
-					eExcelConditionalFormattingRuleType.FiveIconSet,
-					address,
-					worksheet,
-					iconNode5,
-					namespaceManager);
+			Icon4 = LoadIcon(4, eExcelConditionalFormattingRuleType.FiveIconSet, address, worksheet, namespaceManager);
+			Icon5 = LoadIcon(5, eExcelConditionalFormattingRuleType.FiveIconSet, address, worksheet, namespaceManager);
 		}
 		else
 		{
 			var iconSetNode = TopNode.SelectSingleNode("d:iconSet", NameSpaceManager);
-			var iconNode4 = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(iconNode4);
-
-			Icon4 = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Percent,
-					60,
-					"",
-					eExcelConditionalFormattingRuleType.ThreeIconSet,
-					address,
-					priority,
-					worksheet,
-					iconNode4,
-					namespaceManager);
-
-			var iconNode5 = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(iconNode5);
-
-			Icon5 = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Percent,
-					80,
-					"",
-					eExcelConditionalFormattingRuleType.ThreeIconSet,
-					address,
-					priority,
-					worksheet,
-					iconNode5,
-					namespaceManager);
+			Icon4 = AppendDefaultIcon(iconSetNode, 60, address, priority, worksheet, namespaceManager);
+			Icon5 = AppendDefaultIcon(iconSetNode, 80, address, priority, worksheet, namespaceManager);
 		}
 	}
 	#endregion Constructors
