@@ -253,28 +253,21 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		internal void SetIndex(ExcelAddressBase address, int ix)
 		{
-			if (address._fromRow == 1 && address._toRow == ExcelPackage.MaxRows) //Entire row
+			int fromRow = address._fromRow, toRow = address._toRow, fromCol = address._fromCol, toCol = address._toCol;
+			if (fromRow == 1 && toRow == ExcelPackage.MaxRows) //Entire column, stored on row 0
 			{
-				for (var col = address._fromCol; col <= address._toCol; col++)
-				{
-					_cells.SetValue(0, col, ix);
-				}
+				fromRow = toRow = 0;
 			}
-			else if (address._fromCol == 1 && address._toCol == ExcelPackage.MaxColumns) //Entire row
+			else if (fromCol == 1 && toCol == ExcelPackage.MaxColumns) //Entire row, stored on column 0
 			{
-				for (var row = address._fromRow; row <= address._toRow; row++)
-				{
-					_cells.SetValue(row, 0, ix);
-				}
+				fromCol = toCol = 0;
 			}
-			else
+
+			for (var col = fromCol; col <= toCol; col++)
 			{
-				for (var col = address._fromCol; col <= address._toCol; col++)
+				for (var row = fromRow; row <= toRow; row++)
 				{
-					for (var row = address._fromRow; row <= address._toRow; row++)
-					{
-						_cells.SetValue(row, col, ix);
-					}
+					_cells.SetValue(row, col, ix);
 				}
 			}
 		}

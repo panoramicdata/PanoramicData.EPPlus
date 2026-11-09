@@ -976,13 +976,18 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		_pck.Workbook.VbaProject?.Modules.Remove(worksheet.CodeModule);
 
 		ReindexWorksheetDictionary();
+		UpdateActiveTabAfterDelete(worksheet.SheetID);
+	}
+
+	private void UpdateActiveTabAfterDelete(int deletedSheetId)
+	{
 		//If the active sheet is deleted, set the first tab as active.
 		if (_pck.Workbook.View.ActiveTab >= _pck.Workbook.Worksheets.Count)
 		{
 			_pck.Workbook.View.ActiveTab = _pck.Workbook.View.ActiveTab - 1;
 		}
 
-		if (_pck.Workbook.View.ActiveTab == worksheet.SheetID)
+		if (_pck.Workbook.View.ActiveTab == deletedSheetId)
 		{
 			_pck.Workbook.Worksheets[_pck._worksheetAdd].View.TabSelected = true;
 		}
