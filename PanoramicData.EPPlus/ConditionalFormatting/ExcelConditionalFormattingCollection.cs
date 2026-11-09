@@ -102,81 +102,80 @@ public class ExcelConditionalFormattingCollection
 		if ((conditionalFormattingNodes != null)
 		  && (conditionalFormattingNodes.Count > 0))
 		{
-			// Foreach <conditionalFormatting>
 			foreach (XmlNode conditionalFormattingNode in conditionalFormattingNodes)
 			{
-				// Check if @sqref attribute exists
-				if (conditionalFormattingNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Sqref] == null)
-				{
-					throw new InvalidOperationException(
-					  ExcelConditionalFormattingConstants.Errors.MissingSqrefAttribute);
-				}
-
-				// Get the @sqref attribute
-				ExcelAddress address = new(
-				  conditionalFormattingNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Sqref].Value);
-
-				// Check for all the <cfRules> nodes and load them
-				var cfRuleNodes = conditionalFormattingNode.SelectNodes(
-				  ExcelConditionalFormattingConstants.Paths.CfRule,
-				  _worksheet.NameSpaceManager);
-
-				// Checking the count of cfRuleNodes "materializes" the collection which prevents a rare infinite loop bug
-				if (cfRuleNodes.Count == 0)
-				{
-					continue;
-				}
-
-				// Foreach <cfRule> inside the current <conditionalFormatting>
-				foreach (XmlNode cfRuleNode in cfRuleNodes)
-				{
-					// Check if @type attribute exists
-					if (cfRuleNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Type] == null)
-					{
-						throw new InvalidOperationException(
-						  ExcelConditionalFormattingConstants.Errors.MissingTypeAttribute);
-					}
-
-					// Check if @priority attribute exists
-					if (cfRuleNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Priority] == null)
-					{
-						throw new InvalidOperationException(
-						  ExcelConditionalFormattingConstants.Errors.MissingPriorityAttribute);
-					}
-
-					// Get the <cfRule> main attributes
-					var typeAttribute = ExcelConditionalFormattingHelper.GetAttributeString(
-					  cfRuleNode,
-					  ExcelConditionalFormattingConstants.Attributes.Type);
-
-					var priority = ExcelConditionalFormattingHelper.GetAttributeInt(
-					  cfRuleNode,
-					  ExcelConditionalFormattingConstants.Attributes.Priority);
-
-					// Transform the @type attribute to EPPlus Rule Type (slighty diferente)
-					var type = ExcelConditionalFormattingRuleType.GetTypeByAttrbiute(
-					  typeAttribute,
-					  cfRuleNode,
-					  _worksheet.NameSpaceManager);
-
-					// Create the Rule according to the correct type, address and priority
-					var cfRule = ExcelConditionalFormattingRuleFactory.Create(
-					  type,
-					  address,
-					  priority,
-					  _worksheet,
-					  cfRuleNode);
-
-					// Add the new rule to the list
-					if (cfRule != null)
-					{
-						_rules.Add(cfRule);
-					}
-				}
+				LoadConditionalFormatting(conditionalFormattingNode);
 			}
 		}
 	}
 	#endregion Constructors
+
+	private void LoadConditionalFormatting(XmlNode conditionalFormattingNode)
+	{
+		if (conditionalFormattingNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Sqref] == null)
+		{
+			throw new InvalidOperationException(
+			  ExcelConditionalFormattingConstants.Errors.MissingSqrefAttribute);
+		}
+
+		ExcelAddress address = new(
+		  conditionalFormattingNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Sqref].Value);
+
+		var cfRuleNodes = conditionalFormattingNode.SelectNodes(
+		  ExcelConditionalFormattingConstants.Paths.CfRule,
+		  _worksheet.NameSpaceManager);
+
+		// Checking the count of cfRuleNodes "materializes" the collection which prevents a rare infinite loop bug
+		if (cfRuleNodes.Count == 0)
+		{
+			return;
+		}
+
+		foreach (XmlNode cfRuleNode in cfRuleNodes)
+		{
+			LoadRule(cfRuleNode, address);
+		}
+	}
+
+	private void LoadRule(XmlNode cfRuleNode, ExcelAddress address)
+	{
+		if (cfRuleNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Type] == null)
+		{
+			throw new InvalidOperationException(
+			  ExcelConditionalFormattingConstants.Errors.MissingTypeAttribute);
+		}
+
+		if (cfRuleNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Priority] == null)
+		{
+			throw new InvalidOperationException(
+			  ExcelConditionalFormattingConstants.Errors.MissingPriorityAttribute);
+		}
+
+		var typeAttribute = ExcelConditionalFormattingHelper.GetAttributeString(
+		  cfRuleNode,
+		  ExcelConditionalFormattingConstants.Attributes.Type);
+
+		var priority = ExcelConditionalFormattingHelper.GetAttributeInt(
+		  cfRuleNode,
+		  ExcelConditionalFormattingConstants.Attributes.Priority);
+
+		var type = ExcelConditionalFormattingRuleType.GetTypeByAttrbiute(
+		  typeAttribute,
+		  cfRuleNode,
+		  _worksheet.NameSpaceManager);
+
+		var cfRule = ExcelConditionalFormattingRuleFactory.Create(
+		  type,
+		  address,
+		  priority,
+		  _worksheet,
+		  cfRuleNode);
+
+		if (cfRule != null)
+		{
+			_rules.Add(cfRule);
+		}
+	}
 
 	/****************************************************************************************/
 
@@ -353,6 +352,7 @@ public class ExcelConditionalFormattingCollection
 		}
 		catch
 		{
+			// Removing a priority that has no rule is deliberately a no-op.
 		}
 	}
 

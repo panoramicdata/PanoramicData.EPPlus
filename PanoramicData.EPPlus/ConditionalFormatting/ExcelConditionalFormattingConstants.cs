@@ -38,7 +38,7 @@ namespace OfficeOpenXml.ConditionalFormatting;
 internal static class ExcelConditionalFormattingConstants
 {
 	#region Errors
-	internal class Errors
+	internal static class Errors
 	{
 		internal const string CommaSeparatedAddresses = @"Multiple addresses may not be commaseparated, use space instead";
 		internal const string InvalidCfruleObject = @"The supplied item must inherit OfficeOpenXml.ConditionalFormatting.ExcelConditionalFormattingRule";
@@ -65,7 +65,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion Errors
 
 	#region Nodes
-	internal class Nodes
+	internal static class Nodes
 	{
 		internal const string Worksheet = "worksheet";
 		internal const string ConditionalFormatting = "conditionalFormatting";
@@ -80,7 +80,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion Nodes
 
 	#region Attributes
-	internal class Attributes
+	internal static class Attributes
 	{
 		internal const string AboveAverage = "aboveAverage";
 		internal const string Bottom = "bottom";
@@ -108,7 +108,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion Attributes
 
 	#region XML Paths
-	internal class Paths
+	internal static class Paths
 	{
 		// Main node and attributes
 		internal const string Worksheet = "d:" + Nodes.Worksheet;
@@ -166,7 +166,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion XML Paths
 
 	#region Rule Type ST_CfType §18.18.12 (with small EPPlus changes)
-	internal class RuleType
+	internal static class RuleType
 	{
 		internal const string AboveAverage = "aboveAverage";
 		internal const string BeginsWith = "beginsWith";
@@ -224,7 +224,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion Rule Type ST_CfType §18.18.12 (with small EPPlus changes)
 
 	#region CFVO Type ST_CfvoType §18.18.13
-	internal class CfvoType
+	internal static class CfvoType
 	{
 		internal const string Min = "min";
 		internal const string Max = "max";
@@ -236,7 +236,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion CFVO Type ST_CfvoType §18.18.13
 
 	#region Operator Type ST_ConditionalFormattingOperator §18.18.15
-	internal class Operators
+	internal static class Operators
 	{
 		internal const string BeginsWith = "beginsWith";
 		internal const string Between = "between";
@@ -254,7 +254,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion Operator Type ST_ConditionalFormattingOperator §18.18.15
 
 	#region Time Period Type ST_TimePeriod §18.18.82
-	internal class TimePeriods
+	internal static class TimePeriods
 	{
 		internal const string Last7Days = "last7Days";
 		internal const string LastMonth = "lastMonth";
@@ -270,7 +270,7 @@ internal static class ExcelConditionalFormattingConstants
 	#endregion Time Period Type ST_TimePeriod §18.18.82
 
 	#region Colors
-	internal class Colors
+	internal static class Colors
 	{
 		internal static readonly Color CfvoLowValue = Color.FromArgb(0xFF, 0xF8, 0x69, 0x6B);
 		internal static readonly Color CfvoMiddleValue = Color.FromArgb(0xFF, 0xFF, 0xEB, 0x84);

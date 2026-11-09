@@ -46,30 +46,14 @@ internal static class ExcelConditionalFormattingValueObjectType
 	/// <returns>1, 2 or 3</returns>
 	internal static int GetOrderByPosition(
 		eExcelConditionalFormattingValueObjectPosition position,
-		eExcelConditionalFormattingRuleType ruleType)
-	{
-		switch (position)
+		eExcelConditionalFormattingRuleType ruleType) => position switch
 		{
-			case eExcelConditionalFormattingValueObjectPosition.Low:
-				return 1;
-
-			case eExcelConditionalFormattingValueObjectPosition.Middle:
-				return 2;
-
-			case eExcelConditionalFormattingValueObjectPosition.High:
-				// Check if the rule type is TwoColorScale.
-				if (ruleType == eExcelConditionalFormattingRuleType.TwoColorScale)
-				{
-					// There are only "Low" and "High". So "High" is the second
-					return 2;
-				}
-
-				// There are "Low", "Middle" and "High". So "High" is the third
-				return 3;
-		}
-
-		return 0;
-	}
+			eExcelConditionalFormattingValueObjectPosition.Low => 1,
+			eExcelConditionalFormattingValueObjectPosition.Middle => 2,
+			// A two colour scale has no middle value, so High is the second node
+			eExcelConditionalFormattingValueObjectPosition.High => ruleType == eExcelConditionalFormattingRuleType.TwoColorScale ? 2 : 3,
+			_ => 0,
+		};
 
 	/// <summary>
 	/// Get the CFVO type by its @type attribute
@@ -103,20 +87,11 @@ internal static class ExcelConditionalFormattingValueObjectType
 		XmlNode topNode,
 		XmlNamespaceManager nameSpaceManager)
 	{
-		// Get the corresponding <cfvo> node (by the position)
 		var node = topNode.SelectSingleNode(
-			string.Format(
-				"{0}[position()={1}]",
-				// {0}
-				ExcelConditionalFormattingConstants.Paths.Cfvo,
-				// {1}
-				GetOrderByPosition(position, ruleType)),
+			string.Format("{0}[position()={1}]", ExcelConditionalFormattingConstants.Paths.Cfvo, GetOrderByPosition(position, ruleType)),
 			nameSpaceManager);
 
-		return node == null
-			?         throw new InvalidOperationException(
-	  ExcelConditionalFormattingConstants.Errors.MissingCfvoNode)
-			: node;
+		return node ?? throw new InvalidOperationException(ExcelConditionalFormattingConstants.Errors.MissingCfvoNode);
 	}
 
 	/// <summary>
@@ -163,4 +138,36 @@ internal static class ExcelConditionalFormattingValueObjectType
 			eExcelConditionalFormattingValueObjectNodeType.Color => ExcelConditionalFormattingConstants.Paths.Color,
 			_ => string.Empty,
 		};
+
+	/// <summary>
+	/// Finds the existing cfvo parent node of the rule with this address and priority.
+	/// </summary>
+	internal static XmlNode GetCfvoParentNode(
+		ExcelWorksheet worksheet,
+		eExcelConditionalFormattingRuleType ruleType,
+		ExcelAddress address,
+		int priority)
+	{
+		var parentNodePath = GetParentPathByRuleType(ruleType);
+		if (parentNodePath == string.Empty)
+		{
+			throw new InvalidOperationException(
+				ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
+		}
+
+		var node = worksheet.WorksheetXml.SelectSingleNode(
+			string.Format(
+				"//{0}[{1}='{2}']/{3}[{4}='{5}']/{6}",
+				ExcelConditionalFormattingConstants.Paths.ConditionalFormatting,
+				ExcelConditionalFormattingConstants.Paths.SqrefAttribute,
+				address.Address,
+				ExcelConditionalFormattingConstants.Paths.CfRule,
+				ExcelConditionalFormattingConstants.Paths.PriorityAttribute,
+				priority,
+				parentNodePath),
+			worksheet.NameSpaceManager);
+
+		return node ?? throw new InvalidOperationException(
+			ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
+	}
 }
