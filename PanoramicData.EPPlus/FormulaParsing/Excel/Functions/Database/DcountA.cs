@@ -32,61 +32,20 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 
 public class DcountA : DatabaseFunction
 {
-
 	public DcountA()
 		: this(new RowMatcher())
 	{
-
 	}
 
 	public DcountA(RowMatcher rowMatcher)
 		: base(rowMatcher)
 	{
-
 	}
 
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
 		ValidateArguments(arguments, 2);
-		var dbAddress = arguments.ElementAt(0).ValueAsRangeInfo.Address.Address;
-		string field = null;
-		string criteriaRange = null;
-		if (arguments.Count() == 2)
-		{
-			criteriaRange = arguments.ElementAt(1).ValueAsRangeInfo.Address.Address;
-		}
-		else
-		{
-			field = ArgToString(arguments, 1).ToLower(CultureInfo.InvariantCulture);
-			criteriaRange = arguments.ElementAt(2).ValueAsRangeInfo.Address.Address;
-		}
-
-		var db = new ExcelDatabase(context.ExcelDataProvider, dbAddress);
-		var criteria = new ExcelDatabaseCriteria(context.ExcelDataProvider, criteriaRange);
-
-		var nHits = 0;
-		while (db.HasMoreRows)
-		{
-			var dataRow = db.Read();
-			if (RowMatcher.IsMatch(dataRow, criteria))
-			{
-				// if a fieldname is supplied, count only this row if the value
-				// of the supplied field is not blank.
-				if (!string.IsNullOrEmpty(field))
-				{
-					var candidate = dataRow[field];
-					if (ShouldCount(candidate))
-					{
-						nHits++;
-					}
-				}
-				else
-				{
-					// no fieldname was supplied, always count matching row.
-					nHits++;
-				}
-			}
-		}
+		var nHits = DatabaseRowCounter.CountMatchingRows(arguments, context, RowMatcher, () => ArgToString(arguments, 1).ToLower(CultureInfo.InvariantCulture), ShouldCount);
 
 		return CreateResult(nHits, DataType.Integer);
 	}

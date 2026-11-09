@@ -38,7 +38,7 @@ public class Median : ExcelFunction
 		Array.Sort(arr);
 		ThrowExcelErrorValueExceptionIf(() => arr.Length == 0, eErrorType.Num);
 		double result;
-		if (arr.Length % 2 == 1)
+		if (arr.Length % 2 != 0)
 		{
 			result = arr[arr.Length / 2];
 		}

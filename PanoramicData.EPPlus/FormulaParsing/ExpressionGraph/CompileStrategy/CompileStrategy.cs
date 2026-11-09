@@ -34,7 +34,7 @@ public abstract class CompileStrategy
 {
 	protected readonly Expression _expression;
 
-	public CompileStrategy(Expression expression)
+	protected CompileStrategy(Expression expression)
 	{
 		_expression = expression;
 	}

@@ -34,9 +34,9 @@ public class IntArgumentParser : ArgumentParser
 	public override object Parse(object obj)
 	{
 		Require.That(obj).Named("argument").IsNotNull();
-		if (obj is ExcelDataProvider.IRangeInfo)
+		if (obj is ExcelDataProvider.IRangeInfo rangeInfo)
 		{
-			var r = ((ExcelDataProvider.IRangeInfo)obj).FirstOrDefault();
+			var r = rangeInfo.FirstOrDefault();
 			return r == null ? 0 : Convert.ToInt32(r.ValueDouble);
 		}
 
@@ -52,7 +52,7 @@ public class IntArgumentParser : ArgumentParser
 		}
 
 		return !int.TryParse(obj.ToString(), out var result)
-			?            throw new ExcelErrorValueException(ExcelErrorValue.Create(eErrorType.Value))
+			? throw new ExcelErrorValueException(ExcelErrorValue.Create(eErrorType.Value))
 			: (object)result;
 	}
 }

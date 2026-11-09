@@ -31,6 +31,7 @@
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OfficeOpenXml.FormulaParsing.ExpressionGraph.FunctionCompilers;
 
@@ -48,7 +49,7 @@ public abstract class FunctionCompiler
 		private set;
 	}
 
-	public FunctionCompiler(ExcelFunction function, ParsingContext context)
+	protected FunctionCompiler(ExcelFunction function, ParsingContext context)
 	{
 		Require.That(function).Named("function").IsNotNull();
 		Require.That(context).Named("context").IsNotNull();
@@ -82,6 +83,25 @@ public abstract class FunctionCompiler
 	}
 
 	protected static void BuildFunctionArguments(CompileResult result, List<FunctionArgument> args) => BuildFunctionArguments(result, result.DataType, args);
+
+	private protected CompileResult CompileWithFallback(IEnumerable<Expression> children, System.Func<CompileResult, bool> useFallback)
+	{
+		var args = new List<FunctionArgument>();
+		Function.BeforeInvoke(Context);
+		var firstChild = children.First();
+		var lastChild = children.ElementAt(1);
+		try
+		{
+			var result = firstChild.Compile();
+			args.Add(new FunctionArgument(useFallback(result) ? lastChild.Compile().Result : result.Result));
+		}
+		catch (Exceptions.ExcelErrorValueException)
+		{
+			args.Add(new FunctionArgument(lastChild.Compile().Result));
+		}
+
+		return Function.Execute(args, Context);
+	}
 
 	public abstract CompileResult Compile(IEnumerable<Expression> children);
 }

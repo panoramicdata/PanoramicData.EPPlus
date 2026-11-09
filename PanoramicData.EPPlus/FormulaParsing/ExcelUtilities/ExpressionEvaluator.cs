@@ -85,9 +85,9 @@ public class ExpressionEvaluator
 			d = Convert.ToDouble(op);
 			return true;
 		}
-		else if (op is DateTime)
+		else if (op is DateTime dateTime)
 		{
-			d = ((DateTime)op).ToOADate();
+			d = dateTime.ToOADate();
 			return true;
 		}
 		else if (op != null)
@@ -110,38 +110,39 @@ public class ExpressionEvaluator
 		}
 
 		var operatorCandidate = GetNonAlphanumericStartChars(expression);
-		if (!string.IsNullOrEmpty(operatorCandidate) && operatorCandidate != "-")
+		if (!string.IsNullOrEmpty(operatorCandidate) && operatorCandidate != "-" && OperatorsDict.Instance.TryGetValue(operatorCandidate, out var op))
 		{
-			if (OperatorsDict.Instance.TryGetValue(operatorCandidate, out var op))
-			{
-				var right = expression.Replace(operatorCandidate, string.Empty);
-				if (left == null && right == string.Empty)
-				{
-					return op.Operator == Operators.Equals;
-				}
-
-				if (left == null ^ right == string.Empty)
-				{
-					return op.Operator == Operators.NotEqualTo;
-				}
-
-				var leftIsNumeric = TryConvertToDouble(left, out var leftNum);
-				var rightIsNumeric = double.TryParse(right, out var rightNum);
-				var rightIsDate = DateTime.TryParse(right, out var date);
-				if (leftIsNumeric && rightIsNumeric)
-				{
-					return EvaluateOperator(leftNum, rightNum, op);
-				}
-
-				if (leftIsNumeric && rightIsDate)
-				{
-					return EvaluateOperator(leftNum, date.ToOADate(), op);
-				}
-
-				return leftIsNumeric != rightIsNumeric ? op.Operator == Operators.NotEqualTo : EvaluateOperator(left, right, op);
-			}
+			return EvaluateWithOperator(left, expression.Replace(operatorCandidate, string.Empty), op);
 		}
 
 		return _wildCardValueMatcher.IsMatch(expression, left) == 0;
+	}
+
+	private bool EvaluateWithOperator(object left, string right, IOperator op)
+	{
+		if (left == null && right == string.Empty)
+		{
+			return op.Operator == Operators.Equals;
+		}
+
+		if (left == null ^ right == string.Empty)
+		{
+			return op.Operator == Operators.NotEqualTo;
+		}
+
+		var leftIsNumeric = TryConvertToDouble(left, out var leftNum);
+		var rightIsNumeric = double.TryParse(right, out var rightNum);
+		var rightIsDate = DateTime.TryParse(right, out var date);
+		if (leftIsNumeric && rightIsNumeric)
+		{
+			return EvaluateOperator(leftNum, rightNum, op);
+		}
+
+		if (leftIsNumeric && rightIsDate)
+		{
+			return EvaluateOperator(leftNum, date.ToOADate(), op);
+		}
+
+		return leftIsNumeric != rightIsNumeric ? op.Operator == Operators.NotEqualTo : EvaluateOperator(left, right, op);
 	}
 }

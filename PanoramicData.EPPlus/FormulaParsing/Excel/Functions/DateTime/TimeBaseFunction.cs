@@ -28,7 +28,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
 public abstract class TimeBaseFunction : ExcelFunction
 {
-	public TimeBaseFunction()
+	protected TimeBaseFunction()
 	{
 		TimeStringParser = new TimeStringParser();
 	}
@@ -57,6 +57,7 @@ public abstract class TimeBaseFunction : ExcelFunction
 
 	protected static double GetSeconds(double serialNumber) => serialNumber * SecondsInADay;
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Bug", "S2184:Results of integer division should not be assigned to floating point variables", Justification = "Whole hours are intended; integer division is the published behaviour.")]
 	protected double GetHour(double serialNumber)
 	{
 		var seconds = GetSeconds(serialNumber);

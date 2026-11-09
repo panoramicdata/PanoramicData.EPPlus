@@ -11,15 +11,9 @@ public class Networkdays : ExcelFunction
 	{
 		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
 		ValidateArguments(functionArguments, 2);
-		var startDate = System.DateTime.FromOADate(ArgToInt(functionArguments, 0));
-		var endDate = System.DateTime.FromOADate(ArgToInt(functionArguments, 1));
-		var calculator = new WorkdayCalculator();
-		var result = calculator.CalculateNumberOfWorkdays(startDate, endDate);
-		if (functionArguments.Length > 2)
-		{
-			result = calculator.ReduceWorkdaysWithHolidays(result, functionArguments[2]);
-		}
-
+		var startDate = ArgToOADate(functionArguments, 0);
+		var endDate = ArgToOADate(functionArguments, 1);
+		var result = new WorkdayCalculator().CalculateNumberOfWorkdays(startDate, endDate, functionArguments, 2);
 		return new CompileResult(result.NumberOfWorkdays, DataType.Integer);
 	}
 }

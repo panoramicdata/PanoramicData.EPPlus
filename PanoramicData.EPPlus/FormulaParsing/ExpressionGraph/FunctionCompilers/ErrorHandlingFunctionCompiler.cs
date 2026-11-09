@@ -39,8 +39,8 @@ public class ErrorHandlingFunctionCompiler : FunctionCompiler
 	public ErrorHandlingFunctionCompiler(ExcelFunction function, ParsingContext context)
 		: base(function, context)
 	{
-
 	}
+
 	public override CompileResult Compile(IEnumerable<Expression> children)
 	{
 		var args = new List<FunctionArgument>();
@@ -50,17 +50,16 @@ public class ErrorHandlingFunctionCompiler : FunctionCompiler
 			try
 			{
 				var arg = child.Compile();
-				BuildFunctionArguments(arg != null ? arg : null, args);
+				BuildFunctionArguments(arg, args);
 			}
 			catch (ExcelErrorValueException efe)
 			{
 				return ((ErrorHandlingFunction)Function).HandleError(efe.ErrorValue.ToString());
 			}
-			catch// (Exception e)
+			catch
 			{
 				return ((ErrorHandlingFunction)Function).HandleError(ExcelErrorValue.Values.Value);
 			}
-
 		}
 
 		return Function.Execute(args, Context);

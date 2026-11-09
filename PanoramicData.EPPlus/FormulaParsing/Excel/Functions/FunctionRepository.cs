@@ -46,7 +46,6 @@ public class FunctionRepository : IFunctionNameProvider
 
 	private FunctionRepository()
 	{
-
 	}
 
 	public static FunctionRepository Create()
@@ -78,8 +77,6 @@ public class FunctionRepository : IFunctionNameProvider
 	{
 		if (!_functions.ContainsKey(name.ToLower(CultureInfo.InvariantCulture)))
 		{
-			//throw new InvalidOperationException("Non supported function: " + name);
-			//throw new ExcelErrorValueException("Non supported function: " + name, ExcelErrorValue.Create(eErrorType.Name));
 			return null;
 		}
 

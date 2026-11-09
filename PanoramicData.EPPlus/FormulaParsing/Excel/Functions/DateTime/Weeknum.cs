@@ -16,36 +16,7 @@ public class Weeknum : ExcelFunction
 		var startDay = DayOfWeek.Sunday;
 		if (arguments.Count() > 1)
 		{
-			var argStartDay = ArgToInt(arguments, 1);
-			switch (argStartDay)
-			{
-				case 1:
-					startDay = DayOfWeek.Sunday;
-					break;
-				case 2:
-				case 11:
-					startDay = DayOfWeek.Monday;
-					break;
-				case 12:
-					startDay = DayOfWeek.Tuesday;
-					break;
-				case 13:
-					startDay = DayOfWeek.Wednesday;
-					break;
-				case 14:
-					startDay = DayOfWeek.Thursday;
-					break;
-				case 15:
-					startDay = DayOfWeek.Friday;
-					break;
-				case 16:
-					startDay = DayOfWeek.Saturday;
-					break;
-				default:
-					// Not supported 
-					ThrowExcelErrorValueException(eErrorType.Num);
-					break;
-			}
+			startDay = GetStartDay(ArgToInt(arguments, 1));
 		}
 
 		if (DateTimeFormatInfo.CurrentInfo == null)
@@ -59,5 +30,15 @@ public class Weeknum : ExcelFunction
 		return CreateResult(week, DataType.Integer);
 	}
 
-
+	private static DayOfWeek GetStartDay(int argStartDay) => argStartDay switch
+	{
+		1 => DayOfWeek.Sunday,
+		2 or 11 => DayOfWeek.Monday,
+		12 => DayOfWeek.Tuesday,
+		13 => DayOfWeek.Wednesday,
+		14 => DayOfWeek.Thursday,
+		15 => DayOfWeek.Friday,
+		16 => DayOfWeek.Saturday,
+		_ => throw new Exceptions.ExcelErrorValueException("An excel function error occurred", ExcelErrorValue.Create(eErrorType.Num))
+	};
 }

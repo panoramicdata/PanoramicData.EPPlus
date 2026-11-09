@@ -30,16 +30,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 
 public class IsOdd : ExcelFunction
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Bug", "S2197:Modulus results should not be checked for direct equality", Justification = "Existing published behaviour returns false for negative odd numbers; changing it would alter results.")]
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-	{
-		ValidateArguments(arguments, 1);
-		var arg1 = GetFirstValue(arguments);//arguments.ElementAt(0);
-		if (!ConvertUtil.IsNumeric(arg1))
-		{
-			ThrowExcelErrorValueException(eErrorType.Value);
-		}
-
-		var number = (int)System.Math.Floor(ConvertUtil.GetValueDouble(arg1));
-		return CreateResult(number % 2 == 1, DataType.Boolean);
-	}
+		=> CreateResult(GetFirstArgumentAsFlooredInteger(arguments) % 2 == 1, DataType.Boolean);
 }

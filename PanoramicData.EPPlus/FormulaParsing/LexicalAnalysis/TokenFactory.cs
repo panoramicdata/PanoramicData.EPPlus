@@ -41,10 +41,10 @@ namespace OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
 public class TokenFactory : ITokenFactory
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public TokenFactory(IFunctionNameProvider functionRepository, INameValueProvider nameValueProvider, bool r1c1 = false)
 		: this(new TokenSeparatorProvider(), nameValueProvider, functionRepository, r1c1)
 	{
-
 	}
 
 	public TokenFactory(ITokenSeparatorProvider tokenSeparatorProvider, INameValueProvider nameValueProvider, IFunctionNameProvider functionNameProvider, bool r1c1)
@@ -71,30 +71,7 @@ public class TokenFactory : ITokenFactory
 		//Address with worksheet-string before  /JK
 		if (token.StartsWith("!") && tokenList[tokenList.Count - 1].TokenType == TokenType.String)
 		{
-			var addr = "";
-			var i = tokenList.Count - 2;
-			if (i > 0)
-			{
-				if (tokenList[i].TokenType == TokenType.StringContent)
-				{
-					addr = "'" + tokenList[i].Value.Replace("'", "''") + "'";
-				}
-				else
-				{
-					throw (new ArgumentException(string.Format("Invalid formula token sequence near {0}", token)));
-				}
-				//Remove the string tokens and content
-				tokenList.RemoveAt(tokenList.Count - 1);
-				tokenList.RemoveAt(tokenList.Count - 1);
-				tokenList.RemoveAt(tokenList.Count - 1);
-
-				return new Token(addr + token, TokenType.ExcelAddress);
-			}
-			else
-			{
-				throw (new ArgumentException(string.Format("Invalid formula token sequence near {0}", token)));
-			}
-
+			return CreateQuotedWorksheetAddressToken(tokenList, token);
 		}
 
 		if (tokens.Any() && tokens.Last().TokenType == TokenType.String)
@@ -107,6 +84,30 @@ public class TokenFactory : ITokenFactory
 			token = token.Trim();
 		}
 
+		return CreateLiteralToken(token)
+			?? CreateNamedToken(tokenList, token, worksheet)
+			?? CreateAddressToken(token);
+	}
+
+	private static Token CreateQuotedWorksheetAddressToken(IList<Token> tokenList, string token)
+	{
+		var i = tokenList.Count - 2;
+		if (i > 0 && tokenList[i].TokenType == TokenType.StringContent)
+		{
+			var addr = "'" + tokenList[i].Value.Replace("'", "''") + "'";
+			//Remove the string tokens and content
+			tokenList.RemoveAt(tokenList.Count - 1);
+			tokenList.RemoveAt(tokenList.Count - 1);
+			tokenList.RemoveAt(tokenList.Count - 1);
+
+			return new Token(addr + token, TokenType.ExcelAddress);
+		}
+
+		throw new ArgumentException(string.Format("Invalid formula token sequence near {0}", token));
+	}
+
+	private static Token CreateLiteralToken(string token)
+	{
 		if (Regex.IsMatch(token, RegexConstants.Decimal))
 		{
 			return new Token(token, TokenType.Decimal);
@@ -122,26 +123,28 @@ public class TokenFactory : ITokenFactory
 			return new Token(token, TokenType.Boolean);
 		}
 
-		if (token.ToUpper(CultureInfo.InvariantCulture).Contains("#REF!"))
+		return CreateErrorToken(token);
+	}
+
+	private static Token CreateErrorToken(string token)
+	{
+		var upper = token.ToUpper(CultureInfo.InvariantCulture);
+		if (upper.Contains("#REF!"))
 		{
 			return new Token(token, TokenType.InvalidReference);
 		}
 
-		if (token.ToUpper(CultureInfo.InvariantCulture) == "#NUM!")
+		return upper switch
 		{
-			return new Token(token, TokenType.NumericError);
-		}
+			"#NUM!" => new Token(token, TokenType.NumericError),
+			"#VALUE!" => new Token(token, TokenType.ValueDataTypeError),
+			"#NULL!" => new Token(token, TokenType.Null),
+			_ => null
+		};
+	}
 
-		if (token.ToUpper(CultureInfo.InvariantCulture) == "#VALUE!")
-		{
-			return new Token(token, TokenType.ValueDataTypeError);
-		}
-
-		if (token.ToUpper(CultureInfo.InvariantCulture) == "#NULL!")
-		{
-			return new Token(token, TokenType.Null);
-		}
-
+	private Token CreateNamedToken(IList<Token> tokenList, string token, string worksheet)
+	{
 		if (_nameValueProvider != null && _nameValueProvider.IsNamedValue(token, worksheet))
 		{
 			return new Token(token, TokenType.NameValue);
@@ -157,6 +160,11 @@ public class TokenFactory : ITokenFactory
 			return new Token(token, TokenType.Enumerable);
 		}
 
+		return null;
+	}
+
+	private Token CreateAddressToken(string token)
+	{
 		var at = ExcelAddressBase.IsValid(token, _r1c1);
 		if (at == ExcelAddressBase.AddressType.InternalAddress)
 		{
@@ -168,7 +176,6 @@ public class TokenFactory : ITokenFactory
 		}
 
 		return new Token(token, TokenType.Unrecognized);
-
 	}
 
 	public Token Create(string token, TokenType explicitTokenType) => new(token, explicitTokenType);

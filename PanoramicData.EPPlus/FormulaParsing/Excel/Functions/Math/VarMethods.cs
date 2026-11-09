@@ -35,19 +35,15 @@ internal static class VarMethods
 
 	public static double Var(IEnumerable<ExcelDoubleCellValue> args) => Var(args.Select(x => (double)x));
 
-	public static double Var(IEnumerable<double> args)
+	private static double SumOfSquaredDeviations(IEnumerable<double> args)
 	{
-		var avg = args.Select(x => (double)x).Average();
-		var d = args.Aggregate(0.0, (total, next) => total += System.Math.Pow(next - avg, 2));
-		return Divide(d, (args.Count() - 1));
+		var avg = args.Average();
+		return args.Aggregate(0.0, (total, next) => total + System.Math.Pow(next - avg, 2));
 	}
+
+	public static double Var(IEnumerable<double> args) => Divide(SumOfSquaredDeviations(args), args.Count() - 1);
 
 	public static double VarP(IEnumerable<ExcelDoubleCellValue> args) => VarP(args.Select(x => (double)x));
 
-	public static double VarP(IEnumerable<double> args)
-	{
-		var avg = args.Select(x => (double)x).Average();
-		var d = args.Aggregate(0.0, (total, next) => total += System.Math.Pow(next - avg, 2));
-		return Divide(d, args.Count());
-	}
+	public static double VarP(IEnumerable<double> args) => Divide(SumOfSquaredDeviations(args), args.Count());
 }

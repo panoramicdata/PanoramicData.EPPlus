@@ -50,17 +50,7 @@ public class AverageIf : HiddenValuesHandlingFunction
 	}
 
 	private bool Evaluate(object obj, string expression)
-	{
-		var candidate = default(double?);
-		if (IsNumeric(obj))
-		{
-			candidate = ConvertUtil.GetValueDouble(obj);
-		}
-
-		return candidate.HasValue
-			? _expressionEvaluator.Evaluate(candidate.Value, expression)
-			: _expressionEvaluator.Evaluate(obj, expression);
-	}
+		=> EvaluateCriteria(_expressionEvaluator, obj, expression);
 
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
@@ -85,62 +75,25 @@ public class AverageIf : HiddenValuesHandlingFunction
 		else if (arguments.Count() > 2)
 		{
 			var lookupRange = arguments.ElementAt(2).Value as ExcelDataProvider.IRangeInfo;
-			retVal = CalculateWithLookupRange(args, criteria, lookupRange, context);
+			retVal = CalculateWithLookupRange(args, criteria, lookupRange);
 		}
 		else
 		{
-			retVal = CalculateSingleRange(args, criteria, context);
+			retVal = CalculateSingleRange(args, criteria);
 		}
 
 		return CreateResult(retVal, DataType.Decimal);
 	}
 
-	private double CalculateWithLookupRange(ExcelDataProvider.IRangeInfo range, string criteria, ExcelDataProvider.IRangeInfo sumRange, ParsingContext context)
+	private double CalculateWithLookupRange(ExcelDataProvider.IRangeInfo range, string criteria, ExcelDataProvider.IRangeInfo sumRange)
 	{
-		var retVal = 0d;
-		var nMatches = 0;
-		foreach (var cell in range)
-		{
-			if (criteria != null && Evaluate(cell.Value, criteria))
-			{
-				var or = cell.Row - range.Address._fromRow;
-				var oc = cell.Column - range.Address._fromCol;
-				if (sumRange.Address._fromRow + or <= sumRange.Address._toRow &&
-				   sumRange.Address._fromCol + oc <= sumRange.Address._toCol)
-				{
-					var v = sumRange.GetOffset(or, oc);
-					if (v is ExcelErrorValue)
-					{
-						throw (new ExcelErrorValueException((ExcelErrorValue)v));
-					}
-
-					nMatches++;
-					retVal += ConvertUtil.GetValueDouble(v, true);
-				}
-			}
-		}
-
+		var retVal = CriteriaRangeSum.SumMatchingOffsets(range, sumRange, value => criteria != null && Evaluate(value, criteria), out var nMatches);
 		return Divide(retVal, nMatches);
 	}
 
-	private double CalculateSingleRange(ExcelDataProvider.IRangeInfo range, string expression, ParsingContext context)
+	private double CalculateSingleRange(ExcelDataProvider.IRangeInfo range, string expression)
 	{
-		var retVal = 0d;
-		var nMatches = 0;
-		foreach (var candidate in range)
-		{
-			if (expression != null && IsNumeric(candidate.Value) && Evaluate(candidate.Value, expression))
-			{
-				if (candidate.IsExcelError)
-				{
-					throw (new ExcelErrorValueException((ExcelErrorValue)candidate.Value));
-				}
-
-				retVal += candidate.ValueDouble;
-				nMatches++;
-			}
-		}
-
+		var retVal = CriteriaRangeSum.SumMatchingCells(range, value => expression != null && IsNumeric(value) && Evaluate(value, expression), out var nMatches);
 		return Divide(retVal, nMatches);
 	}
 }

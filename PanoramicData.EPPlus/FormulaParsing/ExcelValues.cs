@@ -66,6 +66,7 @@ public class ExcelErrorValue
 	/// Handles the convertion between <see cref="eErrorType"/> and the string values
 	/// used by Excel.
 	/// </summary>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2339:Public constant members should not be used", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public static class Values
 	{
 		public const string Div0 = "#DIV/0!";
@@ -152,6 +153,7 @@ public class ExcelErrorValue
 	/// Returns the string representation of the error type
 	/// </summary>
 	/// <returns></returns>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3877:Exceptions should not be thrown from unexpected methods", Justification = "Unreachable for defined error types; kept to preserve published behaviour.")]
 	public override string ToString() => Type switch
 	{
 		eErrorType.Div0 => Values.Div0,
@@ -161,7 +163,7 @@ public class ExcelErrorValue
 		eErrorType.Num => Values.Num,
 		eErrorType.Ref => Values.Ref,
 		eErrorType.Value => Values.Value,
-		_ => throw (new ArgumentException("Invalid errortype")),
+		_ => throw new ArgumentException("Invalid errortype"),
 	};
 	public static ExcelErrorValue operator +(object v1, ExcelErrorValue v2)
 	{
@@ -172,7 +174,8 @@ public class ExcelErrorValue
 		return v1;
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Bug", "S3249:Classes directly extending object should not call base in GetHashCode or Equals", Justification = "Existing hash behaviour of a published type; changing it would alter dictionary and set semantics.")]
 	public override int GetHashCode() => base.GetHashCode();
 
-	public override bool Equals(object? obj) => obj is ExcelErrorValue && ((ExcelErrorValue)obj).ToString() == ToString();
+	public override bool Equals(object? obj) => obj is ExcelErrorValue other && other.ToString() == ToString();
 }

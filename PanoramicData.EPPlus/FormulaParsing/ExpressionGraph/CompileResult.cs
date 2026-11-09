@@ -45,9 +45,9 @@ public class CompileResult
 
 	public CompileResult(object result, DataType dataType)
 	{
-		if (result is ExcelDoubleCellValue)
+		if (result is ExcelDoubleCellValue doubleCellValue)
 		{
-			Result = ((ExcelDoubleCellValue)result).Value;
+			Result = doubleCellValue.Value;
 		}
 		else
 		{
@@ -91,32 +91,37 @@ public class CompileResult
 			// We assume that Result does not change unless it is a range.
 			if (_ResultNumeric == null)
 			{
-				if (IsNumeric)
+				if (Result is ExcelDataProvider.IRangeInfo rangeInfo && !IsNumeric)
 				{
-					_ResultNumeric = Result == null ? 0 : Convert.ToDouble(Result);
-				}
-				else if (Result is DateTime)
-				{
-					_ResultNumeric = ((DateTime)Result).ToOADate();
-				}
-				else if (Result is TimeSpan)
-				{
-					_ResultNumeric = DateTime.FromOADate(0).Add((TimeSpan)Result).ToOADate();
-				}
-				else if (Result is ExcelDataProvider.IRangeInfo)
-				{
-					var c = ((ExcelDataProvider.IRangeInfo)Result).FirstOrDefault();
+					var c = rangeInfo.FirstOrDefault();
 					return c == null ? 0 : c.ValueDoubleLogical;
 				}
-				// The IsNumericString and IsDateString properties will set _ResultNumeric for efficiency so we just need
-				// to check them here.
-				else if (!IsNumericString && !IsDateString)
-				{
-					_ResultNumeric = 0;
-				}
+
+				SetResultNumeric();
 			}
 
 			return _ResultNumeric.Value;
+		}
+	}
+
+	private void SetResultNumeric()
+	{
+		if (IsNumeric)
+		{
+			_ResultNumeric = Result == null ? 0 : Convert.ToDouble(Result);
+		}
+		else if (Result is DateTime dateTime)
+		{
+			_ResultNumeric = dateTime.ToOADate();
+		}
+		else if (Result is TimeSpan timeSpan)
+		{
+			_ResultNumeric = DateTime.FromOADate(0).Add(timeSpan).ToOADate();
+		}
+		// IsNumericString and IsDateString set _ResultNumeric themselves when they succeed.
+		else if (!IsNumericString && !IsDateString)
+		{
+			_ResultNumeric = 0;
 		}
 	}
 

@@ -32,11 +32,16 @@ namespace OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 public abstract class AtomicExpression : Expression
 {
-	public AtomicExpression(string expression)
+	protected AtomicExpression(string expression)
 		: base(expression)
 	{
-
 	}
 
 	public override bool IsGroupedExpression => false;
+
+	private protected double GetNumericValue(double? compiledValue, bool negate)
+	{
+		var result = compiledValue.HasValue ? compiledValue.Value : double.Parse(ExpressionString, System.Globalization.CultureInfo.InvariantCulture);
+		return negate ? result * -1 : result;
+	}
 }
