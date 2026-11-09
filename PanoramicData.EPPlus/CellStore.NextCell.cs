@@ -81,45 +81,17 @@ internal partial class CellStore<T>
 						minCol = 0;
 					}
 
-					var c = colPos + 1;
-					while (c < ColumnCount && c <= endColPos)
+					if (FindRowInColumnsForward(row, colPos + 1, endColPos, ref colPos, ref minRow, ref minCol))
 					{
-						r = _columnIndex[c].GetNextRow(row);
-						if (r == row) //Exists next Row
-						{
-							colPos = c;
-							return true;
-						}
-
-						if (r > row && r < minRow)
-						{
-							minRow = r;
-							minCol = c;
-						}
-
-						c++;
+						return true;
 					}
 
-					c = startColPos;
 					if (row < endRow)
 					{
 						row++;
-						while (c < colPos)
+						if (FindRowInEarlierColumns(row, startColPos, endRow, ref colPos, ref minRow, ref minCol))
 						{
-							r = _columnIndex[c].GetNextRow(row);
-							if (r == row) //Exists next Row
-							{
-								colPos = c;
-								return true;
-							}
-
-							if (r > row && (r < minRow || (r == minRow && c < minCol)) && r <= endRow)
-							{
-								minRow = r;
-								minCol = c;
-							}
-
-							c++;
+							return true;
 						}
 					}
 
@@ -147,6 +119,52 @@ internal partial class CellStore<T>
 				return GetNextCell(ref row, ref colPos, startColPos, endRow, endColPos);
 			}
 		}
+	}
+
+	private bool FindRowInColumnsForward(int row, int c, int endColPos, ref int colPos, ref int minRow, ref int minCol)
+	{
+		while (c < ColumnCount && c <= endColPos)
+		{
+			var r = _columnIndex[c].GetNextRow(row);
+			if (r == row) //Exists next Row
+			{
+				colPos = c;
+				return true;
+			}
+
+			if (r > row && r < minRow)
+			{
+				minRow = r;
+				minCol = c;
+			}
+
+			c++;
+		}
+
+		return false;
+	}
+
+	private bool FindRowInEarlierColumns(int row, int c, int endRow, ref int colPos, ref int minRow, ref int minCol)
+	{
+		while (c < colPos)
+		{
+			var r = _columnIndex[c].GetNextRow(row);
+			if (r == row) //Exists next Row
+			{
+				colPos = c;
+				return true;
+			}
+
+			if (r > row && (r < minRow || (r == minRow && c < minCol)) && r <= endRow)
+			{
+				minRow = r;
+				minCol = c;
+			}
+
+			c++;
+		}
+
+		return false;
 	}
 
 	private bool ClampColumnPositions(int minColPos, ref int maxColPos)
