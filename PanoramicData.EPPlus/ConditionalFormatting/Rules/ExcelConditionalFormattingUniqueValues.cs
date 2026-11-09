@@ -55,8 +55,8 @@ public class ExcelConditionalFormattingUniqueValues
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 	  : base(
 		eExcelConditionalFormattingRuleType.UniqueValues,
 		address,
@@ -64,46 +64,6 @@ public class ExcelConditionalFormattingUniqueValues
 		worksheet,
 		itemElementNode,
 		namespaceManager == null ? worksheet.NameSpaceManager : namespaceManager)
-	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingUniqueValues(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		itemElementNode,
-		null)
-	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingUniqueValues(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		null,
-		null)
 	{
 	}
 	#endregion Constructors

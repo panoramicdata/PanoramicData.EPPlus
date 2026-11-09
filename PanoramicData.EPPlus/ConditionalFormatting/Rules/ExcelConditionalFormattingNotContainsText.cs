@@ -55,8 +55,8 @@ public class ExcelConditionalFormattingNotContainsText
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 	  : base(
 		eExcelConditionalFormattingRuleType.NotContainsText,
 		address,
@@ -70,46 +70,6 @@ public class ExcelConditionalFormattingNotContainsText
 			Operator = eExcelConditionalFormattingOperatorType.NotContains;
 			Text = string.Empty;
 		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingNotContainsText(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		itemElementNode,
-		null)
-	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingNotContainsText(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		null,
-		null)
-	{
 	}
 	#endregion Constructors
 

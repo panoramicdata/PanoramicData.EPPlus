@@ -53,8 +53,8 @@ public class ExcelConditionalFormattingBelowOrEqualAverage
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 	  : base(
 		eExcelConditionalFormattingRuleType.BelowOrEqualAverage,
 		address,
@@ -68,46 +68,6 @@ public class ExcelConditionalFormattingBelowOrEqualAverage
 			AboveAverage = false;
 			EqualAverage = true;
 		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="address"></param>
-	/// <param name="priority"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingBelowOrEqualAverage(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		itemElementNode,
-		null)
-	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="address"></param>
-	/// <param name="priority"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingBelowOrEqualAverage(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		null,
-		null)
-	{
 	}
 	#endregion Constructors
 
