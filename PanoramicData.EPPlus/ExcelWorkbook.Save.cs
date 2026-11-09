@@ -12,7 +12,6 @@ public sealed partial class ExcelWorkbook
 	/// Saves the workbook and all its components to the package.
 	/// For internal use only!
 	/// </summary>
-	[SuppressMessage("Major Code Smell", "S3440:Variables should not be checked against the values they're about to be assigned", Justification = "The ContentType setter rewrites the package content-type map, so it is only called when the value changes.")]
 	internal void Save()  // Workbook Save
 	{
 		if (Worksheets.Count == 0)
@@ -21,22 +20,7 @@ public sealed partial class ExcelWorkbook
 		}
 
 		DeleteCalcChain();
-
-		if (_vba == null && !_package.Package.PartExists(new Uri(ExcelVbaProject.PartUri, UriKind.Relative)))
-		{
-			if (Part.ContentType != ExcelPackage.contentTypeWorkbookDefault)
-			{
-				Part.ContentType = ExcelPackage.contentTypeWorkbookDefault;
-			}
-		}
-		else
-		{
-			if (Part.ContentType != ExcelPackage.contentTypeWorkbookMacroEnabled)
-			{
-				Part.ContentType = ExcelPackage.contentTypeWorkbookMacroEnabled;
-			}
-		}
-
+		UpdateWorkbookContentType();
 		UpdateDefinedNamesXml();
 
 		// save the workbook
@@ -52,6 +36,42 @@ public sealed partial class ExcelWorkbook
 		Styles.UpdateXml();
 		_package.SavePart(StylesUri, _stylesXml);
 
+		SaveWorksheets();
+
+		// Issue 15252: save SharedStrings only once
+		GetOrCreateSharedStringsPart().SaveHandler = SaveSharedStringHandler;
+
+		// Data validation
+		ValidateDataValidations();
+
+		//VBA
+		if (_vba != null)
+		{
+			VbaProject.Save();
+		}
+
+	}
+	[SuppressMessage("Major Code Smell", "S3440:Variables should not be checked against the values they're about to be assigned", Justification = "The ContentType setter rewrites the package content-type map, so it is only called when the value changes.")]
+	private void UpdateWorkbookContentType()
+	{
+		if (_vba == null && !_package.Package.PartExists(new Uri(ExcelVbaProject.PartUri, UriKind.Relative)))
+		{
+			if (Part.ContentType != ExcelPackage.contentTypeWorkbookDefault)
+			{
+				Part.ContentType = ExcelPackage.contentTypeWorkbookDefault;
+			}
+		}
+		else
+		{
+			if (Part.ContentType != ExcelPackage.contentTypeWorkbookMacroEnabled)
+			{
+				Part.ContentType = ExcelPackage.contentTypeWorkbookMacroEnabled;
+			}
+		}
+	}
+
+	private void SaveWorksheets()
+	{
 		// save all the open worksheets
 		var isProtected = Protection.LockWindows || Protection.LockStructure;
 		foreach (var worksheet in Worksheets)
@@ -64,31 +84,20 @@ public sealed partial class ExcelWorkbook
 			worksheet.Save();
 			worksheet.Part.SaveHandler = worksheet.SaveHandler;
 		}
+	}
 
-		// Issue 15252: save SharedStrings only once
-		Packaging.ZipPackagePart part;
+	private Packaging.ZipPackagePart GetOrCreateSharedStringsPart()
+	{
 		if (_package.Package.PartExists(SharedStringsUri))
 		{
-			part = _package.Package.GetPart(SharedStringsUri);
-		}
-		else
-		{
-			part = _package.Package.CreatePart(SharedStringsUri, @"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml", _package.Compression);
-			Part.CreateRelationship(UriHelper.GetRelativeUri(WorkbookUri, SharedStringsUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/sharedStrings");
+			return _package.Package.GetPart(SharedStringsUri);
 		}
 
-		part.SaveHandler = SaveSharedStringHandler;
-
-		// Data validation
-		ValidateDataValidations();
-
-		//VBA
-		if (_vba != null)
-		{
-			VbaProject.Save();
-		}
-
+		var part = _package.Package.CreatePart(SharedStringsUri, @"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml", _package.Compression);
+		Part.CreateRelationship(UriHelper.GetRelativeUri(WorkbookUri, SharedStringsUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/sharedStrings");
+		return part;
 	}
+
 	private void DeleteCalcChain()
 	{
 		//Remove the calc chain if it exists.
@@ -131,27 +140,7 @@ public sealed partial class ExcelWorkbook
 		foreach (var t in _sharedStrings.Keys)
 		{
 
-			var ssi = _sharedStrings[t];
-			if (ssi.isRichText)
-			{
-				cache.Append("<si>");
-				ConvertUtil.ExcelEncodeString(cache, t);
-				cache.Append("</si>");
-			}
-			else
-			{
-				if (t.Length > 0 && (t[0] == ' ' || t[^1] == ' ' || t.Contains("  ") || t.Contains('\t') || t.Contains('\n') || t.Contains('\n')))   //Fixes issue 14849
-				{
-					cache.Append("<si><t xml:space=\"preserve\">");
-				}
-				else
-				{
-					cache.Append("<si><t>");
-				}
-
-				ConvertUtil.ExcelEncodeString(cache, ConvertUtil.ExcelEscapeString(t));
-				cache.Append("</t></si>");
-			}
+			AppendSharedString(cache, t, _sharedStrings[t]);
 
 			if (cache.Length > 0x600000)
 			{
@@ -163,5 +152,29 @@ public sealed partial class ExcelWorkbook
 		cache.Append("</sst>");
 		sw.Write(cache.ToString());
 		sw.Flush();
+	}
+
+	private static void AppendSharedString(StringBuilder cache, string t, SharedStringItem ssi)
+	{
+		if (ssi.isRichText)
+		{
+			cache.Append("<si>");
+			ConvertUtil.ExcelEncodeString(cache, t);
+			cache.Append("</si>");
+		}
+		else
+		{
+			if (t.Length > 0 && (t[0] == ' ' || t[^1] == ' ' || t.Contains("  ") || t.Contains('\t') || t.Contains('\n') || t.Contains('\n')))   //Fixes issue 14849
+			{
+				cache.Append("<si><t xml:space=\"preserve\">");
+			}
+			else
+			{
+				cache.Append("<si><t>");
+			}
+
+			ConvertUtil.ExcelEncodeString(cache, ConvertUtil.ExcelEscapeString(t));
+			cache.Append("</t></si>");
+		}
 	}
 }

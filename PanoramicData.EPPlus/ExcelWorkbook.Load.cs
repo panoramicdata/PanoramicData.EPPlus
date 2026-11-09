@@ -1,4 +1,4 @@
-﻿using OfficeOpenXml.Utils;
+using OfficeOpenXml.Utils;
 using System.Globalization;
 using System.Xml;
 
@@ -66,71 +66,17 @@ public sealed partial class ExcelWorkbook
 				}
 
 				var addressType = ExcelAddressBase.IsValid(fullAddress);
-				ExcelRangeBase range;
 				ExcelNamedRange namedRange;
 
-				if (fullAddress.StartsWith("["))
-				{
-					var start = fullAddress.IndexOf("[");
-					var end = fullAddress.IndexOf("]", start);
-					if (start >= 0 && end >= 0)
-					{
-
-						var externalIndex = fullAddress.Substring(start + 1, end - start - 1);
-						if (int.TryParse(externalIndex, NumberStyles.Any, CultureInfo.InvariantCulture, out var index))
-						{
-							if (index > 0 && index <= _externalReferences.Count)
-							{
-								fullAddress = fullAddress[..start] + "[" + _externalReferences[index - 1] + "]" + fullAddress[(end + 1)..];
-							}
-						}
-					}
-				}
+				fullAddress = ResolveExternalReferenceIndex(fullAddress);
 
 				if (addressType is ExcelAddressBase.AddressType.Invalid or ExcelAddressBase.AddressType.InternalName or ExcelAddressBase.AddressType.ExternalName or ExcelAddressBase.AddressType.Formula or ExcelAddressBase.AddressType.ExternalAddress)    //A value or a formula
 				{
-					range = new ExcelRangeBase(this, nameWorksheet, elem.GetAttribute("name"), true);
-					if (nameWorksheet == null)
-					{
-						namedRange = _names.Add(elem.GetAttribute("name"), range);
-					}
-					else
-					{
-						namedRange = nameWorksheet.Names.Add(elem.GetAttribute("name"), range);
-					}
-
-					if (ConvertUtil._invariantCompareInfo.IsPrefix(fullAddress, "\"")) //String value
-					{
-						namedRange.NameValue = fullAddress[1..^1];
-					}
-					else if (double.TryParse(fullAddress, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
-					{
-						namedRange.NameValue = value;
-					}
-					else
-					{
-						namedRange.NameFormula = fullAddress;
-					}
+					namedRange = AddValueOrFormulaName(elem, nameWorksheet, fullAddress);
 				}
 				else
 				{
-					ExcelAddress addr = new(fullAddress, _package, null);
-					if (localSheetID > -1)
-					{
-						if (string.IsNullOrEmpty(addr._ws))
-						{
-							namedRange = Worksheets[localSheetID + _package._worksheetAdd].Names.Add(elem.GetAttribute("name"), new ExcelRangeBase(this, Worksheets[localSheetID + _package._worksheetAdd], fullAddress, false));
-						}
-						else
-						{
-							namedRange = Worksheets[localSheetID + _package._worksheetAdd].Names.Add(elem.GetAttribute("name"), new ExcelRangeBase(this, Worksheets[addr._ws], fullAddress, false));
-						}
-					}
-					else
-					{
-						var ws = Worksheets[addr._ws];
-						namedRange = _names.Add(elem.GetAttribute("name"), new ExcelRangeBase(this, ws, fullAddress, false));
-					}
+					namedRange = AddAddressName(elem, localSheetID, fullAddress);
 				}
 
 				if (elem.GetAttribute("hidden") == "1" && namedRange != null)
@@ -143,6 +89,79 @@ public sealed partial class ExcelWorkbook
 					namedRange.NameComment = elem.GetAttribute("comment");
 				}
 			}
+		}
+	}
+
+	private string ResolveExternalReferenceIndex(string fullAddress)
+	{
+		if (fullAddress.StartsWith("[", StringComparison.CurrentCulture))
+		{
+			var start = fullAddress.IndexOf("[", StringComparison.CurrentCulture);
+			var end = fullAddress.IndexOf("]", start, StringComparison.CurrentCulture);
+			if (start >= 0 && end >= 0)
+			{
+
+				var externalIndex = fullAddress.Substring(start + 1, end - start - 1);
+				if (int.TryParse(externalIndex, NumberStyles.Any, CultureInfo.InvariantCulture, out var index))
+				{
+					if (index > 0 && index <= _externalReferences.Count)
+					{
+						fullAddress = fullAddress[..start] + "[" + _externalReferences[index - 1] + "]" + fullAddress[(end + 1)..];
+					}
+				}
+			}
+		}
+
+		return fullAddress;
+	}
+
+	private ExcelNamedRange AddValueOrFormulaName(XmlElement elem, ExcelWorksheet nameWorksheet, string fullAddress)
+	{
+		ExcelNamedRange namedRange;
+		var range = new ExcelRangeBase(this, nameWorksheet, elem.GetAttribute("name"), true);
+		if (nameWorksheet == null)
+		{
+			namedRange = _names.Add(elem.GetAttribute("name"), range);
+		}
+		else
+		{
+			namedRange = nameWorksheet.Names.Add(elem.GetAttribute("name"), range);
+		}
+
+		if (ConvertUtil._invariantCompareInfo.IsPrefix(fullAddress, "\"")) //String value
+		{
+			namedRange.NameValue = fullAddress[1..^1];
+		}
+		else if (double.TryParse(fullAddress, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
+		{
+			namedRange.NameValue = value;
+		}
+		else
+		{
+			namedRange.NameFormula = fullAddress;
+		}
+
+		return namedRange;
+	}
+
+	private ExcelNamedRange AddAddressName(XmlElement elem, int localSheetID, string fullAddress)
+	{
+		ExcelAddress addr = new(fullAddress, _package, null);
+		if (localSheetID > -1)
+		{
+			if (string.IsNullOrEmpty(addr._ws))
+			{
+				return Worksheets[localSheetID + _package._worksheetAdd].Names.Add(elem.GetAttribute("name"), new ExcelRangeBase(this, Worksheets[localSheetID + _package._worksheetAdd], fullAddress, false));
+			}
+			else
+			{
+				return Worksheets[localSheetID + _package._worksheetAdd].Names.Add(elem.GetAttribute("name"), new ExcelRangeBase(this, Worksheets[addr._ws], fullAddress, false));
+			}
+		}
+		else
+		{
+			var ws = Worksheets[addr._ws];
+			return _names.Add(elem.GetAttribute("name"), new ExcelRangeBase(this, ws, fullAddress, false));
 		}
 	}
 }

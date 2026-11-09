@@ -36,21 +36,7 @@ public sealed partial class ExcelWorkbook
 
 				foreach (var name in _names)
 				{
-
-					var elem = WorkbookXml.CreateElement("definedName", ExcelPackage.schemaMain);
-					top.AppendChild(elem);
-					elem.SetAttribute("name", name.Name);
-					if (name.IsNameHidden)
-					{
-						elem.SetAttribute("hidden", "1");
-					}
-
-					if (!string.IsNullOrEmpty(name.NameComment))
-					{
-						elem.SetAttribute("comment", name.NameComment);
-					}
-
-					SetNameElement(name, elem);
+					AppendDefinedName(top, name, false);
 				}
 			}
 
@@ -60,21 +46,7 @@ public sealed partial class ExcelWorkbook
 				{
 					foreach (var name in ws.Names)
 					{
-						var elem = WorkbookXml.CreateElement("definedName", ExcelPackage.schemaMain);
-						top.AppendChild(elem);
-						elem.SetAttribute("name", name.Name);
-						elem.SetAttribute("localSheetId", name.LocalSheetId.ToString());
-						if (name.IsNameHidden)
-						{
-							elem.SetAttribute("hidden", "1");
-						}
-
-						if (!string.IsNullOrEmpty(name.NameComment))
-						{
-							elem.SetAttribute("comment", name.NameComment);
-						}
-
-						SetNameElement(name, elem);
+						AppendDefinedName(top, name, true);
 					}
 				}
 			}
@@ -83,6 +55,29 @@ public sealed partial class ExcelWorkbook
 		{
 			throw new Exception("Internal error updating named ranges ", ex);
 		}
+	}
+
+	private void AppendDefinedName(XmlNode top, ExcelNamedRange name, bool isLocal)
+	{
+		var elem = WorkbookXml.CreateElement("definedName", ExcelPackage.schemaMain);
+		top.AppendChild(elem);
+		elem.SetAttribute("name", name.Name);
+		if (isLocal)
+		{
+			elem.SetAttribute("localSheetId", name.LocalSheetId.ToString());
+		}
+
+		if (name.IsNameHidden)
+		{
+			elem.SetAttribute("hidden", "1");
+		}
+
+		if (!string.IsNullOrEmpty(name.NameComment))
+		{
+			elem.SetAttribute("comment", name.NameComment);
+		}
+
+		SetNameElement(name, elem);
 	}
 
 	private static void SetNameElement(ExcelNamedRange name, XmlElement elem)
