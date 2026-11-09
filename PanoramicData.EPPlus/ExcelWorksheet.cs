@@ -1347,13 +1347,13 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				{
 					if (xr.LocalName == "r")
 					{
-						var rXml = xr.ReadOuterXml();
+						var rXml = new StringBuilder(xr.ReadOuterXml());
 						while (xr.LocalName == "r")
 						{
-							rXml += xr.ReadOuterXml();
+							rXml.Append(xr.ReadOuterXml());
 						}
 
-						SetValueInner(address._fromRow, address._fromCol, rXml);
+						SetValueInner(address._fromRow, address._fromCol, rXml.ToString());
 					}
 					else
 					{
@@ -1727,16 +1727,16 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			View.TabSelected = true;
 		}
 
-		var selAddress = ExcelCellBase.GetAddress(Address.Start.Row, Address.Start.Column) + ":" + ExcelCellBase.GetAddress(Address.End.Row, Address.End.Column);
+		var selAddress = new StringBuilder(ExcelCellBase.GetAddress(Address.Start.Row, Address.Start.Column) + ":" + ExcelCellBase.GetAddress(Address.End.Row, Address.End.Column));
 		if (Address.Addresses != null)
 		{
 			foreach (var a in Address.Addresses)
 			{
-				selAddress += " " + ExcelCellBase.GetAddress(a.Start.Row, a.Start.Column) + ":" + ExcelCellBase.GetAddress(a.End.Row, a.End.Column);
+				selAddress.Append(' ').Append(ExcelCellBase.GetAddress(a.Start.Row, a.Start.Column)).Append(':').Append(ExcelCellBase.GetAddress(a.End.Row, a.End.Column));
 			}
 		}
 
-		View.SelectedRange = selAddress;
+		View.SelectedRange = selAddress.ToString();
 		View.ActiveCell = ExcelCellBase.GetAddress(Address.Start.Row, Address.Start.Column);
 	}
 
