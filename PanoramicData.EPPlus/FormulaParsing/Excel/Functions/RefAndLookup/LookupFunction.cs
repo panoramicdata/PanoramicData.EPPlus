@@ -24,6 +24,7 @@
  *******************************************************************************/
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 
@@ -32,13 +33,12 @@ public abstract class LookupFunction : ExcelFunction
 	private readonly ValueMatcher _valueMatcher;
 	private readonly CompileResultFactory _compileResultFactory;
 
-	public LookupFunction()
+	protected LookupFunction()
 		: this(new LookupValueMatcher(), new CompileResultFactory())
 	{
-
 	}
 
-	public LookupFunction(ValueMatcher valueMatcher, CompileResultFactory compileResultFactory)
+	protected LookupFunction(ValueMatcher valueMatcher, CompileResultFactory compileResultFactory)
 	{
 		_valueMatcher = valueMatcher;
 		_compileResultFactory = compileResultFactory;
@@ -47,6 +47,14 @@ public abstract class LookupFunction : ExcelFunction
 	public override bool IsLookupFuction => true;
 
 	protected int IsMatch(object o1, object o2) => _valueMatcher.IsMatch(o1, o2);
+
+	private protected RangeAddress CreateRangeAddressFromArgument(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		var rangeAddress = ArgToAddress(arguments, 0, context);
+		return ExcelAddressUtil.IsValidAddress(rangeAddress)
+			? new RangeAddressFactory(context.ExcelDataProvider).Create(rangeAddress)
+			: null;
+	}
 
 	protected static LookupDirection GetLookupDirection(RangeAddress rangeAddress)
 	{

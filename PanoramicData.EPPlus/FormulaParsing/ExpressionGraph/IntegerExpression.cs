@@ -41,7 +41,6 @@ public class IntegerExpression : AtomicExpression
 	public IntegerExpression(string expression)
 		: this(expression, false)
 	{
-
 	}
 
 	public IntegerExpression(string expression, bool negate)
@@ -58,8 +57,6 @@ public class IntegerExpression : AtomicExpression
 
 	public override CompileResult Compile()
 	{
-		var result = _compiledValue.HasValue ? _compiledValue.Value : double.Parse(ExpressionString, CultureInfo.InvariantCulture);
-		result = _negate ? result * -1 : result;
-		return new CompileResult(result, DataType.Integer);
+		return new CompileResult(GetNumericValue(_compiledValue, _negate), DataType.Integer);
 	}
 }

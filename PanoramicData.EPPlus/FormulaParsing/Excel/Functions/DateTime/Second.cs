@@ -31,10 +31,5 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 public class Second : DateParsingFunction
 {
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-	{
-		ValidateArguments(arguments, 1);
-		var dateObj = arguments.ElementAt(0).Value;
-		var date = ParseDate(arguments, dateObj);
-		return CreateResult(date.Second, DataType.Integer);
-	}
+		=> CreateResult(ParseFirstArgumentDate(arguments).Second, DataType.Integer);
 }

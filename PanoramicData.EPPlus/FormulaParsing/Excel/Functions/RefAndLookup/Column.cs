@@ -39,14 +39,7 @@ public class Column : LookupFunction
 			return CreateResult(context.Scopes.Current.Address.FromCol, DataType.Integer);
 		}
 
-		var rangeAddress = ArgToAddress(arguments, 0, context);
-		if (!ExcelAddressUtil.IsValidAddress(rangeAddress))
-		{
-			throw new ArgumentException("An invalid argument was supplied");
-		}
-
-		var factory = new RangeAddressFactory(context.ExcelDataProvider);
-		var address = factory.Create(rangeAddress);
+		var address = CreateRangeAddressFromArgument(arguments, context) ?? throw new ArgumentException("An invalid argument was supplied");
 		return CreateResult(address.FromCol, DataType.Integer);
 	}
 }
