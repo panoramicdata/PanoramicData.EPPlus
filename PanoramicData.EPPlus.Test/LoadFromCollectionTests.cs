@@ -30,6 +30,19 @@ public class LoadFromCollectionTests
 		public int Number { get; set; }
 	}
 
+	private static List<BaseClass> CreateImplementations() =>
+	[
+		new Implementation { Id = "123", Name = "Item 1", Number = 3 }
+	];
+
+	private static object LoadIntoC1<T>(IEnumerable<T> items)
+	{
+		using var pck = new ExcelPackage(new MemoryStream());
+		var sheet = pck.Workbook.Worksheets.Add("sheet");
+		sheet.Cells["C1"].LoadFromCollection(items, true, TableStyles.Dark1);
+		return sheet.Cells["C1"].Value;
+	}
+
 	[TestMethod]
 	public void ShouldUseAclassProperties()
 	{
@@ -37,49 +50,23 @@ public class LoadFromCollectionTests
 		{
 			new(){ Id = "123", Name = "Item 1", Number = 3}
 		};
-		using var pck = new ExcelPackage(new MemoryStream());
-		var sheet = pck.Workbook.Worksheets.Add("sheet");
-		sheet.Cells["C1"].LoadFromCollection(items, true, TableStyles.Dark1);
-
-		Assert.AreEqual("Id", sheet.Cells["C1"].Value);
+		Assert.AreEqual("Id", LoadIntoC1(items));
 	}
 
 	[TestMethod]
-	public void ShouldUseBaseClassProperties()
-	{
-		var items = new List<BaseClass>
-		{
-			new Implementation { Id = "123", Name = "Item 1", Number = 3}
-		};
-		using var pck = new ExcelPackage(new MemoryStream());
-		var sheet = pck.Workbook.Worksheets.Add("sheet");
-		sheet.Cells["C1"].LoadFromCollection(items, true, TableStyles.Dark1);
-
-		Assert.AreEqual("Id", sheet.Cells["C1"].Value);
-	}
+	public void ShouldUseBaseClassProperties() => Assert.AreEqual("Id", LoadIntoC1(CreateImplementations()));
 
 	[TestMethod]
 	public void ShouldUseAnonymousProperties()
 	{
-		var objs = new List<BaseClass>
-		{
-			new Implementation { Id = "123", Name = "Item 1", Number = 3}
-		};
-		var items = objs.Select(x => new { x.Id, x.Name }).ToList();
-		using var pck = new ExcelPackage(new MemoryStream());
-		var sheet = pck.Workbook.Worksheets.Add("sheet");
-		sheet.Cells["C1"].LoadFromCollection(items, true, TableStyles.Dark1);
-
-		Assert.AreEqual("Id", sheet.Cells["C1"].Value);
+		var items = CreateImplementations().Select(x => new { x.Id, x.Name }).ToList();
+		Assert.AreEqual("Id", LoadIntoC1(items));
 	}
+
 	[TestMethod]
 	public void ShouldThrowInvalidCastExceptionIf()
 	{
-		var objs = new List<BaseClass>
-		{
-			new Implementation { Id = "123", Name = "Item 1", Number = 3}
-		};
-		var items = objs.Select(x => new { x.Id, x.Name }).ToList();
+		var items = CreateImplementations().Select(x => new { x.Id, x.Name }).ToList();
 		using var pck = new ExcelPackage(new MemoryStream());
 		var sheet = pck.Workbook.Worksheets.Add("sheet");
 		Assert.ThrowsExactly<InvalidCastException>(() => sheet.Cells["C1"].LoadFromCollection(items, true, TableStyles.Dark1, BindingFlags.Public | BindingFlags.Instance, typeof(string).GetMembers()));
