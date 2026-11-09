@@ -46,6 +46,7 @@ using OfficeOpenXml.Table.PivotTable;
 using OfficeOpenXml.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -85,11 +86,11 @@ internal enum CellFlags
 /// <summary>
 /// For Cell value structure (for memory optimization of huge sheet)
 /// </summary>
+[SuppressMessage("Minor Code Smell", "S3898:Value types should implement IEquatable<T>", Justification = "Public API: adding IEquatable to this published struct is out of scope for a behaviour-preserving change.")]
 public struct ExcelCoreValue
 {
 	internal object _value;
 	internal int _styleId;
-
 }
 /// <summary>
 /// Represents an Excel Chartsheet and provides access to its properties and methods
@@ -131,30 +132,30 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		internal string GetFormula(int row, int column, string worksheet)
 		{
-			if ((StartRow == row && StartCol == column))
+			if (StartRow == row && StartCol == column)
 			{
 				return Formula;
 			}
 
 			Tokens ??= _tokenizer.Tokenize(Formula, worksheet);
 
-			var f = "";
+			var f = new StringBuilder();
 			foreach (var token in Tokens)
 			{
 				if (token.TokenType == TokenType.ExcelAddress)
 				{
 					var a = new ExcelFormulaAddress(token.Value);
-					f += !string.IsNullOrEmpty(a._wb) || !string.IsNullOrEmpty(a._ws)
+					f.Append(!string.IsNullOrEmpty(a._wb) || !string.IsNullOrEmpty(a._ws)
 						? token.Value
-						: a.GetOffset(row - StartRow, column - StartCol);
+						: a.GetOffset(row - StartRow, column - StartCol));
 				}
 				else
 				{
-					f += token.Value;
+					f.Append(token.Value);
 				}
 			}
 
-			return f;
+			return f.ToString();
 		}
 
 		public Formulas Clone()
@@ -178,7 +179,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	{
 		internal MergeCellsCollection()
 		{
-
 		}
 
 		internal CellStore<int> _cells = new();
@@ -202,9 +202,10 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				return _list[index];
 			}
 		}
+		[SuppressMessage("Major Bug", "S2551:Shared resources should not be used for locking", Justification = "Public type: external callers may already synchronise on the collection, so the lock target is kept.")]
 		internal void Add(ExcelAddressBase address, bool doValidate)
 		{
-			var ix = 0;
+			int ix;
 
 			//Validate
 			if (doValidate && Validate(address) == false)
@@ -562,7 +563,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 	}
-	double _defaultRowHeight = double.NaN;
 	/// <summary>
 	/// Get/set the default height of all rows in the worksheet
 	/// </summary>
@@ -571,18 +571,17 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		get
 		{
 			CheckSheetType();
-			_defaultRowHeight = GetXmlNodeDouble("d:sheetFormatPr/@defaultRowHeight");
-			if (double.IsNaN(_defaultRowHeight) || CustomHeight == false)
+			var defaultRowHeight = GetXmlNodeDouble("d:sheetFormatPr/@defaultRowHeight");
+			if (double.IsNaN(defaultRowHeight) || CustomHeight == false)
 			{
-				_defaultRowHeight = GetRowHeightFromNormalStyle();
+				defaultRowHeight = GetRowHeightFromNormalStyle();
 			}
 
-			return _defaultRowHeight;
+			return defaultRowHeight;
 		}
 		set
 		{
 			CheckSheetType();
-			_defaultRowHeight = value;
 			if (double.IsNaN(value))
 			{
 				DeleteNode("d:sheetFormatPr/@defaultRowHeight");
@@ -590,8 +589,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			else
 			{
 				SetXmlNodeString("d:sheetFormatPr/@defaultRowHeight", value.ToString(CultureInfo.InvariantCulture));
-				//Check if this is the default width for the normal style
-				var defHeight = GetRowHeightFromNormalStyle();
+				_ = GetRowHeightFromNormalStyle();
 				CustomHeight = true;
 			}
 		}
@@ -1089,7 +1087,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	}
 	private void LoadColumns(XmlReader xr)
 	{
-		var colList = new List<IRangeID>();
 		if (ReadUntil(xr, "cols", "sheetData"))
 		{
 			while (xr.Read())
@@ -1265,7 +1262,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 				if (DoAddRow(xr))
 				{
-					SetValueInner(row, 0, AddRow(xr, row));
+					SetValueInner(row, 0, AddRow(xr));
 					if (xr.GetAttribute("s") != null)
 					{
 						SetStyleInner(row, 0, int.Parse(xr.GetAttribute("s"), CultureInfo.InvariantCulture));
@@ -1449,9 +1446,8 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// Reads a row from the XML reader
 	/// </summary>
 	/// <param name="xr">The reader</param>
-	/// <param name="row">The row number</param>
 	/// <returns></returns>
-	private static RowInternal AddRow(XmlReader xr, int row) => new()
+	private static RowInternal AddRow(XmlReader xr) => new()
 	{
 		Collapsed = xr.GetAttribute("collapsed") is not null and "1",
 		OutlineLevel = xr.GetAttribute("outlineLevel") == null ? (short)0 : short.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture),
@@ -1478,7 +1474,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		}
 		else if (type == "b")
 		{
-			SetValueInner(row, col, (xr.ReadElementContentAsString() != "0"));
+			SetValueInner(row, col, xr.ReadElementContentAsString() != "0");
 		}
 		else if (type == "e")
 		{
@@ -1497,7 +1493,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 						res += ExcelWorkbook.date1904Offset;
 					}
 
-					if (res is >= (-657435.0) and < 2958465.9999999)
+					if (res is >= -657435.0 and < 2958465.9999999)
 					{
 						SetValueInner(row, col, DateTime.FromOADate(res));
 					}
@@ -1620,6 +1616,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// </summary>
 	/// <param name="row">The row number in the worksheet</param>
 	/// <returns></returns>
+	[SuppressMessage("Minor Code Smell", "S3872:Parameter names should not duplicate the names of their methods", Justification = "Public API: renaming the parameter would break callers using named arguments.")]
 	public ExcelRow Row(int row)
 	{
 		CheckSheetType();
@@ -1641,12 +1638,11 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		var column = GetValueInner(0, col) as ExcelColumn;
 		if (column != null)
 		{
-
 			if (column.ColumnMin != column.ColumnMax)
 			{
 				var maxCol = column.ColumnMax;
 				column.ColumnMax = col;
-				var copy = CopyColumn(column, col + 1, maxCol);
+				CopyColumn(column, col + 1, maxCol);
 			}
 		}
 		else
@@ -1661,7 +1657,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					column.ColumnMax = col - 1;
 					if (maxCol > col)
 					{
-						var newC = CopyColumn(column, col + 1, maxCol);
+						CopyColumn(column, col + 1, maxCol);
 					}
 
 					return CopyColumn(column, col, col);
@@ -2294,13 +2290,12 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 						f.Address = ExcelCellBase.GetAddress(fromRow, fromCol, toRow, toCol);
 						Cells[f.Address].SetSharedFormulaID(f.Index);
-
 					}
 				}
 			}
 		}
 
-		AddFormulas(added, position, rows);
+		AddFormulas(added);
 
 		//Remove formulas
 		foreach (var f in deleted)
@@ -2316,10 +2311,10 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			UpdateSharedFormulaRow(ref f, position, rows, ref added);
 		}
 
-		AddFormulas(added, position, rows);
+		AddFormulas(added);
 	}
 
-	private void AddFormulas(List<Formulas> added, int position, int rows)
+	private void AddFormulas(List<Formulas> added)
 	{
 		//Add new formulas
 		foreach (var f in added)
@@ -2605,18 +2600,22 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 
+		RemoveSharedFormulasAndUpdateReferences(delSF, -rows, 0, rowFrom, 0);
+	}
+
+	private void RemoveSharedFormulasAndUpdateReferences(List<int> delSF, int rowIncrement, int colIncrement, int afterRow, int afterColumn)
+	{
 		foreach (var ix in delSF)
 		{
 			_sharedFormulas.Remove(ix);
 		}
 
-		delSF = null;
 		var cse = new CellsStoreEnumerator<object>(_formulas, 1, 1, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
 		while (cse.Next())
 		{
 			if (cse.Value is string)
 			{
-				cse.Value = ExcelCellBase.UpdateFormulaReferences(cse.Value.ToString(), -rows, 0, rowFrom, 0, Name, Name);
+				cse.Value = ExcelCellBase.UpdateFormulaReferences(cse.Value.ToString(), rowIncrement, colIncrement, afterRow, afterColumn, Name, Name);
 			}
 		}
 	}
@@ -2639,24 +2638,10 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					sf.Formula = ExcelCellBase.UpdateFormulaReferences(sf.Formula, 0, -c, 0, 1, Name, Name);
 					sf.StartCol -= c;
 				}
-
 			}
 		}
 
-		foreach (var ix in delSF)
-		{
-			_sharedFormulas.Remove(ix);
-		}
-
-		delSF = null;
-		var cse = new CellsStoreEnumerator<object>(_formulas, 1, 1, ExcelPackage.MaxRows, ExcelPackage.MaxColumns);
-		while (cse.Next())
-		{
-			if (cse.Value is string)
-			{
-				cse.Value = ExcelCellBase.UpdateFormulaReferences(cse.Value.ToString(), 0, -columns, 0, columnFrom, Name, Name);
-			}
-		}
+		RemoveSharedFormulasAndUpdateReferences(delSF, 0, -columns, 0, columnFrom);
 	}
 	/// <summary>
 	/// Deletes the specified row from the worksheet.
@@ -2949,7 +2934,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				if (_comments.Part == null)
 				{
 					_comments.Part = _package.Package.CreatePart(_comments.Uri, "application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml", _package.Compression);
-					var rel = Part.CreateRelationship(UriHelper.GetRelativeUri(WorksheetUri, _comments.Uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/comments");
+					Part.CreateRelationship(UriHelper.GetRelativeUri(WorksheetUri, _comments.Uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/comments");
 				}
 
 				_comments.CommentXml.Save(_comments.Part.GetStream(FileMode.Create));
@@ -2999,7 +2984,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				var colVal = new HashSet<string>();
 				foreach (var col in tbl.Columns)
 				{
-					var n = col.Name.ToLowerInvariant();
+					string n;
 					if (tbl.ShowHeader)
 					{
 						n = tbl.WorkSheet.GetValue<string>(tbl.Address._fromRow,
@@ -3186,7 +3171,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				}
 				else
 				{
-					var ws = Workbook.Worksheets[pt.CacheDefinition.SourceRange.WorkSheet];
 					t = ExcelTableCollection.GetFromRange(pt.CacheDefinition.SourceRange);
 					if (t == null)
 					{
@@ -3201,7 +3185,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 						pt.CacheDefinition.SetXmlNodeString(ExcelPivotCacheDefinition._sourceNamePath, t.Name);
 					}
 				}
-
 
 				var fields =
 					pt.CacheDefinition.CacheDefinitionXml.SelectNodes(
@@ -3305,14 +3288,12 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			GetBlockPos(xml, "cols", ref colStart, ref colEnd);
 
 			sw.Write(xml[..colStart]);
-			var colBreaks = new List<int>();
 			UpdateColumnData(sw);
 
 			int cellStart = colEnd, cellEnd = colEnd;
 			GetBlockPos(xml, "sheetData", ref cellStart, ref cellEnd);
 
 			sw.Write(xml[colEnd..cellStart]);
-			var rowBreaks = new List<int>();
 			UpdateRowCellData(sw);
 
 			int mergeStart = cellEnd, mergeEnd = cellEnd;
@@ -3377,7 +3358,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		if (count > 0)
 		{
-			sw.Write(string.Format("<colBreaks count=\"{0}\" manualBreakCount=\"{0}\">{1}</colBreaks>", count, breaks.ToString()));
+			sw.Write(string.Format("<colBreaks count=\"{0}\" manualBreakCount=\"{0}\">{1}</colBreaks>", count, breaks));
 		}
 	}
 
@@ -3397,7 +3378,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		if (count > 0)
 		{
-			sw.Write(string.Format("<rowBreaks count=\"{0}\" manualBreakCount=\"{0}\">{1}</rowBreaks>", count, breaks.ToString()));
+			sw.Write(string.Format("<rowBreaks count=\"{0}\" manualBreakCount=\"{0}\">{1}</rowBreaks>", count, breaks));
 		}
 	}
 	/// <summary>
@@ -3474,12 +3455,9 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		var row = -1;
 
-		StringBuilder sbXml = new();
 		var ss = _package.Workbook._sharedStrings;
-		var styles = _package.Workbook.Styles;
 		var cache = new StringBuilder();
 		cache.Append("<sheetData>");
-
 
 		FixSharedFormulas(); //Fixes Issue #32
 
@@ -3490,7 +3468,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			if (cse.Column > 0)
 			{
 				var val = cse.Value;
-				var styleID = cellXfs[(val._styleId == 0 ? GetStyleIdDefaultWithMemo(cse.Row, cse.Column) : val._styleId)].newID;
+				var styleID = cellXfs[val._styleId == 0 ? GetStyleIdDefaultWithMemo(cse.Row, cse.Column) : val._styleId].newID;
 				//Add the row element if it's a new row
 				if (cse.Row != row)
 				{
@@ -3502,7 +3480,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				var formula = _formulas.GetValue(cse.Row, cse.Column);
 				if (formula is int sfId)
 				{
-					var f = _sharedFormulas[(int)sfId];
+					var f = _sharedFormulas[sfId];
 					if (f.Address.IndexOf(':') > 0)
 					{
 						if (f.StartCol == cse.Column && f.StartRow == cse.Row)
@@ -3515,7 +3493,6 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 							{
 								cache.AppendFormat("<c r=\"{0}\" s=\"{1}\"{6}><f ref=\"{2}\" t=\"shared\" si=\"{3}\">{4}</f>{5}</c>", cse.CellAddress, styleID < 0 ? 0 : styleID, f.Address, sfId, ConvertUtil.ExcelEscapeString(f.Formula), GetFormulaValue(v), GetCellType(v, true));
 							}
-
 						}
 						else if (f.IsArray)
 						{
