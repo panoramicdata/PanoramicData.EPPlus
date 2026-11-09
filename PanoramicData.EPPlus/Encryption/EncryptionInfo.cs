@@ -235,26 +235,21 @@ internal class EncryptionInfoAgile : EncryptionInfo
 			eHashAlogorithm.SHA1 => "SHA-1",
 			_ => value.ToString(),
 		};
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S2372:Exceptions should not be thrown from property getters", Justification = "Invalid encryption XML must fail when the chaining mode is read.")]
-		internal eChainingMode CipherChaining
+		internal eChainingMode GetCipherChaining()
 		{
-			get
+			var v = GetXmlNodeString("@cipherChaining");
+			try
 			{
-				var v = GetXmlNodeString("@cipherChaining");
-				try
-				{
-					return Enum.Parse<eChainingMode>(v);
-				}
-				catch
-				{
-					throw (new InvalidDataException("Invalid chaining mode"));
-				}
+				return Enum.Parse<eChainingMode>(v);
 			}
-			set
+			catch
 			{
-				SetXmlNodeString("@cipherChaining", value.ToString());
+				throw (new InvalidDataException("Invalid chaining mode"));
 			}
 		}
+
+		internal void SetCipherChaining(eChainingMode value) => SetXmlNodeString("@cipherChaining", value.ToString());
+
 		internal eCipherAlgorithm CipherAlgorithm
 		{
 			get
