@@ -49,7 +49,7 @@ public class TokenHandler : ITokenIndexProvider
 
 	public string Worksheet { get; set; }
 
-	public bool HasMore() => _tokenIndex < (_context.FormulaChars.Length - 1);
+	public bool HasMore() => _tokenIndex < _context.FormulaChars.Length - 1;
 
 	public void Next()
 	{
@@ -62,45 +62,51 @@ public class TokenHandler : ITokenIndexProvider
 		var c = _context.FormulaChars[_tokenIndex];
 		if (CharIsTokenSeparator(c, out var tokenSeparator))
 		{
-			if (TokenSeparatorHandler.Handle(c, tokenSeparator, _context, this))
-			{
-				return;
-			}
-
-			if (_context.CurrentTokenHasValue)
-			{
-				if (Regex.IsMatch(_context.CurrentToken, "^\"*$"))
-				{
-					_context.AddToken(_tokenFactory.Create(_context.CurrentToken, TokenType.StringContent));
-				}
-				else
-				{
-					_context.AddToken(CreateToken(_context, Worksheet));
-				}
-
-
-				//If the a next token is an opening parantheses and the previous token is interpeted as an address or name, then the currenct token is a function
-				if (tokenSeparator.TokenType == TokenType.OpeningParenthesis && (_context.LastToken.TokenType == TokenType.ExcelAddress || _context.LastToken.TokenType == TokenType.NameValue))
-				{
-					_context.LastToken.TokenType = TokenType.Function;
-				}
-			}
-
-			if (tokenSeparator.Value == "-")
-			{
-				if (TokenIsNegator(_context))
-				{
-					_context.AddToken(new Token("-", TokenType.Negator));
-					return;
-				}
-			}
-
-			_context.AddToken(tokenSeparator);
-			_context.NewToken();
+			HandleTokenSeparator(c, tokenSeparator);
 			return;
 		}
 
 		_context.AppendToCurrentToken(c);
+	}
+
+	private void HandleTokenSeparator(char c, Token tokenSeparator)
+	{
+		if (TokenSeparatorHandler.Handle(c, tokenSeparator, _context, this))
+		{
+			return;
+		}
+
+		if (_context.CurrentTokenHasValue)
+		{
+			AddCurrentToken(tokenSeparator);
+		}
+
+		if (tokenSeparator.Value == "-" && TokenIsNegator(_context))
+		{
+			_context.AddToken(new Token("-", TokenType.Negator));
+			return;
+		}
+
+		_context.AddToken(tokenSeparator);
+		_context.NewToken();
+	}
+
+	private void AddCurrentToken(Token tokenSeparator)
+	{
+		if (Regex.IsMatch(_context.CurrentToken, "^\"*$"))
+		{
+			_context.AddToken(_tokenFactory.Create(_context.CurrentToken, TokenType.StringContent));
+		}
+		else
+		{
+			_context.AddToken(CreateToken(_context, Worksheet));
+		}
+
+		// An address or name followed by an opening parenthesis is a function.
+		if (tokenSeparator.TokenType == TokenType.OpeningParenthesis && (_context.LastToken.TokenType == TokenType.ExcelAddress || _context.LastToken.TokenType == TokenType.NameValue))
+		{
+			_context.LastToken.TokenType = TokenType.Function;
+		}
 	}
 
 	private bool CharIsTokenSeparator(char c, out Token token)
