@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OfficeOpenXml.Table;
+﻿namespace OfficeOpenXml.Table;
 
 /// <summary>
 /// Name and style handling shared by tables and pivot tables.
