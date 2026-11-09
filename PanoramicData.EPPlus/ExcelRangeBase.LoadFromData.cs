@@ -111,7 +111,7 @@ public partial class ExcelRangeBase
 		var rowArray = new List<object[]>();
 		if (PrintHeaders)
 		{
-			rowArray.Add(Table.Columns.Cast<DataColumn>().Select((dc) => { return dc.Caption; }).ToArray());
+			rowArray.Add(Table.Columns.Cast<DataColumn>().Select((dc) => { return (object)dc.Caption; }).ToArray());
 		}
 
 		foreach (DataRow dr in Table.Rows)

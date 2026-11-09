@@ -20,40 +20,9 @@ public partial class ExcelRangeBase
 		public CompareOptions compareOptions = CompareOptions.None;
 		public int Compare(SortItem<ExcelCoreValue> x, SortItem<ExcelCoreValue> y)
 		{
-			int ret;
 			for (var i = 0; i < columns.Length; i++)
 			{
-				var x1 = x.Items[columns[i]]._value;
-				var y1 = y.Items[columns[i]]._value;
-				var isNumX = ConvertUtil.IsNumeric(x1);
-				var isNumY = ConvertUtil.IsNumeric(y1);
-				if (isNumX && isNumY)   //Numeric Compare
-				{
-					var d1 = ConvertUtil.GetValueDouble(x1);
-					var d2 = ConvertUtil.GetValueDouble(y1);
-					if (double.IsNaN(d1))
-					{
-						d1 = double.MaxValue;
-					}
-
-					if (double.IsNaN(d2))
-					{
-						d2 = double.MaxValue;
-					}
-
-					ret = d1 < d2 ? -1 : d1 > d2 ? 1 : 0;
-				}
-				else if (isNumX == false && isNumY == false)   //String Compare
-				{
-					var s1 = x1 == null ? "" : x1.ToString();
-					var s2 = y1 == null ? "" : y1.ToString();
-					ret = string.Compare(s1, s2, StringComparison.CurrentCulture);
-				}
-				else
-				{
-					ret = isNumX ? -1 : 1;
-				}
-
+				var ret = CompareValues(x.Items[columns[i]]._value, y.Items[columns[i]]._value);
 				if (ret != 0)
 				{
 					return ret * (descending[i] ? -1 : 1);
@@ -62,5 +31,44 @@ public partial class ExcelRangeBase
 
 			return 0;
 		}
+
+		private static int CompareValues(object x1, object y1)
+		{
+			var isNumX = ConvertUtil.IsNumeric(x1);
+			var isNumY = ConvertUtil.IsNumeric(y1);
+			if (isNumX && isNumY)   //Numeric Compare
+			{
+				return CompareNumbers(x1, y1);
+			}
+			else if (isNumX == false && isNumY == false)   //String Compare
+			{
+				var s1 = AsSortText(x1);
+				var s2 = AsSortText(y1);
+				return string.Compare(s1, s2, StringComparison.CurrentCulture);
+			}
+			else
+			{
+				return isNumX ? -1 : 1;
+			}
+		}
+
+		private static int CompareNumbers(object x1, object y1)
+		{
+			var d1 = ConvertUtil.GetValueDouble(x1);
+			var d2 = ConvertUtil.GetValueDouble(y1);
+			if (double.IsNaN(d1))
+			{
+				d1 = double.MaxValue;
+			}
+
+			if (double.IsNaN(d2))
+			{
+				d2 = double.MaxValue;
+			}
+
+			return d1 < d2 ? -1 : d1 > d2 ? 1 : 0;
+		}
+
+		private static string AsSortText(object value) => value == null ? "" : value.ToString();
 	}
 }

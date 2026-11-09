@@ -32,15 +32,7 @@ public partial class ExcelRangeBase
 
 		Format ??= new ExcelTextFormat();
 
-		string[] lines;
-		if (Format.TextQualifier == 0)
-		{
-			lines = Regex.Split(Text, Format.EOL);
-		}
-		else
-		{
-			lines = GetLines(Text, Format);
-		}
+		var lines = SplitTextLines(Text, Format);
 
 		var row = 0;
 		var col = 0;
@@ -54,86 +46,14 @@ public partial class ExcelRangeBase
 
 			if (lineNo > Format.SkipLinesBeginning && lineNo <= lines.Length - Format.SkipLinesEnd)
 			{
-				col = 0;
-				var v = new StringBuilder();
-				bool isText = false, isQualifier = false;
-				var QCount = 0;
-				var lineQCount = 0;
-				foreach (var c in line)
-				{
-					if (Format.TextQualifier != 0 && c == Format.TextQualifier)
-					{
-						if (!isText && v.Length != 0)
-						{
-							throw new Exception(string.Format("Invalid Text Qualifier in line : {0}", line));
-						}
-
-						isQualifier = !isQualifier;
-						QCount += 1;
-						lineQCount++;
-						isText = true;
-					}
-					else
-					{
-						if (QCount > 1 && v.Length != 0)
-						{
-							v.Append(Format.TextQualifier, QCount / 2);
-						}
-						else if (QCount > 2 && v.Length == 0)
-						{
-							v.Append(Format.TextQualifier, (QCount - 1) / 2);
-						}
-
-						if (isQualifier)
-						{
-							v.Append(c);
-						}
-						else
-						{
-							if (c == Format.Delimiter)
-							{
-								items.Add(ConvertData(Format, v.ToString(), col, isText));
-								v.Clear();
-								isText = false;
-								col++;
-							}
-							else
-							{
-								if (QCount % 2 != 0)
-								{
-									throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
-								}
-
-								v.Append(c);
-							}
-						}
-
-						QCount = 0;
-					}
-				}
-
-				if (QCount > 1 && v.Length != 0 && QCount == 2)
-				{
-					v.Append(Format.TextQualifier, QCount / 2);
-				}
-
-				if (lineQCount % 2 != 0)
-				{
-					throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
-				}
-
-				items.Add(ConvertData(Format, v.ToString(), col, isText));
-				if (col > maxCol)
-				{
-					maxCol = col;
-				}
+				col = ParseTextLine(line, Format, items);
+				maxCol = Math.Max(maxCol, col);
 
 				row++;
 			}
 
 			lineNo++;
-		}
-		// flush
+		}		// flush
 		_worksheet._values.SetRangeValueSpecial(_fromRow, _fromCol, _fromRow + values.Length - 1, _fromCol + maxCol,
 			(List<ExcelCoreValue> list, int index, int rowIx, int columnIx, object _) =>
 			{
@@ -151,6 +71,105 @@ public partial class ExcelRangeBase
 		return _worksheet.Cells[_fromRow, _fromCol, _fromRow + row - 1, _fromCol + maxCol];
 	}
 
+	private static string[] SplitTextLines(string Text, ExcelTextFormat Format)
+	{
+		if (Format.TextQualifier == 0)
+		{
+			return Regex.Split(Text, Format.EOL);
+		}
+		else
+		{
+			return GetLines(Text, Format);
+		}
+	}
+
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour of LoadFromText: callers may catch this exact exception type, so it is kept.")]
+	private static int ParseTextLine(string line, ExcelTextFormat Format, List<object> items)
+	{
+		var col = 0;
+		var v = new StringBuilder();
+		bool isText = false, isQualifier = false;
+		var QCount = 0;
+		var lineQCount = 0;
+		foreach (var c in line)
+		{
+			if (Format.TextQualifier != 0 && c == Format.TextQualifier)
+			{
+				if (!isText && v.Length != 0)
+				{
+					throw new Exception(string.Format("Invalid Text Qualifier in line : {0}", line));
+				}
+
+				isQualifier = !isQualifier;
+				QCount += 1;
+				lineQCount++;
+				isText = true;
+			}
+			else
+			{
+				AppendTextChar(c, line, Format, v, items, QCount, isQualifier, ref isText, ref col);
+				QCount = 0;
+			}
+		}
+
+		FinishTextLine(line, Format, v, items, QCount, lineQCount, isText, col);
+		return col;
+	}
+
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour of LoadFromText: callers may catch this exact exception type, so it is kept.")]
+	private static void AppendTextChar(char c, string line, ExcelTextFormat Format, StringBuilder v, List<object> items, int QCount, bool isQualifier, ref bool isText, ref int col)
+	{
+		AppendPendingQualifiers(v, Format.TextQualifier, QCount);
+
+		if (isQualifier)
+		{
+			v.Append(c);
+		}
+		else if (c == Format.Delimiter)
+		{
+			items.Add(ConvertData(Format, v.ToString(), col, isText));
+			v.Clear();
+			isText = false;
+			col++;
+		}
+		else
+		{
+			if (QCount % 2 != 0)
+			{
+				throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
+			}
+
+			v.Append(c);
+		}
+	}
+
+	private static void AppendPendingQualifiers(StringBuilder v, char textQualifier, int QCount)
+	{
+		if (QCount > 1 && v.Length != 0)
+		{
+			v.Append(textQualifier, QCount / 2);
+		}
+		else if (QCount > 2 && v.Length == 0)
+		{
+			v.Append(textQualifier, (QCount - 1) / 2);
+		}
+	}
+
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour of LoadFromText: callers may catch this exact exception type, so it is kept.")]
+	private static void FinishTextLine(string line, ExcelTextFormat Format, StringBuilder v, List<object> items, int QCount, int lineQCount, bool isText, int col)
+	{
+		if (QCount > 1 && v.Length != 0 && QCount == 2)
+		{
+			v.Append(Format.TextQualifier, QCount / 2);
+		}
+
+		if (lineQCount % 2 != 0)
+		{
+			throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
+		}
+
+		items.Add(ConvertData(Format, v.ToString(), col, isText));
+	}
 	/// <summary>
 	/// Loads a CSV text into a range starting from the top left cell.
 	/// </summary>

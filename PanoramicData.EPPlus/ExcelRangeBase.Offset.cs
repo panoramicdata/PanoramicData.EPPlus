@@ -13,7 +13,7 @@ public partial class ExcelRangeBase
 	/// <returns></returns>
 	public ExcelRangeBase Offset(int RowOffset, int ColumnOffset)
 	{
-		if (_fromRow + RowOffset < 1 || _fromCol + ColumnOffset < 1 || _fromRow + RowOffset > ExcelPackage.MaxRows || _fromCol + ColumnOffset > ExcelPackage.MaxColumns)
+		if (IsOutsideSheet(_fromRow + RowOffset, _fromCol + ColumnOffset))
 		{
 			throw new ArgumentOutOfRangeException("Offset value out of range");
 		}
@@ -39,8 +39,8 @@ public partial class ExcelRangeBase
 
 		NumberOfRows--;
 		NumberOfColumns--;
-		if (_fromRow + RowOffset < 1 || _fromCol + ColumnOffset < 1 || _fromRow + RowOffset > ExcelPackage.MaxRows || _fromCol + ColumnOffset > ExcelPackage.MaxColumns ||
-			 _fromRow + RowOffset + NumberOfRows < 1 || _fromCol + ColumnOffset + NumberOfColumns < 1 || _fromRow + RowOffset + NumberOfRows > ExcelPackage.MaxRows || _fromCol + ColumnOffset + NumberOfColumns > ExcelPackage.MaxColumns)
+		if (IsOutsideSheet(_fromRow + RowOffset, _fromCol + ColumnOffset) ||
+			 IsOutsideSheet(_fromRow + RowOffset + NumberOfRows, _fromCol + ColumnOffset + NumberOfColumns))
 		{
 			throw new ArgumentOutOfRangeException("Offset value out of range");
 		}
@@ -48,4 +48,7 @@ public partial class ExcelRangeBase
 		var address = GetAddress(_fromRow + RowOffset, _fromCol + ColumnOffset, _fromRow + RowOffset + NumberOfRows, _fromCol + ColumnOffset + NumberOfColumns);
 		return new ExcelRangeBase(_worksheet, address);
 	}
+
+	private static bool IsOutsideSheet(int row, int col)
+		=> row < 1 || col < 1 || row > ExcelPackage.MaxRows || col > ExcelPackage.MaxColumns;
 }
