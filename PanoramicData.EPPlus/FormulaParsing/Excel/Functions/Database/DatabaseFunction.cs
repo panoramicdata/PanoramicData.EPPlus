@@ -22,6 +22,7 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2015-04-19
  *******************************************************************************/
+using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 using OfficeOpenXml.Utils;
 using System.Collections.Generic;
 using System.Globalization;
@@ -41,6 +42,13 @@ public abstract class DatabaseFunction : ExcelFunction
 	public DatabaseFunction(RowMatcher rowMatcher)
 	{
 		RowMatcher = rowMatcher;
+	}
+
+	private protected CompileResult ExecuteAggregate(IEnumerable<FunctionArgument> arguments, ParsingContext context, System.Func<IEnumerable<double>, double> aggregate)
+	{
+		ValidateArguments(arguments, 3);
+		var values = GetMatchingValues(arguments, context);
+		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(aggregate(values), DataType.Integer);
 	}
 
 	protected IEnumerable<double> GetMatchingValues(IEnumerable<FunctionArgument> arguments, ParsingContext context)

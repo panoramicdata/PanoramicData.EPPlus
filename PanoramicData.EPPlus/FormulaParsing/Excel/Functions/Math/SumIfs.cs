@@ -34,7 +34,6 @@ public class SumIfs : MultipleRangeCriteriasFunction
 	{
 		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
 		ValidateArguments(functionArguments, 3);
-		var rows = new List<int>();
 		var valueRange = functionArguments[0].ValueAsRangeInfo;
 		List<double> sumRange;
 		if (valueRange != null)
@@ -46,28 +45,7 @@ public class SumIfs : MultipleRangeCriteriasFunction
 			sumRange = ArgsToDoubleEnumerable(true, new List<FunctionArgument> { functionArguments[0] }, context).Select(x => (double)x).ToList();
 		}
 
-		var argRanges = new List<ExcelDataProvider.IRangeInfo>();
-		var criterias = new List<string>();
-		for (var ix = 1; ix < 31; ix += 2)
-		{
-			if (functionArguments.Length <= ix)
-			{
-				break;
-			}
-
-			var rangeInfo = functionArguments[ix].ValueAsRangeInfo;
-			argRanges.Add(rangeInfo);
-			var value = functionArguments[ix + 1].Value?.ToString();
-			criterias.Add(value);
-		}
-
-		IEnumerable<int> matchIndexes = GetMatchIndexes(argRanges[0], criterias[0]);
-		var enumerable = matchIndexes as IList<int> ?? matchIndexes.ToList();
-		for (var ix = 1; ix < argRanges.Count && enumerable.Any(); ix++)
-		{
-			var indexes = GetMatchIndexes(argRanges[ix], criterias[ix]);
-			matchIndexes = enumerable.Intersect(indexes);
-		}
+		var matchIndexes = GetMatchIndexesForCriteria(functionArguments, 1);
 
 		var result = matchIndexes.Sum(index => sumRange[index]);
 

@@ -75,7 +75,7 @@ public abstract class Expression
 
 	public virtual Expression MergeWithNext()
 	{
-		var expression = this;
+		Expression expression;
 		if (Next != null && Operator != null)
 		{
 			var result = Operator.Apply(Compile(), Next.Compile());
@@ -106,7 +106,7 @@ public abstract class Expression
 		}
 		else
 		{
-			throw (new FormatException("Invalid formula syntax. Operator missing expression."));
+			throw new FormatException("Invalid formula syntax. Operator missing expression.");
 		}
 
 		if (Prev != null)
@@ -118,5 +118,4 @@ public abstract class Expression
 	}
 
 	public abstract CompileResult Compile();
-
 }

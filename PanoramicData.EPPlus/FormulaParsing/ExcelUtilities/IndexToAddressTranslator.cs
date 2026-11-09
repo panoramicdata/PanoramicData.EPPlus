@@ -51,20 +51,19 @@ public class IndexToAddressTranslator
 
 	protected internal static string GetColumnLetter(int iColumnNumber, bool fixedCol)
 	{
-
 		if (iColumnNumber < 1)
 		{
 			return "#REF!";
 		}
 
-		var sCol = "";
+		var sCol = new System.Text.StringBuilder();
 		do
 		{
-			sCol = ((char)('A' + ((iColumnNumber - 1) % 26))) + sCol;
+			sCol.Insert(0, (char)('A' + ((iColumnNumber - 1) % 26)));
 			iColumnNumber = (iColumnNumber - ((iColumnNumber - 1) % 26)) / 26;
 		}
 		while (iColumnNumber > 0);
-		return fixedCol ? "$" + sCol : sCol;
+		return fixedCol ? "$" + sCol : sCol.ToString();
 	}
 
 	public string ToAddress(int col, int row)
@@ -77,13 +76,8 @@ public class IndexToAddressTranslator
 
 	private string GetRowNumber(int rowNo)
 	{
-		var retVal = rowNo < (_excelDataProvider.ExcelMaxRows) ? rowNo.ToString() : string.Empty;
-		return !string.IsNullOrEmpty(retVal)
-			? _excelReferenceType switch
-			{
-				ExcelReferenceType.AbsoluteRowAndColumn or ExcelReferenceType.AbsoluteRowRelativeColumn => "$" + retVal,
-				_ => retVal,
-			}
-			: retVal;
+		var retVal = rowNo < _excelDataProvider.ExcelMaxRows ? rowNo.ToString() : string.Empty;
+		var isAbsoluteRow = _excelReferenceType is ExcelReferenceType.AbsoluteRowAndColumn or ExcelReferenceType.AbsoluteRowRelativeColumn;
+		return !string.IsNullOrEmpty(retVal) && isAbsoluteRow ? "$" + retVal : retVal;
 	}
 }
