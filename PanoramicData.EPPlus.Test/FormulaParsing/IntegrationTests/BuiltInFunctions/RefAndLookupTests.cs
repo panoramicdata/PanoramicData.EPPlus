@@ -104,12 +104,6 @@ public class RefAndLookupTests : FormulaParserTestBase
 		s.Cells[5, 5].Formula = "LOOKUP(4, " + lookupAddress + ")";
 		s.Calculate();
 		Assert.AreEqual(1, s.Cells[5, 5].Value);
-		//    A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,1, 1)).Returns(3);
-		//A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,1, 2)).Returns(5);
-		//A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,2, 1)).Returns(4);
-		//A.CallTo(() => _excelDataProvider.GetCellValue(WorksheetName,2, 2)).Returns(1);
-		//var result = _parser.Parse("LOOKUP(4, " + lookupAddress + ")");
-		//Assert.AreEqual(1, result);
 	}
 
 	[TestMethod]
@@ -305,9 +299,7 @@ public class RefAndLookupTests : FormulaParserTestBase
 	{
 		using var package = new ExcelPackage(new FileInfo(@"c:\temp\Book3.xlsx"));
 		var s1 = package.Workbook.Worksheets.First();
-		var v = s1.Cells["X10"].Formula;
-		//s1.Calculate();
-		v = s1.Cells["X10"].Formula;
+		_ = s1.Cells["X10"].Formula;
 	}
 
 	[TestMethod]

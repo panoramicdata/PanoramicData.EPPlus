@@ -19,11 +19,6 @@ public class SourceCodeTokenizerTests
 		_tokenizer = new SourceCodeTokenizer(context.Configuration.FunctionRepository, null);
 	}
 
-	[TestCleanup]
-	public void Cleanup()
-	{
-	}
-
 	[TestMethod]
 	public void ShouldCreateTokensForStringCorrectly()
 	{
@@ -120,10 +115,6 @@ public class SourceCodeTokenizerTests
 	[TestMethod]
 	public void ShouldIgnoreTwoSubsequentStringIdentifyers2()
 	{
-		//using (var pck = new ExcelPackage(new FileInfo("c:\\temp\\QuoteIssue2.xlsx")))
-		//{
-		//    pck.Workbook.Worksheets.First().Calculate();
-		//}
 		var input = "\"\"\"\"\"\"";
 		var tokens = _tokenizer.Tokenize(input);
 		Assert.AreEqual(TokenType.StringContent, tokens.ElementAt(1).TokenType);
@@ -158,7 +149,6 @@ public class SourceCodeTokenizerTests
 		}
 
 		ws1.Cells["A11"].Formula = "(( A1 -(- A2 )-( A3 + A4 + A5 ))/( A6 + A7 + A8 - A9 )* A5 )";
-		//ws1.Cells["A11"].Formula = "(-A2 + 1 )";
 		ws1.Calculate();
 		var result = ws1.Cells["A11"].Value;
 		Assert.AreEqual(-3.75, result);

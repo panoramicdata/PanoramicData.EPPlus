@@ -33,7 +33,7 @@ public class LoadFromCollectionTests
 	[TestMethod]
 	public void ShouldUseAclassProperties()
 	{
-		var items = new List<Aclass>()
+		var items = new List<Aclass>
 		{
 			new(){ Id = "123", Name = "Item 1", Number = 3}
 		};
@@ -47,9 +47,9 @@ public class LoadFromCollectionTests
 	[TestMethod]
 	public void ShouldUseBaseClassProperties()
 	{
-		var items = new List<BaseClass>()
+		var items = new List<BaseClass>
 		{
-			new Implementation(){ Id = "123", Name = "Item 1", Number = 3}
+			new Implementation { Id = "123", Name = "Item 1", Number = 3}
 		};
 		using var pck = new ExcelPackage(new MemoryStream());
 		var sheet = pck.Workbook.Worksheets.Add("sheet");
@@ -61,9 +61,9 @@ public class LoadFromCollectionTests
 	[TestMethod]
 	public void ShouldUseAnonymousProperties()
 	{
-		var objs = new List<BaseClass>()
+		var objs = new List<BaseClass>
 		{
-			new Implementation(){ Id = "123", Name = "Item 1", Number = 3}
+			new Implementation { Id = "123", Name = "Item 1", Number = 3}
 		};
 		var items = objs.Select(x => new { x.Id, x.Name }).ToList();
 		using var pck = new ExcelPackage(new MemoryStream());
@@ -75,9 +75,9 @@ public class LoadFromCollectionTests
 	[TestMethod]
 	public void ShouldThrowInvalidCastExceptionIf()
 	{
-		var objs = new List<BaseClass>()
+		var objs = new List<BaseClass>
 		{
-			new Implementation(){ Id = "123", Name = "Item 1", Number = 3}
+			new Implementation { Id = "123", Name = "Item 1", Number = 3}
 		};
 		var items = objs.Select(x => new { x.Id, x.Name }).ToList();
 		using var pck = new ExcelPackage(new MemoryStream());

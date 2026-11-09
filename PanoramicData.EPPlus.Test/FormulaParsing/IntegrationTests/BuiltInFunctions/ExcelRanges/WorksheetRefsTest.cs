@@ -8,17 +8,16 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.BuiltInFunct
 public class WorksheetRefsTest
 {
 	private ExcelPackage _package;
-	private ExcelWorksheet _firstSheet;
 	private ExcelWorksheet _secondSheet;
 
 	[TestInitialize]
 	public void Init()
 	{
 		_package = new ExcelPackage();
-		_firstSheet = _package.Workbook.Worksheets.Add("sheet1");
+		var firstSheet = _package.Workbook.Worksheets.Add("sheet1");
 		_secondSheet = _package.Workbook.Worksheets.Add("sheet2");
-		_firstSheet.Cells["A1"].Value = 1;
-		_firstSheet.Cells["A2"].Value = 2;
+		firstSheet.Cells["A1"].Value = 1;
+		firstSheet.Cells["A2"].Value = 2;
 	}
 
 	[TestCleanup]

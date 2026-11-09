@@ -10,14 +10,13 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 public class ExpressionFactoryTests
 {
 	private ExpressionFactory _factory;
-	private ParsingContext _parsingContext;
 
 	[TestInitialize]
 	public void Setup()
 	{
-		_parsingContext = ParsingContext.Create();
+		var parsingContext = ParsingContext.Create();
 		var provider = A.Fake<ExcelDataProvider>();
-		_factory = new ExpressionFactory(provider, _parsingContext);
+		_factory = new ExpressionFactory(provider, parsingContext);
 	}
 
 	[TestMethod]

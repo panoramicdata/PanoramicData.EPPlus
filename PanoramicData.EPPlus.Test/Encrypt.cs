@@ -52,8 +52,6 @@ public class Encrypt : TestBase
 		ws.Row(1).Style.Font.Bold = true;
 		ws.Column(1).Style.Font.Bold = true;
 
-		//package.Encryption.Algorithm = EncryptionAlgorithm.AES256;
-		//package.SaveAs(new FileInfo(@"c:\temp\encrTest.xlsx"), "ABxsw23edc");
 		package.Encryption.Password = "test";
 		package.Encryption.IsEncrypted = true;
 		package.SaveAs(new FileInfo(@"c:\temp\encrTest.xlsx"));
@@ -63,9 +61,6 @@ public class Encrypt : TestBase
 	public void WriteProtect()
 	{
 		ExcelPackage package = new(new FileInfo(@"c:\temp\workbookprot2.xlsx"), "");
-		//Load the sheet with one string column, one date column and a few random numbers.
-		//package.Workbook.Protection.LockWindows = true;
-		//package.Encryption.IsEncrypted = true;
 		package.Workbook.Protection.SetPassword("t");
 		package.Workbook.Protection.LockStructure = true;
 		package.Workbook.View.Left = 585;
@@ -89,7 +84,7 @@ public class Encrypt : TestBase
 	{
 		var p = new ExcelPackage(new FileInfo(@"c:\temp\encr.xlsx"), "test");
 
-		var n = p.Workbook.Worksheets[1].Name;
+		_ = p.Workbook.Worksheets[1].Name;
 		p.Encryption.Password = null;
 		p.SaveAs(new FileInfo(@"c:\temp\encrNew.xlsx"));
 
