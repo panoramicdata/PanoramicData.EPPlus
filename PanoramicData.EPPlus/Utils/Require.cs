@@ -37,7 +37,6 @@ namespace OfficeOpenXml.Utils;
 /// </summary>
 public static class Require
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3872:Parameter names should not duplicate the names of their methods", Justification = "Public API: renaming the parameter would break callers that use named arguments.")]
 	public static IArgument<T> Argument<T>(T argument) => new Argument<T>(argument);
-
-
 }
