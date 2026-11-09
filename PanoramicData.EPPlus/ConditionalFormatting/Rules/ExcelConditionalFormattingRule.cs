@@ -32,6 +32,7 @@ using OfficeOpenXml.ConditionalFormatting.Contracts;
 using OfficeOpenXml.Style.Dxf;
 using OfficeOpenXml.Utils;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace OfficeOpenXml.ConditionalFormatting.Rules;
@@ -68,7 +69,7 @@ public abstract class ExcelConditionalFormattingRule
 	/// <param name="worksheet"></param>
 	/// <param name="itemElementNode"></param>
 	/// <param name="namespaceManager"></param>
-	internal ExcelConditionalFormattingRule(
+	private protected ExcelConditionalFormattingRule(
 	  eExcelConditionalFormattingRuleType type,
 	  ExcelAddress address,
 	  int priority,
@@ -131,7 +132,7 @@ public abstract class ExcelConditionalFormattingRule
 	/// <param name="priority"></param>
 	/// <param name="worksheet"></param>
 	/// <param name="namespaceManager"></param>
-	internal ExcelConditionalFormattingRule(
+	private protected ExcelConditionalFormattingRule(
 	  eExcelConditionalFormattingRuleType type,
 	  ExcelAddress address,
 	  int priority,
@@ -239,6 +240,8 @@ public abstract class ExcelConditionalFormattingRule
 	/// which format should be evaluated and rendered. Lower numeric values are higher
 	/// priority than higher numeric values, where 1 is the highest priority.
 	/// </summary>
+	[SuppressMessage("Critical Code Smell", "S2696:Instance members should not write to \"static\" fields", Justification = "The static flag guards re-entrant priority shifts across all rules; making it per instance would change behaviour.")]
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Callers may catch IndexOutOfRangeException; the published exception type is kept.")]
 	public int Priority
 	{
 		get
@@ -428,6 +431,7 @@ public abstract class ExcelConditionalFormattingRule
 	/// <summary>
 	/// EqualAverage
 	/// </summary>
+	[SuppressMessage("Major Bug", "S3237:\"value\" contextual keyword should be used", Justification = "The attribute is derived from the rule type; changing the setter would change published behaviour.")]
 	internal protected bool? EqualAverage
 	{
 		get

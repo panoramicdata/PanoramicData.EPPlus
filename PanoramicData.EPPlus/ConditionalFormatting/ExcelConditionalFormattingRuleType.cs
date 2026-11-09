@@ -128,37 +128,25 @@ internal static class ExcelConditionalFormattingRuleType
 	  XmlNode topNode,
 	  XmlNamespaceManager nameSpaceManager)
 	{
-		// Get the <cfvo> nodes
-		var cfvoNodes = topNode.SelectNodes(
-		  string.Format(
-			"{0}/{1}",
-			ExcelConditionalFormattingConstants.Paths.ColorScale,
-			ExcelConditionalFormattingConstants.Paths.Cfvo),
-		  nameSpaceManager);
+		var cfvoNodes = SelectColorScaleChildren(topNode, ExcelConditionalFormattingConstants.Paths.Cfvo, nameSpaceManager);
+		var colorNodes = SelectColorScaleChildren(topNode, ExcelConditionalFormattingConstants.Paths.Color, nameSpaceManager);
 
-		// Get the <color> nodes
-		var colorNodes = topNode.SelectNodes(
-		  string.Format(
-			"{0}/{1}",
-			ExcelConditionalFormattingConstants.Paths.ColorScale,
-			ExcelConditionalFormattingConstants.Paths.Color),
-		  nameSpaceManager);
-
-		// We determine if it is "TwoColorScale" or "ThreeColorScale" by the
-		// number of <cfvo> and <color> inside the <colorScale> node
-		if ((cfvoNodes == null) || (cfvoNodes.Count < 2) || (cfvoNodes.Count > 3)
-		  || (colorNodes == null) || (colorNodes.Count < 2) || (colorNodes.Count > 3)
-		  || (cfvoNodes.Count != colorNodes.Count))
+		if (!HasColorScaleNodeCount(cfvoNodes) || !HasColorScaleNodeCount(colorNodes) || cfvoNodes.Count != colorNodes.Count)
 		{
 			throw new InvalidOperationException(
 			  ExcelConditionalFormattingConstants.Errors.WrongNumberCfvoColorNodes);
 		}
 
-		// Return the corresponding rule type (TwoColorScale or ThreeColorScale)
 		return (cfvoNodes.Count == 2)
 		  ? eExcelConditionalFormattingRuleType.TwoColorScale
 		  : eExcelConditionalFormattingRuleType.ThreeColorScale;
 	}
+
+	private static XmlNodeList SelectColorScaleChildren(XmlNode topNode, string childPath, XmlNamespaceManager nameSpaceManager) => topNode.SelectNodes(
+		string.Format("{0}/{1}", ExcelConditionalFormattingConstants.Paths.ColorScale, childPath),
+		nameSpaceManager);
+
+	private static bool HasColorScaleNodeCount(XmlNodeList nodes) => nodes != null && nodes.Count is >= 2 and <= 3;
 
 	/// <summary>
 	/// Get the "aboveAverage" rule type according to the follwoing attributes:
