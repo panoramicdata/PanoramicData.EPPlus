@@ -31,10 +31,6 @@
  * Jan Källman		                License changed GPL-->LGPL  2011-12-27
  * Raziq York                       Added Created & Modified    2014-08-20
  *******************************************************************************/
-using OfficeOpenXml.Utils;
-using System;
-using System.Globalization;
-using System.IO;
 using System.Xml;
 
 namespace OfficeOpenXml;

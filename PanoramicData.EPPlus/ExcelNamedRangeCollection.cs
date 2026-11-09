@@ -30,10 +30,7 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace OfficeOpenXml;
 
