@@ -61,7 +61,21 @@ public sealed class ExcelBarChart : ExcelChart
 	#region "Private functions"
 	private void SetTypeProperties(eChartType type)
 	{
-		/******* Bar direction *******/
+		var direction = GetDirectionForType(type);
+		if (direction.HasValue)
+		{
+			Direction = direction.Value;
+		}
+
+		var shape = GetShapeForType(type);
+		if (shape.HasValue)
+		{
+			Shape = shape.Value;
+		}
+	}
+
+	private static eDirection? GetDirectionForType(eChartType type)
+	{
 		if (type is eChartType.BarClustered or
 			eChartType.BarStacked or
 			eChartType.BarStacked100 or
@@ -78,10 +92,10 @@ public sealed class ExcelBarChart : ExcelChart
 			eChartType.PyramidBarStacked or
 			eChartType.PyramidBarStacked100)
 		{
-			Direction = eDirection.Bar;
+			return eDirection.Bar;
 		}
-		else if (
-			type is eChartType.ColumnClustered or
+
+		return type is eChartType.ColumnClustered or
 			eChartType.ColumnStacked or
 			eChartType.ColumnStacked100 or
 			eChartType.Column3D or
@@ -99,62 +113,43 @@ public sealed class ExcelBarChart : ExcelChart
 			eChartType.PyramidCol or
 			eChartType.PyramidColClustered or
 			eChartType.PyramidColStacked or
-			eChartType.PyramidColStacked100)
-		{
-			Direction = eDirection.Column;
-		}
-
-		/****** Shape ******/
-		if (/*type == eChartType.ColumnClustered ||
-                type == eChartType.ColumnStacked ||
-                type == eChartType.ColumnStacked100 ||*/
-			type is eChartType.Column3D or
-			eChartType.ColumnClustered3D or
-			eChartType.ColumnStacked3D or
-			eChartType.ColumnStacked1003D or
-			/*type == eChartType.BarClustered ||
-                type == eChartType.BarStacked ||
-                type == eChartType.BarStacked100 ||*/
-			eChartType.BarClustered3D or
-			eChartType.BarStacked3D or
-			eChartType.BarStacked1003D)
-		{
-			Shape = eShape.Box;
-		}
-		else if (
-			type is eChartType.CylinderBarClustered or
-			eChartType.CylinderBarStacked or
-			eChartType.CylinderBarStacked100 or
-			eChartType.CylinderCol or
-			eChartType.CylinderColClustered or
-			eChartType.CylinderColStacked or
-			eChartType.CylinderColStacked100)
-		{
-			Shape = eShape.Cylinder;
-		}
-		else if (
-			type is eChartType.ConeBarClustered or
-			eChartType.ConeBarStacked or
-			eChartType.ConeBarStacked100 or
-			eChartType.ConeCol or
-			eChartType.ConeColClustered or
-			eChartType.ConeColStacked or
-			eChartType.ConeColStacked100)
-		{
-			Shape = eShape.Cone;
-		}
-		else if (
-			type is eChartType.PyramidBarClustered or
-			eChartType.PyramidBarStacked or
-			eChartType.PyramidBarStacked100 or
-			eChartType.PyramidCol or
-			eChartType.PyramidColClustered or
-			eChartType.PyramidColStacked or
-			eChartType.PyramidColStacked100)
-		{
-			Shape = eShape.Pyramid;
-		}
+			eChartType.PyramidColStacked100
+			? eDirection.Column
+			: null;
 	}
+
+	private static eShape? GetShapeForType(eChartType type) => type switch
+	{
+		eChartType.Column3D or
+		eChartType.ColumnClustered3D or
+		eChartType.ColumnStacked3D or
+		eChartType.ColumnStacked1003D or
+		eChartType.BarClustered3D or
+		eChartType.BarStacked3D or
+		eChartType.BarStacked1003D => eShape.Box,
+		eChartType.CylinderBarClustered or
+		eChartType.CylinderBarStacked or
+		eChartType.CylinderBarStacked100 or
+		eChartType.CylinderCol or
+		eChartType.CylinderColClustered or
+		eChartType.CylinderColStacked or
+		eChartType.CylinderColStacked100 => eShape.Cylinder,
+		eChartType.ConeBarClustered or
+		eChartType.ConeBarStacked or
+		eChartType.ConeBarStacked100 or
+		eChartType.ConeCol or
+		eChartType.ConeColClustered or
+		eChartType.ConeColStacked or
+		eChartType.ConeColStacked100 => eShape.Cone,
+		eChartType.PyramidBarClustered or
+		eChartType.PyramidBarStacked or
+		eChartType.PyramidBarStacked100 or
+		eChartType.PyramidCol or
+		eChartType.PyramidColClustered or
+		eChartType.PyramidColStacked or
+		eChartType.PyramidColStacked100 => eShape.Pyramid,
+		_ => null,
+	};
 	#endregion
 	#region "Properties"
 	readonly string _directionPath = "c:barDir/@val";
@@ -191,15 +186,7 @@ public sealed class ExcelBarChart : ExcelChart
 	/// <summary>
 	/// Access to datalabel properties
 	/// </summary>
-	public ExcelChartDataLabel DataLabel
-	{
-		get
-		{
-			_dataLabel ??= new ExcelChartDataLabel(NameSpaceManager, ChartNode);
-
-			return _dataLabel;
-		}
-	}
+	public ExcelChartDataLabel DataLabel => _dataLabel ??= new ExcelChartDataLabel(NameSpaceManager, ChartNode);
 	readonly string _gapWidthPath = "c:gapWidth/@val";
 	/// <summary>
 	/// The size of the gap between two adjacent bars/columns
@@ -217,17 +204,9 @@ public sealed class ExcelBarChart : ExcelChart
 	}
 	#endregion
 	#region "Direction Enum Traslation"
-	private static string GetDirectionText(eDirection direction) => direction switch
-	{
-		eDirection.Bar => "bar",
-		_ => "col",
-	};
+	private static string GetDirectionText(eDirection direction) => direction == eDirection.Bar ? "bar" : "col";
 
-	private static eDirection GetDirectionEnum(string direction) => direction switch
-	{
-		"bar" => eDirection.Bar,
-		_ => eDirection.Column,
-	};
+	private static eDirection GetDirectionEnum(string direction) => direction == "bar" ? eDirection.Bar : eDirection.Column;
 	#endregion
 	#region "Shape Enum Translation"
 	private static string GetShapeText(eShape Shape) => Shape switch
@@ -254,168 +233,47 @@ public sealed class ExcelBarChart : ExcelChart
 	#endregion
 	internal override eChartType GetChartType(string name)
 	{
-		if (name == "barChart")
+		var type = name switch
 		{
-			if (Direction == eDirection.Bar)
-			{
-				if (Grouping == eGrouping.Stacked)
-				{
-					return eChartType.BarStacked;
-				}
-				else
-				{
-					return Grouping == eGrouping.PercentStacked ? eChartType.BarStacked100 : eChartType.BarClustered;
-				}
-			}
-			else
-			{
-				if (Grouping == eGrouping.Stacked)
-				{
-					return eChartType.ColumnStacked;
-				}
-				else
-				{
-					return Grouping == eGrouping.PercentStacked ? eChartType.ColumnStacked100 : eChartType.ColumnClustered;
-				}
-			}
-		}
+			"barChart" => GetBarChartType(),
+			"bar3DChart" => GetBar3DChartType(),
+			_ => null,
+		};
+		return type ?? base.GetChartType(name);
+	}
 
-		if (name == "bar3DChart")
+	private static eChartType? ByGrouping(eGrouping grouping, eChartType stacked, eChartType percentStacked, eChartType clustered, eChartType? otherwise) => grouping switch
+	{
+		eGrouping.Stacked => stacked,
+		eGrouping.PercentStacked => percentStacked,
+		eGrouping.Clustered => clustered,
+		_ => otherwise,
+	};
+
+	private eChartType? GetBarChartType() => Direction == eDirection.Bar
+		? ByGrouping(Grouping, eChartType.BarStacked, eChartType.BarStacked100, eChartType.BarClustered, eChartType.BarClustered)
+		: ByGrouping(Grouping, eChartType.ColumnStacked, eChartType.ColumnStacked100, eChartType.ColumnClustered, eChartType.ColumnClustered);
+
+	// Bar variants of cone, cylinder and pyramid with no grouping fall back to the base type lookup.
+	private eChartType? GetBar3DChartType()
+	{
+		var isBar = Direction == eDirection.Bar;
+		var grouping = Grouping;
+		return Shape switch
 		{
-			#region "Bar Shape"
-			if (Shape == eShape.Box)
-			{
-				if (Direction == eDirection.Bar)
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.BarStacked3D;
-					}
-					else
-					{
-						return Grouping == eGrouping.PercentStacked ? eChartType.BarStacked1003D : eChartType.BarClustered3D;
-					}
-				}
-				else
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.ColumnStacked3D;
-					}
-					else
-					{
-						return Grouping == eGrouping.PercentStacked ? eChartType.ColumnStacked1003D : eChartType.ColumnClustered3D;
-					}
-				}
-			}
-			#endregion
-			#region "Cone Shape"
-			if (Shape is eShape.Cone or eShape.ConeToMax)
-			{
-				if (Direction == eDirection.Bar)
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.ConeBarStacked;
-					}
-					else if (Grouping == eGrouping.PercentStacked)
-					{
-						return eChartType.ConeBarStacked100;
-					}
-					else if (Grouping == eGrouping.Clustered)
-					{
-						return eChartType.ConeBarClustered;
-					}
-				}
-				else
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.ConeColStacked;
-					}
-					else if (Grouping == eGrouping.PercentStacked)
-					{
-						return eChartType.ConeColStacked100;
-					}
-					else
-					{
-						return Grouping == eGrouping.Clustered ? eChartType.ConeColClustered : eChartType.ConeCol;
-					}
-				}
-			}
-			#endregion
-			#region "Cylinder Shape"
-			if (Shape == eShape.Cylinder)
-			{
-				if (Direction == eDirection.Bar)
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.CylinderBarStacked;
-					}
-					else if (Grouping == eGrouping.PercentStacked)
-					{
-						return eChartType.CylinderBarStacked100;
-					}
-					else if (Grouping == eGrouping.Clustered)
-					{
-						return eChartType.CylinderBarClustered;
-					}
-				}
-				else
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.CylinderColStacked;
-					}
-					else if (Grouping == eGrouping.PercentStacked)
-					{
-						return eChartType.CylinderColStacked100;
-					}
-					else
-					{
-						return Grouping == eGrouping.Clustered ? eChartType.CylinderColClustered : eChartType.CylinderCol;
-					}
-				}
-			}
-			#endregion
-			#region "Pyramide Shape"
-			if (Shape is eShape.Pyramid or eShape.PyramidToMax)
-			{
-				if (Direction == eDirection.Bar)
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.PyramidBarStacked;
-					}
-					else if (Grouping == eGrouping.PercentStacked)
-					{
-						return eChartType.PyramidBarStacked100;
-					}
-					else if (Grouping == eGrouping.Clustered)
-					{
-						return eChartType.PyramidBarClustered;
-					}
-				}
-				else
-				{
-					if (Grouping == eGrouping.Stacked)
-					{
-						return eChartType.PyramidColStacked;
-					}
-					else if (Grouping == eGrouping.PercentStacked)
-					{
-						return eChartType.PyramidColStacked100;
-					}
-					else
-					{
-						return Grouping == eGrouping.Clustered ? eChartType.PyramidColClustered : eChartType.PyramidCol;
-					}
-				}
-			}
-			#endregion
-		}
-
-		return base.GetChartType(name);
+			eShape.Box => isBar
+				? ByGrouping(grouping, eChartType.BarStacked3D, eChartType.BarStacked1003D, eChartType.BarClustered3D, eChartType.BarClustered3D)
+				: ByGrouping(grouping, eChartType.ColumnStacked3D, eChartType.ColumnStacked1003D, eChartType.ColumnClustered3D, eChartType.ColumnClustered3D),
+			eShape.Cone or eShape.ConeToMax => isBar
+				? ByGrouping(grouping, eChartType.ConeBarStacked, eChartType.ConeBarStacked100, eChartType.ConeBarClustered, null)
+				: ByGrouping(grouping, eChartType.ConeColStacked, eChartType.ConeColStacked100, eChartType.ConeColClustered, eChartType.ConeCol),
+			eShape.Cylinder => isBar
+				? ByGrouping(grouping, eChartType.CylinderBarStacked, eChartType.CylinderBarStacked100, eChartType.CylinderBarClustered, null)
+				: ByGrouping(grouping, eChartType.CylinderColStacked, eChartType.CylinderColStacked100, eChartType.CylinderColClustered, eChartType.CylinderCol),
+			eShape.Pyramid or eShape.PyramidToMax => isBar
+				? ByGrouping(grouping, eChartType.PyramidBarStacked, eChartType.PyramidBarStacked100, eChartType.PyramidBarClustered, null)
+				: ByGrouping(grouping, eChartType.PyramidColStacked, eChartType.PyramidColStacked100, eChartType.PyramidColClustered, eChartType.PyramidCol),
+			_ => null,
+		};
 	}
 }

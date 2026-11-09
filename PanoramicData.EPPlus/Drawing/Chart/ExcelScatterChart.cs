@@ -75,17 +75,9 @@ public sealed class ExcelScatterChart : ExcelChart
 	}
 	#region "Grouping Enum Translation"
 	readonly string _scatterTypePath = "c:scatterStyle/@val";
-	private static eScatterStyle GetScatterEnum(string text) => text switch
-	{
-		"smoothMarker" => eScatterStyle.SmoothMarker,
-		_ => eScatterStyle.LineMarker,
-	};
+	private static eScatterStyle GetScatterEnum(string text) => text == "smoothMarker" ? eScatterStyle.SmoothMarker : eScatterStyle.LineMarker;
 
-	private static string GetScatterText(eScatterStyle shatterStyle) => shatterStyle switch
-	{
-		eScatterStyle.SmoothMarker => "smoothMarker",
-		_ => "lineMarker",
-	};
+	private static string GetScatterText(eScatterStyle shatterStyle) => shatterStyle == eScatterStyle.SmoothMarker ? "smoothMarker" : "lineMarker";
 	#endregion
 	/// <summary>
 	/// If the scatter has LineMarkers or SmoothMarkers
