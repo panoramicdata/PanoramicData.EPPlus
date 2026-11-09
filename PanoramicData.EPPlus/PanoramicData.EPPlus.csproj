@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>icon.jpg</PackageIcon>
     <PackageProjectUrl>https://github.com/rimland/EPPlus</PackageProjectUrl>
@@ -9,7 +9,7 @@
     <Company></Company>
     <Product>EPPlus Free Edition</Product>
     <Title>Panoramic Data's EPPlus Free Edition</Title>
-    <Description>PanoramicData.EPPlus is an unofficial EPPlus library, targeting .NET 9 and above.</Description>
+    <Description>PanoramicData.EPPlus is an unofficial EPPlus library, targeting .NET 11 and above.</Description>
     <AssemblyName>PanoramicData.EPPlus</AssemblyName>
     <RootNamespace>OfficeOpenXml</RootNamespace>
     <RepositoryUrl>https://github.com/panoramicdata/PanoramicData.EPPlus</RepositoryUrl>
