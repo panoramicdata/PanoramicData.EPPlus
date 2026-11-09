@@ -40,18 +40,14 @@ namespace OfficeOpenXml.Drawing;
 /// </summary>
 public sealed class ExcelDrawingFill : XmlHelper
 {
-	//ExcelShape _shp;                
 	readonly string _fillPath;
-	XmlNode _fillNode;
 	internal ExcelDrawingFill(XmlNamespaceManager nameSpaceManager, XmlNode topNode, string fillPath) :
 		base(nameSpaceManager, topNode)
 	{
-		//  _shp=shp;
 		_fillPath = fillPath;
-		_fillNode = topNode.SelectSingleNode(_fillPath, NameSpaceManager);
+		var fillNode = topNode.SelectSingleNode(_fillPath, NameSpaceManager);
 		SchemaNodeOrder = ["tickLblPos", "spPr", "txPr", "dLblPos", "crossAx", "printSettings", "showVal", "prstGeom", "noFill", "solidFill", "blipFill", "gradFill", "noFill", "pattFill", "ln", "prstDash"];
-		//Setfill node
-		if (_fillNode != null)
+		if (fillNode != null)
 		{
 			_fillTypeNode = topNode.SelectSingleNode("solidFill");
 			_fillTypeNode ??= topNode.SelectSingleNode("noFill");
@@ -61,7 +57,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 		}
 	}
 	eFillStyle _style;
-	readonly XmlNode _fillTypeNode = null;
+	readonly XmlNode _fillTypeNode;
 	/// <summary>
 	/// Fill style
 	/// </summary>
@@ -102,7 +98,6 @@ public sealed class ExcelDrawingFill : XmlHelper
 		}
 
 		CreateNode(_fillPath + "/a:" + GetStyleText(value), false);
-		_fillNode = TopNode.SelectSingleNode(_fillPath + "/a:" + GetStyleText(value), NameSpaceManager);
 	}
 
 	private static eFillStyle GetStyleEnum(string name) => name switch
@@ -144,7 +139,7 @@ public sealed class ExcelDrawingFill : XmlHelper
 			}
 			else if (_style != eFillStyle.SolidFill)
 			{
-				throw new Exception("FillStyle must be set to SolidFill");
+				throw new InvalidOperationException("FillStyle must be set to SolidFill");
 			}
 
 			CreateNode(_fillPath, false);
@@ -171,9 +166,8 @@ public sealed class ExcelDrawingFill : XmlHelper
 			}
 			else if (_style != eFillStyle.SolidFill)
 			{
-				throw new Exception("FillStyle must be set to SolidFill");
+				throw new InvalidOperationException("FillStyle must be set to SolidFill");
 			}
-			//CreateNode(_fillPath, false);
 			SetXmlNodeString(_fillPath + alphaPath, ((100 - value) * 1000).ToString());
 		}
 	}

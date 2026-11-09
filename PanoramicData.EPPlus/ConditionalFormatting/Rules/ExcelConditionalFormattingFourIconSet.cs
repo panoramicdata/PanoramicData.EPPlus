@@ -60,8 +60,8 @@ public class ExcelConditionalFormattingFourIconSet
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 	  : base(
 		eExcelConditionalFormattingRuleType.FourIconSet,
 		address,
@@ -72,71 +72,13 @@ public class ExcelConditionalFormattingFourIconSet
 	{
 		if (itemElementNode != null && itemElementNode.HasChildNodes)
 		{
-			var iconNode4 = TopNode.SelectSingleNode("d:iconSet/d:cfvo[position()=4]", NameSpaceManager);
-			Icon4 = new ExcelConditionalFormattingIconDataBarValue(
-					eExcelConditionalFormattingRuleType.FourIconSet,
-					address,
-					worksheet,
-					iconNode4,
-					namespaceManager);
+			Icon4 = LoadIcon(4, eExcelConditionalFormattingRuleType.FourIconSet, address, worksheet, namespaceManager);
 		}
 		else
 		{
 			var iconSetNode = TopNode.SelectSingleNode("d:iconSet", NameSpaceManager);
-			var iconNode4 = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(iconNode4);
-
-
-			Icon4 = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Percent,
-					75,
-					"",
-					eExcelConditionalFormattingRuleType.ThreeIconSet,
-					address,
-					priority,
-					worksheet,
-					iconNode4,
-					namespaceManager);
+			Icon4 = AppendDefaultIcon(iconSetNode, 75, address, priority, worksheet, namespaceManager);
 		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingFourIconSet(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		itemElementNode,
-		null)
-	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingFourIconSet(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		null,
-		null)
-	{
 	}
 	#endregion Constructors
 

@@ -71,18 +71,10 @@ public sealed class ExcelPieChartSerie : ExcelChartSerie
 			SetXmlNodeString(explosionPath, value.ToString());
 		}
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// DataLabels
 	/// </summary>
-	public ExcelChartSerieDataLabel DataLabel
-	{
-		get
-		{
-			_DataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
-
-			return _DataLabel;
-		}
-	}
+	public ExcelChartSerieDataLabel DataLabel => GetDataLabel(ref _DataLabel);
 
 }

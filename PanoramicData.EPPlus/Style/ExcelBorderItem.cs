@@ -61,7 +61,7 @@ public sealed class ExcelBorderItem : StyleBase
 			_ChangedEvent(this, new StyleChangeEventArgs(_cls, eStyleProperty.Style, value, _positionID, _address));
 		}
 	}
-	ExcelColor _color = null;
+	ExcelColor _color;
 	/// <summary>
 	/// The color of the border
 	/// </summary>
@@ -88,7 +88,7 @@ public sealed class ExcelBorderItem : StyleBase
 			eStyleClass.BorderLeft => _styles.Borders[ix].Left,
 			eStyleClass.BorderRight => _styles.Borders[ix].Right,
 			eStyleClass.BorderDiagonal => _styles.Borders[ix].Diagonal,
-			_ => throw new Exception("Invalid class for Borderitem"),
+			_ => throw new InvalidOperationException("Invalid class for Borderitem"),
 		};
 	}
 }

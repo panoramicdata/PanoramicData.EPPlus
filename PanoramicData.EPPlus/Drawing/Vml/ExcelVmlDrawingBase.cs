@@ -30,6 +30,8 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Xml;
 
 namespace OfficeOpenXml.Drawing.Vml;
@@ -102,6 +104,8 @@ public class ExcelVmlDrawingBase : XmlHelper
 		}
 	}
 	#region "Style Handling methods"
+	[SuppressMessage("Minor Code Smell", "S3874:\"out\" and \"ref\" parameters should not be used", Justification = "Protected member of a published type; the signature is public API.")]
+	[SuppressMessage("Major Code Smell", "S2692:\"IndexOf\" checks should not be for positive numbers", Justification = "A leading colon is deliberately not treated as a key separator.")]
 	protected static bool GetStyle(string style, string key, out string value)
 	{
 		var styles = style.Split(';');
@@ -129,38 +133,39 @@ public class ExcelVmlDrawingBase : XmlHelper
 	protected static string SetStyle(string style, string key, string value)
 	{
 		var styles = style.Split([';'], StringSplitOptions.RemoveEmptyEntries);
-		var newStyle = "";
+		var newStyle = new StringBuilder();
 		var changed = false;
 		foreach (var s in styles)
 		{
 			var split = s.Split(':');
 			if (split[0].Trim() == key)
 			{
-				if (value.Trim() != "") //If blank remove the item
+				// A blank value removes the item
+				if (value.Trim() != "")
 				{
-					newStyle += key + ':' + value;
+					newStyle.Append(key).Append(':').Append(value);
 				}
 
 				changed = true;
 			}
 			else
 			{
-				newStyle += s;
+				newStyle.Append(s);
 			}
 
-			newStyle += ';';
+			newStyle.Append(';');
 		}
 
 		if (!changed)
 		{
-			newStyle += key + ':' + value;
+			newStyle.Append(key).Append(':').Append(value);
 		}
 		else
 		{
-			newStyle = newStyle[..^1];
+			newStyle.Length--;
 		}
 
-		return newStyle;
+		return newStyle.ToString();
 	}
 	#endregion
 }

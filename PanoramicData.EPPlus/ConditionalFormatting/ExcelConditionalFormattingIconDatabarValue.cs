@@ -85,47 +85,7 @@ public class ExcelConditionalFormattingIconDataBarValue
 	{
 		Require.Argument(priority).IsInRange(1, int.MaxValue, "priority");
 
-		// Check if the parent does not exists
-		if (itemElementNode == null)
-		{
-			// Get the parent node path by the rule type
-			var parentNodePath = ExcelConditionalFormattingValueObjectType.GetParentPathByRuleType(
-				ruleType);
-
-			// Check for en error (rule type does not have <cfvo>)
-			if (parentNodePath == string.Empty)
-			{
-				throw new Exception(
-					ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
-			}
-
-			// Point to the <cfvo> parent node
-			itemElementNode = _worksheet.WorksheetXml.SelectSingleNode(
-						string.Format(
-							"//{0}[{1}='{2}']/{3}[{4}='{5}']/{6}",
-							// {0}
-							ExcelConditionalFormattingConstants.Paths.ConditionalFormatting,
-							// {1}
-							ExcelConditionalFormattingConstants.Paths.SqrefAttribute,
-							// {2}
-							address.Address,
-							// {3}
-							ExcelConditionalFormattingConstants.Paths.CfRule,
-							// {4}
-							ExcelConditionalFormattingConstants.Paths.PriorityAttribute,
-							// {5}
-							priority,
-							// {6}
-							parentNodePath),
-						_worksheet.NameSpaceManager);
-
-			// Check for en error (rule type does not have <cfvo>)
-			if (itemElementNode == null)
-			{
-				throw new Exception(
-					ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
-			}
-		}
+		itemElementNode ??= ExcelConditionalFormattingValueObjectType.GetCfvoParentNode(_worksheet, ruleType, address, priority);
 
 		TopNode = itemElementNode;
 
@@ -176,7 +136,7 @@ public class ExcelConditionalFormattingIconDataBarValue
 			// Check for en error (rule type does not have <cfvo>)
 			if (parentNodePath == string.Empty)
 			{
-				throw new Exception(
+				throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingCfvoParentNode);
 			}
 		}

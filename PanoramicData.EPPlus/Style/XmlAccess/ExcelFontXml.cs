@@ -30,6 +30,8 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Xml;
@@ -127,14 +129,14 @@ public sealed class ExcelFontXml : StyleXmlHelper
 	{
 		get
 		{
-			return (_family == int.MinValue ? 0 : _family); ;
+			return _family == int.MinValue ? 0 : _family;
 		}
 		set
 		{
 			_family = value;
 		}
 	}
-	ExcelColorXml _color = null;
+	ExcelColorXml _color;
 	const string _colorPath = "d:color";
 	/// <summary>
 	/// Text color
@@ -267,39 +269,43 @@ public sealed class ExcelFontXml : StyleXmlHelper
 		return FontSize.FontHeights.ContainsKey(name) ? GetHeightByName(name, size) : GetHeightByName("Calibri", size);
 	}
 
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Sizes are exact table keys and -1 or MaxValue are sentinels, so exact comparison is intended.")]
 	private static float GetHeightByName(string name, float size)
 	{
-		if (FontSize.FontHeights[name].TryGetValue(size, out var value))
+		var heights = FontSize.FontHeights[name];
+		if (heights.TryGetValue(size, out var value))
 		{
 			return value.Height;
 		}
-		else
+
+		var (min, max) = FindNearestSizes(heights.Keys, size);
+		if (min == max || max == float.MaxValue)
 		{
-			float min = -1, max = float.MaxValue;
-			foreach (var h in FontSize.FontHeights[name])
-			{
-				if (min < h.Key && h.Key < size)
-				{
-					min = h.Key;
-				}
+			return Convert.ToSingle(heights[min].Height);
+		}
 
-				if (max > h.Key && h.Key > size)
-				{
-					max = h.Key;
-				}
+		return min == -1
+			? Convert.ToSingle(heights[max].Height)
+			: Convert.ToSingle(heights[min].Height + (heights[max].Height - heights[min].Height) * ((size - min) / (max - min)));
+	}
+
+	private static (float Min, float Max) FindNearestSizes(IEnumerable<float> sizes, float size)
+	{
+		float min = -1, max = float.MaxValue;
+		foreach (var key in sizes)
+		{
+			if (min < key && key < size)
+			{
+				min = key;
 			}
 
-			if (min == max || max == float.MaxValue)
+			if (max > key && key > size)
 			{
-				return Convert.ToSingle(FontSize.FontHeights[name][min].Height);
-			}
-			else
-			{
-				return min == -1
-					? Convert.ToSingle(FontSize.FontHeights[name][max].Height)
-					: Convert.ToSingle(FontSize.FontHeights[name][min].Height + (FontSize.FontHeights[name][max].Height - FontSize.FontHeights[name][min].Height) * ((size - min) / (max - min)));
+				max = key;
 			}
 		}
+
+		return (min, max);
 	}
 	internal ExcelFontXml Copy()
 	{
@@ -322,32 +328,9 @@ public sealed class ExcelFontXml : StyleXmlHelper
 	{
 		TopNode = topElement;
 
-		if (_bold)
-		{
-			CreateNode(boldPath);
-		}
-		else
-		{
-			DeleteAllNode(boldPath);
-		}
-
-		if (_italic)
-		{
-			CreateNode(italicPath);
-		}
-		else
-		{
-			DeleteAllNode(italicPath);
-		}
-
-		if (_strike)
-		{
-			CreateNode(strikePath);
-		}
-		else
-		{
-			DeleteAllNode(strikePath);
-		}
+		SetFlagNode(boldPath, _bold);
+		SetFlagNode(italicPath, _italic);
+		SetFlagNode(strikePath, _strike);
 
 		if (_underlineType == ExcelUnderLineType.None)
 		{
@@ -391,9 +374,21 @@ public sealed class ExcelFontXml : StyleXmlHelper
 
 		if (_scheme != "")
 		{
-			SetXmlNodeString(schemePath, _scheme.ToString());
+			SetXmlNodeString(schemePath, _scheme);
 		}
 
 		return TopNode;
+	}
+
+	private void SetFlagNode(string path, bool value)
+	{
+		if (value)
+		{
+			CreateNode(path);
+		}
+		else
+		{
+			DeleteAllNode(path);
+		}
 	}
 }

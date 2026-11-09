@@ -73,10 +73,9 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			return true; //Equal
 		}
 	}
-	//internal List<ImageCompare> _pics = new List<ImageCompare>();
 	internal Dictionary<string, string> _hashes = [];
 	internal ExcelPackage _package;
-	internal Packaging.ZipPackageRelationship _drawingRelation = null;
+	internal Packaging.ZipPackageRelationship _drawingRelation;
 	internal ExcelDrawings(ExcelPackage xlPackage, ExcelWorksheet sheet)
 	{
 		_drawingsXml = new XmlDocument
@@ -154,7 +153,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <summary>
 	/// Provides access to a namespace manager instance to allow XPath searching
 	/// </summary>
-	XmlNamespaceManager _nsManager = null;
+	XmlNamespaceManager _nsManager;
 	public XmlNamespaceManager NameSpaceManager => _nsManager;
 	#endregion
 	#region IEnumerable Members
@@ -192,9 +191,9 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		}
 	}
 	public int Count => _drawings == null ? 0 : _drawings.Count;
-	Packaging.ZipPackagePart _part = null;
+	Packaging.ZipPackagePart _part;
 	internal Packaging.ZipPackagePart Part => _part;
-	Uri _uriDrawing = null;
+	Uri _uriDrawing;
 	public Uri UriDrawing => _uriDrawing;
 	#endregion
 	
@@ -211,7 +210,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	{
 		if (_drawingNames.ContainsKey(Name))
 		{
-			throw new Exception("Name already exists in the drawings collection");
+			throw new InvalidOperationException("Name already exists in the drawings collection");
 		}
 
 		if (ChartType is eChartType.StockHLC or
@@ -335,23 +334,13 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 	private ExcelPicture AddPictureCore(string Name, Func<XmlElement, ExcelPicture> create)
 	{
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new Exception("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 		drawNode.SetAttribute("editAs", "oneCell");
 		var pic = create(drawNode);
 		pic.Name = Name;
-		_drawings.Add(pic);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return pic;
+		return AddToCollection(pic, Name);
 	}
 
 	/// <summary>
@@ -388,15 +377,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			throw new ArgumentOutOfRangeException(WidthPixels <= 0 ? nameof(WidthPixels) : nameof(HeightPixels), "AddPicture: pixel dimensions must be positive");
 		}
 
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new Exception("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 		drawNode.SetAttribute("editAs", "oneCell");
@@ -404,9 +385,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		{
 			Name = Name
 		};
-		_drawings.Add(pic);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return pic;
+		return AddToCollection(pic, Name);
 	}
 
 	/// <summary>
@@ -418,15 +397,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 	public ExcelShape AddShape(string Name, eShapeStyle Style)
 	{
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new Exception("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 
@@ -435,9 +406,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			Name = Name,
 			Style = Style
 		};
-		_drawings.Add(shape);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return shape;
+		return AddToCollection(shape, Name);
 	}
 	/// <summary>
 	/// Add a new shape to the worksheet
@@ -447,15 +416,7 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 	/// <returns>The shape object</returns>
 	public ExcelShape AddShape(string Name, ExcelShape Source)
 	{
-		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
-		{
-			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
-		}
-
-		if (_drawingNames.ContainsKey(Name))
-		{
-			throw new Exception("Name already exists in the drawings collection");
-		}
+		EnsureCanAddDrawing(Name);
 
 		var drawNode = CreateDrawingXml();
 		drawNode.InnerXml = Source.TopNode.InnerXml;
@@ -465,10 +426,28 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 			Name = Name,
 			Style = Source.Style
 		};
-		_drawings.Add(shape);
-		_drawingNames.Add(Name, _drawings.Count - 1);
-		return shape;
+		return AddToCollection(shape, Name);
 	}
+	private void EnsureCanAddDrawing(string name)
+	{
+		if (Worksheet is ExcelChartsheet && _drawings.Count > 0)
+		{
+			throw new InvalidOperationException("Chart worksheets can't have more than one drawing");
+		}
+
+		if (_drawingNames.ContainsKey(name))
+		{
+			throw new InvalidOperationException("Name already exists in the drawings collection");
+		}
+	}
+
+	private T AddToCollection<T>(T drawing, string name) where T : ExcelDrawing
+	{
+		_drawings.Add(drawing);
+		_drawingNames.Add(name, _drawings.Count - 1);
+		return drawing;
+	}
+
 	private XmlElement CreateDrawingXml()
 	{
 		if (DrawingXml.DocumentElement == null)
@@ -493,10 +472,8 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 
 			_drawingRelation = Worksheet.Part.CreateRelationship(UriHelper.GetRelativeUri(Worksheet.WorksheetUri, _uriDrawing), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/drawing");
 			var e = (XmlElement)Worksheet.CreateNode("d:drawing");
-			//XmlElement e = Worksheet.WorksheetXml.SelectSingleNode("d:drawing", );
 			e.SetAttribute("id", ExcelPackage.schemaRelationships, _drawingRelation.Id);
 
-			//Worksheet.WorksheetXml.DocumentElement.AppendChild(e);
 			Packaging.ZipPackage.Flush();
 		}
 
@@ -519,12 +496,10 @@ public class ExcelDrawings : IEnumerable<ExcelDrawing>, IDisposable
 		{
 			drawNode = _drawingsXml.CreateElement("xdr", "twoCellAnchor", ExcelPackage.schemaSheetDrawings);
 			colNode.AppendChild(drawNode);
-			//Add from position Element;
 			var fromNode = _drawingsXml.CreateElement("xdr", "from", ExcelPackage.schemaSheetDrawings);
 			drawNode.AppendChild(fromNode);
 			fromNode.InnerXml = "<xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>0</xdr:rowOff>";
 
-			//Add to position Element;
 			var toNode = _drawingsXml.CreateElement("xdr", "to", ExcelPackage.schemaSheetDrawings);
 			drawNode.AppendChild(toNode);
 			toNode.InnerXml = "<xdr:col>10</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>10</xdr:row><xdr:rowOff>0</xdr:rowOff>";

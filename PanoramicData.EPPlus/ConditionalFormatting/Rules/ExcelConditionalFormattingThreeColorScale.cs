@@ -74,8 +74,8 @@ public class ExcelConditionalFormattingThreeColorScale
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 	  : base(
 		eExcelConditionalFormattingRuleType.ThreeColorScale,
 		address,
@@ -87,22 +87,11 @@ public class ExcelConditionalFormattingThreeColorScale
 		if (itemElementNode == null)
 		{
 			// Create the <colorScale> node inside the <cfRule> node
-			var colorScaleNode = CreateComplexNode(
+			CreateComplexNode(
 			  Node,
 			  ExcelConditionalFormattingConstants.Paths.ColorScale);
 
-			// LowValue default
-			LowValue = new ExcelConditionalFormattingColorScaleValue(
-			  eExcelConditionalFormattingValueObjectPosition.Low,
-			  eExcelConditionalFormattingValueObjectType.Min,
-			  ExcelConditionalFormattingConstants.Colors.CfvoLowValue,
-			  eExcelConditionalFormattingRuleType.ThreeColorScale,
-			  address,
-			  priority,
-			  worksheet,
-			  NameSpaceManager);
-
-			// MiddleValue default
+			LowValue = ExcelConditionalFormattingColorScaleValue.CreateDefaultLow(eExcelConditionalFormattingRuleType.ThreeColorScale, address, priority, worksheet, NameSpaceManager);
 			MiddleValue = new ExcelConditionalFormattingColorScaleValue(
 			  eExcelConditionalFormattingValueObjectPosition.Middle,
 			  eExcelConditionalFormattingValueObjectType.Percent,
@@ -115,57 +104,8 @@ public class ExcelConditionalFormattingThreeColorScale
 			  worksheet,
 			  NameSpaceManager);
 
-			// HighValue default
-			HighValue = new ExcelConditionalFormattingColorScaleValue(
-			  eExcelConditionalFormattingValueObjectPosition.High,
-			  eExcelConditionalFormattingValueObjectType.Max,
-			  ExcelConditionalFormattingConstants.Colors.CfvoHighValue,
-			  eExcelConditionalFormattingRuleType.ThreeColorScale,
-			  address,
-			  priority,
-			  worksheet,
-			  NameSpaceManager);
+			HighValue = ExcelConditionalFormattingColorScaleValue.CreateDefaultHigh(eExcelConditionalFormattingRuleType.ThreeColorScale, address, priority, worksheet, NameSpaceManager);
 		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingThreeColorScale(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		itemElementNode,
-		null)
-	{
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingThreeColorScale(
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-	  : this(
-		address,
-		priority,
-		worksheet,
-		null,
-		null)
-	{
 	}
 	#endregion Constructors
 

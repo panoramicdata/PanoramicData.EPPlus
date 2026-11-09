@@ -37,11 +37,11 @@ namespace OfficeOpenXml.Style.XmlAccess;
 /// </summary>
 public abstract class StyleXmlHelper : XmlHelper
 {
-	internal StyleXmlHelper(XmlNamespaceManager nameSpaceManager) : base(nameSpaceManager)
+	private protected StyleXmlHelper(XmlNamespaceManager nameSpaceManager) : base(nameSpaceManager)
 	{
 
 	}
-	internal StyleXmlHelper(XmlNamespaceManager nameSpaceManager, XmlNode topNode) : base(nameSpaceManager, topNode)
+	private protected StyleXmlHelper(XmlNamespaceManager nameSpaceManager, XmlNode topNode) : base(nameSpaceManager, topNode)
 	{
 	}
 	internal abstract XmlNode CreateXmlNode(XmlNode top);
@@ -49,7 +49,7 @@ public abstract class StyleXmlHelper : XmlHelper
 	{
 		get;
 	}
-	internal long useCnt = 0;
+	internal long useCnt;
 	internal int newID = int.MinValue;
 	protected bool GetBoolValue(XmlNode topNode, string path)
 	{

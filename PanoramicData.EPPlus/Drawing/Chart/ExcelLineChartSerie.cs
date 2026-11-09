@@ -52,20 +52,11 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 		base(chartSeries, ns, node, isPivot)
 	{
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabels
 	/// </summary>
-	public ExcelChartSerieDataLabel DataLabel
-	{
-		get
-		{
-			_DataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
-
-			return _DataLabel;
-		}
-	}
-	const string markerPath = "c:marker/c:symbol/@val";
+	public ExcelChartSerieDataLabel DataLabel => GetDataLabel(ref _DataLabel);
 	/// <summary>
 	/// Marker symbol 
 	/// </summary>
@@ -73,12 +64,11 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var marker = GetXmlNodeString(markerPath);
-			return marker == "" ? eMarkerStyle.None : Enum.Parse<eMarkerStyle>(marker, true);
+			return GetMarker();
 		}
 		set
 		{
-			SetXmlNodeString(markerPath, value.ToString().ToLower(CultureInfo.InvariantCulture));
+			SetMarker(value);
 		}
 	}
 	const string smoothPath = "c:smooth/@val";
@@ -119,7 +109,6 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 			SetXmlNodeString(LINECOLOR_PATH, value.ToArgb().ToString("X")[2..], true);
 		}
 	}
-	readonly string MARKERSIZE_PATH = "c:marker/c:size/@val";
 	/// <summary>
 	/// Gets or sets the size of the marker.
 	/// </summary>
@@ -135,18 +124,13 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var size = GetXmlNodeString(MARKERSIZE_PATH);
-			return size == "" ? 5 : Int32.Parse(GetXmlNodeString(MARKERSIZE_PATH));
+			return GetMarkerSize();
 		}
 		set
 		{
-			var size = value;
-			size = Math.Max(2, size);
-			size = Math.Min(72, size);
-			SetXmlNodeString(MARKERSIZE_PATH, size.ToString(), true);
+			SetMarkerSize(value);
 		}
 	}
-	readonly string LINEWIDTH_PATH = "c:spPr/a:ln/@w";
 	/// <summary>
 	/// Gets or sets the width of the line in pt.
 	/// </summary>
@@ -158,12 +142,11 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 	{
 		get
 		{
-			var size = GetXmlNodeString(LINEWIDTH_PATH);
-			return size == "" ? 2.25 : double.Parse(GetXmlNodeString(LINEWIDTH_PATH)) / 12700;
+			return GetLineWidth();
 		}
 		set
 		{
-			SetXmlNodeString(LINEWIDTH_PATH, ((int)(12700 * value)).ToString(), true);
+			SetLineWidth(value);
 		}
 	}
 	//marker line color
@@ -188,6 +171,4 @@ public sealed class ExcelLineChartSerie : ExcelChartSerie
 			SetXmlNodeString(MARKERLINECOLOR_PATH, value.ToArgb().ToString("X")[2..], true);
 		}
 	}
-
-
 }
