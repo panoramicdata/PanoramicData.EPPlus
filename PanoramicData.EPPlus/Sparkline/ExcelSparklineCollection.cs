@@ -87,9 +87,9 @@ public class ExcelSparklineCollection : IEnumerable<ExcelSparkline>
 		_slg.TopNode.AppendChild(sls);
 		var sl = new ExcelSparkline(_slg.NameSpaceManager, sparkline)
 		{
-			Cell = cell,
-			RangeAddress = sqref
+			Cell = cell
 		};
+		sl.SetRangeAddress(sqref);
 		_lst.Add(sl);
 	}
 }
