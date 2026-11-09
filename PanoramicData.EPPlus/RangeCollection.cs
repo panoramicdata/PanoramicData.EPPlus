@@ -5,20 +5,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*******************************************************************************
  * You may amend and distribute as you like, but don't remove this header!
  *
@@ -60,7 +46,7 @@ namespace OfficeOpenXml;
 /// This is the store for all Rows, Columns and Cells.
 /// It is a Dictionary implementation that allows you to change the Key (the RowID, ColumnID or CellID )
 /// </summary>
-internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
+internal partial class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 {
 	private class IndexItem
 	{
@@ -81,10 +67,8 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 	/// </summary>
 	internal class Compare : IComparer<IndexItem>
 	{
-		#region IComparer<IndexItem> Members
 		int IComparer<IndexItem>.Compare(IndexItem x, IndexItem y) => x.RangeID < y.RangeID ? -1 : x.RangeID > y.RangeID ? 1 : 0;
 
-		#endregion
 	}
 	IndexItem[] _cellIndex;
 	List<IRangeID> _cells;
@@ -169,100 +153,6 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 	internal int IndexOf(ulong key) => Array.BinarySearch<IndexItem>(_cellIndex, 0, _cells.Count, new IndexItem(key), _comparer);
 	internal bool ContainsKey(ulong key) => IndexOf(key) >= 0;
 	int _size { get; set; }
-	#region "RangeID manipulation methods"
-	/// <summary>
-	/// Insert a number of rows in the collecion but dont update the cell only the index
-	/// </summary>
-	/// <param name="rowID"></param>
-	/// <param name="rows"></param>
-	/// <returns>Index of first rangeItem</returns>
-	internal int InsertRowsUpdateIndex(ulong rowID, int rows)
-	{
-		var index = IndexOf(rowID);
-		if (index < 0)
-		{
-			index = ~index; //No match found invert to get start cell
-		}
-
-		var rowAdd = (((ulong)rows) << 29);
-		for (var i = index; i < _cells.Count; i++)
-		{
-			_cellIndex[i].RangeID += rowAdd;
-		}
-
-		return index;
-	}
-	/// <summary>
-	/// Insert a number of rows in the collecion
-	/// </summary>
-	/// <param name="rowID"></param>
-	/// <param name="rows"></param>
-	/// <returns>Index of first rangeItem</returns>
-	internal int InsertRows(ulong rowID, int rows)
-	{
-		var index = IndexOf(rowID);
-		if (index < 0)
-		{
-			index = ~index; //No match found invert to get start cell
-		}
-
-		var rowAdd = (((ulong)rows) << 29);
-		for (var i = index; i < _cells.Count; i++)
-		{
-			_cellIndex[i].RangeID += rowAdd;
-			_cells[_cellIndex[i].ListPointer].RangeID += rowAdd;
-		}
-
-		return index;
-	}
-	/// <summary>
-	/// Delete rows from the collecion
-	/// </summary>
-	/// <param name="rowID"></param>
-	/// <param name="rows"></param>
-	/// <param name="updateCells">Update range id's on cells</param>
-	internal int DeleteRows(ulong rowID, int rows, bool updateCells)
-	{
-		var rowAdd = (((ulong)rows) << 29);
-		var index = IndexOf(rowID);
-		if (index < 0)
-		{
-			index = ~index; //No match found invert to get start cell
-		}
-
-		if (index >= _cells.Count || _cellIndex[index] == null)
-		{
-			return -1;   //No row above this row
-		}
-
-		while (index < _cells.Count && _cellIndex[index].RangeID < rowID + rowAdd)
-		{
-			Delete(_cellIndex[index].RangeID);
-		}
-
-		var updIndex = IndexOf(rowID + rowAdd);
-		if (updIndex < 0)
-		{
-			updIndex = ~updIndex; //No match found invert to get start cell
-		}
-
-		for (var i = updIndex; i < _cells.Count; i++)
-		{
-			_cellIndex[i].RangeID -= rowAdd;                        //Change the index
-			if (updateCells)
-			{
-				_cells[_cellIndex[i].ListPointer].RangeID -= rowAdd;    //Change the cell/row or column object
-			}
-		}
-
-		return index;
-	}
-	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
-	internal static void InsertColumn(ulong ColumnID, int columns) => throw new Exception("Working on it...");
-	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
-	internal static void DeleteColumn(ulong ColumnID, int columns) => throw new Exception("Working on it...");
-	#endregion
-	#region "Private Methods"
 	/// <summary>
 	/// Init the size starting from 128 items. Double the size until the list fits.
 	/// </summary>
@@ -295,21 +185,11 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 		_cellIndex[ix] = new IndexItem(cell.RangeID, _cells.Count);
 		_cells.Add(cell);
 	}
-	#endregion
-
-	#region IEnumerator<IRangeID> Members
 
 	IRangeID IEnumerator<IRangeID>.Current => throw new NotImplementedException();
 
-	#endregion
-
-	#region IDisposable for the enumerator Members
-
 	void IDisposable.Dispose() => _ix = -1;
 
-	#endregion
-
-	#region IEnumerator Members
 	int _ix = -1;
 	object IEnumerator.Current => _cells[_cellIndex[_ix].ListPointer];
 
@@ -321,11 +201,6 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 
 	void IEnumerator.Reset() => _ix = -1;
 
-	#endregion
-
-	#region IEnumerable Members
-
 	IEnumerator IEnumerable.GetEnumerator() => MemberwiseClone() as IEnumerator;
 
-	#endregion
 }

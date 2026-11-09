@@ -30,211 +30,19 @@
  * Jan Källman                      Total rewrite               2010-03-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  * *******************************************************************************/
-using OfficeOpenXml.Compatibility;
-using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Vml;
 using OfficeOpenXml.Utils;
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Xml;
 
 namespace OfficeOpenXml;
 
 /// <summary>
-/// How a picture will be aligned in the header/footer
-/// </summary>
-public enum PictureAlignment
-{
-	/// <summary>
-	/// The picture will be added to the left aligned text
-	/// </summary>
-	Left,
-	/// <summary>
-	/// The picture will be added to the centered text
-	/// </summary>
-	Centered,
-	/// <summary>
-	/// The picture will be added to the right aligned text
-	/// </summary>
-	Right
-}
-#region class ExcelHeaderFooterText
-/// <summary>
-/// Print header and footer 
-/// </summary>
-[SuppressMessage("Minor Code Smell", "S1104:Fields should not have public accessibility", Justification = "Public API: the text fields are published; converting them to properties would break binary compatibility.")]
-[SuppressMessage("Minor Code Smell", "S2357:Fields should be private", Justification = "Public API: the text fields are published; converting them to properties would break binary compatibility.")]
-public class ExcelHeaderFooterText
-{
-	readonly ExcelWorksheet _ws;
-	readonly string _hf;
-	internal ExcelHeaderFooterText(XmlNode TextNode, ExcelWorksheet ws, string hf)
-	{
-		_ws = ws;
-		_hf = hf;
-		if (TextNode == null || string.IsNullOrEmpty(TextNode.InnerText))
-		{
-			return;
-		}
-
-		var text = TextNode.InnerText;
-		var code = text[..2];
-		var startPos = 2;
-		var pos = startPos;
-		while (pos < text.Length - 2)
-		{
-			var newCode = text.Substring(pos, 2);
-			if (newCode is "&C" or "&R")
-			{
-				SetText(code, text[startPos..pos]);
-				startPos = pos + 2;
-				pos = startPos;
-				code = newCode;
-			}
-
-			pos++;
-		}
-
-		SetText(code, text[startPos..]);
-	}
-	private void SetText(string code, string text)
-	{
-		switch (code)
-		{
-			case "&L":
-				LeftAlignedText = text;
-				break;
-			case "&C":
-				CenteredText = text;
-				break;
-			default:
-				RightAlignedText = text;
-				break;
-		}
-	}
-	/// <summary>
-	/// Get/set the text to appear on the left hand side of the header (or footer) on the worksheet.
-	/// </summary>
-	public string LeftAlignedText;
-	/// <summary>
-	/// Get/set the text to appear in the center of the header (or footer) on the worksheet.
-	/// </summary>
-	public string CenteredText;
-	/// <summary>
-	/// Get/set the text to appear on the right hand side of the header (or footer) on the worksheet.
-	/// </summary>
-	public string RightAlignedText;
-	/// <summary>
-	/// Inserts a picture at the end of the text in the header or footer
-	/// </summary>
-	/// <param name="Picture">The image file's bytes (PNG, JPEG, GIF, BMP, TIFF, EMF or WMF)</param>
-	/// <param name="Alignment">Alignment. The image object will be inserted at the end of the Text.</param>
-	public ExcelVmlDrawingPicture InsertPicture(byte[] Picture, PictureAlignment Alignment)
-	{
-		ArgumentNullException.ThrowIfNull(Picture);
-		// Read the header first: ValidateImage appends the picture placeholder to the section text,
-		// which must not happen for data that is rejected.
-		var header = ReadHeader(Picture);
-		var id = ValidateImage(Alignment);
-		var contentType = header.ContentType;
-		var uriPic = XmlHelper.GetNewUri(_ws._package.Package, "/xl/media/image{0}" + ExcelPicture.GetExtension(contentType));
-		var ii = _ws.Workbook._package.AddImage(Picture, uriPic, contentType);
-
-		return AddImage(header, id, ii);
-	}
-	/// <summary>
-	/// Inserts a picture at the end of the text in the header or footer
-	/// </summary>
-	/// <param name="Picture">A stream containing the image file. It is read to the end.</param>
-	/// <param name="Alignment">Alignment. The image object will be inserted at the end of the Text.</param>
-	public ExcelVmlDrawingPicture InsertPicture(Stream Picture, PictureAlignment Alignment)
-	{
-		ArgumentNullException.ThrowIfNull(Picture);
-		using var ms = new MemoryStream();
-		Picture.CopyTo(ms);
-		return InsertPicture(ms.ToArray(), Alignment);
-	}
-	/// <summary>
-	/// Inserts a picture at the end of the text in the header or footer
-	/// </summary>
-	/// <param name="PictureFile">The image file</param>
-	/// <param name="Alignment">Alignment. The image object will be inserted at the end of the Text.</param>
-	public ExcelVmlDrawingPicture InsertPicture(FileInfo PictureFile, PictureAlignment Alignment)
-	{
-		ArgumentNullException.ThrowIfNull(PictureFile);
-		byte[] imgBytes;
-		ImageHeaderInfo header;
-		try
-		{
-			if (!PictureFile.Exists)
-			{
-				throw new FileNotFoundException(string.Format("{0} is missing", PictureFile.FullName));
-			}
-
-			imgBytes = File.ReadAllBytes(PictureFile.FullName);
-			header = ReadHeader(imgBytes);
-		}
-		catch (Exception ex)
-		{
-			throw new InvalidDataException("File is not a supported image-file or is corrupt", ex);
-		}
-
-		var id = ValidateImage(Alignment);
-		var contentType = ExcelPicture.GetContentType(PictureFile.Extension);
-		var uriPic = XmlHelper.GetNewUri(_ws._package.Package, "/xl/media/" + PictureFile.Name[..^PictureFile.Extension.Length] + "{0}" + PictureFile.Extension);
-
-		var ii = _ws.Workbook._package.AddImage(imgBytes, uriPic, contentType);
-
-		return AddImage(header, id, ii);
-	}
-
-	private static ImageHeaderInfo ReadHeader(byte[] bytes) => ImageHeaderReader.Read(bytes);
-
-	private ExcelVmlDrawingPicture AddImage(ImageHeaderInfo Picture, string id, ExcelPackage.ImageInfo ii)
-	{
-		double width = Picture.Width * 72 / Picture.HorizontalResolution,      //Pixel --> Points
-			   height = Picture.Height * 72 / Picture.VerticalResolution;      //Pixel --> Points
-																			   //Add VML-drawing            
-		return _ws.HeaderFooter.Pictures.Add(id, ii.Uri, "", width, height);
-	}
-	private string ValidateImage(PictureAlignment Alignment)
-	{
-		var id = string.Concat(Alignment.ToString()[0], _hf);
-		foreach (ExcelVmlDrawingPicture image in _ws.HeaderFooter.Pictures)
-		{
-			if (image.Id == id)
-			{
-				throw new InvalidOperationException("A picture already exists in this section");
-			}
-		}
-		//Add the image placeholder to the end of the text
-		switch (Alignment)
-		{
-			case PictureAlignment.Left:
-				LeftAlignedText += ExcelHeaderFooter.Image;
-				break;
-			case PictureAlignment.Centered:
-				CenteredText += ExcelHeaderFooter.Image;
-				break;
-			default:
-				RightAlignedText += ExcelHeaderFooter.Image;
-				break;
-		}
-
-		return id;
-	}
-}
-#endregion
-
-#region ExcelHeaderFooter
-/// <summary>
 /// Represents the Header and Footer on an Excel Worksheet
 /// </summary>
 [SuppressMessage("Critical Code Smell", "S2339:Public constant members should not be used", Justification = "Public API: the format codes are published constants used in constant expressions by callers.")]
-public sealed class ExcelHeaderFooter : XmlHelper
+public sealed partial class ExcelHeaderFooter : XmlHelper
 {
-	#region Static Properties
 	/// <summary>
 	/// The code for "current page #"
 	/// </summary>
@@ -281,9 +89,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 	/// The code for "shadow style"
 	/// </summary>
 	public const string ShadowStyle = @"&H";
-	#endregion
 
-	#region ExcelHeaderFooter Private Properties
 	internal ExcelHeaderFooterText _oddHeader;
 	internal ExcelHeaderFooterText _oddFooter;
 	internal ExcelHeaderFooterText _evenHeader;
@@ -291,9 +97,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 	internal ExcelHeaderFooterText _firstHeader;
 	internal ExcelHeaderFooterText _firstFooter;
 	private readonly ExcelWorksheet _ws;
-	#endregion
 
-	#region ExcelHeaderFooter Constructor
 	/// <summary>
 	/// ExcelHeaderFooter Constructor
 	/// </summary>
@@ -306,9 +110,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 		_ws = ws;
 		SchemaNodeOrder = ["headerFooter", "oddHeader", "oddFooter", "evenHeader", "evenFooter", "firstHeader", "firstFooter"];
 	}
-	#endregion
 
-	#region alignWithMargins
 	const string alignWithMarginsPath = "@alignWithMargins";
 	/// <summary>
 	/// Gets/sets the alignWithMargins attribute
@@ -324,9 +126,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			SetXmlNodeString(alignWithMarginsPath, value ? "1" : "0");
 		}
 	}
-	#endregion
 
-	#region differentOddEven
 	const string differentOddEvenPath = "@differentOddEven";
 	/// <summary>
 	/// Gets/sets the flag that tells Excel to display different headers and footers on odd and even pages.
@@ -342,9 +142,7 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			SetXmlNodeString(differentOddEvenPath, value ? "1" : "0");
 		}
 	}
-	#endregion
 
-	#region differentFirst
 	const string differentFirstPath = "@differentFirst";
 
 	/// <summary>
@@ -361,8 +159,6 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			SetXmlNodeString(differentFirstPath, value ? "1" : "0");
 		}
 	}
-	#endregion
-	#region ScaleWithDoc
 	const string scaleWithDocPath = "@scaleWithDoc";
 	/// <summary>
 	/// Specify whether the header and footer should scale as you use the "Shrink to fit" feature on the document
@@ -378,8 +174,6 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			SetXmlNodeBool(scaleWithDocPath, value);
 		}
 	}
-	#endregion
-	#region ExcelHeaderFooter Public Properties
 	/// <summary>
 	/// Provides access to the header on odd numbered pages of the document.
 	/// If you want the same header on both odd and even pages, then only set values in this ExcelHeaderFooterText class.
@@ -507,94 +301,4 @@ public sealed class ExcelHeaderFooter : XmlHelper
 			return _vmlDrawingsHF;
 		}
 	}
-	#endregion
-	#region Save  //  ExcelHeaderFooter
-	/// <summary>
-	/// Saves the header and footer information to the worksheet XML
-	/// </summary>
-	internal void Save()
-	{
-		SaveText("d:oddHeader", _oddHeader);
-		SaveText("d:oddFooter", _oddFooter);
-
-		// only set evenHeader and evenFooter
-		if (differentOddEven)
-		{
-			SaveText("d:evenHeader", _evenHeader);
-			SaveText("d:evenFooter", _evenFooter);
-		}
-
-		// only set firstHeader and firstFooter
-		if (differentFirst)
-		{
-			SaveText("d:firstHeader", _firstHeader);
-			SaveText("d:firstFooter", _firstFooter);
-		}
-	}
-
-	private void SaveText(string path, ExcelHeaderFooterText? text)
-	{
-		if (text != null)
-		{
-			SetXmlNodeString(path, GetText(text));
-		}
-	}
-	internal void SaveHeaderFooterImages()
-	{
-		if (_vmlDrawingsHF != null)
-		{
-			if (_vmlDrawingsHF.Count == 0)
-			{
-				if (_vmlDrawingsHF.Uri != null)
-				{
-					_ws.Part.DeleteRelationship(_vmlDrawingsHF.RelId);
-					_ws._package.Package.DeletePart(_vmlDrawingsHF.Uri);
-				}
-			}
-			else
-			{
-				if (_vmlDrawingsHF.Uri == null)
-				{
-					_vmlDrawingsHF.Uri = GetNewUri(_ws._package.Package, @"/xl/drawings/vmlDrawing{0}.vml");
-				}
-
-				if (_vmlDrawingsHF.Part == null)
-				{
-					_vmlDrawingsHF.Part = _ws._package.Package.CreatePart(_vmlDrawingsHF.Uri, "application/vnd.openxmlformats-officedocument.vmlDrawing", _ws._package.Compression);
-					var rel = _ws.Part.CreateRelationship(UriHelper.GetRelativeUri(_ws.WorksheetUri, _vmlDrawingsHF.Uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/vmlDrawing");
-					_ws.SetHFLegacyDrawingRel(rel.Id);
-					_vmlDrawingsHF.RelId = rel.Id;
-					foreach (ExcelVmlDrawingPicture draw in _vmlDrawingsHF)
-					{
-						rel = _vmlDrawingsHF.Part.CreateRelationship(UriHelper.GetRelativeUri(_vmlDrawingsHF.Uri, draw.ImageUri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
-						draw.RelId = rel.Id;
-					}
-				}
-
-				_vmlDrawingsHF.VmlDrawingXml.Save(_vmlDrawingsHF.Part.GetStream());
-			}
-		}
-	}
-	private static string GetText(ExcelHeaderFooterText headerFooter)
-	{
-		var ret = "";
-		if (headerFooter.LeftAlignedText != null)
-		{
-			ret += "&L" + headerFooter.LeftAlignedText;
-		}
-
-		if (headerFooter.CenteredText != null)
-		{
-			ret += "&C" + headerFooter.CenteredText;
-		}
-
-		if (headerFooter.RightAlignedText != null)
-		{
-			ret += "&R" + headerFooter.RightAlignedText;
-		}
-
-		return ret;
-	}
-	#endregion
 }
-#endregion
