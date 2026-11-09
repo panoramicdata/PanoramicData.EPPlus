@@ -211,7 +211,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		IsRangeValid("");
 		if (_fromRow == 1 && _fromCol == 1 && _toRow == ExcelPackage.MaxRows && _toCol == ExcelPackage.MaxColumns)  //Full sheet (ex ws.Cells.Value=0). Set value for A1 only to avoid hanging 
 		{
-			throw (new ArgumentException("Can't reference all cells. Please use the indexer to set the range"));
+			throw new ArgumentException("Can't reference all cells. Please use the indexer to set the range");
 		}
 		else
 		{
@@ -293,7 +293,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		if (range._fromRow == 1 && range._fromCol == 1 && range._toRow == ExcelPackage.MaxRows && range._toCol == ExcelPackage.MaxColumns)  //Full sheet (ex ws.Cells.Value=0). Set value for A1 only to avoid hanging 
 		{
-			throw (new InvalidOperationException("Can't set a formula for the entire worksheet"));
+			throw new InvalidOperationException("Can't set a formula for the entire worksheet");
 		}
 		else if (address.Start.Row == address.End.Row && address.Start.Column == address.End.Column && !IsArray)             //is it really a shared formula? Arrayformulas can be one cell only
 		{
@@ -355,7 +355,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		if (range._worksheet._commentsStore.Exists(row, col))
 		{
-			throw (new InvalidOperationException(string.Format("Cell {0} already contain a comment.", new ExcelCellAddress(row, col).Address)));
+			throw new InvalidOperationException(string.Format("Cell {0} already contain a comment.", new ExcelCellAddress(row, col).Address));
 		}
 
 	}
@@ -388,11 +388,11 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 			{
 				if (type == "")
 				{
-					throw (new InvalidOperationException(string.Format("Range is not valid for this operation: {0}", _address)));
+					throw new InvalidOperationException(string.Format("Range is not valid for this operation: {0}", _address));
 				}
 				else
 				{
-					throw (new InvalidOperationException(string.Format("Range is not valid for {0} : {1}", type, _address)));
+					throw new InvalidOperationException(string.Format("Range is not valid for {0} : {1}", type, _address));
 				}
 			}
 		}
@@ -1237,7 +1237,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				var c = Collide(_worksheet.AutoFilterAddress);
 				if (value == false && (c == eAddressCollition.Partly || c == eAddressCollition.No))
 				{
-					throw (new InvalidOperationException("Can't remote Autofilter. Current autofilter does not match selected range."));
+					throw new InvalidOperationException("Can't remote Autofilter. Current autofilter does not match selected range.");
 				}
 			}
 
@@ -1503,7 +1503,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 						if (_worksheet._sharedFormulas[id].IsArray &&
 								Collide(_worksheet.Cells[_worksheet._sharedFormulas[id].Address]) == eAddressCollition.Partly) // If the formula is an array formula and its on the inside the overwriting range throw an exception
 						{
-							throw (new InvalidOperationException("Can not overwrite a part of an array-formula"));
+							throw new InvalidOperationException("Can not overwrite a part of an array-formula");
 						}
 
 						formulas.Add(id);
@@ -1744,7 +1744,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		if (Reader == null)
 		{
-			throw (new ArgumentNullException(nameof(Reader), "Reader can't be null"));
+			throw new ArgumentNullException(nameof(Reader), "Reader can't be null");
 		}
 
 		var fieldCount = Reader.FieldCount;
@@ -1946,7 +1946,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			if (Members.Length == 0)   //Fixes issue 15555
 			{
-				throw (new ArgumentException("Parameter Members must have at least one property. Length is zero"));
+				throw new ArgumentException("Parameter Members must have at least one property. Length is zero");
 			}
 
 			foreach (var t in Members)
@@ -2111,7 +2111,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 					{
 						if (!isText && v != "")
 						{
-							throw (new Exception(string.Format("Invalid Text Qualifier in line : {0}", line)));
+							throw new Exception(string.Format("Invalid Text Qualifier in line : {0}", line));
 						}
 
 						isQualifier = !isQualifier;
@@ -2147,7 +2147,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 							{
 								if (QCount % 2 == 1)
 								{
-									throw (new Exception(string.Format("Text delimiter is not closed in line : {0}", line)));
+									throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
 								}
 
 								v += c;
@@ -2165,7 +2165,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 				if (lineQCount % 2 == 1)
 				{
-					throw (new Exception(string.Format("Text delimiter is not closed in line : {0}", line)));
+					throw new Exception(string.Format("Text delimiter is not closed in line : {0}", line));
 				}
 
 				items.Add(ConvertData(Format, v, col, isText));
@@ -2227,7 +2227,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 
 		if (inTQ)
 		{
-			throw (new ArgumentException(string.Format("Text delimiter is not closed in line : {0}", list.Count)));
+			throw new ArgumentException(string.Format("Text delimiter is not closed in line : {0}", list.Count));
 		}
 
 		if (prevLineStart >= Format.EOL.Length && IsEOL(text, prevLineStart - Format.EOL.Length, Format.EOL))
@@ -2333,7 +2333,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		if (_fromRow + RowOffset < 1 || _fromCol + ColumnOffset < 1 || _fromRow + RowOffset > ExcelPackage.MaxRows || _fromCol + ColumnOffset > ExcelPackage.MaxColumns)
 		{
-			throw (new ArgumentOutOfRangeException("Offset value out of range"));
+			throw new ArgumentOutOfRangeException("Offset value out of range");
 		}
 
 		var address = GetAddress(_fromRow + RowOffset, _fromCol + ColumnOffset, _toRow + RowOffset, _toCol + ColumnOffset);
@@ -2351,7 +2351,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		if (NumberOfRows < 1 || NumberOfColumns < 1)
 		{
-			throw (new Exception("Number of rows/columns must be greater than 0"));
+			throw new Exception("Number of rows/columns must be greater than 0");
 		}
 
 		NumberOfRows--;
@@ -2359,7 +2359,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		if (_fromRow + RowOffset < 1 || _fromCol + ColumnOffset < 1 || _fromRow + RowOffset > ExcelPackage.MaxRows || _fromCol + ColumnOffset > ExcelPackage.MaxColumns ||
 			 _fromRow + RowOffset + NumberOfRows < 1 || _fromCol + ColumnOffset + NumberOfColumns < 1 || _fromRow + RowOffset + NumberOfRows > ExcelPackage.MaxRows || _fromCol + ColumnOffset + NumberOfColumns > ExcelPackage.MaxColumns)
 		{
-			throw (new ArgumentOutOfRangeException("Offset value out of range"));
+			throw new ArgumentOutOfRangeException("Offset value out of range");
 		}
 
 		var address = GetAddress(_fromRow + RowOffset, _fromCol + ColumnOffset, _fromRow + RowOffset + NumberOfRows, _fromCol + ColumnOffset + NumberOfColumns);
@@ -2633,7 +2633,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 	{
 		if (Addresses != null)
 		{
-			throw (new Exception("An Arrayformula can not have more than one address"));
+			throw new Exception("An Arrayformula can not have more than one address");
 		}
 
 		Set_SharedFormula(this, ArrayFormula, this, true);
@@ -2695,7 +2695,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 				}
 				else
 				{
-					throw (new InvalidOperationException("Can't remove/overwrite a part of cells that are merged"));
+					throw new InvalidOperationException("Can't remove/overwrite a part of cells that are merged");
 				}
 			}
 		}
@@ -2853,7 +2853,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			if (c > cols - 1 || c < 0)
 			{
-				throw (new ArgumentException("Can not reference columns outside the boundries of the range. Note that column reference is zero-based within the range"));
+				throw new ArgumentException("Can not reference columns outside the boundries of the range. Note that column reference is zero-based within the range");
 			}
 		}
 
@@ -2865,7 +2865,7 @@ public class ExcelRangeBase : ExcelAddress, IExcelCell, IDisposable, IEnumerable
 		{
 			if (l.Count == 0 || l[^1].Row != e.Row)
 			{
-				item = new SortItem<ExcelCoreValue>() { Row = e.Row, Items = new ExcelCoreValue[cols] };
+				item = new SortItem<ExcelCoreValue> { Row = e.Row, Items = new ExcelCoreValue[cols] };
 				l.Add(item);
 			}
 

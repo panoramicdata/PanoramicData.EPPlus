@@ -162,12 +162,12 @@ public class ExcelRange : ExcelRangeBase
 	{
 		if (Row is < 1 or > ExcelPackage.MaxRows)
 		{
-			throw (new ArgumentException("Row out of range"));
+			throw new ArgumentException("Row out of range");
 		}
 
 		if (Col is < 1 or > ExcelPackage.MaxColumns)
 		{
-			throw (new ArgumentException("Column out of range"));
+			throw new ArgumentException("Column out of range");
 		}
 	}
 

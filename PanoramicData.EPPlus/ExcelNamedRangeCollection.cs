@@ -67,7 +67,7 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 		ExcelNamedRange item;
 		if (!ExcelAddressUtil.IsValidName(Name))
 		{
-			throw (new ArgumentException($"Name {Name} contains invalid characters"));  //Issue 458
+			throw new ArgumentException($"Name {Name} contains invalid characters");  //Issue 458
 		}
 
 		if (Range.IsName)

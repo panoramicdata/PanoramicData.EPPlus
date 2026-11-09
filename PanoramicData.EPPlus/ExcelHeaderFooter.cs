@@ -163,7 +163,7 @@ public class ExcelHeaderFooterText
 		{
 			if (!PictureFile.Exists)
 			{
-				throw (new FileNotFoundException(string.Format("{0} is missing", PictureFile.FullName)));
+				throw new FileNotFoundException(string.Format("{0} is missing", PictureFile.FullName));
 			}
 
 			imgBytes = File.ReadAllBytes(PictureFile.FullName);
@@ -171,7 +171,7 @@ public class ExcelHeaderFooterText
 		}
 		catch (Exception ex)
 		{
-			throw (new InvalidDataException("File is not a supported image-file or is corrupt", ex));
+			throw new InvalidDataException("File is not a supported image-file or is corrupt", ex);
 		}
 
 		var id = ValidateImage(Alignment);
@@ -199,7 +199,7 @@ public class ExcelHeaderFooterText
 		{
 			if (image.Id == id)
 			{
-				throw (new InvalidOperationException("A picture already exists in this section"));
+				throw new InvalidOperationException("A picture already exists in this section");
 			}
 		}
 		//Add the image placeholder to the end of the text

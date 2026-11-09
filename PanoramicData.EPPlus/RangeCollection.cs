@@ -136,7 +136,7 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 		var ix = IndexOf(cell.RangeID);
 		if (ix >= 0)
 		{
-			throw (new Exception("Item already exists"));
+			throw new Exception("Item already exists");
 		}
 
 		Insert(~ix, cell);
@@ -146,7 +146,7 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 		var ix = IndexOf(key);
 		if (ix < 0)
 		{
-			throw (new Exception("Key does not exists"));
+			throw new Exception("Key does not exists");
 		}
 
 		var listPointer = _cellIndex[ix].ListPointer;
@@ -254,8 +254,8 @@ internal class RangeCollection : IEnumerator<IRangeID>, IEnumerable, IDisposable
 
 		return index;
 	}
-	internal static void InsertColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
-	internal static void DeleteColumn(ulong ColumnID, int columns) => throw (new Exception("Working on it..."));
+	internal static void InsertColumn(ulong ColumnID, int columns) => throw new Exception("Working on it...");
+	internal static void DeleteColumn(ulong ColumnID, int columns) => throw new Exception("Working on it...");
 	#endregion
 	#region "Private Methods"
 	/// <summary>

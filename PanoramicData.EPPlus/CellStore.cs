@@ -523,7 +523,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					page--;
 					if (pos < 0)
 					{
-						throw (new Exception("Unexpected error when setting value"));
+						throw new Exception("Unexpected error when setting value");
 					}
 
 					pageItem = _columnIndex[col]._pages[pos];
@@ -617,7 +617,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 								page--;
 								if (pos < 0)
 								{
-									throw (new Exception("Unexpected error when setting value"));
+									throw new Exception("Unexpected error when setting value");
 								}
 
 								pageItem = _columnIndex[col]._pages[pos];
@@ -688,7 +688,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 					page--;
 					if (pos < 0)
 					{
-						throw (new Exception("Unexpected error when setting value"));
+						throw new Exception("Unexpected error when setting value");
 					}
 
 					pageItem = _columnIndex[col]._pages[pos];
@@ -858,7 +858,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 
 								if (endRow > delEndRow && pagePos < column.PageCount && column._pages[pagePos].MinIndex < endRow)
 								{
-									pagePos = (delEndRow == fromRow ? pagePos : pagePos + 1);
+									pagePos = delEndRow == fromRow ? pagePos : pagePos + 1;
 									var rowsLeft = CellStore<T>.DeletePage(shift ? fromRow : delEndRow, endRow - delEndRow, column, pagePos, shift);
 									if (rowsLeft > 0)
 									{
@@ -1106,7 +1106,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 				Array.Copy(_columnIndex, tPos, _columnIndex, fPos, ColumnCount - tPos);
 			}
 
-			ColumnCount -= (tPos - fPos);
+			ColumnCount -= tPos - fPos;
 		}
 
 		if (shift)
@@ -1345,7 +1345,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			Array.Copy(pageItem.Rows, pos, pageItem.Rows, pos + 1, pageItem.RowCount - pos);
 		}
 
-		pageItem.Rows[pos] = new IndexItem() { Index = ix, IndexPointer = _values.Count };
+		pageItem.Rows[pos] = new IndexItem { Index = ix, IndexPointer = _values.Count };
 		_values.Add(value);
 		pageItem.RowCount++;
 	}
@@ -1427,7 +1427,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 	private static void AddPage(ColumnIndex column, int pos, short index)
 	{
 		CellStore<T>.AddPage(column, pos);
-		column._pages[pos] = new PageIndex() { Index = index };
+		column._pages[pos] = new PageIndex { Index = index };
 		if (pos > 0)
 		{
 			var pp = column._pages[pos - 1];
@@ -1483,7 +1483,7 @@ internal class CellStore<T> : IDisposable// : IEnumerable<ulong>, IEnumerator<ul
 			Array.Copy(_columnIndex, pos, _columnIndex, pos + 1, ColumnCount - pos);
 		}
 
-		_columnIndex[pos] = new ColumnIndex() { Index = (short)(Column) };
+		_columnIndex[pos] = new ColumnIndex { Index = (short)Column };
 		ColumnCount++;
 	}
 	int _colPos = -1, _row;

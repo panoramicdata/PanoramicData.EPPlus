@@ -97,7 +97,7 @@ public sealed class OfficeProperties : XmlHelper
 				_xmlPropertiesCore = GetXmlDocument(xml, _uriPropertiesCore, @"application/vnd.openxmlformats-package.core-properties+xml", @"http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties");
 			}
 
-			return (_xmlPropertiesCore);
+			return _xmlPropertiesCore;
 		}
 	}
 
@@ -259,7 +259,7 @@ public sealed class OfficeProperties : XmlHelper
 					@"application/vnd.openxmlformats-officedocument.extended-properties+xml",
 					@"http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties");
 
-			return (_xmlPropertiesExtended);
+			return _xmlPropertiesExtended;
 		}
 	}
 	#endregion
@@ -418,7 +418,7 @@ public sealed class OfficeProperties : XmlHelper
 					 @"application/vnd.openxmlformats-officedocument.custom-properties+xml",
 					 @"http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties");
 
-			return (_xmlPropertiesCustom);
+			return _xmlPropertiesCustom;
 		}
 	}
 	#endregion

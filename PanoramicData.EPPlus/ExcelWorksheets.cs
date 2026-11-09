@@ -142,7 +142,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			Name = ValidateFixSheetName(Name);
 			if (GetByName(Name) != null)
 			{
-				throw (new InvalidOperationException(ERR_DUP_WORKSHEET + " : " + Name));
+				throw new InvalidOperationException(ERR_DUP_WORKSHEET + " : " + Name);
 			}
 
 			GetSheetURI(ref Name, out var sheetID, out var uriWorksheet, isChart);
@@ -190,12 +190,12 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			if (Copy is ExcelChartsheet)
 			{
-				throw (new ArgumentException("Can not copy a chartsheet"));
+				throw new ArgumentException("Can not copy a chartsheet");
 			}
 
 			if (GetByName(Name) != null)
 			{
-				throw (new InvalidOperationException(ERR_DUP_WORKSHEET));
+				throw new InvalidOperationException(ERR_DUP_WORKSHEET);
 			}
 
 			GetSheetURI(ref Name, out var sheetID, out var uriWorksheet, false);
@@ -1039,7 +1039,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		}
 		else
 		{
-			throw (new ArgumentException("Worksheet is not in the collection."));
+			throw new ArgumentException("Worksheet is not in the collection.");
 		}
 	}
 	#endregion
@@ -1068,7 +1068,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 		{
 			return _worksheets.TryGetValue(PositionID, out var value)
 				? value
-				: throw (new IndexOutOfRangeException("Worksheet position out of range."));
+				: throw new IndexOutOfRangeException("Worksheet position out of range.");
 		}
 	}
 
@@ -1130,7 +1130,7 @@ public class ExcelWorksheets : XmlHelper, IEnumerable<ExcelWorksheet>, IDisposab
 			}
 		}
 
-		return (xlWorksheet);
+		return xlWorksheet;
 	}
 	#region MoveBefore and MoveAfter Methods
 	/// <summary>

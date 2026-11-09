@@ -201,7 +201,7 @@ public sealed class ExcelStyles : XmlHelper
 	{
 		if (address.Start.Column == 0 || address.Start.Row == 0)
 		{
-			throw (new Exception("error address"));
+			throw new Exception("error address");
 		}
 		//Columns
 		else if (address.Start.Row == 1 && address.End.Row == ExcelPackage.MaxRows)

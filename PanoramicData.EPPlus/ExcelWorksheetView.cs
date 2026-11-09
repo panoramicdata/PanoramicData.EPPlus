@@ -200,7 +200,7 @@ public class ExcelWorksheetView : XmlHelper
 			var ac = new ExcelAddressBase(value);
 			if (ac.IsSingleCell == false)
 			{
-				throw (new InvalidOperationException("ActiveCell must be a single cell."));
+				throw new InvalidOperationException("ActiveCell must be a single cell.");
 			}
 
 			/*** Active cell must be inside SelectedRange ***/

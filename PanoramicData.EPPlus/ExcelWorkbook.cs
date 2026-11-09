@@ -144,11 +144,11 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 					var n = node.SelectSingleNode("d:t", NameSpaceManager);
 					if (n != null)
 					{
-						_sharedStringsList.Add(new SharedStringItem() { Text = ConvertUtil.ExcelDecodeString(n.InnerText) });
+						_sharedStringsList.Add(new SharedStringItem { Text = ConvertUtil.ExcelDecodeString(n.InnerText) });
 					}
 					else
 					{
-						_sharedStringsList.Add(new SharedStringItem() { Text = node.InnerXml, isRichText = true });
+						_sharedStringsList.Add(new SharedStringItem { Text = node.InnerXml, isRichText = true });
 					}
 				}
 			}
@@ -284,7 +284,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				_worksheets = new ExcelWorksheets(_package, _namespaceManager, sheetsNode);
 			}
 
-			return (_worksheets);
+			return _worksheets;
 		}
 	}
 	#endregion
@@ -449,7 +449,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 	{
 		if (_vba != null || _package.Package.PartExists(new Uri(ExcelVbaProject.PartUri, UriKind.Relative)))
 		{
-			throw (new InvalidOperationException("VBA project already exists."));
+			throw new InvalidOperationException("VBA project already exists.");
 		}
 
 		_vba = new ExcelVbaProject(this);
@@ -486,7 +486,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				CreateWorkbookXml(_namespaceManager);
 			}
 
-			return (_workbookXml);
+			return _workbookXml;
 		}
 	}
 	const string codeModuleNamePath = "d:workbookPr/@codeName";
@@ -653,7 +653,7 @@ public sealed class ExcelWorkbook : XmlHelper, IDisposable
 				}
 			}
 
-			return (_stylesXml);
+			return _stylesXml;
 		}
 		set
 		{

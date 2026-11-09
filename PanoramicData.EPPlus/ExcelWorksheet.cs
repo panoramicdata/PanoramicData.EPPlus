@@ -209,7 +209,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			//Validate
 			if (doValidate && Validate(address) == false)
 			{
-				throw (new ArgumentException("Can't merge and already merged range"));
+				throw new ArgumentException("Can't merge and already merged range");
 			}
 
 			lock (this)
@@ -302,7 +302,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					var adr = new ExcelAddressBase(_list[v]);
 					if (Destination.Collide(adr) is not (ExcelAddressBase.eAddressCollition.Inside or ExcelAddressBase.eAddressCollition.Equal))
 					{
-						throw (new InvalidOperationException(string.Format("Can't delete/overwrite merged cells. A range is partly merged with the another merged range. {0}", adr._address)));
+						throw new InvalidOperationException(string.Format("Can't delete/overwrite merged cells. A range is partly merged with the another merged range. {0}", adr._address));
 					}
 
 					used.Add(v);
@@ -397,7 +397,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <summary>
 	/// The position of the worksheet.
 	/// </summary>
-	internal int PositionID { get { return (_positionID); } set { _positionID = value; } }
+	internal int PositionID { get { return _positionID; } set { _positionID = value; } }
 	#region Worksheet Public Properties
 	/// <summary>
 	/// The index in the worksheets collection
@@ -433,7 +433,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	{
 		if (this is ExcelChartsheet)
 		{
-			throw (new NotSupportedException("This property or method is not supported for a Chartsheet"));
+			throw new NotSupportedException("This property or method is not supported for a Chartsheet");
 		}
 	}
 
@@ -456,7 +456,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				_sheetView = new ExcelWorksheetView(NameSpaceManager, node, this);
 			}
 
-			return (_sheetView);
+			return _sheetView;
 		}
 	}
 
@@ -465,7 +465,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// </summary>
 	public string Name
 	{
-		get { return (_name); }
+		get { return _name; }
 		set
 		{
 			if (value == _name)
@@ -478,7 +478,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			{
 				if (ws.PositionID != PositionID && ws.Name.Equals(value, StringComparison.OrdinalIgnoreCase))
 				{
-					throw (new ArgumentException("Worksheet name must be unique"));
+					throw new ArgumentException("Worksheet name must be unique");
 				}
 			}
 
@@ -842,7 +842,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		_package.DoAdjustDrawings = false;
 		Stream stream = packPart.GetStream();
 
-		var xr = XmlReader.Create(stream, new XmlReaderSettings() { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true });
+		var xr = XmlReader.Create(stream, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true });
 		LoadColumns(xr);    //columnXml
 		var start = stream.Position;
 		LoadCells(xr);
@@ -1085,7 +1085,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 			}
 		}
 
-		return (ConvertUtil._invariantCompareInfo.IsSuffix(xr.LocalName, tagName[0]));
+		return ConvertUtil._invariantCompareInfo.IsSuffix(xr.LocalName, tagName[0]);
 	}
 	private void LoadColumns(XmlReader xr)
 	{
@@ -1453,10 +1453,10 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	/// <returns></returns>
 	private static RowInternal AddRow(XmlReader xr, int row) => new()
 	{
-		Collapsed = (xr.GetAttribute("collapsed") is not null and "1"),
-		OutlineLevel = (xr.GetAttribute("outlineLevel") == null ? (short)0 : short.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture)),
-		Height = (xr.GetAttribute("ht") == null ? -1 : double.Parse(xr.GetAttribute("ht"), CultureInfo.InvariantCulture)),
-		Hidden = (xr.GetAttribute("hidden") is not null and "1"),
+		Collapsed = xr.GetAttribute("collapsed") is not null and "1",
+		OutlineLevel = xr.GetAttribute("outlineLevel") == null ? (short)0 : short.Parse(xr.GetAttribute("outlineLevel"), CultureInfo.InvariantCulture),
+		Height = xr.GetAttribute("ht") == null ? -1 : double.Parse(xr.GetAttribute("ht"), CultureInfo.InvariantCulture),
+		Hidden = xr.GetAttribute("hidden") is not null and "1",
 		Phonetic = xr.GetAttribute("ph") is not null and "1",
 		CustomHeight = xr.GetAttribute("customHeight") is not null and "1"
 	};
@@ -1555,7 +1555,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 				_headerFooter = new ExcelHeaderFooter(NameSpaceManager, headerFooterNode, this);
 			}
 
-			return (_headerFooter);
+			return _headerFooter;
 		}
 	}
 	#endregion
@@ -1623,7 +1623,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	public ExcelRow Row(int row)
 	{
 		CheckSheetType();
-		return row is < 1 or > ExcelPackage.MaxRows ? throw (new ArgumentException("Row number out of bounds")) : new ExcelRow(this, row);
+		return row is < 1 or > ExcelPackage.MaxRows ? throw new ArgumentException("Row number out of bounds") : new ExcelRow(this, row);
 	}
 	/// <summary>
 	/// Provides access to an individual column within the worksheet so you can set its properties.
@@ -1635,7 +1635,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		CheckSheetType();
 		if (col is < 1 or > ExcelPackage.MaxColumns)
 		{
-			throw (new ArgumentException("Column number out of bounds"));
+			throw new ArgumentException("Column number out of bounds");
 		}
 
 		var column = GetValueInner(0, col) as ExcelColumn;
@@ -1791,13 +1791,13 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		if (rowFrom < 1)
 		{
-			throw (new ArgumentOutOfRangeException("rowFrom can't be lesser that 1"));
+			throw new ArgumentOutOfRangeException("rowFrom can't be lesser that 1");
 		}
 
 		//Check that cells aren't shifted outside the boundries
 		if (d != null && d.End.Row > rowFrom && d.End.Row + rows > ExcelPackage.MaxRows)
 		{
-			throw (new ArgumentOutOfRangeException("Can't insert. Rows will be shifted outside the boundries of the worksheet."));
+			throw new ArgumentOutOfRangeException("Can't insert. Rows will be shifted outside the boundries of the worksheet.");
 		}
 
 		lock (this)
@@ -1917,12 +1917,12 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 		if (columnFrom < 1)
 		{
-			throw (new ArgumentOutOfRangeException("columnFrom can't be lesser that 1"));
+			throw new ArgumentOutOfRangeException("columnFrom can't be lesser that 1");
 		}
 		//Check that cells aren't shifted outside the boundries
 		if (d != null && d.End.Column > columnFrom && d.End.Column + columns > ExcelPackage.MaxColumns)
 		{
-			throw (new ArgumentOutOfRangeException("Can't insert. Columns will be shifted outside the boundries of the worksheet."));
+			throw new ArgumentOutOfRangeException("Can't insert. Columns will be shifted outside the boundries of the worksheet.");
 		}
 
 		lock (this)
@@ -2429,7 +2429,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 		CheckSheetType();
 		if (rowFrom < 1 || rowFrom + rows > ExcelPackage.MaxRows)
 		{
-			throw (new ArgumentException("Row out of range. Spans from 1 to " + ExcelPackage.MaxRows.ToString(CultureInfo.InvariantCulture)));
+			throw new ArgumentException("Row out of range. Spans from 1 to " + ExcelPackage.MaxRows.ToString(CultureInfo.InvariantCulture));
 		}
 
 		lock (this)
@@ -2488,7 +2488,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 	{
 		if (columnFrom < 1 || columnFrom + columns > ExcelPackage.MaxColumns)
 		{
-			throw (new ArgumentException("Column out of range. Spans from 1 to " + ExcelPackage.MaxColumns.ToString(CultureInfo.InvariantCulture)));
+			throw new ArgumentException("Column out of range. Spans from 1 to " + ExcelPackage.MaxColumns.ToString(CultureInfo.InvariantCulture));
 		}
 
 		lock (this)
@@ -3021,7 +3021,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 
 					if (colVal.Contains(n))
 					{
-						throw (new InvalidDataException(string.Format("Table {0} Column {1} does not have a unique name.", tbl.Name, col.Name)));
+						throw new InvalidDataException(string.Format("Table {0} Column {1} does not have a unique name.", tbl.Name, col.Name));
 					}
 
 					colVal.Add(n);
@@ -3119,7 +3119,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 					SetFormula(tbl.Address._toRow, colNum, GetTotalFunction(col, "109"));
 					break;
 				default:
-					throw (new Exception("Unknown RowFunction enum"));
+					throw new Exception("Unknown RowFunction enum");
 			}
 		}
 		else
@@ -3579,7 +3579,7 @@ public class ExcelWorksheet : XmlHelper, IEqualityComparer<ExcelWorksheet>, IDis
 							if (!ss.TryGetValue(vString, out var value))
 							{
 								ix = ss.Count;
-								ss.Add(vString, new ExcelWorkbook.SharedStringItem() { isRichText = _flags.GetFlagValue(cse.Row, cse.Column, CellFlags.RichText), pos = ix });
+								ss.Add(vString, new ExcelWorkbook.SharedStringItem { isRichText = _flags.GetFlagValue(cse.Row, cse.Column, CellFlags.RichText), pos = ix });
 							}
 							else
 							{

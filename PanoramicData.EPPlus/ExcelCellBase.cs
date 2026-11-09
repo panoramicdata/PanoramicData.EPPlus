@@ -549,7 +549,7 @@ public abstract class ExcelCellBase
 			{
 				row = 0;
 				col = 0;
-				return throwException ? throw (new Exception(string.Format("Invalid Address format {0}", address))) : false;
+				return throwException ? throw new Exception(string.Format("Invalid Address format {0}", address)) : false;
 			}
 		}
 

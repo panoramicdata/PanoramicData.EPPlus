@@ -385,7 +385,7 @@ public sealed class ExcelPackage : IDisposable
 	{
 		if (newStream.Length > 0)
 		{
-			throw (new Exception("The output stream must be empty. Length > 0"));
+			throw new Exception("The output stream must be empty. Length > 0");
 		}
 		else if (!(newStream.CanRead && newStream.CanWrite))
 		{
@@ -405,7 +405,7 @@ public sealed class ExcelPackage : IDisposable
 	{
 		if (newStream.Length > 0)
 		{
-			throw (new Exception("The output stream must be empty. Length > 0"));
+			throw new Exception("The output stream must be empty. Length > 0");
 		}
 		else if (!(newStream.CanRead && newStream.CanWrite))
 		{
@@ -442,7 +442,7 @@ public sealed class ExcelPackage : IDisposable
 				var stream = imagePart.GetStream(FileMode.Create, FileAccess.Write);
 				stream.Write(image, 0, image.GetLength(0));
 
-				_images.Add(hash, new ImageInfo() { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
+				_images.Add(hash, new ImageInfo { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
 			}
 		}
 
@@ -457,7 +457,7 @@ public sealed class ExcelPackage : IDisposable
 		}
 		else
 		{
-			_images.Add(hash, new ImageInfo() { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
+			_images.Add(hash, new ImageInfo { Uri = uri, RefCount = 1, Hash = hash, Part = imagePart });
 		}
 
 		return _images[hash];
@@ -663,7 +663,7 @@ public sealed class ExcelPackage : IDisposable
 
 			}
 
-			return (_workbook);
+			return _workbook;
 		}
 	}
 	/// <summary>
@@ -840,7 +840,7 @@ public sealed class ExcelPackage : IDisposable
 					}
 					catch (Exception ex)
 					{
-						throw (new Exception(string.Format("Error overwriting file {0}", File.FullName), ex));
+						throw new Exception(string.Format("Error overwriting file {0}", File.FullName), ex);
 					}
 				}
 
@@ -880,7 +880,7 @@ public sealed class ExcelPackage : IDisposable
 			}
 			else
 			{
-				throw (new InvalidOperationException(string.Format("Error saving file {0}", File.FullName), ex));
+				throw new InvalidOperationException(string.Format("Error saving file {0}", File.FullName), ex);
 			}
 		}
 	}
@@ -1020,7 +1020,7 @@ public sealed class ExcelPackage : IDisposable
 		XmlDocument xml = new();
 		var part = _package.GetPart(uri);
 		XmlHelper.LoadXmlSafe(xml, part.GetStream());
-		return (xml);
+		return xml;
 	}
 	#endregion
 
@@ -1182,12 +1182,12 @@ public sealed class ExcelPackage : IDisposable
 	{
 		if (!inputStream.CanRead)
 		{
-			throw (new Exception("Can not read from inputstream"));
+			throw new Exception("Can not read from inputstream");
 		}
 
 		if (!outputStream.CanWrite)
 		{
-			throw (new Exception("Can not write to outputstream"));
+			throw new Exception("Can not write to outputstream");
 		}
 
 		if (inputStream.CanSeek)

@@ -115,7 +115,7 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 		get
 		{
 			return Index < 0 || Index >= _list.Count
-				?              throw (new ArgumentOutOfRangeException("Comment index out of range"))
+				?              throw new ArgumentOutOfRangeException("Comment index out of range")
 				: _list[Index] as ExcelComment;
 		}
 	}
@@ -211,7 +211,7 @@ public class ExcelCommentCollection : IEnumerable, IDisposable
 		}
 		else
 		{
-			throw (new ArgumentException("Comment does not exist in the worksheet"));
+			throw new ArgumentException("Comment does not exist in the worksheet");
 		}
 	}
 
