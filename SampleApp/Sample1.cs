@@ -72,7 +72,7 @@ class Sample1
 		//Add a formula for the value-column
 		worksheet.Cells["E2:E4"].Formula = "C2*D2";
 
-		//Ok now format the values;
+		//Ok now format the values
 		using (var range = worksheet.Cells[1, 1, 1, 5])
 		{
 			range.Style.Font.Bold = true;

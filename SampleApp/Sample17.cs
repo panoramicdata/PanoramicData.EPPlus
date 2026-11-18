@@ -69,16 +69,16 @@ public static class Sample17
 
 			string dataAddress;
 			if (i > 3) //test discontinuous cells.
+			{
 				dataAddress = $"{new ExcelAddress(2, col, 8, col).Address},{new ExcelAddress(10, col, 12, col).Address}";
+			}
 			else
+			{
 				dataAddress = new ExcelAddress(2, col, 12, col).Address;
-			ExcelNamedRange excelNamedRange = new($"namedRange_{i}", ws, ws, dataAddress, ws.Names.Count); //{ IsNameHidden = true };
+			}
+			ExcelNamedRange excelNamedRange = new($"namedRange_{i}", ws, ws, dataAddress, ws.Names.Count);
 			ws.Names.Add(excelNamedRange.Name, excelNamedRange);
 			excelNamedRanges.Add(excelNamedRange);
-
-			//ExcelNamedRange namedRange = ws.Names.Add($"namedRange_{col}", ws.Cells[2, col, 12, col]);
-			//ExcelNamedRange namedRange = ws.Names.AddFormula($"namedRange_{col}", ws.Cells[2, col, 12, col].FullAddressAbsolute);
-			//excelNamedRanges.Add(namedRange);
 		}
 
 		var sparklineLine = ws.SparklineGroups.Add(eSparklineType.Line, ws.Cells[15, 2, 15, 9], excelNamedRanges);
@@ -89,11 +89,6 @@ public static class Sample17
 		sparklineLine.ColorLow.SetColor(Color.Green);
 		sparklineLine.Negative = true;
 		sparklineLine.ColorNegative.SetColor(Color.Blue);
-
-		//var dataRng1 = sparklineLine.DataRange;
-		//ws.InsertRow(1, 10);
-		//ws.InsertColumn(1, 10);
-		//var dataRng2 = sparklineLine.DataRange;
 
 		package.SaveAs(Utils.GetFileInfo("Sample17.xlsx"));
 	}
