@@ -89,11 +89,6 @@ public static class Sample16
 		ws.Row(16).Height = 40;
 		ws.Row(17).Height = 40;
 
-		//var dataRng1 = sparklineLine.DataRange;
-		//ws.InsertRow(1, 10);
-		//ws.InsertColumn(1, 10);
-		//var dataRng2 = sparklineLine.DataRange;
-
 		package.SaveAs(Utils.GetFileInfo("Sample16.xlsx"));
 	}
 }

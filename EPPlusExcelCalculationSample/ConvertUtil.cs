@@ -12,7 +12,10 @@ namespace EPPlusExcelFormDemo
     {
         internal static bool IsNumeric(object candidate)
         {
-            if (candidate == null) return false;
+            if (candidate == null)
+            {
+                return false;
+            }
             return (candidate.GetType().IsPrimitive || candidate is double || candidate is decimal || candidate is DateTime || candidate is TimeSpan || candidate is long);
         }
 
