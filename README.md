@@ -1,4 +1,4 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: LGPL v2.1 or later](https://img.shields.io/badge/License-LGPL_v2.1+-blue.svg)](LICENSE)
 
 [![NuGet version](https://img.shields.io/nuget/v/PanoramicData.EPPlus.svg)](https://www.nuget.org/packages/PanoramicData.EPPlus/)
 

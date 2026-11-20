@@ -29,4 +29,4 @@ Thank you for your interest in contributing to this project!
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the GNU Lesser General Public License, version 2.1 or (at your option) any later version, the licence of the EPPlus code this library is built on. See [NOTICE.md](NOTICE.md).
