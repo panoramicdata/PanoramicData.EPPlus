@@ -144,7 +144,9 @@ class Sample3
 								{
 									// do not bother filling cell with blank data (also useful if we have a formula in a cell)
 									if (sqlReader.GetValue(i) != null)
+									{
 										worksheet.Cells[row, col].Value = sqlReader.GetValue(i);
+									}
 									col++;
 								}
 							}

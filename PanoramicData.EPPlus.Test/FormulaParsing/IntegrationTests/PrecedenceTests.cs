@@ -53,6 +53,6 @@ public class PrecedenceTests : FormulaParserTestBase
 	[TestMethod]
 	public void Bugfixtest()
 	{
-		var result = _parser.Parse("(1+2)+3^2");
+		_parser.Parse("(1+2)+3^2");
 	}
 }

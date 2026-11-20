@@ -31,33 +31,11 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 public class CountIfs : MultipleRangeCriteriasFunction
 {
-
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
 		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
 		ValidateArguments(functionArguments, 2);
-		var argRanges = new List<ExcelDataProvider.IRangeInfo>();
-		var criterias = new List<string>();
-		for (var ix = 0; ix < 30; ix += 2)
-		{
-			if (functionArguments.Length <= ix)
-			{
-				break;
-			}
-
-			var rangeInfo = functionArguments[ix].ValueAsRangeInfo;
-			argRanges.Add(rangeInfo);
-			var value = functionArguments[ix + 1].Value?.ToString();
-			criterias.Add(value);
-		}
-
-		IEnumerable<int> matchIndexes = GetMatchIndexes(argRanges[0], criterias[0]);
-		var enumerable = matchIndexes as IList<int> ?? matchIndexes.ToList();
-		for (var ix = 1; ix < argRanges.Count && enumerable.Any(); ix++)
-		{
-			var indexes = GetMatchIndexes(argRanges[ix], criterias[ix]);
-			matchIndexes = enumerable.Intersect(indexes);
-		}
+		var matchIndexes = GetMatchIndexesForCriteria(functionArguments, 0);
 
 		return CreateResult((double)matchIndexes.Count(), DataType.Integer);
 	}

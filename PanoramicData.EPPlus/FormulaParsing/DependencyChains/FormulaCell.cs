@@ -35,8 +35,8 @@ internal class FormulaCell
 	internal int Column { get; set; }
 	internal string Formula { get; set; }
 	internal List<Token> Tokens { get; set; }
-	internal int tokenIx = 0;
-	internal int addressIx = 0;
+	internal int tokenIx;
+	internal int addressIx;
 	internal CellsStoreEnumerator<object> iterator;
 	internal ExcelWorksheet ws;
 }

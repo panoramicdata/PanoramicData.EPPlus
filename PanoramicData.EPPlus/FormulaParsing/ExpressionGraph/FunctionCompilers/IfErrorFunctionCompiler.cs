@@ -13,7 +13,6 @@ public class IfErrorFunctionCompiler : FunctionCompiler
 		: base(function, context)
 	{
 		Require.That(function).Named("function").IsNotNull();
-
 	}
 
 	public override CompileResult Compile(IEnumerable<Expression> children)
@@ -23,28 +22,6 @@ public class IfErrorFunctionCompiler : FunctionCompiler
 			throw new ExcelErrorValueException(eErrorType.Value);
 		}
 
-		var args = new List<FunctionArgument>();
-		Function.BeforeInvoke(Context);
-		var firstChild = children.First();
-		var lastChild = children.ElementAt(1);
-		try
-		{
-			var result = firstChild.Compile();
-			if (result.DataType == DataType.ExcelError)
-			{
-				args.Add(new FunctionArgument(lastChild.Compile().Result));
-			}
-			else
-			{
-				args.Add(new FunctionArgument(result.Result));
-			}
-
-		}
-		catch (ExcelErrorValueException)
-		{
-			args.Add(new FunctionArgument(lastChild.Compile().Result));
-		}
-
-		return Function.Execute(args, Context);
+		return CompileWithFallback(children, result => result.DataType == DataType.ExcelError);
 	}
 }

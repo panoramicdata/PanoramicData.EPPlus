@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Text;
 
 namespace OfficeOpenXml.Utils;
 
-internal class UriHelper
+internal static class UriHelper
 {
 	internal static Uri ResolvePartUri(Uri sourceUri, Uri targetUri)
 	{
@@ -44,12 +45,9 @@ internal class UriHelper
 			}
 		}
 
-		if (s >= 0)
+		for (var i = s; i >= 0; i--)
 		{
-			for (var i = s; i >= 0; i--)
-			{
-				file = source[i] + "/" + file;
-			}
+			file = source[i] + "/" + file;
 		}
 
 		return new Uri(file, UriKind.RelativeOrAbsolute);
@@ -76,18 +74,23 @@ internal class UriHelper
 			i++;
 		}
 
-		var dirUp = "";
+		var relative = new StringBuilder();
 		for (var s = i; s < slen; s++)
 		{
-			dirUp += "../";
+			relative.Append("../");
 		}
 
-		var file = "";
+		var fileStart = relative.Length;
 		for (var t = i; t < target.Length; t++)
 		{
-			file += (file == "" ? "" : "/") + target[t];
+			if (relative.Length > fileStart)
+			{
+				relative.Append('/');
+			}
+
+			relative.Append(target[t]);
 		}
 
-		return new Uri(dirUp + file, UriKind.Relative);
+		return new Uri(relative.ToString(), UriKind.Relative);
 	}
 }

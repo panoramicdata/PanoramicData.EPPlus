@@ -35,7 +35,7 @@ public class ExcelProtectedRangeCollection : XmlHelper, IEnumerable<ExcelProtect
 		{
 			if (name.Equals(pr.Name, StringComparison.CurrentCultureIgnoreCase))
 			{
-				throw (new InvalidOperationException($"A protected range with the namn {name} already exists"));
+				throw new InvalidOperationException($"A protected range with the namn {name} already exists");
 			}
 		}
 

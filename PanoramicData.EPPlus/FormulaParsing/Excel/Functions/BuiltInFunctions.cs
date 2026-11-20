@@ -38,6 +38,17 @@ public class BuiltInFunctions : FunctionsModule
 {
 	public BuiltInFunctions()
 	{
+		AddTextFunctions();
+		AddMathFunctions();
+		AddStatisticalFunctions();
+		AddInformationAndLogicalFunctions();
+		AddLookupFunctions();
+		AddDateFunctions();
+		AddDatabaseAndFinanceFunctions();
+	}
+
+	private void AddTextFunctions()
+	{
 		// Text
 		Functions["len"] = new Len();
 		Functions["lower"] = new Lower();
@@ -59,6 +70,10 @@ public class BuiltInFunctions : FunctionsModule
 		Functions["t"] = new T();
 		Functions["hyperlink"] = new Hyperlink();
 		Functions["value"] = new Value();
+	}
+
+	private void AddMathFunctions()
+	{
 		// Numbers
 		Functions["int"] = new CInt();
 		// Math
@@ -103,6 +118,10 @@ public class BuiltInFunctions : FunctionsModule
 		Functions["min"] = new Min();
 		Functions["mina"] = new Mina();
 		Functions["mod"] = new Mod();
+	}
+
+	private void AddStatisticalFunctions()
+	{
 		Functions["average"] = new Average();
 		Functions["averagea"] = new AverageA();
 		Functions["averageif"] = new AverageIf();
@@ -129,6 +148,10 @@ public class BuiltInFunctions : FunctionsModule
 		Functions["large"] = new Large();
 		Functions["small"] = new Small();
 		Functions["degrees"] = new Degrees();
+	}
+
+	private void AddInformationAndLogicalFunctions()
+	{
 		// Information
 		Functions["isblank"] = new IsBlank();
 		Functions["isnumber"] = new IsNumber();
@@ -152,6 +175,10 @@ public class BuiltInFunctions : FunctionsModule
 		Functions["or"] = new Or();
 		Functions["true"] = new True();
 		Functions["false"] = new False();
+	}
+
+	private void AddLookupFunctions()
+	{
 		// Reference and lookup
 		Functions["address"] = new Address();
 		Functions["hlookup"] = new HLookup();
@@ -166,6 +193,10 @@ public class BuiltInFunctions : FunctionsModule
 		Functions["index"] = new RefAndLookup.Index();
 		Functions["indirect"] = new Indirect();
 		Functions["offset"] = new Offset();
+	}
+
+	private void AddDateFunctions()
+	{
 		// Date
 		Functions["date"] = new Date();
 		Functions["today"] = new Today();
@@ -189,6 +220,10 @@ public class BuiltInFunctions : FunctionsModule
 		Functions["networkdays.intl"] = new NetworkdaysIntl();
 		Functions["datevalue"] = new DateValue();
 		Functions["timevalue"] = new TimeValue();
+	}
+
+	private void AddDatabaseAndFinanceFunctions()
+	{
 		// Database
 		Functions["dget"] = new Dget();
 		Functions["dcount"] = new Dcount();

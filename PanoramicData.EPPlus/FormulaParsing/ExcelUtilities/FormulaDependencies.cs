@@ -37,7 +37,6 @@ public class FormulaDependencies
 	public FormulaDependencies()
 		: this(new FormulaDependencyFactory())
 	{
-
 	}
 
 	public FormulaDependencies(FormulaDependencyFactory formulaDependencyFactory)
@@ -52,22 +51,7 @@ public class FormulaDependencies
 
 	public static void AddFormulaScope(ParsingScope parsingScope)
 	{
-		//var dependency = _formulaDependencyFactory.Create(parsingScope);
-		//var address = parsingScope.Address.ToString();
-		//if (!_dependencies.ContainsKey(address))
-		//{
-		//    _dependencies.Add(address, dependency);
-		//}
-		//if (parsingScope.Parent != null)
-		//{
-		//    var parentAddress = parsingScope.Parent.Address.ToString();
-		//    if (_dependencies.ContainsKey(parentAddress))
-		//    {
-		//        var parent = _dependencies[parentAddress];
-		//        parent.AddReferenceTo(parsingScope.Address);
-		//        dependency.AddReferenceFrom(parent.Address);
-		//    }
-		//}
+		// Dependency tracking by scope is not implemented; kept for API compatibility.
 	}
 
 	public void Clear() => _dependencies.Clear();

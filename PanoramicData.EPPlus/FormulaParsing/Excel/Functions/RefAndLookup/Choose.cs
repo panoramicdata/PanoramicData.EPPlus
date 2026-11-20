@@ -57,7 +57,7 @@ public class Choose : ExcelFunction
 
 public class ChoosenInfo : ExcelDataProvider.IRangeInfo
 {
-	private readonly string[] chosenIndeces = null;
+	private readonly string[] chosenIndeces;
 
 	public ChoosenInfo(string[] chosenIndeces)
 	{
@@ -82,6 +82,7 @@ public class ChoosenInfo : ExcelDataProvider.IRangeInfo
 
 	public void Dispose()
 	{
+		// Holds no disposable resources.
 	}
 
 	object System.Collections.IEnumerator.Current => chosenIndeces[0];

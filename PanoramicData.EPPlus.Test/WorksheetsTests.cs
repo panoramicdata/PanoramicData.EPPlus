@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 using System.Reflection;
 
 namespace PanoramicData.EPPlus.Test;
@@ -42,11 +39,11 @@ public class WorksheetsTests
 		workbook.Worksheets.Delete("NEW2");
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
+	[TestMethod]
 	public void DeleteByNameWhereWorkSheetDoesNotExist()
 	{
 		workbook.Worksheets.Add("NEW2");
-		workbook.Worksheets.Delete("NEW3");
+		Assert.ThrowsExactly<ArgumentException>(() => workbook.Worksheets.Delete("NEW3"));
 	}
 
 	[TestMethod]
@@ -108,13 +105,7 @@ public class WorksheetsTests
 	public void DeleteFirstColumnInRangeColumnShouldBeDeleted()
 	{
 		// Arrange
-		ExcelPackage pck = new();
-		using (
-			var file =
-		  Assembly.GetExecutingAssembly().GetManifestResourceStream("EPPlusTest.TestWorkbooks.PreDeleteColumn.xls"))
-		{
-			pck.Load(file);
-		}
+		var pck = LoadPreDeleteColumnWorkbook();
 
 		var wsData = pck.Workbook.Worksheets[1];
 
@@ -133,13 +124,7 @@ public class WorksheetsTests
 	public void DeleteLastColumnInRangeColumnShouldBeDeleted()
 	{
 		// Arrange
-		ExcelPackage pck = new();
-		using (
-			var file =
-		  Assembly.GetExecutingAssembly().GetManifestResourceStream("EPPlusTest.TestWorkbooks.PreDeleteColumn.xls"))
-		{
-			pck.Load(file);
-		}
+		var pck = LoadPreDeleteColumnWorkbook();
 
 		var wsData = pck.Workbook.Worksheets[1];
 
@@ -157,13 +142,7 @@ public class WorksheetsTests
 	public void DeleteColumnAfterNormalRangeSheetShouldRemainUnchanged()
 	{
 		// Arrange
-		ExcelPackage pck = new();
-		using (
-			var file =
-		  Assembly.GetExecutingAssembly().GetManifestResourceStream("EPPlusTest.TestWorkbooks.PreDeleteColumn.xls"))
-		{
-			pck.Load(file);
-		}
+		var pck = LoadPreDeleteColumnWorkbook();
 
 		var wsData = pck.Workbook.Worksheets[1];
 
@@ -180,62 +159,34 @@ public class WorksheetsTests
 	}
 
 	[TestMethod, Ignore]
-	[ExpectedException(typeof(ArgumentException))]
 	public void DeleteColumnBeforeRangeMimitThrowsArgumentException()
 	{
 		// Arrange
-		ExcelPackage pck = new();
-		using (
-			var file =
-		  Assembly.GetExecutingAssembly().GetManifestResourceStream("EPPlusTest.TestWorkbooks.PreDeleteColumn.xls"))
-		{
-			pck.Load(file);
-		}
+		var pck = LoadPreDeleteColumnWorkbook();
 
 		var wsData = pck.Workbook.Worksheets[1];
 
-		// Act
-		wsData.DeleteColumn(0);
-
-		// Assert
-		Assert.Fail();
-
+		// Act and assert
+		Assert.ThrowsExactly<ArgumentException>(() => wsData.DeleteColumn(0));
 	}
 
 	[TestMethod, Ignore]
-	[ExpectedException(typeof(ArgumentException))]
 	public void DeleteColumnAfterRangeLimitThrowsArgumentException()
 	{
 		// Arrange
-		ExcelPackage pck = new();
-		using (
-			var file =
-		  Assembly.GetExecutingAssembly().GetManifestResourceStream("EPPlusTest.TestWorkbooks.PreDeleteColumn.xls"))
-		{
-			pck.Load(file);
-		}
+		var pck = LoadPreDeleteColumnWorkbook();
 
 		var wsData = pck.Workbook.Worksheets[1];
 
-		// Act
-		wsData.DeleteColumn(16385);
-
-		// Assert
-		Assert.Fail();
-
+		// Act and assert
+		Assert.ThrowsExactly<ArgumentException>(() => wsData.DeleteColumn(16385));
 	}
 
 	[TestMethod, Ignore]
 	public void DeleteFirstTwoColumnsFromRangeColumnsShouldBeDeleted()
 	{
 		// Arrange
-		ExcelPackage pck = new();
-		using (
-			var file =
-		  Assembly.GetExecutingAssembly().GetManifestResourceStream("EPPlusTest.TestWorkbooks.PreDeleteColumn.xls"))
-		{
-			pck.Load(file);
-		}
+		var pck = LoadPreDeleteColumnWorkbook();
 
 		var wsData = pck.Workbook.Worksheets[1];
 
@@ -277,5 +228,16 @@ public class WorksheetsTests
 			Assert.AreEqual(worksheet.Name, newPackage.Workbook.Worksheets[positionId].Name, "Worksheets are not in the same order");
 			positionId++;
 		}
+	}
+
+	private static ExcelPackage LoadPreDeleteColumnWorkbook()
+	{
+		ExcelPackage pck = new();
+		using (var file = Assembly.GetExecutingAssembly().GetManifestResourceStream("EPPlusTest.TestWorkbooks.PreDeleteColumn.xls"))
+		{
+			pck.Load(file);
+		}
+
+		return pck;
 	}
 }

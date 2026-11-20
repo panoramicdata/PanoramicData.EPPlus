@@ -6,7 +6,7 @@ namespace OfficeOpenXml.Style.Dxf;
 public abstract class DxfStyleBase<T>
 {
 	protected ExcelStyles _styles;
-	internal DxfStyleBase(ExcelStyles styles)
+	private protected DxfStyleBase(ExcelStyles styles)
 	{
 		_styles = styles;
 		AllowChange = false; //Don't touch this value in the styles.xml (by default). When Dxfs is fully implemented this can be removed.

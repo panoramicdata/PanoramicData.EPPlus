@@ -89,7 +89,7 @@ public class ExcelFillXml : StyleXmlHelper
 			_fillPatternType = value;
 		}
 	}
-	protected ExcelColorXml _patternColor = null;
+	protected ExcelColorXml _patternColor;
 	const string _patternColorPath = "d:patternFill/d:bgColor";
 	/// <summary>
 	/// Pattern color
@@ -105,7 +105,7 @@ public class ExcelFillXml : StyleXmlHelper
 			_patternColor = value;
 		}
 	}
-	protected ExcelColorXml _backgroundColor = null;
+	protected ExcelColorXml _backgroundColor;
 	const string _backgroundColorPath = "d:patternFill/d:fgColor";
 	/// <summary>
 	/// Cell background color 
@@ -124,11 +124,6 @@ public class ExcelFillXml : StyleXmlHelper
 	#endregion
 
 
-	//internal Fill Copy()
-	//{
-	//    Fill newFill = new Fill(NameSpaceManager, TopNode.Clone());
-	//    return newFill;
-	//}
 
 	internal virtual ExcelFillXml Copy()
 	{
@@ -147,7 +142,6 @@ public class ExcelFillXml : StyleXmlHelper
 		SetXmlNodeString(fillPatternTypePath, SetPatternString(_fillPatternType));
 		if (PatternType != ExcelFillStyle.None)
 		{
-			var pattern = topNode.SelectSingleNode(fillPatternTypePath, NameSpaceManager);
 			if (BackgroundColor.Exists)
 			{
 				CreateNode(_backgroundColorPath);

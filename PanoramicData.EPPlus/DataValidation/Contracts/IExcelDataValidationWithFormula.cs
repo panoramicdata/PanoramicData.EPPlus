@@ -33,6 +33,7 @@ using OfficeOpenXml.DataValidation.Formulas.Contracts;
 
 namespace OfficeOpenXml.DataValidation.Contracts;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3246:Generic type parameters should be co/contravariant when possible", Justification = "Public API: adding variance changes the published interface signature.")]
 public interface IExcelDataValidationWithFormula<T> : IExcelDataValidation
 	where T : IExcelDataValidationFormula
 {

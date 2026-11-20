@@ -40,7 +40,6 @@ public class LookupFunctionCompiler : FunctionCompiler
 	public LookupFunctionCompiler(ExcelFunction function, ParsingContext context)
 		: base(function, context)
 	{
-
 	}
 
 	public override CompileResult Compile(IEnumerable<Expression> children)
@@ -50,10 +49,6 @@ public class LookupFunctionCompiler : FunctionCompiler
 		for (var x = 0; x < children.Count(); x++)
 		{
 			var child = children.ElementAt(x);
-			//if (x > 0 || Function.SkipArgumentEvaluation)
-			//{
-			//    child.ParentIsLookupFunction = Function.IsLookupFuction;
-			//}
 			var arg = child.Compile();
 			if (arg != null)
 			{

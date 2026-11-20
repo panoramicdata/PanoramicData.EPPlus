@@ -7,11 +7,11 @@ namespace PanoramicData.EPPlus.Test.FormulaParsing.Excel.Functions;
 [TestClass]
 public class ArgumentParsersImplementationsTests
 {
-	[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+	[TestMethod]
 	public void IntParserShouldThrowIfArgumentIsNull()
 	{
 		var parser = new IntArgumentParser();
-		parser.Parse(null);
+		Assert.ThrowsExactly<ArgumentNullException>(() => parser.Parse(null));
 	}
 
 	[TestMethod]
@@ -86,11 +86,11 @@ public class ArgumentParsersImplementationsTests
 		Assert.AreEqual(3d, result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentNullException))]
+	[TestMethod]
 	public void DoubleParserShouldThrowIfArgumentIsNull()
 	{
 		var parser = new DoubleArgumentParser();
-		parser.Parse(null);
+		Assert.ThrowsExactly<ArgumentNullException>(() => parser.Parse(null));
 	}
 
 	[TestMethod]

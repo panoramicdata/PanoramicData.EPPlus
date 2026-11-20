@@ -22,8 +22,10 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+using System.Collections.Generic;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 
@@ -32,12 +34,13 @@ public abstract class LookupFunction : ExcelFunction
 	private readonly ValueMatcher _valueMatcher;
 	private readonly CompileResultFactory _compileResultFactory;
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public LookupFunction()
 		: this(new LookupValueMatcher(), new CompileResultFactory())
 	{
-
 	}
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public LookupFunction(ValueMatcher valueMatcher, CompileResultFactory compileResultFactory)
 	{
 		_valueMatcher = valueMatcher;
@@ -47,6 +50,14 @@ public abstract class LookupFunction : ExcelFunction
 	public override bool IsLookupFuction => true;
 
 	protected int IsMatch(object o1, object o2) => _valueMatcher.IsMatch(o1, o2);
+
+	private protected RangeAddress CreateRangeAddressFromArgument(IEnumerable<FunctionArgument> arguments, ParsingContext context)
+	{
+		var rangeAddress = ArgToAddress(arguments, 0, context);
+		return ExcelAddressUtil.IsValidAddress(rangeAddress)
+			? new RangeAddressFactory(context.ExcelDataProvider).Create(rangeAddress)
+			: null;
+	}
 
 	protected static LookupDirection GetLookupDirection(RangeAddress rangeAddress)
 	{
@@ -68,39 +79,57 @@ public abstract class LookupFunction : ExcelFunction
 		do
 		{
 			var matchResult = IsMatch(navigator.CurrentValue, lookupArgs.SearchedValue);
-			if (matchResult != 0)
-			{
-				if (lastValue != null && navigator.CurrentValue == null)
-				{
-					break;
-				}
-
-				if (!lookupArgs.RangeLookup)
-				{
-					continue;
-				}
-
-				if (lastValue == null && matchResult > 0)
-				{
-					return new CompileResult(eErrorType.NA);
-				}
-
-				if (lastValue != null && matchResult > 0 && lastMatchResult < 0)
-				{
-					return _compileResultFactory.Create(lastLookupValue);
-				}
-
-				lastMatchResult = matchResult;
-				lastValue = navigator.CurrentValue;
-				lastLookupValue = navigator.GetLookupValue();
-			}
-			else
+			if (matchResult == 0)
 			{
 				return _compileResultFactory.Create(navigator.GetLookupValue());
 			}
+
+			if (ReachedEndOfValues(lastValue, navigator))
+			{
+				break;
+			}
+
+			if (!lookupArgs.RangeLookup)
+			{
+				continue;
+			}
+
+			if (TryGetRangeLookupResult(lastValue, matchResult, lastMatchResult, lastLookupValue, out var rangeResult))
+			{
+				return rangeResult;
+			}
+
+			lastMatchResult = matchResult;
+			lastValue = navigator.CurrentValue;
+			lastLookupValue = navigator.GetLookupValue();
 		}
 		while (navigator.MoveNext());
 
 		return lookupArgs.RangeLookup ? _compileResultFactory.Create(lastLookupValue) : new CompileResult(eErrorType.NA);
+	}
+
+	private static bool ReachedEndOfValues(object lastValue, LookupNavigator navigator) => lastValue != null && navigator.CurrentValue == null;
+
+	private bool TryGetRangeLookupResult(object lastValue, int matchResult, int? lastMatchResult, object lastLookupValue, out CompileResult result)
+	{
+		result = null;
+		if (matchResult <= 0)
+		{
+			return false;
+		}
+
+		if (lastValue == null)
+		{
+			result = new CompileResult(eErrorType.NA);
+			return true;
+		}
+
+		if (lastMatchResult < 0)
+		{
+			result = _compileResultFactory.Create(lastLookupValue);
+			return true;
+		}
+
+		return false;
 	}
 }

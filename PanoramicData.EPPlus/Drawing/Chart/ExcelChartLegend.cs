@@ -80,7 +80,7 @@ public class ExcelChartLegend : XmlHelper
 		{
 			if (TopNode == null)
 			{
-				throw (new Exception("Can't set position. Chart has no legend"));
+				throw (new InvalidOperationException("Can't set position. Chart has no legend"));
 			}
 
 			switch (value)
@@ -117,60 +117,27 @@ public class ExcelChartLegend : XmlHelper
 		{
 			if (TopNode == null)
 			{
-				throw (new Exception("Can't set overlay. Chart has no legend"));
+				throw (new InvalidOperationException("Can't set overlay. Chart has no legend"));
 			}
 
 			SetXmlNodeBool(OVERLAY_PATH, value);
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Fill style
 	/// </summary>
-	public ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
-	ExcelDrawingBorder _border = null;
+	public ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Border style
 	/// </summary>
-	public ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
-	ExcelTextFont _font = null;
+	public ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
+	ExcelTextFont _font;
 	/// <summary>
 	/// Font properties
 	/// </summary>
-	public ExcelTextFont Font
-	{
-		get
-		{
-			if (_font == null)
-			{
-				if (TopNode.SelectSingleNode("c:txPr", NameSpaceManager) == null)
-				{
-					CreateNode("c:txPr/a:bodyPr");
-					CreateNode("c:txPr/a:lstStyle");
-				}
-
-				_font = new ExcelTextFont(NameSpaceManager, TopNode, "c:txPr/a:p/a:pPr/a:defRPr", ["legendPos", "layout", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
-			}
-
-			return _font;
-		}
-	}
+	public ExcelTextFont Font => ChartStyleAccess.GetFont(this, ref _font, ["legendPos", "layout", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
 	/// <summary>
 	/// Remove the legend
 	/// </summary>
@@ -194,7 +161,6 @@ public class ExcelChartLegend : XmlHelper
 			return;
 		}
 
-		//XmlHelper xml = new XmlHelper(NameSpaceManager, _chart.ChartXml);
 		var xml = XmlHelperFactory.Create(NameSpaceManager, _chart.ChartXml);
 		xml.SchemaNodeOrder = _chart.SchemaNodeOrder;
 

@@ -40,7 +40,6 @@ public class DecimalExpression : AtomicExpression
 	public DecimalExpression(string expression)
 		: this(expression, false)
 	{
-
 	}
 
 	public DecimalExpression(string expression, bool negate)
@@ -57,8 +56,6 @@ public class DecimalExpression : AtomicExpression
 
 	public override CompileResult Compile()
 	{
-		var result = _compiledValue.HasValue ? _compiledValue.Value : double.Parse(ExpressionString, CultureInfo.InvariantCulture);
-		result = _negate ? result * -1 : result;
-		return new CompileResult(result, DataType.Decimal);
+		return new CompileResult(GetNumericValue(_compiledValue, _negate), DataType.Decimal);
 	}
 }

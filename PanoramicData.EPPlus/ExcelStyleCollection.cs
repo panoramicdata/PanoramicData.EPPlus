@@ -53,7 +53,7 @@ public class ExcelStyleCollection<T> : IEnumerable<T>
 	public XmlNode TopNode { get; set; }
 	internal List<T> _list = [];
 	readonly Dictionary<string, int> _dic = new(StringComparer.OrdinalIgnoreCase);
-	internal int NextId = 0;
+	internal int NextId;
 	#region IEnumerable<T> Members
 
 	public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
@@ -71,12 +71,6 @@ public class ExcelStyleCollection<T> : IEnumerable<T>
 		}
 	}
 	public int Count => _list.Count;
-	//internal int Add(T item)
-	//{
-	//    _list.Add(item);
-	//    if (_setNextIdManual) NextId++;
-	//    return _list.Count-1;
-	//}
 	internal int Add(string key, T item)
 	{
 		_list.Add(item);

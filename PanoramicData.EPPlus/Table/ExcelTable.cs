@@ -153,16 +153,16 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 	private string GetStartXml(string name, int tblId)
 	{
 		name = ConvertUtil.ExcelEscapeString(name);
-		var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>";
-		xml += string.Format("<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" id=\"{0}\" name=\"{1}\" displayName=\"{2}\" ref=\"{3}\" headerRowCount=\"1\">",
+		var xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>");
+		xml.AppendFormat("<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" id=\"{0}\" name=\"{1}\" displayName=\"{2}\" ref=\"{3}\" headerRowCount=\"1\">",
 		tblId,
 		name,
 		ExcelAddressUtil.GetValidName(name),
 		Address.Address);
-		xml += string.Format("<autoFilter ref=\"{0}\" />", Address.Address);
+		xml.AppendFormat("<autoFilter ref=\"{0}\" />", Address.Address);
 
 		var cols = Address._toCol - Address._fromCol + 1;
-		xml += string.Format("<tableColumns count=\"{0}\">", cols);
+		xml.AppendFormat("<tableColumns count=\"{0}\">", cols);
 		var names = new Dictionary<string, string>();
 		for (var i = 1; i <= cols; i++)
 		{
@@ -184,14 +184,14 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 			}
 
 			names.Add(colName, colName);
-			xml += string.Format("<tableColumn id=\"{0}\" name=\"{1}\" />", i, colName);
+			xml.AppendFormat("<tableColumn id=\"{0}\" name=\"{1}\" />", i, colName);
 		}
 
-		xml += "</tableColumns>";
-		xml += "<tableStyleInfo name=\"TableStyleMedium9\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\" /> ";
-		xml += "</table>";
+		xml.Append("</tableColumns>");
+		xml.Append("<tableStyleInfo name=\"TableStyleMedium9\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\" /> ");
+		xml.Append("</table>");
 
-		return xml;
+		return xml.ToString();
 	}
 	internal static string CleanDisplayName(string name) => Regex.Replace(name, @"[^\w\.-_]", "_");
 	internal Packaging.ZipPackagePart Part
@@ -250,13 +250,7 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 				throw (new ArgumentException("Tablename is not unique"));
 			}
 
-			var prevName = Name;
-			if (WorkSheet.Tables._tableNames.TryGetValue(prevName, out var ix))
-			{
-				WorkSheet.Tables._tableNames.Remove(prevName);
-				WorkSheet.Tables._tableNames.Add(value, ix);
-			}
-
+			TableNameHelper.RenameTable(WorkSheet, Name, value);
 			SetXmlNodeString(NAME_PATH, value);
 			SetXmlNodeString(DISPLAY_NAME_PATH, ExcelAddressUtil.GetValidName(value));
 		}
@@ -270,7 +264,7 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 		set;
 	}
 
-	private ExcelAddressBase _address = null;
+	private ExcelAddressBase _address;
 	/// <summary>
 	/// The address of the table
 	/// </summary>
@@ -287,7 +281,7 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 			WriteAutoFilter(ShowTotal);
 		}
 	}
-	internal ExcelTableColumnCollection _cols = null;
+	internal ExcelTableColumnCollection _cols;
 	/// <summary>
 	/// Collection of the columns in the table
 	/// </summary>
@@ -465,27 +459,7 @@ public class ExcelTable : XmlHelper, IEqualityComparer<ExcelTable>
 		}
 		set
 		{
-			if (value.StartsWith("TableStyle"))
-			{
-				try
-				{
-					_tableStyle = Enum.Parse<TableStyles>(value[10..], true);
-				}
-				catch
-				{
-					_tableStyle = TableStyles.Custom;
-				}
-			}
-			else if (value == "None")
-			{
-				_tableStyle = TableStyles.None;
-				value = "";
-			}
-			else
-			{
-				_tableStyle = TableStyles.Custom;
-			}
-
+			(_tableStyle, value) = TableNameHelper.ParseStyleName(value, "TableStyle");
 			SetXmlNodeString(STYLENAME_PATH, value, true);
 		}
 	}

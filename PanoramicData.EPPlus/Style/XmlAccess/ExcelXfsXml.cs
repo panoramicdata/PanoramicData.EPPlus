@@ -114,18 +114,6 @@ public sealed class ExcelXfs : StyleXmlHelper
 			return ExcelVerticalAlignment.Bottom;
 		}
 	}
-	internal void Xf_ChangedEvent(object sender, EventArgs e)
-	{
-		//if (_cell != null)
-		//{
-		//    if (!Styles.ChangedCells.ContainsKey(_cell.Id))
-		//    {
-		//        //_cell.Style = "";
-		//        _cell.SetNewStyleID(int.MinValue.ToString());
-		//        Styles.ChangedCells.Add(_cell.Id, _cell);
-		//    }
-		//}
-	}
 	int _xfID;
 	/// <summary>
 	/// Style index
@@ -278,7 +266,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string wrapTextPath = "d:alignment/@wrapText";
-	bool _wrapText = false;
+	bool _wrapText;
 	/// <summary>
 	/// Wraped text
 	/// </summary>
@@ -294,7 +282,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	readonly string textRotationPath = "d:alignment/@textRotation";
-	int _textRotation = 0;
+	int _textRotation;
 	/// <summary>
 	/// Text rotation angle
 	/// </summary>
@@ -326,7 +314,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string hiddenPath = "d:protection/@hidden";
-	bool _hidden = false;
+	bool _hidden;
 	/// <summary>
 	/// Hide formulas when sheet is protected
 	/// </summary>
@@ -342,7 +330,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string quotePrefixPath = "@quotePrefix";
-	bool _quotePrefix = false;
+	bool _quotePrefix;
 	/// <summary>
 	/// Prefix the formula with a quote.
 	/// </summary>
@@ -374,7 +362,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string shrinkToFitPath = "d:alignment/@shrinkToFit";
-	bool _shrinkToFit = false;
+	bool _shrinkToFit;
 	/// <summary>
 	/// Shrink to fit
 	/// </summary>
@@ -390,7 +378,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	const string indentPath = "d:alignment/@indent";
-	int _indent = 0;
+	int _indent;
 	/// <summary>
 	/// Indentation
 	/// </summary>
@@ -406,11 +394,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 	}
 	#endregion
-	internal static void RegisterEvent(ExcelXfs xf)
-	{
-		//                RegisterEvent(xf, xf.Xf_ChangedEvent);
-	}
-	internal override string Id => XfId + "|" + NumberFormatId.ToString() + "|" + FontId.ToString() + "|" + FillId.ToString() + "|" + BorderId.ToString() + VerticalAlignment.ToString() + "|" + HorizontalAlignment.ToString() + "|" + WrapText.ToString() + "|" + ReadingOrder.ToString() + "|" + isBuildIn.ToString() + TextRotation.ToString() + Locked.ToString() + Hidden.ToString() + ShrinkToFit.ToString() + Indent.ToString() + QuotePrefix.ToString();//return Numberformat.Id + "|" + Font.Id + "|" + Fill.Id + "|" + Border.Id + VerticalAlignment.ToString() + "|" + HorizontalAlignment.ToString() + "|" + WrapText.ToString() + "|" + ReadingOrder.ToString(); 
+	internal override string Id => XfId + "|" + NumberFormatId.ToString() + "|" + FontId.ToString() + "|" + FillId.ToString() + "|" + BorderId.ToString() + VerticalAlignment.ToString() + "|" + HorizontalAlignment.ToString() + "|" + WrapText.ToString() + "|" + ReadingOrder.ToString() + "|" + isBuildIn.ToString() + TextRotation.ToString() + Locked.ToString() + Hidden.ToString() + ShrinkToFit.ToString() + Indent.ToString() + QuotePrefix.ToString();
 	internal ExcelXfs Copy() => Copy(_styles);
 	internal ExcelXfs Copy(ExcelStyles styles)
 	{
@@ -508,12 +492,9 @@ public sealed class ExcelXfs : StyleXmlHelper
 						newXfs.QuotePrefix = (bool)value;
 						break;
 					default:
-						throw (new Exception("Invalid property for class style."));
-
+						throw (new InvalidOperationException("Invalid property for class style."));
 				}
 
-				break;
-			default:
 				break;
 		}
 
@@ -553,12 +534,12 @@ public sealed class ExcelXfs : StyleXmlHelper
 				}
 				else
 				{
-					throw (new Exception("Invalid property for class Border."));
+					throw (new InvalidOperationException("Invalid property for class Border."));
 				}
 
 				break;
 			default:
-				throw (new Exception("Invalid class/property for class Border."));
+				throw (new InvalidOperationException("Invalid class/property for class Border."));
 		}
 
 		int subId;
@@ -577,7 +558,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		{
 			if (excelBorderItem.Style == ExcelBorderStyle.None)
 			{
-				throw (new Exception("Can't set bordercolor when style is not set."));
+				throw (new InvalidOperationException("Can't set bordercolor when style is not set."));
 			}
 
 			excelBorderItem.Color.Rgb = value.ToString();
@@ -747,7 +728,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 		}
 		else
 		{
-			throw (new Exception("Invalid property for class Numberformat"));
+			throw (new InvalidOperationException("Invalid property for class Numberformat"));
 		}
 	}
 	private int GetIdFont(eStyleProperty styleProperty, object value)
@@ -793,7 +774,7 @@ public sealed class ExcelXfs : StyleXmlHelper
 				fnt.VerticalAlign = ((ExcelVerticalAlignmentFont)value) == ExcelVerticalAlignmentFont.None ? "" : value.ToString().ToLower(CultureInfo.InvariantCulture);
 				break;
 			default:
-				throw (new Exception("Invalid property for class Font"));
+				throw (new InvalidOperationException("Invalid property for class Font"));
 		}
 
 		int subId;

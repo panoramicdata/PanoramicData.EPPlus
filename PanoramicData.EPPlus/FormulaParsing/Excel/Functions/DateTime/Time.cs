@@ -31,12 +31,6 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 
 public class Time : TimeBaseFunction
 {
-	public Time()
-		: base()
-	{
-
-	}
-
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
 		ValidateArguments(arguments, 1);
@@ -55,7 +49,6 @@ public class Time : TimeBaseFunction
 		ThrowArgumentExceptionIf(() => sec is < 0 or > 59, "Invalid second: " + sec);
 		ThrowArgumentExceptionIf(() => min is < 0 or > 59, "Invalid minute: " + min);
 		ThrowArgumentExceptionIf(() => min < 0 || hour > 23, "Invalid hour: " + hour);
-
 
 		var secondsOfThisTime = (double)(hour * 60 * 60 + min * 60 + sec);
 		return CreateResult(GetTimeSerialNumber(secondsOfThisTime), DataType.Time);

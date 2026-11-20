@@ -42,13 +42,12 @@ public class ExpressionGraphBuilder : IExpressionGraphBuilder
 	private readonly ExpressionGraph _graph = new();
 	private readonly IExpressionFactory _expressionFactory;
 	private readonly ParsingContext _parsingContext;
-	private int _tokenIndex = 0;
+	private int _tokenIndex;
 	private bool _negateNextExpression;
 
 	public ExpressionGraphBuilder(ExcelDataProvider excelDataProvider, ParsingContext parsingContext)
 		: this(new ExpressionFactory(excelDataProvider, parsingContext), parsingContext)
 	{
-
 	}
 
 	public ExpressionGraphBuilder(IExpressionFactory expressionFactory, ParsingContext parsingContext)
@@ -71,64 +70,73 @@ public class ExpressionGraphBuilder : IExpressionGraphBuilder
 		while (_tokenIndex < tokens.Length)
 		{
 			var token = tokens[_tokenIndex];
-			if (token.TokenType == TokenType.Operator && OperatorsDict.Instance.TryGetValue(token.Value, out var op))
-			{
-				SetOperatorOnExpression(parent, op);
-			}
-			else if (token.TokenType == TokenType.Function)
-			{
-				BuildFunctionExpression(tokens, parent, token.Value);
-			}
-			else if (token.TokenType == TokenType.OpeningEnumerable)
-			{
-				_tokenIndex++;
-				BuildEnumerableExpression(tokens, parent);
-			}
-			else if (token.TokenType == TokenType.OpeningParenthesis)
-			{
-				_tokenIndex++;
-				BuildGroupExpression(tokens, parent);
-				//if (parent is FunctionExpression)
-				//{
-				//    return;
-				//}
-			}
-			else if (token.TokenType is TokenType.ClosingParenthesis or TokenType.ClosingEnumerable)
+			if (token.TokenType is TokenType.ClosingParenthesis or TokenType.ClosingEnumerable)
 			{
 				break;
 			}
-			else if (token.TokenType == TokenType.WorksheetName)
+
+			HandleToken(tokens, token, ref parent);
+			_tokenIndex++;
+		}
+	}
+
+	private void HandleToken(Token[] tokens, Token token, ref Expression parent)
+	{
+		if (token.TokenType == TokenType.Operator && OperatorsDict.Instance.TryGetValue(token.Value, out var op))
+		{
+			SetOperatorOnExpression(parent, op);
+		}
+		else if (token.TokenType == TokenType.Function)
+		{
+			BuildFunctionExpression(tokens, parent, token.Value);
+		}
+		else if (token.TokenType == TokenType.OpeningEnumerable)
+		{
+			_tokenIndex++;
+			BuildEnumerableExpression(tokens, parent);
+		}
+		else if (token.TokenType == TokenType.OpeningParenthesis)
+		{
+			_tokenIndex++;
+			BuildGroupExpression(tokens, parent);
+		}
+		else
+		{
+			HandleValueToken(tokens, token, ref parent);
+		}
+	}
+
+	private void HandleValueToken(Token[] tokens, Token token, ref Expression parent)
+	{
+		if (token.TokenType == TokenType.WorksheetName)
+		{
+			var sb = new StringBuilder();
+			sb.Append(tokens[_tokenIndex++].Value);
+			sb.Append(tokens[_tokenIndex++].Value);
+			sb.Append(tokens[_tokenIndex++].Value);
+			sb.Append(tokens[_tokenIndex].Value);
+			var t = new Token(sb.ToString(), TokenType.ExcelAddress);
+			CreateAndAppendExpression(ref parent, t);
+		}
+		else if (token.TokenType == TokenType.Negator)
+		{
+			_negateNextExpression = true;
+		}
+		else if (token.TokenType == TokenType.Percent)
+		{
+			SetOperatorOnExpression(parent, Operator.Percent);
+			if (parent == null)
 			{
-				var sb = new StringBuilder();
-				sb.Append(tokens[_tokenIndex++].Value);
-				sb.Append(tokens[_tokenIndex++].Value);
-				sb.Append(tokens[_tokenIndex++].Value);
-				sb.Append(tokens[_tokenIndex].Value);
-				var t = new Token(sb.ToString(), TokenType.ExcelAddress);
-				CreateAndAppendExpression(ref parent, t);
-			}
-			else if (token.TokenType == TokenType.Negator)
-			{
-				_negateNextExpression = true;
-			}
-			else if (token.TokenType == TokenType.Percent)
-			{
-				SetOperatorOnExpression(parent, Operator.Percent);
-				if (parent == null)
-				{
-					_graph.Add(ConstantExpressions.Percent);
-				}
-				else
-				{
-					parent.AddChild(ConstantExpressions.Percent);
-				}
+				_graph.Add(ConstantExpressions.Percent);
 			}
 			else
 			{
-				CreateAndAppendExpression(ref parent, token);
+				parent.AddChild(ConstantExpressions.Percent);
 			}
-
-			_tokenIndex++;
+		}
+		else
+		{
+			CreateAndAppendExpression(ref parent, token);
 		}
 	}
 

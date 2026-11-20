@@ -41,7 +41,6 @@ public sealed class ExcelBubbleChartSeries : ExcelChartSeries
 	internal ExcelBubbleChartSeries(ExcelChart chart, XmlNamespaceManager ns, XmlNode node, bool isPivot)
 	   : base(chart, ns, node, isPivot)
 	{
-		//_chartSeries = new ExcelChartSeries(this, _drawings.NameSpaceManager, _chartNode, isPivot);
 	}
 	public ExcelChartSerie Add(ExcelRangeBase Serie, ExcelRangeBase XSerie, ExcelRangeBase BubbleSize) => AddSeries(Serie.FullAddressAbsolute, XSerie.FullAddressAbsolute, BubbleSize.FullAddressAbsolute);
 	public ExcelChartSerie Add(string SerieAddress, string XSerieAddress, string BubbleSizeAddress) => AddSeries(SerieAddress, XSerieAddress, BubbleSizeAddress);
@@ -160,107 +159,50 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 
 		var idx = FindIndex();
 		ser.InnerXml = string.Format("<c:idx val=\"{1}\" /><c:order val=\"{1}\" /><c:tx><c:strRef><c:f></c:f><c:strCache><c:ptCount val=\"1\" /></c:strCache></c:strRef></c:tx>{5}{0}{2}{3}{4}", AddExplosion(Chart.ChartType), idx, AddScatterPoint(Chart.ChartType), AddAxisNodes(Chart.ChartType), AddSmooth(Chart.ChartType), AddMarker(Chart.ChartType));
-		ExcelChartSerie serie;
-		switch (Chart.ChartType)
-		{
-			case eChartType.Bubble:
-			case eChartType.Bubble3DEffect:
-				serie = new ExcelBubbleChartSerie(this, NameSpaceManager, ser, _isPivot)
-				{
-					Bubble3D = Chart.ChartType == eChartType.Bubble3DEffect,
-					Series = SeriesAddress,
-					XSeries = XSeriesAddress,
-					BubbleSize = bubbleSizeAddress
-				};
-				break;
-			case eChartType.XYScatter:
-			case eChartType.XYScatterLines:
-			case eChartType.XYScatterLinesNoMarkers:
-			case eChartType.XYScatterSmooth:
-			case eChartType.XYScatterSmoothNoMarkers:
-				serie = new ExcelScatterChartSerie(this, NameSpaceManager, ser, _isPivot);
-				break;
-			case eChartType.Radar:
-			case eChartType.RadarFilled:
-			case eChartType.RadarMarkers:
-				serie = new ExcelRadarChartSerie(this, NameSpaceManager, ser, _isPivot);
-				break;
-			case eChartType.Surface:
-			case eChartType.SurfaceTopView:
-			case eChartType.SurfaceTopViewWireframe:
-			case eChartType.SurfaceWireframe:
-				serie = new ExcelSurfaceChartSerie(this, NameSpaceManager, ser, _isPivot);
-				break;
-			case eChartType.Pie:
-			case eChartType.Pie3D:
-			case eChartType.PieExploded:
-			case eChartType.PieExploded3D:
-			case eChartType.PieOfPie:
-			case eChartType.Doughnut:
-			case eChartType.DoughnutExploded:
-			case eChartType.BarOfPie:
-				serie = new ExcelPieChartSerie(this, NameSpaceManager, ser, _isPivot);
-				break;
-			case eChartType.Line:
-			case eChartType.LineMarkers:
-			case eChartType.LineMarkersStacked:
-			case eChartType.LineMarkersStacked100:
-			case eChartType.LineStacked:
-			case eChartType.LineStacked100:
-				serie = new ExcelLineChartSerie(this, NameSpaceManager, ser, _isPivot);
-				if (Chart.ChartType is eChartType.LineMarkers or
-					eChartType.LineMarkersStacked or
-					eChartType.LineMarkersStacked100)
-				{
-					((ExcelLineChartSerie)serie).Marker = eMarkerStyle.Square;
-				}
-
-				((ExcelLineChartSerie)serie).Smooth = ((ExcelLineChart)Chart).Smooth;
-				break;
-			case eChartType.BarClustered:
-			case eChartType.BarStacked:
-			case eChartType.BarStacked100:
-			case eChartType.ColumnClustered:
-			case eChartType.ColumnStacked:
-			case eChartType.ColumnStacked100:
-			case eChartType.BarClustered3D:
-			case eChartType.BarStacked3D:
-			case eChartType.BarStacked1003D:
-			case eChartType.ColumnClustered3D:
-			case eChartType.ColumnStacked3D:
-			case eChartType.ColumnStacked1003D:
-			case eChartType.ConeBarClustered:
-			case eChartType.ConeBarStacked:
-			case eChartType.ConeBarStacked100:
-			case eChartType.ConeCol:
-			case eChartType.ConeColClustered:
-			case eChartType.ConeColStacked:
-			case eChartType.ConeColStacked100:
-			case eChartType.CylinderBarClustered:
-			case eChartType.CylinderBarStacked:
-			case eChartType.CylinderBarStacked100:
-			case eChartType.CylinderCol:
-			case eChartType.CylinderColClustered:
-			case eChartType.CylinderColStacked:
-			case eChartType.CylinderColStacked100:
-			case eChartType.PyramidBarClustered:
-			case eChartType.PyramidBarStacked:
-			case eChartType.PyramidBarStacked100:
-			case eChartType.PyramidCol:
-			case eChartType.PyramidColClustered:
-			case eChartType.PyramidColStacked:
-			case eChartType.PyramidColStacked100:
-				serie = new ExcelBarChartSerie(this, NameSpaceManager, ser, _isPivot);
-				((ExcelBarChartSerie)serie).InvertIfNegative = false;
-				break;
-			default:
-				serie = new ExcelChartSerie(this, NameSpaceManager, ser, _isPivot);
-				break;
-		}
-
+		var serie = CreateSerie(ser, SeriesAddress, XSeriesAddress, bubbleSizeAddress);
 		serie.Series = SeriesAddress;
 		serie.XSeries = XSeriesAddress;
 		_list.Add(serie);
+		return serie;
+	}
+
+	private ExcelChartSerie CreateSerie(XmlElement ser, string seriesAddress, string xSeriesAddress, string bubbleSizeAddress) => Chart.ChartType switch
+	{
+		eChartType.Bubble or eChartType.Bubble3DEffect => new ExcelBubbleChartSerie(this, NameSpaceManager, ser, _isPivot)
+		{
+			Bubble3D = Chart.ChartType == eChartType.Bubble3DEffect,
+			Series = seriesAddress,
+			XSeries = xSeriesAddress,
+			BubbleSize = bubbleSizeAddress
+		},
+		eChartType.XYScatter or eChartType.XYScatterLines or eChartType.XYScatterLinesNoMarkers or eChartType.XYScatterSmooth or eChartType.XYScatterSmoothNoMarkers => new ExcelScatterChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Radar or eChartType.RadarFilled or eChartType.RadarMarkers => new ExcelRadarChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Surface or eChartType.SurfaceTopView or eChartType.SurfaceTopViewWireframe or eChartType.SurfaceWireframe => new ExcelSurfaceChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Pie or eChartType.Pie3D or eChartType.PieExploded or eChartType.PieExploded3D or eChartType.PieOfPie or
+		eChartType.Doughnut or eChartType.DoughnutExploded or eChartType.BarOfPie => new ExcelPieChartSerie(this, NameSpaceManager, ser, _isPivot),
+		eChartType.Line or eChartType.LineMarkers or eChartType.LineMarkersStacked or eChartType.LineMarkersStacked100 or eChartType.LineStacked or
+		eChartType.LineStacked100 => CreateLineSerie(ser),
+		eChartType.BarClustered or eChartType.BarStacked or eChartType.BarStacked100 or eChartType.ColumnClustered or eChartType.ColumnStacked or
+		eChartType.ColumnStacked100 or eChartType.BarClustered3D or eChartType.BarStacked3D or eChartType.BarStacked1003D or eChartType.ColumnClustered3D or
+		eChartType.ColumnStacked3D or eChartType.ColumnStacked1003D or eChartType.ConeBarClustered or eChartType.ConeBarStacked or eChartType.ConeBarStacked100 or
+		eChartType.ConeCol or eChartType.ConeColClustered or eChartType.ConeColStacked or eChartType.ConeColStacked100 or eChartType.CylinderBarClustered or
+		eChartType.CylinderBarStacked or eChartType.CylinderBarStacked100 or eChartType.CylinderCol or eChartType.CylinderColClustered or eChartType.CylinderColStacked or
+		eChartType.CylinderColStacked100 or eChartType.PyramidBarClustered or eChartType.PyramidBarStacked or eChartType.PyramidBarStacked100 or eChartType.PyramidCol or
+		eChartType.PyramidColClustered or eChartType.PyramidColStacked or eChartType.PyramidColStacked100 => new ExcelBarChartSerie(this, NameSpaceManager, ser, _isPivot) { InvertIfNegative = false },
+		_ => new ExcelChartSerie(this, NameSpaceManager, ser, _isPivot),
+	};
+
+	private ExcelLineChartSerie CreateLineSerie(XmlElement ser)
+	{
+		var serie = new ExcelLineChartSerie(this, NameSpaceManager, ser, _isPivot);
+		if (Chart.ChartType is eChartType.LineMarkers or
+			eChartType.LineMarkersStacked or
+			eChartType.LineMarkersStacked100)
+		{
+			serie.Marker = eMarkerStyle.Square;
+		}
+
+		serie.Smooth = ((ExcelLineChart)Chart).Smooth;
 		return serie;
 	}
 	bool _isPivot;
@@ -327,30 +269,14 @@ public class ExcelChartSeries : XmlHelper, IEnumerable
 			? "<c:xVal /><c:yVal />"
 			: "<c:val />";
 
-	private static string AddExplosion(eChartType chartType)
-	{
-		if (chartType is eChartType.PieExploded3D or
-		   eChartType.PieExploded or
-			eChartType.DoughnutExploded)
-		{
-			return "<c:explosion val=\"25\" />"; //Default 25;
-		}
-		else
-		{
-			return "";
-		}
-	}
-	private static string AddSmooth(eChartType chartType)
-	{
-		if (chartType is eChartType.XYScatterSmooth or
-		   eChartType.XYScatterSmoothNoMarkers)
-		{
-			return "<c:smooth val=\"1\" />"; //Default 25;
-		}
-		else
-		{
-			return "";
-		}
-	}
+	private static string AddExplosion(eChartType chartType) => chartType is eChartType.PieExploded3D or
+		eChartType.PieExploded or
+		eChartType.DoughnutExploded
+		? "<c:explosion val=\"25\" />"
+		: "";
+	private static string AddSmooth(eChartType chartType) => chartType is eChartType.XYScatterSmooth or
+		eChartType.XYScatterSmoothNoMarkers
+		? "<c:smooth val=\"1\" />"
+		: "";
 	#endregion
 }

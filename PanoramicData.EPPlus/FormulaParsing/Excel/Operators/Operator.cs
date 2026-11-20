@@ -34,6 +34,7 @@ using System;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Operators;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3453:Classes should not have only private constructors", Justification = "Instances are created internally and exposed through the static operator properties.")]
 public class Operator : IOperator
 {
 	private const int PrecedencePercent = 2;
@@ -44,8 +45,6 @@ public class Operator : IOperator
 	private const int PrecedenceAddSubtract = 12;
 	private const int PrecedenceConcat = 15;
 	private const int PrecedenceComparison = 25;
-
-	private Operator() { }
 
 	private Operator(Operators @operator, int precedence, Func<CompileResult, CompileResult, CompileResult> implementation)
 	{
@@ -67,12 +66,10 @@ public class Operator : IOperator
 		if (left.Result is ExcelErrorValue)
 		{
 			return new CompileResult(left.Result, DataType.ExcelError);
-			//throw(new ExcelErrorValueException((ExcelErrorValue)left.Result));
 		}
 		else if (right.Result is ExcelErrorValue)
 		{
 			return new CompileResult(right.Result, DataType.ExcelError);
-			//throw(new ExcelErrorValueException((ExcelErrorValue)right.Result));
 		}
 
 		return _implementation(left, right);
@@ -82,164 +79,105 @@ public class Operator : IOperator
 
 	private static IOperator _plus;
 	public static IOperator Plus => _plus ??= new Operator(Operators.Plus, PrecedenceAddSubtract, (l, r) =>
-											 {
-												 l = l == null || l.Result == null ? new CompileResult(0, DataType.Integer) : l;
-												 r = r == null || r.Result == null ? new CompileResult(0, DataType.Integer) : r;
-												 if (EitherIsError(l, r, out var errorVal))
-												 {
-													 return new CompileResult(errorVal);
-												 }
-
-												 if (l.DataType == DataType.Integer && r.DataType == DataType.Integer)
-												 {
-													 return new CompileResult(l.ResultNumeric + r.ResultNumeric, DataType.Integer);
-												 }
-												 else if ((l.IsNumeric || l.IsNumericString || l.IsDateString || l.Result is ExcelDataProvider.IRangeInfo) &&
-														  (r.IsNumeric || r.IsNumericString || r.IsDateString || r.Result is ExcelDataProvider.IRangeInfo))
-												 {
-													 return new CompileResult(l.ResultNumeric + r.ResultNumeric, DataType.Decimal);
-												 }
-
-												 return new CompileResult(eErrorType.Value);
-											 });
+	{
+		l = ZeroIfNullResult(l);
+		r = ZeroIfNullResult(r);
+		return EitherIsError(l, r, out var errorVal)
+			? new CompileResult(errorVal)
+			: ApplyArithmetic(l, r, (x, y) => x + y);
+	});
 
 	private static IOperator _minus;
-	public static IOperator Minus => _minus ??= new Operator(Operators.Minus, PrecedenceAddSubtract, (l, r) =>
-											  {
-												  l = l == null || l.Result == null ? new CompileResult(0, DataType.Integer) : l;
-												  r = r == null || r.Result == null ? new CompileResult(0, DataType.Integer) : r;
-												  if (l.DataType == DataType.Integer && r.DataType == DataType.Integer)
-												  {
-													  return new CompileResult(l.ResultNumeric - r.ResultNumeric, DataType.Integer);
-												  }
-												  else if ((l.IsNumeric || l.IsNumericString || l.IsDateString || l.Result is ExcelDataProvider.IRangeInfo) &&
-														   (r.IsNumeric || r.IsNumericString || r.IsDateString || r.Result is ExcelDataProvider.IRangeInfo))
-												  {
-													  return new CompileResult(l.ResultNumeric - r.ResultNumeric, DataType.Decimal);
-												  }
-
-												  return new CompileResult(eErrorType.Value);
-											  });
+	public static IOperator Minus => _minus ??= new Operator(Operators.Minus, PrecedenceAddSubtract,
+		(l, r) => ApplyArithmetic(ZeroIfNullResult(l), ZeroIfNullResult(r), (x, y) => x - y));
 
 	private static IOperator _multiply;
-	public static IOperator Multiply => _multiply ??= new Operator(Operators.Multiply, PrecedenceMultiplyDevide, (l, r) =>
-												 {
-													 l = l ?? new CompileResult(0, DataType.Integer);
-													 r = r ?? new CompileResult(0, DataType.Integer);
-													 if (l.DataType == DataType.Integer && r.DataType == DataType.Integer)
-													 {
-														 return new CompileResult(l.ResultNumeric * r.ResultNumeric, DataType.Integer);
-													 }
-													 else if ((l.IsNumeric || l.IsNumericString || l.IsDateString || l.Result is ExcelDataProvider.IRangeInfo) &&
-															  (r.IsNumeric || r.IsNumericString || r.IsDateString || r.Result is ExcelDataProvider.IRangeInfo))
-													 {
-														 return new CompileResult(l.ResultNumeric * r.ResultNumeric, DataType.Decimal);
-													 }
-
-													 return new CompileResult(eErrorType.Value);
-												 });
+	public static IOperator Multiply => _multiply ??= new Operator(Operators.Multiply, PrecedenceMultiplyDevide,
+		(l, r) => ApplyArithmetic(l ?? Zero(), r ?? Zero(), (x, y) => x * y));
 
 	private static IOperator _divide;
 	public static IOperator Divide => _divide ??= new Operator(Operators.Divide, PrecedenceMultiplyDevide, (l, r) =>
-											   {
-												   if (!(l.IsNumeric || l.IsNumericString || l.IsDateString || l.Result is ExcelDataProvider.IRangeInfo) ||
-													   !(r.IsNumeric || r.IsNumericString || r.IsDateString || r.Result is ExcelDataProvider.IRangeInfo))
-												   {
-													   return new CompileResult(eErrorType.Value);
-												   }
+	{
+		if (!IsNumericLike(l) || !IsNumericLike(r))
+		{
+			return new CompileResult(eErrorType.Value);
+		}
 
-												   var left = l.ResultNumeric;
-												   var right = r.ResultNumeric;
-												   if (Math.Abs(right - 0d) < double.Epsilon)
-												   {
-													   return new CompileResult(eErrorType.Div0);
-												   }
-												   else if ((l.IsNumeric || l.IsNumericString || l.IsDateString || l.Result is ExcelDataProvider.IRangeInfo) &&
-															(r.IsNumeric || r.IsNumericString || r.IsDateString || r.Result is ExcelDataProvider.IRangeInfo))
-												   {
-													   return new CompileResult(left / right, DataType.Decimal);
-												   }
-
-												   return new CompileResult(eErrorType.Value);
-											   });
+		var left = l.ResultNumeric;
+		var right = r.ResultNumeric;
+		return Math.Abs(right - 0d) < double.Epsilon
+			? new CompileResult(eErrorType.Div0)
+			: new CompileResult(left / right, DataType.Decimal);
+	});
 
 	public static IOperator Exp => new Operator(Operators.Exponentiation, PrecedenceExp, (l, r) =>
-												{
-													if (l == null && r == null)
-													{
-														return new CompileResult(eErrorType.Value);
-													}
+	{
+		if (l == null && r == null)
+		{
+			return new CompileResult(eErrorType.Value);
+		}
 
-													l = l ?? new CompileResult(0, DataType.Integer);
-													r = r ?? new CompileResult(0, DataType.Integer);
-													return (l.IsNumeric || l.IsNumericString || l.IsDateString || l.Result is ExcelDataProvider.IRangeInfo) &&
-														(r.IsNumeric || r.IsNumericString || r.IsDateString || r.Result is ExcelDataProvider.IRangeInfo)
-														? new CompileResult(Math.Pow(l.ResultNumeric, r.ResultNumeric), DataType.Decimal)
-														: new CompileResult(0d, DataType.Decimal);
-												});
+		l ??= Zero();
+		r ??= Zero();
+		return IsNumericLike(l) && IsNumericLike(r)
+			? new CompileResult(Math.Pow(l.ResultNumeric, r.ResultNumeric), DataType.Decimal)
+			: new CompileResult(0d, DataType.Decimal);
+	});
 
 	public static IOperator Concat => new Operator(Operators.Concat, PrecedenceConcat, (l, r) =>
-												   {
-													   l = l ?? new CompileResult(string.Empty, DataType.String);
-													   r = r ?? new CompileResult(string.Empty, DataType.String);
-													   var lStr = l.Result != null ? l.ResultValue.ToString() : string.Empty;
-													   var rStr = r.Result != null ? r.ResultValue.ToString() : string.Empty;
-													   return new CompileResult(string.Concat(lStr, rStr), DataType.String);
-												   });
+	{
+		l ??= new CompileResult(string.Empty, DataType.String);
+		r ??= new CompileResult(string.Empty, DataType.String);
+		var lStr = l.Result != null ? l.ResultValue.ToString() : string.Empty;
+		var rStr = r.Result != null ? r.ResultValue.ToString() : string.Empty;
+		return new CompileResult(string.Concat(lStr, rStr), DataType.String);
+	});
 
 	private static IOperator _greaterThan;
-	public static IOperator GreaterThan => _greaterThan ??=
-					   new Operator(Operators.GreaterThan, PrecedenceComparison,
-						   (l, r) => Compare(l, r, (compRes) => compRes > 0));
+	public static IOperator GreaterThan => _greaterThan ??= CreateComparison(Operators.GreaterThan, compRes => compRes > 0);
 
 	private static IOperator _eq;
-	public static IOperator Eq => _eq ??=
-					   new Operator(Operators.Equals, PrecedenceComparison,
-						   (l, r) => Compare(l, r, (compRes) => compRes == 0));
+	public static IOperator Eq => _eq ??= CreateComparison(Operators.Equals, compRes => compRes == 0);
 
 	private static IOperator _notEqualsTo;
-	public static IOperator NotEqualsTo => _notEqualsTo ??=
-					   new Operator(Operators.NotEqualTo, PrecedenceComparison,
-						   (l, r) => Compare(l, r, (compRes) => compRes != 0));
+	public static IOperator NotEqualsTo => _notEqualsTo ??= CreateComparison(Operators.NotEqualTo, compRes => compRes != 0);
 
 	private static IOperator _greaterThanOrEqual;
-	public static IOperator GreaterThanOrEqual => _greaterThanOrEqual ??=
-					   new Operator(Operators.GreaterThanOrEqual, PrecedenceComparison,
-						   (l, r) => Compare(l, r, (compRes) => compRes >= 0));
+	public static IOperator GreaterThanOrEqual => _greaterThanOrEqual ??= CreateComparison(Operators.GreaterThanOrEqual, compRes => compRes >= 0);
 
 	private static IOperator _lessThan;
-	public static IOperator LessThan => _lessThan ??=
-					   new Operator(Operators.LessThan, PrecedenceComparison,
-						   (l, r) => Compare(l, r, (compRes) => compRes < 0));
+	public static IOperator LessThan => _lessThan ??= CreateComparison(Operators.LessThan, compRes => compRes < 0);
 
-	public static IOperator LessThanOrEqual =>
-			//return new Operator(Operators.LessThanOrEqual, PrecedenceComparison, (l, r) => new CompileResult(Compare(l, r) <= 0, DataType.Boolean));
-			new Operator(Operators.LessThanOrEqual, PrecedenceComparison, (l, r) => Compare(l, r, (compRes) => compRes <= 0));
+	public static IOperator LessThanOrEqual => CreateComparison(Operators.LessThanOrEqual, compRes => compRes <= 0);
 
 	private static IOperator _percent;
-	public static IOperator Percent
+	public static IOperator Percent => _percent ??= new Operator(Operators.Percent, PrecedencePercent,
+		(l, r) => ApplyArithmetic(l ?? Zero(), r ?? Zero(), (x, y) => x * y));
+
+	private static Operator CreateComparison(Operators @operator, Func<int, bool> comparison) =>
+		new(@operator, PrecedenceComparison, (l, r) => Compare(l, r, comparison));
+
+	private static CompileResult Zero() => new(0, DataType.Integer);
+
+	private static CompileResult ZeroIfNullResult(CompileResult result) => result == null || result.Result == null ? Zero() : result;
+
+	// Evaluated in this order because IsNumericString and IsDateString cache ResultNumeric as a side effect.
+	private static bool IsNumericLike(CompileResult result) =>
+		result.IsNumeric || result.IsNumericString || result.IsDateString || result.Result is ExcelDataProvider.IRangeInfo;
+
+	private static CompileResult ApplyArithmetic(CompileResult l, CompileResult r, Func<double, double, double> operation)
 	{
-		get
+		if (l.DataType == DataType.Integer && r.DataType == DataType.Integer)
 		{
-			_percent ??= new Operator(Operators.Percent, PrecedencePercent, (l, r) =>
-					{
-						l = l ?? new CompileResult(0, DataType.Integer);
-						r = r ?? new CompileResult(0, DataType.Integer);
-						if (l.DataType == DataType.Integer && r.DataType == DataType.Integer)
-						{
-							return new CompileResult(l.ResultNumeric * r.ResultNumeric, DataType.Integer);
-						}
-						else if ((l.IsNumeric || l.IsNumericString || l.IsDateString || l.Result is ExcelDataProvider.IRangeInfo) &&
-							(r.IsNumeric || r.IsNumericString || r.IsDateString || r.Result is ExcelDataProvider.IRangeInfo))
-						{
-							return new CompileResult(l.ResultNumeric * r.ResultNumeric, DataType.Decimal);
-						}
-
-						return new CompileResult(eErrorType.Value);
-					});
-
-			return _percent;
+			return new CompileResult(operation(l.ResultNumeric, r.ResultNumeric), DataType.Integer);
 		}
+
+		if (IsNumericLike(l) && IsNumericLike(r))
+		{
+			return new CompileResult(operation(l.ResultNumeric, r.ResultNumeric), DataType.Decimal);
+		}
+
+		return new CompileResult(eErrorType.Value);
 	}
 
 	private static object GetObjFromOther(CompileResult obj, CompileResult other)

@@ -28,37 +28,32 @@
  *******************************************************************************
  * Jan Källman		Added		25-Oct-2012
  *******************************************************************************/
-using OfficeOpenXml.Packaging.DotNetZip;
-using OfficeOpenXml.Packaging.Ionic.Zip;
 using System;
 using System.IO;
+using System.IO.Compression;
 
 namespace OfficeOpenXml.Packaging;
 
 internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 {
-	internal delegate void SaveHandlerDelegate(ZipOutputStream stream, CompressionLevel compressionLevel, string fileName);
+	internal delegate void SaveHandlerDelegate(Stream stream);
 
-	internal ZipPackagePart(ZipPackage package, ZipEntry entry)
+	internal ZipPackagePart(ZipPackage package, string entryName)
 	{
 		Package = package;
-		Entry = entry;
 		SaveHandler = null;
-		Uri = new Uri(ZipPackage.GetUriKey(entry.FileName), UriKind.Relative);
+		Uri = new Uri(ZipPackage.GetUriKey(entryName), UriKind.Relative);
 	}
 	internal ZipPackagePart(ZipPackage package, Uri partUri, string contentType, CompressionLevel compressionLevel)
 	{
 		Package = package;
-		//Entry = new ZipEntry();
-		//Entry.FileName = partUri.OriginalString.Replace('/','\\');
 		Uri = partUri;
 		ContentType = contentType;
 		CompressionLevel = compressionLevel;
 	}
 	internal ZipPackage Package { get; set; }
-	internal ZipEntry Entry { get; set; }
 	internal CompressionLevel CompressionLevel;
-	MemoryStream _stream = null;
+	MemoryStream _stream;
 	internal MemoryStream Stream
 	{
 		get
@@ -115,47 +110,35 @@ internal class ZipPackagePart : ZipPackageRelationshipBase, IDisposable
 		}
 	}
 	public Uri Uri { get; private set; }
-	public static Stream GetZipStream()
-	{
-		MemoryStream ms = new();
-		ZipOutputStream os = new(ms);
-		return os;
-	}
 	internal SaveHandlerDelegate SaveHandler
 	{
 		get;
 		set;
 	}
-	internal void WriteZip(ZipOutputStream os)
+	internal void WriteZip(ZipArchive archive)
 	{
-		byte[] b;
 		if (SaveHandler == null)
 		{
-			b = GetStream().ToArray();
-			if (b.Length == 0)   //Make sure the file isn't empty. DotNetZip streams does not seems to handle zero sized files.
+			var b = GetStream().ToArray();
+			if (b.Length == 0)
 			{
 				return;
 			}
 
-			os.CompressionLevel = (DotNetZip.Zlib.CompressionLevel)CompressionLevel;
-			os.PutNextEntry(Uri.OriginalString);
-			os.Write(b, 0, b.Length);
+			ZipPackage.WriteEntry(archive, Uri.OriginalString, CompressionLevel, entryStream => entryStream.Write(b, 0, b.Length));
 		}
 		else
 		{
-			SaveHandler(os, (CompressionLevel)CompressionLevel, Uri.OriginalString);
+			ZipPackage.WriteEntry(archive, Uri.OriginalString, CompressionLevel, entryStream => SaveHandler(entryStream));
 		}
 
 		if (_rels.Count > 0)
 		{
 			var f = Uri.OriginalString;
 			var name = Path.GetFileName(f);
-			_rels.WriteZip(os, (string.Format("{0}_rels/{1}.rels", f[..^name.Length], name)));
+			_rels.WriteZip(archive, string.Format("{0}_rels/{1}.rels", f[..^name.Length], name), CompressionLevel);
 		}
-
-		b = null;
 	}
-
 
 	public void Dispose()
 	{

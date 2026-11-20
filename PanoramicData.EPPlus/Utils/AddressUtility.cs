@@ -19,7 +19,7 @@ public static class AddressUtility
 	private static void AddRowNumbersToEntireColumnRange(ref string address, string range)
 	{
 		var parsedRange = string.Format("{0}{1}", range, ExcelPackage.MaxRows);
-		var splitArr = parsedRange.Split([':']);
+		var splitArr = parsedRange.Split(':');
 		address = address.Replace(range, string.Format("{0}1:{1}", splitArr[0], splitArr[1]));
 	}
 }

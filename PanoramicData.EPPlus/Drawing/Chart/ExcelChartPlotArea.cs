@@ -84,7 +84,7 @@ public sealed class ExcelChartPlotArea : XmlHelper
 		DeleteAllNode("c:dTable");
 		_dataTable = null;
 	}
-	ExcelChartDataTable _dataTable = null;
+	ExcelChartDataTable _dataTable;
 	/// <summary>
 	/// The data table object.
 	/// Use the CreateDataTable method to create a datatable if it does not exist.
@@ -93,24 +93,8 @@ public sealed class ExcelChartPlotArea : XmlHelper
 	/// </summary>
 	public ExcelChartDataTable DataTable => _dataTable;
 	#endregion
-	ExcelDrawingFill _fill = null;
-	public ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
-	ExcelDrawingBorder _border = null;
-	public ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
+	ExcelDrawingFill _fill;
+	public ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
+	ExcelDrawingBorder _border;
+	public ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
 }

@@ -30,7 +30,9 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Xml;
 
 
@@ -216,14 +218,8 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 				throw (new ArgumentOutOfRangeException("Value must be positive"));
 			}
 
-			if (value == 1)
-			{
-				DeleteNode("v:imagedata/@gamma");
-			}
-			else
-			{
-				SetXmlNodeString("v:imagedata/@gain", value.ToString("#.0#", CultureInfo.InvariantCulture));
-			}
+			// Resetting Gain removes @gamma rather than @gain, as published
+			SetImageDataValue("v:imagedata/@gain", "v:imagedata/@gamma", value, 1);
 		}
 	}
 	/// <summary>
@@ -239,14 +235,7 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 		}
 		set
 		{
-			if (value == 0) //Default
-			{
-				DeleteNode("v:imagedata/@gamma");
-			}
-			else
-			{
-				SetXmlNodeString("v:imagedata/@gamma", value.ToString("#.0#", CultureInfo.InvariantCulture));
-			}
+			SetImageDataValue("v:imagedata/@gamma", "v:imagedata/@gamma", value, 0);
 		}
 	}
 	/// <summary>
@@ -262,18 +251,24 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 		}
 		set
 		{
-			if (value == 0)
-			{
-				DeleteNode("v:imagedata/@blacklevel");
-			}
-			else
-			{
-				SetXmlNodeString("v:imagedata/@blacklevel", value.ToString("#.0#", CultureInfo.InvariantCulture));
-			}
+			SetImageDataValue("v:imagedata/@blacklevel", "v:imagedata/@blacklevel", value, 0);
 		}
 	}
 
 	#region Private Methods
+	[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Only the exact default removes the attribute; a tolerance would change what is written.")]
+	private void SetImageDataValue(string path, string defaultPath, double value, double defaultValue)
+	{
+		if (value == defaultValue)
+		{
+			DeleteNode(defaultPath);
+		}
+		else
+		{
+			SetXmlNodeString(path, value.ToString("#.0#", CultureInfo.InvariantCulture));
+		}
+	}
+
 	private static double GetFracDT(string v, double def)
 	{
 		double d;
@@ -302,28 +297,28 @@ public class ExcelVmlDrawingPicture : ExcelVmlDrawingBase
 	private void SetStyleProp(string propertyName, string value)
 	{
 		var style = GetXmlNodeString("@style");
-		var newStyle = "";
+		var newStyle = new StringBuilder();
 		var found = false;
 		foreach (var prop in style.Split(';'))
 		{
 			var split = prop.Split(':');
 			if (split[0] == propertyName)
 			{
-				newStyle += propertyName + ":" + value + ";";
+				newStyle.Append(propertyName).Append(':').Append(value).Append(';');
 				found = true;
 			}
 			else
 			{
-				newStyle += prop + ";";
+				newStyle.Append(prop).Append(';');
 			}
 		}
 
 		if (!found)
 		{
-			newStyle += propertyName + ":" + value + ";";
+			newStyle.Append(propertyName).Append(':').Append(value).Append(';');
 		}
 
-		SetXmlNodeString("@style", newStyle[..^1]);
+		SetXmlNodeString("@style", newStyle.ToString(0, newStyle.Length - 1));
 	}
 	private double GetStyleProp(string propertyName)
 	{

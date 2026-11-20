@@ -22,8 +22,8 @@ public class IndexToAddressTranslatorTests
 		_indexToAddressTranslator = new IndexToAddressTranslator(_excelDataProvider, refType);
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentNullException))]
-	public void ShouldThrowIfExcelDataProviderIsNull() => new IndexToAddressTranslator(null);
+	[TestMethod]
+	public void ShouldThrowIfExcelDataProviderIsNull() => Assert.ThrowsExactly<ArgumentNullException>(() => new IndexToAddressTranslator(null));
 
 	[TestMethod]
 	public void ShouldTranslate1And1ToA1()

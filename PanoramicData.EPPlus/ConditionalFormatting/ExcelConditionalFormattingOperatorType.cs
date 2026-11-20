@@ -80,7 +80,7 @@ internal static class ExcelConditionalFormattingOperatorType
 		  ExcelConditionalFormattingConstants.Operators.NotBetween => eExcelConditionalFormattingOperatorType.NotBetween,
 		  ExcelConditionalFormattingConstants.Operators.NotContains => eExcelConditionalFormattingOperatorType.NotContains,
 		  ExcelConditionalFormattingConstants.Operators.NotEqual => eExcelConditionalFormattingOperatorType.NotEqual,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.UnexistentOperatorTypeAttribute),
 	  };
 }

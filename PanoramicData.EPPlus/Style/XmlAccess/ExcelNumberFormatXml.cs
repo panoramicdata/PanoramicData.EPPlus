@@ -31,6 +31,7 @@
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -58,7 +59,6 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 	}
 	public bool BuildIn { get; private set; }
 	int _numFmtId;
-	//        const string idPath = "@numFmtId";
 	/// <summary>
 	/// Id for number format
 	/// 
@@ -178,7 +178,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 		Number = 1,
 		DateTime = 2,
 	}
-	ExcelFormatTranslator _translator = null;
+	ExcelFormatTranslator _translator;
 	internal ExcelFormatTranslator FormatTranslator
 	{
 		get
@@ -222,7 +222,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 		}
 		internal string NetTextFormat { get; private set; }
 		internal string NetFormat { get; private set; }
-		CultureInfo _ci = null;
+		CultureInfo _ci;
 		internal CultureInfo Culture
 		{
 			get
@@ -239,18 +239,18 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 		internal string NetFormatForWidth { get; private set; }
 		internal string FractionFormat { get; private set; }
 		internal eSystemDateFormat SpecialDateFormat { get; private set; }
+		[SuppressMessage("Major Code Smell", "S127:\"for\" loop stop conditions should be invariant", Justification = "A fraction consumes several format characters, so the scan skips past them.")]
 		private void ToNetFormat(string ExcelFormat, bool forColWidth)
 		{
 			DataType = eFormatType.Unknown;
 			var secCount = 0;
 			var isText = false;
 			var isBracket = false;
-			var bracketText = "";
+			var bracketText = new StringBuilder();
 			var prevBslsh = false;
 			var useMinute = false;
 			var prevUnderScore = false;
 			var ignoreNext = false;
-			var fractionPos = -1;
 			var containsAmPm = ExcelFormat.Contains("AM/PM");
 			List<int> lstDec = [];
 			StringBuilder sb = new();
@@ -288,53 +288,11 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 						if (c == ']')
 						{
 							isBracket = false;
-							if (bracketText[0] == '$')  //Local Info
-							{
-								var li = Regex.Split(bracketText, "-");
-								if (li[0].Length > 1)
-								{
-									sb.Append("\"" + li[0][1..] + "\"");     //Currency symbol
-								}
-
-								if (li.Length > 1)
-								{
-									if (li[1].Equals("f800", StringComparison.OrdinalIgnoreCase))
-									{
-										SpecialDateFormat = eSystemDateFormat.SystemLongDate;
-									}
-									else if (li[1].Equals("f400", StringComparison.OrdinalIgnoreCase))
-									{
-										SpecialDateFormat = eSystemDateFormat.SystemLongTime;
-									}
-									else
-									{
-										var num = int.Parse(li[1], NumberStyles.HexNumber);
-										try
-										{
-											Culture = CultureInfo.GetCultureInfo(num & 0xFFFF);
-										}
-										catch
-										{
-											Culture = null;
-										}
-									}
-								}
-							}
-							else if (bracketText.StartsWith("<") ||
-									bracketText.StartsWith(">") ||
-									bracketText.StartsWith("=")) //Conditional
-							{
-								SpecialDateFormat = eSystemDateFormat.Conditional;
-							}
-							else
-							{
-								sb.Append(bracketText);
-								SpecialDateFormat = eSystemDateFormat.Conditional;
-							}
+							ApplyBracketText(bracketText.ToString(), sb);
 						}
 						else
 						{
-							bracketText += c;
+							bracketText.Append(c);
 						}
 					}
 					else if (prevUnderScore)
@@ -396,7 +354,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 							}
 							else if (c == '[')
 							{
-								bracketText = "";
+								bracketText.Clear();
 								isBracket = true;
 							}
 							else if (c == '\\')
@@ -421,7 +379,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 							{
 								if (containsAmPm)
 								{
-									sb.Append('h'); ;
+									sb.Append('h');
 								}
 								else
 								{
@@ -453,37 +411,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 							{
 								if (DataType == eFormatType.Number)
 								{
-									fractionPos = sb.Length;
-									var startPos = pos - 1;
-									while (startPos >= 0 &&
-											(ExcelFormat[startPos] == '?' ||
-											ExcelFormat[startPos] == '#' ||
-											ExcelFormat[startPos] == '0'))
-									{
-										startPos--;
-									}
-
-									if (startPos > 0)  //RemovePart
-									{
-										sb.Remove(sb.Length - (pos - startPos - 1), (pos - startPos - 1));
-									}
-
-									var endPos = pos + 1;
-									while (endPos < ExcelFormat.Length &&
-											(ExcelFormat[endPos] == '?' ||
-											ExcelFormat[endPos] == '#' ||
-											(ExcelFormat[endPos] >= '0' && ExcelFormat[endPos] <= '9')))
-									{
-										endPos++;
-									}
-
-									pos = endPos;
-									if (FractionFormat != "")
-									{
-										FractionFormat = ExcelFormat.Substring(startPos + 1, endPos - startPos - 1);
-									}
-
-									sb.Append('?'); //Will be replaced later on by the fraction
+									pos = AppendFraction(ExcelFormat, pos, sb);
 								}
 								else
 								{
@@ -544,6 +472,93 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 			Culture ??= CultureInfo.CurrentCulture;
 		}
 
+		private void ApplyBracketText(string bracketText, StringBuilder sb)
+		{
+			if (bracketText[0] == '$')  //Local Info
+			{
+				var li = Regex.Split(bracketText, "-");
+				if (li[0].Length > 1)
+				{
+					sb.Append("\"" + li[0][1..] + "\"");     //Currency symbol
+				}
+
+				if (li.Length > 1)
+				{
+					ApplyLocaleId(li[1]);
+				}
+			}
+			else if (bracketText.StartsWith("<") ||
+					bracketText.StartsWith(">") ||
+					bracketText.StartsWith("=")) //Conditional
+			{
+				SpecialDateFormat = eSystemDateFormat.Conditional;
+			}
+			else
+			{
+				sb.Append(bracketText);
+				SpecialDateFormat = eSystemDateFormat.Conditional;
+			}
+		}
+
+		private void ApplyLocaleId(string localeId)
+		{
+			if (localeId.Equals("f800", StringComparison.OrdinalIgnoreCase))
+			{
+				SpecialDateFormat = eSystemDateFormat.SystemLongDate;
+			}
+			else if (localeId.Equals("f400", StringComparison.OrdinalIgnoreCase))
+			{
+				SpecialDateFormat = eSystemDateFormat.SystemLongTime;
+			}
+			else
+			{
+				var num = int.Parse(localeId, NumberStyles.HexNumber);
+				try
+				{
+					Culture = CultureInfo.GetCultureInfo(num & 0xFFFF);
+				}
+				catch
+				{
+					Culture = null;
+				}
+			}
+		}
+
+		// Returns the index just past the fraction; the caller assigns it to its loop counter.
+		private int AppendFraction(string excelFormat, int pos, StringBuilder sb)
+		{
+			var startPos = pos - 1;
+			while (startPos >= 0 &&
+					(excelFormat[startPos] == '?' ||
+					excelFormat[startPos] == '#' ||
+					excelFormat[startPos] == '0'))
+			{
+				startPos--;
+			}
+
+			if (startPos > 0)  //RemovePart
+			{
+				sb.Remove(sb.Length - (pos - startPos - 1), (pos - startPos - 1));
+			}
+
+			var endPos = pos + 1;
+			while (endPos < excelFormat.Length &&
+					(excelFormat[endPos] == '?' ||
+					excelFormat[endPos] == '#' ||
+					(excelFormat[endPos] >= '0' && excelFormat[endPos] <= '9')))
+			{
+				endPos++;
+			}
+
+			if (FractionFormat != "")
+			{
+				FractionFormat = excelFormat.Substring(startPos + 1, endPos - startPos - 1);
+			}
+
+			sb.Append('?'); //Will be replaced later on by the fraction
+			return endPos;
+		}
+
 		private static void SetDecimal(List<int> lstDec, StringBuilder sb)
 		{
 			if (lstDec.Count > 1)
@@ -556,6 +571,7 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 			}
 		}
 
+		[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Zero is formatted specially only when it is exactly zero.")]
 		internal string FormatFraction(double d)
 		{
 			int numerator, denomerator;
@@ -580,60 +596,12 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 			var sign = d < 0 ? "-" : "";
 			if (fixedDenominator == 0)
 			{
-				List<double> numerators = [1, 0];
-				List<double> denominators = [0, 1];
-
 				if (maxDigits is < 1 or > 12)
 				{
 					throw (new ArgumentException("Number of digits out of range (1-12)"));
 				}
 
-				var maxNum = 0;
-				for (var i = 0; i < maxDigits; i++)
-				{
-					maxNum += 9 * (int)(Math.Pow((double)10, (double)i));
-				}
-
-				var divRes = 1 / ((double)Math.Abs(d) - intPart);
-				double result, prevResult = double.NaN;
-				int listPos = 2, index = 1;
-				while (true)
-				{
-					index++;
-					var intDivRes = Math.Floor(divRes);
-					numerators.Add((intDivRes * numerators[index - 1] + numerators[index - 2]));
-					if (numerators[index] > maxNum)
-					{
-						break;
-					}
-
-					denominators.Add((intDivRes * denominators[index - 1] + denominators[index - 2]));
-
-					result = numerators[index] / denominators[index];
-					if (denominators[index] > maxNum)
-					{
-						break;
-					}
-
-					listPos = index;
-
-					if (result == prevResult)
-					{
-						break;
-					}
-
-					if (result == d)
-					{
-						break;
-					}
-
-					prevResult = result;
-
-					divRes = 1 / (divRes - intDivRes);  //Rest
-				}
-
-				numerator = (int)numerators[listPos];
-				denomerator = (int)denominators[listPos];
+				(numerator, denomerator) = ApproximateFraction(d, intPart, maxDigits);
 			}
 			else
 			{
@@ -658,26 +626,75 @@ public sealed class ExcelNumberFormatXml : StyleXmlHelper
 			}
 		}
 
+		// Continued fraction expansion, stopping before either term exceeds maxDigits digits.
+		[SuppressMessage("Major Bug", "S1244:Floating point numbers should not be tested for equality", Justification = "Exact equality is the convergence test of the published algorithm; a tolerance would change the fractions produced.")]
+		private static (int Numerator, int Denominator) ApproximateFraction(double d, int intPart, int maxDigits)
+		{
+			List<double> numerators = [1, 0];
+			List<double> denominators = [0, 1];
+
+			var maxNum = 0;
+			for (var i = 0; i < maxDigits; i++)
+			{
+				maxNum += 9 * (int)Math.Pow(10, i);
+			}
+
+			var divRes = 1 / (Math.Abs(d) - intPart);
+			double result, prevResult = double.NaN;
+			int listPos = 2, index = 1;
+			while (true)
+			{
+				index++;
+				var intDivRes = Math.Floor(divRes);
+				numerators.Add((intDivRes * numerators[index - 1] + numerators[index - 2]));
+				if (numerators[index] > maxNum)
+				{
+					break;
+				}
+
+				denominators.Add((intDivRes * denominators[index - 1] + denominators[index - 2]));
+
+				result = numerators[index] / denominators[index];
+				if (denominators[index] > maxNum)
+				{
+					break;
+				}
+
+				listPos = index;
+
+				if (result == prevResult || result == d)
+				{
+					break;
+				}
+
+				prevResult = result;
+
+				divRes = 1 / (divRes - intDivRes);  //Rest
+			}
+
+			return ((int)numerators[listPos], (int)denominators[listPos]);
+		}
+
 		private static string FmtInt(double value, string format)
 		{
 			var v = value.ToString("#");
-			var pad = "";
+			var pad = new StringBuilder();
 			if (v.Length < format.Length)
 			{
 				for (var i = format.Length - v.Length - 1; i >= 0; i--)
 				{
 					if (format[i] == '?')
 					{
-						pad += " ";
+						pad.Append(' ');
 					}
 					else if (format[i] == ' ')
 					{
-						pad += "0";
+						pad.Append('0');
 					}
 				}
 			}
 
-			return pad + v;
+			return pad.Append(v).ToString();
 		}
 	}
 	#endregion

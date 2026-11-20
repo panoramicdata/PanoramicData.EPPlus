@@ -58,7 +58,6 @@ public class FunctionExpression : AtomicExpression
 	private readonly FunctionCompilerFactory _functionCompilerFactory;
 	private readonly bool _isNegated;
 
-
 	public override CompileResult Compile()
 	{
 		try
@@ -81,24 +80,7 @@ public class FunctionExpression : AtomicExpression
 
 			var compiler = _functionCompilerFactory.Create(function);
 			var result = compiler.Compile(HasChildren ? Children : []);
-			if (_isNegated)
-			{
-				if (!result.IsNumeric)
-				{
-					if (_parsingContext.Debug)
-					{
-						var msg = string.Format("Trying to negate a non-numeric value ({0}) in function '{1}'",
-							result.Result, ExpressionString);
-						_parsingContext.Configuration.Logger.Log(_parsingContext, msg);
-					}
-
-					return new CompileResult(ExcelErrorValue.Create(eErrorType.Value), DataType.ExcelError);
-				}
-
-				return new CompileResult(result.ResultNumeric * -1, result.DataType);
-			}
-
-			return result;
+			return _isNegated ? Negate(result) : result;
 		}
 		catch (ExcelErrorValueException e)
 		{
@@ -109,12 +91,28 @@ public class FunctionExpression : AtomicExpression
 
 			return new CompileResult(e.ErrorValue, DataType.ExcelError);
 		}
+	}
 
+	private CompileResult Negate(CompileResult result)
+	{
+		if (!result.IsNumeric)
+		{
+			if (_parsingContext.Debug)
+			{
+				var msg = string.Format("Trying to negate a non-numeric value ({0}) in function '{1}'",
+					result.Result, ExpressionString);
+				_parsingContext.Configuration.Logger.Log(_parsingContext, msg);
+			}
+
+			return new CompileResult(ExcelErrorValue.Create(eErrorType.Value), DataType.ExcelError);
+		}
+
+		return new CompileResult(result.ResultNumeric * -1, result.DataType);
 	}
 
 	public override Expression PrepareForNextChild() => base.AddChild(new FunctionArgumentExpression(this));
 
-	public override bool HasChildren => (Children.Any() && Children.First().Children.Any());
+	public override bool HasChildren => Children.Any() && Children.First().Children.Any();
 
 	public override Expression AddChild(Expression child)
 	{

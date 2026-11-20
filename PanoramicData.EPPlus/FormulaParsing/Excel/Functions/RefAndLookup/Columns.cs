@@ -40,17 +40,8 @@ public class Columns : LookupFunction
 		{
 			return CreateResult(r.Address._toCol - r.Address._fromCol + 1, DataType.Integer);
 		}
-		else
-		{
-			var range = ArgToAddress(arguments, 0, context);
-			if (ExcelAddressUtil.IsValidAddress(range))
-			{
-				var factory = new RangeAddressFactory(context.ExcelDataProvider);
-				var address = factory.Create(range);
-				return CreateResult(address.ToCol - address.FromCol + 1, DataType.Integer);
-			}
-		}
 
-		throw new ArgumentException("Invalid range supplied");
+		var address = CreateRangeAddressFromArgument(arguments, context) ?? throw new ArgumentException("Invalid range supplied");
+		return CreateResult(address.ToCol - address.FromCol + 1, DataType.Integer);
 	}
 }

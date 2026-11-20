@@ -38,34 +38,40 @@ public class Address : ExcelFunction
 		var row = ArgToInt(arguments, 0);
 		var col = ArgToInt(arguments, 1);
 		ThrowExcelErrorValueExceptionIf(() => row < 0 && col < 0, eErrorType.Value);
-		var referenceType = ExcelReferenceType.AbsoluteRowAndColumn;
-		var worksheetSpec = string.Empty;
-		if (arguments.Count() > 2)
+		var referenceType = GetReferenceType(arguments);
+		if (arguments.Count() > 3 && arguments.ElementAt(3).Value is bool fourthArg && !fourthArg)
 		{
-			var arg3 = ArgToInt(arguments, 2);
-			ThrowExcelErrorValueExceptionIf(() => arg3 is < 1 or > 4, eErrorType.Value);
-			referenceType = (ExcelReferenceType)ArgToInt(arguments, 2);
+			throw new InvalidOperationException("Excelformulaparser does not support the R1C1 format!");
 		}
 
-		if (arguments.Count() > 3)
+		var worksheetSpec = GetWorksheetSpec(arguments);
+		var translator = new IndexToAddressTranslator(context.ExcelDataProvider, referenceType);
+		return CreateResult(worksheetSpec + translator.ToAddress(col, row), DataType.ExcelAddress);
+	}
+
+	private ExcelReferenceType GetReferenceType(IEnumerable<FunctionArgument> arguments)
+	{
+		if (arguments.Count() <= 2)
 		{
-			var fourthArg = arguments.ElementAt(3).Value;
-			if (fourthArg is bool && !(bool)fourthArg)
-			{
-				throw new InvalidOperationException("Excelformulaparser does not support the R1C1 format!");
-			}
+			return ExcelReferenceType.AbsoluteRowAndColumn;
 		}
 
+		var arg3 = ArgToInt(arguments, 2);
+		ThrowExcelErrorValueExceptionIf(() => arg3 is < 1 or > 4, eErrorType.Value);
+		return (ExcelReferenceType)ArgToInt(arguments, 2);
+	}
+
+	private static string GetWorksheetSpec(IEnumerable<FunctionArgument> arguments)
+	{
 		if (arguments.Count() > 4)
 		{
 			var fifthArg = arguments.ElementAt(4).Value;
 			if (fifthArg is string && !string.IsNullOrEmpty(fifthArg.ToString()))
 			{
-				worksheetSpec = fifthArg + "!";
+				return fifthArg + "!";
 			}
 		}
 
-		var translator = new IndexToAddressTranslator(context.ExcelDataProvider, referenceType);
-		return CreateResult(worksheetSpec + translator.ToAddress(col, row), DataType.ExcelAddress);
+		return string.Empty;
 	}
 }

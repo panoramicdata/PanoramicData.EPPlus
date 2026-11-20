@@ -42,7 +42,6 @@ public class Match : LookupFunction
 	public Match()
 		: base(new WildCardValueMatcher(), new CompileResultFactory())
 	{
-
 	}
 
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
@@ -68,7 +67,7 @@ public class Match : LookupFunction
 				return CreateResult(navigator.Index + 1, DataType.Integer);
 			}
 
-			if ((matchType == MatchType.ClosestBelow && matchResult < 0) || (matchType == MatchType.ClosestAbove && matchResult > 0))
+			if (IsClosestMatchCandidate(matchType, matchResult))
 			{
 				lastValidIndex = navigator.Index + 1;
 			}
@@ -81,6 +80,9 @@ public class Match : LookupFunction
 		while (navigator.MoveNext());
 		return CreateResult(lastValidIndex, DataType.Integer);
 	}
+
+	private static bool IsClosestMatchCandidate(MatchType matchType, int matchResult) =>
+		(matchType == MatchType.ClosestBelow && matchResult < 0) || (matchType == MatchType.ClosestAbove && matchResult > 0);
 
 	private MatchType GetMatchType(IEnumerable<FunctionArgument> arguments)
 	{

@@ -13,8 +13,8 @@ public class NetworkdaysIntl : ExcelFunction
 	{
 		var functionArguments = arguments as FunctionArgument[] ?? arguments.ToArray();
 		ValidateArguments(functionArguments, 2);
-		var startDate = System.DateTime.FromOADate(ArgToInt(functionArguments, 0));
-		var endDate = System.DateTime.FromOADate(ArgToInt(functionArguments, 1));
+		var startDate = ArgToOADate(functionArguments, 0);
+		var endDate = ArgToOADate(functionArguments, 1);
 		WorkdayCalculator calculator = new();
 		var weekdayFactory = new HolidayWeekdaysFactory();
 		if (functionArguments.Length > 2)
@@ -35,12 +35,7 @@ public class NetworkdaysIntl : ExcelFunction
 			}
 		}
 
-		var result = calculator.CalculateNumberOfWorkdays(startDate, endDate);
-		if (functionArguments.Length > 3)
-		{
-			result = calculator.ReduceWorkdaysWithHolidays(result, functionArguments[3]);
-		}
-
+		var result = calculator.CalculateNumberOfWorkdays(startDate, endDate, functionArguments, 3);
 		return new CompileResult(result.NumberOfWorkdays, DataType.Integer);
 	}
 }

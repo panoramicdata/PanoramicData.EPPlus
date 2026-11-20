@@ -40,18 +40,7 @@ internal class ExcelDataValidationFormulaDateTime : ExcelDataValidationFormulaVa
 	public ExcelDataValidationFormulaDateTime(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
 		: base(namespaceManager, topNode, formulaPath)
 	{
-		var value = GetXmlNodeString(formulaPath);
-		if (!string.IsNullOrEmpty(value))
-		{
-			if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var oADate))
-			{
-				Value = DateTime.FromOADate(oADate);
-			}
-			else
-			{
-				ExcelFormula = value;
-			}
-		}
+		LoadNumberOrFormula(formulaPath, oADate => DateTime.FromOADate(oADate));
 	}
 
 	protected override string GetValueAsString() => Value.HasValue ? Value.Value.ToOADate().ToString(CultureInfo.InvariantCulture) : string.Empty;

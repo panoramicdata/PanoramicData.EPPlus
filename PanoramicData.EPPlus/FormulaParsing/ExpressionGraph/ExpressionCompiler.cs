@@ -60,10 +60,10 @@ public class ExpressionCompiler : IExpressionCompiler
 	public CompileResult Compile(string worksheet, int row, int column, IEnumerable<Expression> expressions)
 	{
 		_expressions = expressions;
-		return PerformCompilation(worksheet, row, column);
+		return PerformCompilation();
 	}
 
-	private CompileResult PerformCompilation(string worksheet = "", int row = -1, int column = -1)
+	private CompileResult PerformCompilation()
 	{
 		var compiledExpressions = HandleGroupedExpressions();
 		while (compiledExpressions.Any(x => x.Operator != null))
@@ -119,7 +119,6 @@ public class ExpressionCompiler : IExpressionCompiler
 	{
 		var first = _expressions.First();
 		var expressionsToHandle = _expressions.Where(x => x.Operator != null && x.Operator.Precedence == precedence);
-		var last = expressionsToHandle.Last();
 		var expression = expressionsToHandle.First();
 		do
 		{

@@ -163,7 +163,7 @@ public abstract class StyleBase
 	internal OfficeOpenXml.XmlHelper.ChangedEventHandler _ChangedEvent;
 	protected int _positionID;
 	protected string _address;
-	internal StyleBase(ExcelStyles styles, OfficeOpenXml.XmlHelper.ChangedEventHandler ChangedEvent, int PositionID, string Address)
+	private protected StyleBase(ExcelStyles styles, OfficeOpenXml.XmlHelper.ChangedEventHandler ChangedEvent, int PositionID, string Address)
 	{
 		_styles = styles;
 		_ChangedEvent = ChangedEvent;

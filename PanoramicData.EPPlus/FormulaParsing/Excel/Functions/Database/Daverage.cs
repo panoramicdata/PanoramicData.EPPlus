@@ -31,20 +31,15 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Database;
 public class Daverage : DatabaseFunction
 {
 	public Daverage()
-	   : this(new RowMatcher())
+		: this(new RowMatcher())
 	{
-
 	}
 
 	public Daverage(RowMatcher rowMatcher)
-	   : base(rowMatcher)
+		: base(rowMatcher)
 	{
+	}
 
-	}
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-	{
-		ValidateArguments(arguments, 3);
-		var values = GetMatchingValues(arguments, context);
-		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(values.Average(), DataType.Integer);
-	}
+		=> ExecuteAggregate(arguments, context, values => values.Average());
 }

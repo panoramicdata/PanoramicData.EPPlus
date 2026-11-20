@@ -16,13 +16,7 @@ public class TimeValue : ExcelFunction
 		return Execute(dateString);
 	}
 
-	internal CompileResult Execute(string dateString)
-	{
-		System.DateTime.TryParse(dateString, out var result);
-		return result != System.DateTime.MinValue ?
-			CreateResult(GetTimeValue(result), DataType.Date) :
-			CreateResult(ExcelErrorValue.Create(eErrorType.Value), DataType.ExcelError);
-	}
+	internal CompileResult Execute(string dateString) => CreateDateResultFromString(dateString, result => GetTimeValue(result));
 
 	private static double GetTimeValue(System.DateTime result) => (int)result.TimeOfDay.TotalSeconds == 0 ? 0d : result.TimeOfDay.TotalSeconds / (3600 * 24);
 }

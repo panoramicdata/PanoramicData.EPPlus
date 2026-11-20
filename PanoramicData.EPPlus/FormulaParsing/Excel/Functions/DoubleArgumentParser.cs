@@ -35,9 +35,9 @@ public class DoubleArgumentParser : ArgumentParser
 	public override object Parse(object obj)
 	{
 		Require.That(obj).Named("argument").IsNotNull();
-		if (obj is ExcelDataProvider.IRangeInfo)
+		if (obj is ExcelDataProvider.IRangeInfo rangeInfo)
 		{
-			var r = ((ExcelDataProvider.IRangeInfo)obj).FirstOrDefault();
+			var r = rangeInfo.FirstOrDefault();
 			return r == null ? 0 : r.ValueDouble;
 		}
 
@@ -58,7 +58,7 @@ public class DoubleArgumentParser : ArgumentParser
 				? d
 				: (object)System.DateTime.Parse(str, CultureInfo.CurrentCulture, DateTimeStyles.None).ToOADate();
 		}
-		catch// (Exception e)
+		catch
 		{
 			throw new ExcelErrorValueException(ExcelErrorValue.Create(eErrorType.Value));
 		}

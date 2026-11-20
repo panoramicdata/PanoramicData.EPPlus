@@ -61,52 +61,19 @@ public sealed class ExcelChartSerieDataLabel : ExcelChartDataLabel
 			SetXmlNodeString(positionPath, GetPosText(value));
 		}
 	}
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Access fill properties
 	/// </summary>
-	public new ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
-	ExcelDrawingBorder _border = null;
+	public new ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access border properties
 	/// </summary>
-	public new ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
-	ExcelTextFont _font = null;
+	public new ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
+	ExcelTextFont _font;
 	/// <summary>
 	/// Access font properties
 	/// </summary>
-	public new ExcelTextFont Font
-	{
-		get
-		{
-			if (_font == null)
-			{
-				if (TopNode.SelectSingleNode("c:txPr", NameSpaceManager) == null)
-				{
-					CreateNode("c:txPr/a:bodyPr");
-					CreateNode("c:txPr/a:lstStyle");
-				}
-
-				_font = new ExcelTextFont(NameSpaceManager, TopNode, "c:txPr/a:p/a:pPr/a:defRPr", ["spPr", "txPr", "dLblPos", "showVal", "showCatName ", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
-			}
-
-			return _font;
-		}
-	}
+	public new ExcelTextFont Font => ChartStyleAccess.GetFont(this, ref _font, ["spPr", "txPr", "dLblPos", "showVal", "showCatName ", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"]);
 }

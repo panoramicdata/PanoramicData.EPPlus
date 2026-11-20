@@ -56,7 +56,7 @@ public sealed class ExcelNamedStyleXml : StyleXmlHelper
 		_style = new ExcelStyle(styles, styles.NamedStylePropertyChange, -1, Name, _styleXfId);
 	}
 	internal override string Id => Name;
-	int _styleXfId = 0;
+	int _styleXfId;
 	const string idPath = "@xfId";
 	/// <summary>
 	/// Named style index
@@ -107,7 +107,7 @@ public sealed class ExcelNamedStyleXml : StyleXmlHelper
 			_name = value;
 		}
 	}
-	ExcelStyle _style = null;
+	ExcelStyle _style;
 	/// <summary>
 	/// The style object
 	/// </summary>

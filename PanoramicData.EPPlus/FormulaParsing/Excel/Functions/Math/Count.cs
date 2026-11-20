@@ -53,7 +53,6 @@ public class Count : HiddenValuesHandlingFunction
 			{
 				foreach (var c in cs)
 				{
-					_CheckForAndHandleExcelError(c, context);
 					if (ShouldIgnore(c, context) == false && ShouldCount(c.Value, ItemContext.InRange))
 					{
 						nItems++;
@@ -68,7 +67,6 @@ public class Count : HiddenValuesHandlingFunction
 				}
 				else
 				{
-					_CheckForAndHandleExcelError(item, context);
 					if (ShouldIgnore(item) == false && ShouldCount(item.Value, itemContext))
 					{
 						nItems++;
@@ -76,22 +74,6 @@ public class Count : HiddenValuesHandlingFunction
 				}
 			}
 		}
-	}
-
-	private static void _CheckForAndHandleExcelError(FunctionArgument arg, ParsingContext context)
-	{
-		//if (context.Scopes.Current.IsSubtotal)
-		//{
-		//    CheckForAndHandleExcelError(arg);
-		//}
-	}
-
-	private static void _CheckForAndHandleExcelError(ExcelDataProvider.ICellInfo cell, ParsingContext context)
-	{
-		//if (context.Scopes.Current.IsSubtotal)
-		//{
-		//    CheckForAndHandleExcelError(cell);
-		//}
 	}
 
 	private static bool ShouldCount(object value, ItemContext context) => context switch

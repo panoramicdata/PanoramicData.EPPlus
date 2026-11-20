@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Style;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Xml;
@@ -286,6 +287,7 @@ public sealed class ExcelShape : ExcelDrawing
 	/// <summary>
 	/// Shape style
 	/// </summary>
+	[SuppressMessage("Minor Code Smell", "S2372:Exceptions should not be thrown from property getters", Justification = "Published behaviour: an unknown shape type in the XML is reported to the caller.")]
 	public eShapeStyle Style
 	{
 		get
@@ -297,7 +299,7 @@ public sealed class ExcelShape : ExcelDrawing
 			}
 			catch
 			{
-				throw (new Exception(string.Format("Invalid shapetype {0}", v)));
+				throw (new InvalidOperationException(string.Format("Invalid shapetype {0}", v)));
 			}
 		}
 		set
@@ -333,7 +335,7 @@ public sealed class ExcelShape : ExcelDrawing
 			return _border;
 		}
 	}
-	ExcelDrawingLineEnd _ends = null;
+	ExcelDrawingLineEnd _ends;
 	/// <summary>
 	/// Line Ends
 	/// </summary>
@@ -348,7 +350,7 @@ public sealed class ExcelShape : ExcelDrawing
 	}
 	readonly string[] paragraphNodeOrder = ["pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
 	const string PARAGRAPH_PATH = "xdr:sp/xdr:txBody/a:p";
-	ExcelTextFont _font = null;
+	ExcelTextFont _font;
 	public ExcelTextFont Font
 	{
 		get
@@ -359,7 +361,6 @@ public sealed class ExcelShape : ExcelDrawing
 				if (node == null)
 				{
 					Text = "";    //Creates the node p element
-					node = TopNode.SelectSingleNode(PARAGRAPH_PATH, NameSpaceManager);
 				}
 
 				_font = new ExcelTextFont(NameSpaceManager, TopNode, "xdr:sp/xdr:txBody/a:p/a:pPr/a:defRPr", paragraphNodeOrder);
@@ -407,11 +408,6 @@ public sealed class ExcelShape : ExcelDrawing
 	{
 		get
 		{
-			//XmlNode node=TopNode.SelectSingleNode(PARAGRAPH_PATH, NameSpaceManager);
-			//if (node == null)
-			//{
-			//    CreateNode(PARAGRAPH_PATH);
-			//}
 			_richText ??= new ExcelParagraphCollection(NameSpaceManager, TopNode, PARAGRAPH_PATH, paragraphNodeOrder);
 
 			return _richText;

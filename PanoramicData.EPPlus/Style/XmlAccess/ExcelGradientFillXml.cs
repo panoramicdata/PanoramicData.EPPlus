@@ -29,6 +29,7 @@
  * Jan Källman		                Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
 namespace OfficeOpenXml.Style.XmlAccess;
@@ -129,6 +130,7 @@ public sealed class ExcelGradientFillXml : ExcelFillXml
 		get;
 		internal set;
 	}
+	[SuppressMessage("Minor Code Smell", "S1449:Culture should be specified for \"string\" operations", Justification = "Id is an in-process style cache key built the same way as its counterparts; changing the format could stop existing styles matching.")]
 	internal override string Id => base.Id + Degree.ToString() + GradientColor1.Id + GradientColor2.Id + Type + Left.ToString() + Right.ToString() + Bottom.ToString() + Top.ToString();
 
 	#region Public Properties

@@ -49,35 +49,20 @@ public class Average : HiddenValuesHandlingFunction
 			return;
 		}
 
-		if (arg.Value is IEnumerable<FunctionArgument>)
+		if (arg.Value is IEnumerable<FunctionArgument> items)
 		{
-			foreach (var item in (IEnumerable<FunctionArgument>)arg.Value)
+			foreach (var item in items)
 			{
 				Calculate(item, context, ref retVal, ref nValues, true);
 			}
 		}
 		else if (arg.IsExcelRange)
 		{
-			foreach (var c in arg.ValueAsRangeInfo)
-			{
-				if (ShouldIgnore(c, context))
-				{
-					continue;
-				}
-
-				CheckForAndHandleExcelError(c);
-				if (!IsNumeric(c.Value) || c.Value is bool)
-				{
-					continue;
-				}
-
-				nValues++;
-				retVal += c.ValueDouble;
-			}
+			AddRangeValues(arg.ValueAsRangeInfo, context, ref retVal, ref nValues);
 		}
 		else
 		{
-			var numericValue = GetNumericValue(arg.Value, isInArray);
+			var numericValue = GetAverageNumericValue(arg.Value, isInArray);
 			if (numericValue.HasValue)
 			{
 				nValues++;
@@ -92,29 +77,23 @@ public class Average : HiddenValuesHandlingFunction
 		CheckForAndHandleExcelError(arg);
 	}
 
-	private static double? GetNumericValue(object obj, bool isInArray)
+	private void AddRangeValues(ExcelDataProvider.IRangeInfo range, ParsingContext context, ref double retVal, ref double nValues)
 	{
-		if (IsNumeric(obj) && !(obj is bool))
+		foreach (var c in range)
 		{
-			return ConvertUtil.GetValueDouble(obj);
-		}
+			if (ShouldIgnore(c, context))
+			{
+				continue;
+			}
 
-		if (!isInArray)
-		{
-			if (obj is bool)
+			CheckForAndHandleExcelError(c);
+			if (!IsNumeric(c.Value) || c.Value is bool)
 			{
-				return ConvertUtil.GetValueDouble(obj);
+				continue;
 			}
-			else if (ConvertUtil.TryParseNumericString(obj, out var number))
-			{
-				return number;
-			}
-			else if (ConvertUtil.TryParseDateString(obj, out var date))
-			{
-				return date.ToOADate();
-			}
-		}
 
-		return default;
+			nValues++;
+			retVal += c.ValueDouble;
+		}
 	}
 }

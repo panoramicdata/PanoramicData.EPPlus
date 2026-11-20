@@ -30,17 +30,14 @@
  * Jan Källman		License changed GPL-->LGPL 2011-12-27
  *******************************************************************************/
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace OfficeOpenXml;
 
 /// <summary>
 /// Collection for named ranges
 /// </summary>
-public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
+public partial class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 {
 	internal ExcelWorksheet _ws;
 	internal ExcelWorkbook _wb;
@@ -67,7 +64,7 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 		ExcelNamedRange item;
 		if (!ExcelAddressUtil.IsValidName(Name))
 		{
-			throw (new ArgumentException($"Name {Name} contains invalid characters"));  //Issue 458
+			throw new ArgumentException($"Name {Name} contains invalid characters");  //Issue 458
 		}
 
 		if (Range.IsName)
@@ -135,165 +132,6 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 		return item;
 	}
 
-	internal void Insert(int rowFrom, int colFrom, int rows, int cols) => Insert(rowFrom, colFrom, rows, cols, n => true);
-
-	internal void Insert(int rowFrom, int colFrom, int rows, int cols, Func<ExcelNamedRange, bool> filter)
-	{
-		var namedRanges = _list.Where(filter);
-		foreach (var namedRange in namedRanges)
-		{
-			InsertRows(rowFrom, rows, namedRange);
-			InsertColumns(colFrom, cols, namedRange);
-		}
-	}
-	internal void Delete(int rowFrom, int colFrom, int rows, int cols) => Delete(rowFrom, colFrom, rows, cols, n => true);
-	internal void Delete(int rowFrom, int colFrom, int rows, int cols, Func<ExcelNamedRange, bool> filter)
-	{
-		var namedRanges = _list.Where(filter);
-		foreach (var namedRange in namedRanges)
-		{
-			ExcelAddressBase adr;
-			if (cols > 0 && rowFrom == 0 && rows >= ExcelPackage.MaxRows)   //Issue 15554. Check
-			{
-				adr = namedRange.DeleteColumn(colFrom, cols);
-			}
-			else
-			{
-				adr = namedRange.DeleteRow(rowFrom, rows);
-			}
-
-			if (adr == null)
-			{
-				namedRange.Address = "#REF!";
-			}
-			else
-			{
-				namedRange.Address = adr.Address;
-			}
-		}
-	}
-	//private void InsertColumns(int colFrom, int cols, ExcelNamedRange namedRange)
-	//{
-	//    if (colFrom > 0)
-	//    {
-	//        if (colFrom <= namedRange.Start.Column)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column +cols, namedRange.End.Row, namedRange.End.Column + cols);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress);
-	//        }
-	//        else if (colFrom <= namedRange.End.Column && namedRange.End.Column + cols < ExcelPackage.MaxColumns)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column, namedRange.End.Row, namedRange.End.Column + cols);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress);
-	//        }
-	//    }
-	//}
-
-	private static void InsertColumns(int colFrom, int cols, ExcelNamedRange namedRange)
-	{
-		if (colFrom > 0)
-		{
-			if (namedRange.Addresses?.Count > 0) //Contains multiple ranges
-			{
-				foreach (var rng in namedRange.Addresses)
-				{
-					if (colFrom <= rng.Start.Column)
-					{
-						var newAddress = ExcelCellBase.GetAddress(rng.Start.Row, rng.Start.Column + cols, rng.End.Row, rng.End.Column + cols);
-						rng.Address = BuildNewAddress(namedRange, newAddress);
-					}
-					else if (colFrom <= rng.End.Column && rng.End.Column + cols < ExcelPackage.MaxColumns)
-					{
-						var newAddress = ExcelCellBase.GetAddress(rng.Start.Row, rng.Start.Column, rng.End.Row, rng.End.Column + cols);
-						rng.Address = BuildNewAddress(namedRange, newAddress);
-					}
-				}
-
-				namedRange.Address = namedRange.FullAddress;
-			}
-			else
-			{
-				if (colFrom <= namedRange.Start.Column)
-				{
-					var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column + cols, namedRange.End.Row, namedRange.End.Column + cols);
-					namedRange.Address = BuildNewAddress(namedRange, newAddress);
-				}
-				else if (colFrom <= namedRange.End.Column && namedRange.End.Column + cols < ExcelPackage.MaxColumns)
-				{
-					var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column, namedRange.End.Row, namedRange.End.Column + cols);
-					namedRange.Address = BuildNewAddress(namedRange, newAddress);
-				}
-			}
-		}
-	}
-
-	private static string BuildNewAddress(ExcelNamedRange namedRange, string newAddress)
-	{
-		if (namedRange.FullAddress.Contains('!'))
-		{
-			var worksheet = namedRange.FullAddress.Split('!')[0];
-			worksheet = worksheet.Trim('\'');
-			newAddress = ExcelCellBase.GetFullAddress(worksheet, newAddress);
-		}
-
-		return newAddress;
-	}
-
-	//private void InsertRows(int rowFrom, int rows, ExcelNamedRange namedRange)
-	//{
-	//    if (rows > 0)
-	//    {
-	//        if (rowFrom <= namedRange.Start.Row)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row + rows, namedRange.Start.Column, namedRange.End.Row + rows, namedRange.End.Column);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress); 
-	//        }
-	//        else if (rowFrom <= namedRange.End.Row && namedRange.End.Row+rows <= ExcelPackage.MaxRows)
-	//        {
-	//            var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column, namedRange.End.Row + rows, namedRange.End.Column);
-	//            namedRange.Address = BuildNewAddress(namedRange, newAddress); 
-	//        }
-	//    }
-	//}
-
-	private static void InsertRows(int rowFrom, int rows, ExcelNamedRange namedRange)
-	{
-		if (rows > 0)
-		{
-			if (namedRange.Addresses?.Count > 0) //Contains multiple ranges
-			{
-				foreach (var rng in namedRange.Addresses)
-				{
-					if (rowFrom <= rng.Start.Row)
-					{
-						var newAddress = ExcelCellBase.GetAddress(rng.Start.Row + rows, rng.Start.Column, rng.End.Row + rows, rng.End.Column);
-						rng.Address = BuildNewAddress(namedRange, newAddress);
-					}
-					else if (rowFrom <= rng.End.Row && rng.End.Row + rows <= ExcelPackage.MaxRows)
-					{
-						var newAddress = ExcelCellBase.GetAddress(rng.Start.Row, rng.Start.Column, rng.End.Row + rows, rng.End.Column);
-						rng.Address = BuildNewAddress(namedRange, newAddress);
-					}
-				}
-
-				namedRange.Address = namedRange.FullAddress;
-			}
-			else
-			{
-				if (rowFrom <= namedRange.Start.Row)
-				{
-					var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row + rows, namedRange.Start.Column, namedRange.End.Row + rows, namedRange.End.Column);
-					namedRange.Address = BuildNewAddress(namedRange, newAddress);
-				}
-				else if (rowFrom <= namedRange.End.Row && namedRange.End.Row + rows <= ExcelPackage.MaxRows)
-				{
-					var newAddress = ExcelCellBase.GetAddress(namedRange.Start.Row, namedRange.Start.Column, namedRange.End.Row + rows, namedRange.End.Column);
-					namedRange.Address = BuildNewAddress(namedRange, newAddress);
-				}
-			}
-		}
-	}
-
 	/// <summary>
 	/// Remove a defined name from the collection
 	/// </summary>
@@ -346,23 +184,16 @@ public class ExcelNamedRangeCollection : IEnumerable<ExcelNamedRange>
 		}
 	}
 
-	#region "IEnumerable"
-	#region IEnumerable<ExcelNamedRange> Members
 	/// <summary>
 	/// Implement interface method IEnumerator&lt;ExcelNamedRange&gt; GetEnumerator()
 	/// </summary>
 	/// <returns></returns>
 	public IEnumerator<ExcelNamedRange> GetEnumerator() => _list.GetEnumerator();
-	#endregion
-	#region IEnumerable Members
 	/// <summary>
 	/// Implement interface method IEnumeratable GetEnumerator()
 	/// </summary>
 	/// <returns></returns>
 	IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
-
-	#endregion
-	#endregion
 
 	internal void Clear()
 	{

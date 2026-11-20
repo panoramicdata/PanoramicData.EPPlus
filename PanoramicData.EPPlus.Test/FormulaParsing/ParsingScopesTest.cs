@@ -46,7 +46,7 @@ public class ParsingScopesTest
 	public void CurrentScopeShouldBeNullWhenScopeHasTerminated()
 	{
 		using (var scope = _parsingScopes.NewScope(RangeAddress.Empty))
-		{ }
+		{ /* disposing the scope is what is tested */ }
 
 		Assert.IsNull(_parsingScopes.Current);
 	}
@@ -63,7 +63,9 @@ public class ParsingScopesTest
 	public void LifetimeEventHandlerShouldBeCalled()
 	{
 		using (var scope = _parsingScopes.NewScope(RangeAddress.Empty))
-		{ }
+		{
+			// Disposing the scope is what raises the event.
+		}
 
 		A.CallTo(() => _lifeTimeEventHandler.ParsingCompleted()).MustHaveHappened();
 	}

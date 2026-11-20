@@ -47,7 +47,6 @@ public class ExcelChartDataLabel : XmlHelper
 		if (topNode == null)
 		{
 			topNode = node.OwnerDocument.CreateElement("c", "dLbls", ExcelPackage.schemaChart);
-			//node.InsertAfter(_topNode, node.SelectSingleNode("c:order", NameSpaceManager));
 			InserAfter(node, "c:marker,c:tx,c:order,c:ser", topNode);
 			SchemaNodeOrder = ["spPr", "txPr", "dLblPos", "showLegendKey", "showVal", "showCatName", "showSerName", "showPercent", "showBubbleSize", "separator", "showLeaderLines"];
 			topNode.InnerXml = "<c:showLegendKey val=\"0\" /><c:showVal val=\"0\" /><c:showCatName val=\"0\" /><c:showSerName val=\"0\" /><c:showPercent val=\"0\" /><c:showBubbleSize val=\"0\" /> <c:separator>\r\n</c:separator><c:showLeaderLines val=\"0\" />";
@@ -181,81 +180,26 @@ public class ExcelChartDataLabel : XmlHelper
 		}
 	}
 
-	ExcelDrawingFill _fill = null;
+	ExcelDrawingFill _fill;
 	/// <summary>
 	/// Access fill properties
 	/// </summary>
-	public ExcelDrawingFill Fill
-	{
-		get
-		{
-			_fill ??= new ExcelDrawingFill(NameSpaceManager, TopNode, "c:spPr");
-
-			return _fill;
-		}
-	}
-	ExcelDrawingBorder _border = null;
+	public ExcelDrawingFill Fill => ChartStyleAccess.GetFill(this, ref _fill);
+	ExcelDrawingBorder _border;
 	/// <summary>
 	/// Access border properties
 	/// </summary>
-	public ExcelDrawingBorder Border
-	{
-		get
-		{
-			_border ??= new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
-
-			return _border;
-		}
-	}
+	public ExcelDrawingBorder Border => ChartStyleAccess.GetBorder(this, ref _border);
 	readonly string[] _paragraphSchemaOrder = ["spPr", "txPr", "dLblPos", "showVal", "showCatName", "showSerName", "showPercent", "separator", "showLeaderLines", "pPr", "defRPr", "solidFill", "uFill", "latin", "cs", "r", "rPr", "t"];
-	ExcelTextFont _font = null;
+	ExcelTextFont _font;
 	/// <summary>
 	/// Access font properties
 	/// </summary>
-	public ExcelTextFont Font
-	{
-		get
-		{
-			if (_font == null)
-			{
-				if (TopNode.SelectSingleNode("c:txPr", NameSpaceManager) == null)
-				{
-					CreateNode("c:txPr/a:bodyPr");
-					CreateNode("c:txPr/a:lstStyle");
-				}
-
-				_font = new ExcelTextFont(NameSpaceManager, TopNode, "c:txPr/a:p/a:pPr/a:defRPr", _paragraphSchemaOrder);
-			}
-
-			return _font;
-		}
-	}
+	public ExcelTextFont Font => ChartStyleAccess.GetFont(this, ref _font, _paragraphSchemaOrder);
 	#endregion
 	#region "Position Enum Translation"
-	protected static string GetPosText(eLabelPosition pos) => pos switch
-	{
-		eLabelPosition.Bottom => "b",
-		eLabelPosition.Center => "ctr",
-		eLabelPosition.InBase => "inBase",
-		eLabelPosition.InEnd => "inEnd",
-		eLabelPosition.Left => "l",
-		eLabelPosition.Right => "r",
-		eLabelPosition.Top => "t",
-		eLabelPosition.OutEnd => "outEnd",
-		_ => "bestFit",
-	};
+	protected static string GetPosText(eLabelPosition pos) => LabelPositionTranslator.ToText(pos);
 
-	protected static eLabelPosition GetPosEnum(string pos) => pos switch
-	{
-		"b" => eLabelPosition.Bottom,
-		"ctr" => eLabelPosition.Center,
-		"inBase" => eLabelPosition.InBase,
-		"inEnd" => eLabelPosition.InEnd,
-		"l" => eLabelPosition.Left,
-		"r" => eLabelPosition.Right,
-		"t" => eLabelPosition.Top,
-		"outEnd" => eLabelPosition.OutEnd,
-		_ => eLabelPosition.BestFit,
-	};
+	protected static eLabelPosition GetPosEnum(string pos) => LabelPositionTranslator.ToEnum(pos);
 	#endregion
 }

@@ -31,7 +31,7 @@ public class Pi : ExcelFunction
 {
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 	{
-		var result = System.Math.Round((double)System.Math.PI, 14);
+		var result = System.Math.Round(System.Math.PI, 14);
 		return CreateResult(result, DataType.Decimal);
 	}
 }

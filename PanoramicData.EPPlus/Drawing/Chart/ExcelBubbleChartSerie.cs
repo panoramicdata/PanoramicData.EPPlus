@@ -51,19 +51,11 @@ public sealed class ExcelBubbleChartSerie : ExcelChartSerie
 	{
 
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabel
 	/// </summary>
-	public ExcelChartSerieDataLabel DataLabel
-	{
-		get
-		{
-			_DataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
-
-			return _DataLabel;
-		}
-	}
+	public ExcelChartSerieDataLabel DataLabel => GetDataLabel(ref _DataLabel);
 	const string BUBBLE3D_PATH = "c:bubble3D/@val";
 	internal bool Bubble3D
 	{
@@ -121,15 +113,9 @@ public sealed class ExcelBubbleChartSerie : ExcelChartSerie
 			{
 				SetXmlNodeString(BUBBLESIZE_PATH, ExcelCellBase.GetFullAddress(_chartSeries.Chart.WorkSheet.Name, value));
 
-				var cache = TopNode.SelectSingleNode(string.Format("{0}/c:numCache", BUBBLESIZE_PATH), _ns);
-				cache?.ParentNode.RemoveChild(cache);
+				RemoveChildNode(string.Format("{0}/c:numCache", BUBBLESIZE_PATH));
 
 				DeleteNode(string.Format("{0}/c:numLit", BUBBLESIZE_TOPPATH));
-				//XmlNode lit = TopNode.SelectSingleNode(string.Format("{0}/c:numLit", _xSeriesTopPath), _ns);
-				//if (lit != null)
-				//{
-				//    lit.ParentNode.RemoveChild(lit);
-				//}
 			}
 		}
 	}
@@ -149,6 +135,6 @@ public sealed class ExcelBubbleChartSerie : ExcelChartSerie
 
 		CreateNode(BUBBLESIZE_TOPPATH + "/c:numLit", true);
 		var lit = TopNode.SelectSingleNode(string.Format("{0}/c:numLit", BUBBLESIZE_TOPPATH), _ns);
-		lit.InnerXml = string.Format("<c:formatCode>General</c:formatCode><c:ptCount val=\"{0}\"/>{1}", ix, sb.ToString());
+		lit.InnerXml = string.Format("<c:formatCode>General</c:formatCode><c:ptCount val=\"{0}\"/>{1}", ix, sb);
 	}
 }

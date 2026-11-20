@@ -82,8 +82,8 @@ public class ExcelConditionalFormattingIconSetBase<T>
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode,
-	  XmlNamespaceManager namespaceManager)
+	  XmlNode itemElementNode = null,
+	  XmlNamespaceManager namespaceManager = null)
 		: base(
 		  type,
 		  address,
@@ -94,43 +94,7 @@ public class ExcelConditionalFormattingIconSetBase<T>
 	{
 		if (itemElementNode != null && itemElementNode.HasChildNodes)
 		{
-			var pos = 1;
-			foreach (XmlNode node in itemElementNode.SelectNodes("d:iconSet/d:cfvo", NameSpaceManager))
-			{
-				if (pos == 1)
-				{
-					Icon1 = new ExcelConditionalFormattingIconDataBarValue(
-							type,
-							address,
-							worksheet,
-							node,
-							namespaceManager);
-				}
-				else if (pos == 2)
-				{
-					Icon2 = new ExcelConditionalFormattingIconDataBarValue(
-							type,
-							address,
-							worksheet,
-							node,
-							namespaceManager);
-				}
-				else if (pos == 3)
-				{
-					Icon3 = new ExcelConditionalFormattingIconDataBarValue(
-							type,
-							address,
-							worksheet,
-							node,
-							namespaceManager);
-				}
-				else
-				{
-					break;
-				}
-
-				pos++;
-			}
+			LoadIcons(type, address, worksheet, itemElementNode, namespaceManager);
 		}
 		else
 		{
@@ -138,106 +102,93 @@ public class ExcelConditionalFormattingIconSetBase<T>
 			  Node,
 			  ExcelConditionalFormattingConstants.Paths.IconSet);
 
-			//Create the <iconSet> node inside the <cfRule> node
-			double spann;
-			if (type == eExcelConditionalFormattingRuleType.ThreeIconSet)
+			double spann = type switch
 			{
-				spann = 3;
+				eExcelConditionalFormattingRuleType.ThreeIconSet => 3,
+				eExcelConditionalFormattingRuleType.FourIconSet => 4,
+				_ => 5,
+			};
+
+			Icon1 = AppendDefaultIcon(iconSetNode, 0, address, priority, worksheet, namespaceManager);
+			Icon2 = AppendDefaultIcon(iconSetNode, Math.Round(100D / spann, 0), address, priority, worksheet, namespaceManager);
+			Icon3 = AppendDefaultIcon(iconSetNode, Math.Round(100D * (2D / spann), 0), address, priority, worksheet, namespaceManager);
+			Type = type;
+		}
+	}
+	#endregion Constructors
+
+	private void LoadIcons(
+	  eExcelConditionalFormattingRuleType type,
+	  ExcelAddress address,
+	  ExcelWorksheet worksheet,
+	  XmlNode itemElementNode,
+	  XmlNamespaceManager namespaceManager)
+	{
+		var pos = 1;
+		foreach (XmlNode node in itemElementNode.SelectNodes("d:iconSet/d:cfvo", NameSpaceManager))
+		{
+			if (pos > 3)
+			{
+				return;
 			}
-			else if (type == eExcelConditionalFormattingRuleType.FourIconSet)
+
+			var icon = new ExcelConditionalFormattingIconDataBarValue(type, address, worksheet, node, namespaceManager);
+			if (pos == 1)
 			{
-				spann = 4;
+				Icon1 = icon;
+			}
+			else if (pos == 2)
+			{
+				Icon2 = icon;
 			}
 			else
 			{
-				spann = 5;
+				Icon3 = icon;
 			}
 
-			var iconNode1 = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(iconNode1);
-			Icon1 = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Percent,
-					0,
-					"",
-					eExcelConditionalFormattingRuleType.ThreeIconSet,
-					address,
-					priority,
-					worksheet,
-					iconNode1,
-					namespaceManager);
-
-			var iconNode2 = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(iconNode2);
-			Icon2 = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Percent,
-					Math.Round(100D / spann, 0),
-					"",
-					eExcelConditionalFormattingRuleType.ThreeIconSet,
-					address,
-					priority,
-					worksheet,
-					iconNode2,
-					namespaceManager);
-
-			var iconNode3 = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
-			iconSetNode.AppendChild(iconNode3);
-			Icon3 = new ExcelConditionalFormattingIconDataBarValue(eExcelConditionalFormattingValueObjectType.Percent,
-					Math.Round(100D * (2D / spann), 0),
-					"",
-					eExcelConditionalFormattingRuleType.ThreeIconSet,
-					address,
-					priority,
-					worksheet,
-					iconNode3,
-					namespaceManager);
-			Type = type;
+			pos++;
 		}
 	}
 
 	/// <summary>
-	/// 
+	/// Wraps the existing cfvo node at this 1-based position.
 	/// </summary>
-	///<param name="type"></param>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	/// <param name="itemElementNode"></param>
-	internal ExcelConditionalFormattingIconSetBase(
+	private protected ExcelConditionalFormattingIconDataBarValue LoadIcon(
+	  int position,
 	  eExcelConditionalFormattingRuleType type,
+	  ExcelAddress address,
+	  ExcelWorksheet worksheet,
+	  XmlNamespaceManager namespaceManager) => new(
+			type,
+			address,
+			worksheet,
+			TopNode.SelectSingleNode(string.Format("d:iconSet/d:cfvo[position()={0}]", position), NameSpaceManager),
+			namespaceManager);
+
+	/// <summary>
+	/// Appends a new cfvo node to the iconSet node and returns a percent value object for it.
+	/// </summary>
+	private protected static ExcelConditionalFormattingIconDataBarValue AppendDefaultIcon(
+	  XmlNode iconSetNode,
+	  double value,
 	  ExcelAddress address,
 	  int priority,
 	  ExcelWorksheet worksheet,
-	  XmlNode itemElementNode)
-		: this(
-		  type,
-		  address,
-		  priority,
-		  worksheet,
-		  itemElementNode,
-		  null)
+	  XmlNamespaceManager namespaceManager)
 	{
+		var iconNode = iconSetNode.OwnerDocument.CreateElement(ExcelConditionalFormattingConstants.Paths.Cfvo, ExcelPackage.schemaMain);
+		iconSetNode.AppendChild(iconNode);
+		return new ExcelConditionalFormattingIconDataBarValue(
+			eExcelConditionalFormattingValueObjectType.Percent,
+			value,
+			"",
+			eExcelConditionalFormattingRuleType.ThreeIconSet,
+			address,
+			priority,
+			worksheet,
+			iconNode,
+			namespaceManager);
 	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	///<param name="type"></param>
-	/// <param name="priority"></param>
-	/// <param name="address"></param>
-	/// <param name="worksheet"></param>
-	internal ExcelConditionalFormattingIconSetBase(
-	  eExcelConditionalFormattingRuleType type,
-	  ExcelAddress address,
-	  int priority,
-	  ExcelWorksheet worksheet)
-		: this(
-		  type,
-		  address,
-		  priority,
-		  worksheet,
-		  null,
-		  null)
-	{
-	}
-	#endregion Constructors
 
 	/// <summary>
 	/// Settings for icon 1 in the iconset

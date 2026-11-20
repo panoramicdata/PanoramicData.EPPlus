@@ -241,7 +241,7 @@ public sealed class ExcelPicture : ExcelDrawing
 	}
 
 	internal string ImageHash { get; set; }
-	byte[] _imageBytes = null;
+	byte[] _imageBytes;
 	/// <summary>
 	/// The image file's bytes, exactly as stored in the package (PNG, JPEG, GIF, BMP, TIFF, EMF or WMF).
 	/// Setting it replaces the picture; the bytes are written to the package verbatim.
@@ -271,7 +271,7 @@ public sealed class ExcelPicture : ExcelDrawing
 				}
 				catch (Exception ex)
 				{
-					throw new Exception("Can't save image - " + ex.Message, ex);
+					throw new InvalidOperationException("Can't save image - " + ex.Message, ex);
 				}
 			}
 		}

@@ -9,7 +9,6 @@ public class ExcelTimeTests
 {
 	private ExcelTime _time;
 	private readonly decimal SecondsPerHour = 3600;
-	// private readonly decimal HoursPerDay = 24;
 	private readonly decimal SecondsPerDay = 3600 * 24;
 
 	private static decimal Round(decimal value) => Math.Round(value, ExcelTime.NumberOfDecimals);
@@ -20,26 +19,26 @@ public class ExcelTimeTests
 	[TestCleanup]
 	public void Cleanup() => _time = null;
 
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
-	public void ExcelTimeTests_ConstructorWithValue_ShouldThrowIfValueIsLessThan0() => new ExcelTime(-1);
+	[TestMethod]
+	public void ExcelTimeTests_ConstructorWithValue_ShouldThrowIfValueIsLessThan0() => Assert.ThrowsExactly<ArgumentException>(() => new ExcelTime(-1));
 
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
-	public void ExcelTimeTests_ConstructorWithValue_ShouldThrowIfValueIsEqualToOrGreaterThan1() => new ExcelTime(1);
+	[TestMethod]
+	public void ExcelTimeTests_ConstructorWithValue_ShouldThrowIfValueIsEqualToOrGreaterThan1() => Assert.ThrowsExactly<ArgumentException>(() => new ExcelTime(1));
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
-	public void ExcelTimeTests_Hour_ShouldThrowIfNegativeValue() => _time.Hour = -1;
+	[TestMethod]
+	public void ExcelTimeTests_Hour_ShouldThrowIfNegativeValue() => Assert.ThrowsExactly<InvalidOperationException>(() => _time.Hour = -1);
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
-	public void ExcelTimeTests_Minute_ShouldThrowIfNegativeValue() => _time.Minute = -1;
+	[TestMethod]
+	public void ExcelTimeTests_Minute_ShouldThrowIfNegativeValue() => Assert.ThrowsExactly<InvalidOperationException>(() => _time.Minute = -1);
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
-	public void ExcelTimeTests_Minute_ShouldThrowIValueIsGreaterThan59() => _time.Minute = 60;
+	[TestMethod]
+	public void ExcelTimeTests_Minute_ShouldThrowIValueIsGreaterThan59() => Assert.ThrowsExactly<InvalidOperationException>(() => _time.Minute = 60);
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
-	public void ExcelTimeTests_Second_ShouldThrowIfNegativeValue() => _time.Second = -1;
+	[TestMethod]
+	public void ExcelTimeTests_Second_ShouldThrowIfNegativeValue() => Assert.ThrowsExactly<InvalidOperationException>(() => _time.Second = -1);
 
-	[TestMethod, ExpectedException(typeof(InvalidOperationException))]
-	public void ExcelTimeTests_Second_ShouldThrowIValueIsGreaterThan59() => _time.Second = 60;
+	[TestMethod]
+	public void ExcelTimeTests_Second_ShouldThrowIValueIsGreaterThan59() => Assert.ThrowsExactly<InvalidOperationException>(() => _time.Second = 60);
 
 	[TestMethod]
 	public void ExcelTimeTests_ToExcelTime_HourIsSet()

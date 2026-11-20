@@ -12,7 +12,6 @@ namespace OfficeOpenXml.Style;
 
 interface IColor
 {
-	//bool? Auto { get; set; }  //TODO: Add this functionallity
 	int Indexed { get; set; }
 	string Rgb { get; }
 	string Theme { get; }

@@ -35,13 +35,10 @@ public class Floor : ExcelFunction
 		ValidateArguments(arguments, 2);
 		var number = ArgToDecimal(arguments, 0);
 		var significance = ArgToDecimal(arguments, 1);
-		ValidateNumberAndSign(number, significance);
+		SignificanceRounding.ValidateNumberAndSign(number, significance, "Floor");
 		if (significance is < 1 and > 0)
 		{
-			var floor = System.Math.Floor(number);
-			var rest = number - floor;
-			var nSign = (int)(rest / significance);
-			return CreateResult(floor + (nSign * significance), DataType.Decimal);
+			return CreateResult(SignificanceRounding.RoundFractional(number, significance, 0), DataType.Decimal);
 		}
 		else if (significance == 1)
 		{
@@ -67,12 +64,4 @@ public class Floor : ExcelFunction
 		}
 	}
 
-	private static void ValidateNumberAndSign(double number, double sign)
-	{
-		if (number > 0d && sign < 0)
-		{
-			var values = string.Format("num: {0}, sign: {1}", number, sign);
-			throw new InvalidOperationException("Floor cannot handle a negative significance when the number is positive" + values);
-		}
-	}
 }

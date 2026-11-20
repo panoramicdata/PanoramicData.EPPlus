@@ -12,9 +12,9 @@ public class N : ExcelFunction
 		ValidateArguments(arguments, 1);
 		var arg = GetFirstValue(arguments);
 
-		if (arg is bool)
+		if (arg is bool boolValue)
 		{
-			var val = (bool)arg ? 1d : 0d;
+			var val = boolValue ? 1d : 0d;
 			return CreateResult(val, DataType.Decimal);
 		}
 		else if (IsNumeric(arg))

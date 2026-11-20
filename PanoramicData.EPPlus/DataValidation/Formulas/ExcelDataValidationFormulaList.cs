@@ -137,7 +137,7 @@ internal class ExcelDataValidationFormulaList : ExcelDataValidationFormula, IExc
 		Require.Argument(formulaPath).IsNotNullOrEmpty("formulaPath");
 		_formulaPath = formulaPath;
 		var values = new DataValidationList();
-		values.ListChanged += new EventHandler<EventArgs>(values_ListChanged);
+		values.ListChanged += values_ListChanged;
 		Values = values;
 		SetInitialValues();
 	}

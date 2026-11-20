@@ -46,9 +46,6 @@ class Sample_Main
 
 			//Set the output directory to the SampleApp folder where the app is running from. 
 			Utils.OutputDir = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}SampleApp");
-			//Sample16.RunSample16();
-			//Sample17.RunSample17();
-			//return;
 
 			// Sample 1 - simply creates a new workbook from scratch
 			// containing a worksheet that adds a few numbers together 

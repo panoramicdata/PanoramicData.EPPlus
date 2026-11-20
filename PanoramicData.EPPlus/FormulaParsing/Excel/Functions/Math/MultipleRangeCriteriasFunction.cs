@@ -26,14 +26,13 @@ using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using OfficeOpenXml.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using Require = OfficeOpenXml.FormulaParsing.Utilities.Require;
-
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 public abstract class MultipleRangeCriteriasFunction : ExcelFunction
 {
-
 	private readonly ExpressionEvaluator _expressionEvaluator;
 
 	protected MultipleRangeCriteriasFunction()
@@ -49,17 +48,7 @@ public abstract class MultipleRangeCriteriasFunction : ExcelFunction
 	}
 
 	protected bool Evaluate(object obj, string expression)
-	{
-		var candidate = default(double?);
-		if (IsNumeric(obj))
-		{
-			candidate = ConvertUtil.GetValueDouble(obj);
-		}
-
-		return candidate.HasValue
-			? _expressionEvaluator.Evaluate(candidate.Value, expression)
-			: _expressionEvaluator.Evaluate(obj, expression);
-	}
+		=> EvaluateCriteria(_expressionEvaluator, obj, expression);
 
 	protected List<int> GetMatchIndexes(ExcelDataProvider.IRangeInfo rangeInfo, string searched)
 	{
@@ -80,5 +69,31 @@ public abstract class MultipleRangeCriteriasFunction : ExcelFunction
 		}
 
 		return result;
+	}
+
+	private protected IEnumerable<int> GetMatchIndexesForCriteria(FunctionArgument[] functionArguments, int firstRangeIndex)
+	{
+		var argRanges = new List<ExcelDataProvider.IRangeInfo>();
+		var criterias = new List<string>();
+		for (var ix = firstRangeIndex; ix < firstRangeIndex + 30; ix += 2)
+		{
+			if (functionArguments.Length <= ix)
+			{
+				break;
+			}
+
+			argRanges.Add(functionArguments[ix].ValueAsRangeInfo);
+			criterias.Add(functionArguments[ix + 1].Value?.ToString());
+		}
+
+		IEnumerable<int> matchIndexes = GetMatchIndexes(argRanges[0], criterias[0]);
+		var enumerable = matchIndexes as IList<int> ?? matchIndexes.ToList();
+		for (var ix = 1; ix < argRanges.Count && enumerable.Any(); ix++)
+		{
+			var indexes = GetMatchIndexes(argRanges[ix], criterias[ix]);
+			matchIndexes = enumerable.Intersect(indexes);
+		}
+
+		return matchIndexes;
 	}
 }

@@ -316,16 +316,16 @@ public sealed class ExcelSheetProtection : XmlHelper
 		if (Password == "")
 		{
 			var node = TopNode.SelectSingleNode(_passwordPath, NameSpaceManager);
-			if (node != null)
+			if (node is XmlAttribute attribute)
 			{
-				(node as XmlAttribute).OwnerElement.Attributes.Remove(node as XmlAttribute);
+				attribute.OwnerElement.Attributes.Remove(attribute);
 			}
 
 			return;
 		}
 
 		int hash = EncryptedPackageHandler.CalculatePasswordHash(Password);
-		SetXmlNodeString(_passwordPath, ((int)hash).ToString("x"));
+		SetXmlNodeString(_passwordPath, hash.ToString("x"));
 	}
 
 }

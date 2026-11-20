@@ -120,7 +120,7 @@ public class ExcelBackgroundImage : XmlHelper
 		}
 		catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
 		{
-			throw (new InvalidDataException("File is not a supported image-file or is corrupt", ex));
+			throw new InvalidDataException("File is not a supported image-file or is corrupt", ex);
 		}
 
 		var contentType = ExcelPicture.GetContentType(PictureFile.Extension);

@@ -28,6 +28,7 @@
  * ******************************************************************************
  * Mats Alm   		                Added       		        2013-03-01 (Prior file history on https://github.com/swmal/ExcelFormulaParser)
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.FormulaParsing.Excel.Operators;
 using System;
 using System.Collections.Generic;
@@ -45,11 +46,12 @@ public abstract class Expression
 	public IOperator Operator { get; set; }
 	public abstract bool IsGroupedExpression { get; }
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public Expression()
 	{
-
 	}
 
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public Expression(string expression)
 	{
 		ExpressionString = expression;
@@ -75,7 +77,7 @@ public abstract class Expression
 
 	public virtual Expression MergeWithNext()
 	{
-		var expression = this;
+		Expression expression;
 		if (Next != null && Operator != null)
 		{
 			var result = Operator.Apply(Compile(), Next.Compile());
@@ -106,7 +108,7 @@ public abstract class Expression
 		}
 		else
 		{
-			throw (new FormatException("Invalid formula syntax. Operator missing expression."));
+			throw new FormatException("Invalid formula syntax. Operator missing expression.");
 		}
 
 		if (Prev != null)
@@ -118,5 +120,4 @@ public abstract class Expression
 	}
 
 	public abstract CompileResult Compile();
-
 }

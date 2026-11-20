@@ -61,38 +61,22 @@ internal static class ExcelConditionalFormattingRuleType
 							nameSpaceManager),
 		  ExcelConditionalFormattingConstants.RuleType.CellIs => GetCellIs((XmlElement)topNode),
 		  ExcelConditionalFormattingConstants.RuleType.BeginsWith => eExcelConditionalFormattingRuleType.BeginsWith,
-		  //case ExcelConditionalFormattingConstants.RuleType.Between:
-		  //  return eExcelConditionalFormattingRuleType.Between;
 		  ExcelConditionalFormattingConstants.RuleType.ContainsBlanks => eExcelConditionalFormattingRuleType.ContainsBlanks,
 		  ExcelConditionalFormattingConstants.RuleType.ContainsErrors => eExcelConditionalFormattingRuleType.ContainsErrors,
 		  ExcelConditionalFormattingConstants.RuleType.ContainsText => eExcelConditionalFormattingRuleType.ContainsText,
 		  ExcelConditionalFormattingConstants.RuleType.DuplicateValues => eExcelConditionalFormattingRuleType.DuplicateValues,
 		  ExcelConditionalFormattingConstants.RuleType.EndsWith => eExcelConditionalFormattingRuleType.EndsWith,
-		  //case ExcelConditionalFormattingConstants.RuleType.Equal:
-		  //  return eExcelConditionalFormattingRuleType.Equal;
 		  ExcelConditionalFormattingConstants.RuleType.Expression => eExcelConditionalFormattingRuleType.Expression,
-		  //case ExcelConditionalFormattingConstants.RuleType.GreaterThan:
-		  //  return eExcelConditionalFormattingRuleType.GreaterThan;
-		  //case ExcelConditionalFormattingConstants.RuleType.GreaterThanOrEqual:
-		  //  return eExcelConditionalFormattingRuleType.GreaterThanOrEqual;
-		  //case ExcelConditionalFormattingConstants.RuleType.LessThan:
-		  //  return eExcelConditionalFormattingRuleType.LessThan;
-		  //case ExcelConditionalFormattingConstants.RuleType.LessThanOrEqual:
-		  //  return eExcelConditionalFormattingRuleType.LessThanOrEqual;
-		  //case ExcelConditionalFormattingConstants.RuleType.NotBetween:
-		  //  return eExcelConditionalFormattingRuleType.NotBetween;
 		  ExcelConditionalFormattingConstants.RuleType.NotContainsBlanks => eExcelConditionalFormattingRuleType.NotContainsBlanks,
 		  ExcelConditionalFormattingConstants.RuleType.NotContainsErrors => eExcelConditionalFormattingRuleType.NotContainsErrors,
 		  ExcelConditionalFormattingConstants.RuleType.NotContainsText => eExcelConditionalFormattingRuleType.NotContainsText,
-		  //case ExcelConditionalFormattingConstants.RuleType.NotEqual:
-		  //  return eExcelConditionalFormattingRuleType.NotEqual;
 		  ExcelConditionalFormattingConstants.RuleType.UniqueValues => eExcelConditionalFormattingRuleType.UniqueValues,
 		  ExcelConditionalFormattingConstants.RuleType.ColorScale => GetColorScaleType(
 							topNode,
 							nameSpaceManager),
 		  ExcelConditionalFormattingConstants.RuleType.IconSet => GetIconSetType(topNode, nameSpaceManager),
 		  ExcelConditionalFormattingConstants.RuleType.DataBar => eExcelConditionalFormattingRuleType.DataBar,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.UnexpectedRuleTypeAttribute),
 	  };
 
@@ -110,7 +94,7 @@ internal static class ExcelConditionalFormattingRuleType
 		ExcelConditionalFormattingConstants.Operators.NotBetween => eExcelConditionalFormattingRuleType.NotBetween,
 		ExcelConditionalFormattingConstants.Operators.NotContains => eExcelConditionalFormattingRuleType.NotContains,
 		ExcelConditionalFormattingConstants.Operators.NotEqual => eExcelConditionalFormattingRuleType.NotEqual,
-		_ => throw new Exception(
+		_ => throw new InvalidOperationException(
 						  ExcelConditionalFormattingConstants.Errors.UnexistentOperatorTypeAttribute),
 	};
 	private static eExcelConditionalFormattingRuleType GetIconSetType(XmlNode topNode, XmlNamespaceManager nameSpaceManager)
@@ -144,37 +128,25 @@ internal static class ExcelConditionalFormattingRuleType
 	  XmlNode topNode,
 	  XmlNamespaceManager nameSpaceManager)
 	{
-		// Get the <cfvo> nodes
-		var cfvoNodes = topNode.SelectNodes(
-		  string.Format(
-			"{0}/{1}",
-			ExcelConditionalFormattingConstants.Paths.ColorScale,
-			ExcelConditionalFormattingConstants.Paths.Cfvo),
-		  nameSpaceManager);
+		var cfvoNodes = SelectColorScaleChildren(topNode, ExcelConditionalFormattingConstants.Paths.Cfvo, nameSpaceManager);
+		var colorNodes = SelectColorScaleChildren(topNode, ExcelConditionalFormattingConstants.Paths.Color, nameSpaceManager);
 
-		// Get the <color> nodes
-		var colorNodes = topNode.SelectNodes(
-		  string.Format(
-			"{0}/{1}",
-			ExcelConditionalFormattingConstants.Paths.ColorScale,
-			ExcelConditionalFormattingConstants.Paths.Color),
-		  nameSpaceManager);
-
-		// We determine if it is "TwoColorScale" or "ThreeColorScale" by the
-		// number of <cfvo> and <color> inside the <colorScale> node
-		if ((cfvoNodes == null) || (cfvoNodes.Count < 2) || (cfvoNodes.Count > 3)
-		  || (colorNodes == null) || (colorNodes.Count < 2) || (colorNodes.Count > 3)
-		  || (cfvoNodes.Count != colorNodes.Count))
+		if (!HasColorScaleNodeCount(cfvoNodes) || !HasColorScaleNodeCount(colorNodes) || cfvoNodes.Count != colorNodes.Count)
 		{
-			throw new Exception(
+			throw new InvalidOperationException(
 			  ExcelConditionalFormattingConstants.Errors.WrongNumberCfvoColorNodes);
 		}
 
-		// Return the corresponding rule type (TwoColorScale or ThreeColorScale)
 		return (cfvoNodes.Count == 2)
 		  ? eExcelConditionalFormattingRuleType.TwoColorScale
 		  : eExcelConditionalFormattingRuleType.ThreeColorScale;
 	}
+
+	private static XmlNodeList SelectColorScaleChildren(XmlNode topNode, string childPath, XmlNamespaceManager nameSpaceManager) => topNode.SelectNodes(
+		string.Format("{0}/{1}", ExcelConditionalFormattingConstants.Paths.ColorScale, childPath),
+		nameSpaceManager);
+
+	private static bool HasColorScaleNodeCount(XmlNodeList nodes) => nodes != null && nodes.Count is >= 2 and <= 3;
 
 	/// <summary>
 	/// Get the "aboveAverage" rule type according to the follwoing attributes:
@@ -312,7 +284,7 @@ internal static class ExcelConditionalFormattingRuleType
 			eExcelConditionalFormattingTimePeriodType.Today => eExcelConditionalFormattingRuleType.Today,
 			eExcelConditionalFormattingTimePeriodType.Tomorrow => eExcelConditionalFormattingRuleType.Tomorrow,
 			eExcelConditionalFormattingTimePeriodType.Yesterday => eExcelConditionalFormattingRuleType.Yesterday,
-			_ => throw new Exception(
+			_ => throw new InvalidOperationException(
 					  ExcelConditionalFormattingConstants.Errors.UnexistentTimePeriodTypeAttribute),
 		};
 	}
@@ -343,7 +315,7 @@ internal static class ExcelConditionalFormattingRuleType
 		  eExcelConditionalFormattingRuleType.NotContainsText => ExcelConditionalFormattingConstants.RuleType.NotContainsText,
 		  eExcelConditionalFormattingRuleType.UniqueValues => ExcelConditionalFormattingConstants.RuleType.UniqueValues,
 		  eExcelConditionalFormattingRuleType.DataBar => ExcelConditionalFormattingConstants.RuleType.DataBar,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingRuleType),
 	  };
 
@@ -358,7 +330,7 @@ internal static class ExcelConditionalFormattingRuleType
 		  eExcelConditionalFormattingRuleType.TwoColorScale or eExcelConditionalFormattingRuleType.ThreeColorScale => ExcelConditionalFormattingConstants.Paths.ColorScale,
 		  eExcelConditionalFormattingRuleType.ThreeIconSet or eExcelConditionalFormattingRuleType.FourIconSet or eExcelConditionalFormattingRuleType.FiveIconSet => ExcelConditionalFormattingConstants.RuleType.IconSet,
 		  eExcelConditionalFormattingRuleType.DataBar => ExcelConditionalFormattingConstants.RuleType.DataBar,
-		  _ => throw new Exception(
+		  _ => throw new InvalidOperationException(
 					ExcelConditionalFormattingConstants.Errors.MissingRuleType),
 	  };
 }

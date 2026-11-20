@@ -53,7 +53,9 @@ class Sample2
 			var col = 2; //The item description
 						 // output the data in column 2
 			for (var row = 2; row < 5; row++)
+			{
 				Console.WriteLine("\tCell({0},{1}).Value={2}", row, col, worksheet.Cells[row, col].Value);
+			}
 
 			// output the formula in row 5
 			Console.WriteLine("\tCell({0},{1}).Formula={2}", 3, 5, worksheet.Cells[3, 5].Formula);

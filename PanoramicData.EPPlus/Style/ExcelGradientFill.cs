@@ -31,6 +31,7 @@
  *******************************************************************************/
 using OfficeOpenXml.Style.XmlAccess;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OfficeOpenXml.Style;
 
@@ -84,7 +85,7 @@ public class ExcelGradientFill : StyleBase
 		}
 		set
 		{
-			if (value < 0 | value > 1)
+			if (value < 0 || value > 1)
 			{
 				throw (new ArgumentOutOfRangeException("Value must be between 0 and 1"));
 			}
@@ -103,7 +104,7 @@ public class ExcelGradientFill : StyleBase
 		}
 		set
 		{
-			if (value < 0 | value > 1)
+			if (value < 0 || value > 1)
 			{
 				throw (new ArgumentOutOfRangeException("Value must be between 0 and 1"));
 			}
@@ -122,7 +123,7 @@ public class ExcelGradientFill : StyleBase
 		}
 		set
 		{
-			if (value < 0 | value > 1)
+			if (value < 0 || value > 1)
 			{
 				throw (new ArgumentOutOfRangeException("Value must be between 0 and 1"));
 			}
@@ -141,7 +142,7 @@ public class ExcelGradientFill : StyleBase
 		}
 		set
 		{
-			if (value < 0 | value > 1)
+			if (value < 0 || value > 1)
 			{
 				throw (new ArgumentOutOfRangeException("Value must be between 0 and 1"));
 			}
@@ -149,7 +150,7 @@ public class ExcelGradientFill : StyleBase
 			_ChangedEvent(this, new StyleChangeEventArgs(eStyleClass.GradientFill, eStyleProperty.GradientRight, value, _positionID, _address));
 		}
 	}
-	ExcelColor _gradientColor1 = null;
+	ExcelColor _gradientColor1;
 	/// <summary>
 	/// Gradient Color 1
 	/// </summary>
@@ -163,7 +164,7 @@ public class ExcelGradientFill : StyleBase
 
 		}
 	}
-	ExcelColor _gradientColor2 = null;
+	ExcelColor _gradientColor2;
 	/// <summary>
 	/// Gradient Color 2
 	/// </summary>
@@ -177,5 +178,6 @@ public class ExcelGradientFill : StyleBase
 
 		}
 	}
+	[SuppressMessage("Minor Code Smell", "S1449:Culture should be specified for \"string\" operations", Justification = "Id is an in-process style cache key built the same way as its counterparts; changing the format could stop existing styles matching.")]
 	internal override string Id => Degree.ToString() + Type + Color1.Id + Color2.Id + Top.ToString() + Bottom.ToString() + Left.ToString() + Right.ToString();
 }

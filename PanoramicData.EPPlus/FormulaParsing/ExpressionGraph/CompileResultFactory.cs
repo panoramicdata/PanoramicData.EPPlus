@@ -36,14 +36,14 @@ public class CompileResultFactory
 {
 	public virtual CompileResult Create(object obj)
 	{
-		if ((obj is ExcelDataProvider.INameInfo))
+		if (obj is ExcelDataProvider.INameInfo nameInfo)
 		{
-			obj = ((ExcelDataProvider.INameInfo)obj).Value;
+			obj = nameInfo.Value;
 		}
 
-		if (obj is ExcelDataProvider.IRangeInfo)
+		if (obj is ExcelDataProvider.IRangeInfo rangeInfo)
 		{
-			obj = ((ExcelDataProvider.IRangeInfo)obj).GetOffset(0, 0);
+			obj = rangeInfo.GetOffset(0, 0);
 		}
 
 		if (obj == null)
@@ -51,33 +51,24 @@ public class CompileResultFactory
 			return new CompileResult(null, DataType.Empty);
 		}
 
-		if (obj.GetType().Equals(typeof(string)))
+		if (obj is System.DateTime dateTime)
 		{
-			return new CompileResult(obj, DataType.String);
+			return new CompileResult(dateTime.ToOADate(), DataType.Date);
 		}
 
-		if (obj.GetType().Equals(typeof(double)) || obj is decimal)
-		{
-			return new CompileResult(obj, DataType.Decimal);
-		}
-
-		if (obj.GetType().Equals(typeof(int)) || obj is long || obj is short)
-		{
-			return new CompileResult(obj, DataType.Integer);
-		}
-
-		if (obj.GetType().Equals(typeof(bool)))
-		{
-			return new CompileResult(obj, DataType.Boolean);
-		}
-
-		if (obj.GetType().Equals(typeof(ExcelErrorValue)))
-		{
-			return new CompileResult(obj, DataType.ExcelError);
-		}
-
-		return obj.GetType().Equals(typeof(System.DateTime))
-			? new CompileResult(((System.DateTime)obj).ToOADate(), DataType.Date)
+		var dataType = GetDataType(obj);
+		return dataType.HasValue
+			? new CompileResult(obj, dataType.Value)
 			: throw new ArgumentException("Non supported type " + obj.GetType().FullName);
 	}
+
+	private static DataType? GetDataType(object obj) => obj switch
+	{
+		string => DataType.String,
+		double or decimal => DataType.Decimal,
+		int or long or short => DataType.Integer,
+		bool => DataType.Boolean,
+		_ when obj.GetType() == typeof(ExcelErrorValue) => DataType.ExcelError,
+		_ => null
+	};
 }

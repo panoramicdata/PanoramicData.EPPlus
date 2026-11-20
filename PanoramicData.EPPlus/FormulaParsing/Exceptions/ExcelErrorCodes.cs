@@ -48,8 +48,9 @@ public class ExcelErrorCodes
 
 	public override int GetHashCode() => Code.GetHashCode();
 
-	public override bool Equals(object? obj) => obj is ExcelErrorCodes && ((ExcelErrorCodes)obj).Code.Equals(Code);
+	public override bool Equals(object? obj) => obj is ExcelErrorCodes other && other.Code.Equals(Code);
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3875:operator== should not be overloaded on reference types", Justification = "Public API of a published library; changing it would break existing consumers.")]
 	public static bool operator ==(ExcelErrorCodes c1, ExcelErrorCodes c2)
 	{
 		return c1.Code.Equals(c2.Code);

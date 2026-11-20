@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 
 namespace PanoramicData.EPPlus.Test;
 
@@ -43,34 +42,28 @@ public class ExcelRangeBaseTests : TestBase
 		sourceExcelRangeC3.AddComment("Testing comment 1", "test1");
 		sourceExcelRangeD3.AddComment("Testing comment 2", "test1");
 		sourceExcelRangeE3.AddComment("Testing comment 3", "test1");
-		Assert.AreEqual("test1", sourceExcelRangeC3.Comment.Author);
-		Assert.AreEqual("Testing comment 1", sourceExcelRangeC3.Comment.Text);
-		Assert.AreEqual("test1", sourceExcelRangeD3.Comment.Author);
-		Assert.AreEqual("Testing comment 2", sourceExcelRangeD3.Comment.Text);
-		Assert.AreEqual("test1", sourceExcelRangeE3.Comment.Author);
-		Assert.AreEqual("Testing comment 3", sourceExcelRangeE3.Comment.Text);
+		AssertNumberedComments(sourceExcelRangeC3, sourceExcelRangeD3, sourceExcelRangeE3);
 		// Copy the full row to capture each cell at once.
 		Assert.IsNull(ws1.Cells[5, 3].Comment);
 		Assert.IsNull(ws1.Cells[5, 4].Comment);
 		Assert.IsNull(ws1.Cells[5, 5].Comment);
 		ws1.Cells["3:3"].Copy(ws1.Cells["5:5"]);
 		// Assert the original comments are intact.
-		Assert.AreEqual("test1", sourceExcelRangeC3.Comment.Author);
-		Assert.AreEqual("Testing comment 1", sourceExcelRangeC3.Comment.Text);
-		Assert.AreEqual("test1", sourceExcelRangeD3.Comment.Author);
-		Assert.AreEqual("Testing comment 2", sourceExcelRangeD3.Comment.Text);
-		Assert.AreEqual("test1", sourceExcelRangeE3.Comment.Author);
-		Assert.AreEqual("Testing comment 3", sourceExcelRangeE3.Comment.Text);
+		AssertNumberedComments(sourceExcelRangeC3, sourceExcelRangeD3, sourceExcelRangeE3);
 		// Assert the comments were copied.
 		var destinationExcelRangeC5 = ws1.Cells[5, 3];
 		var destinationExcelRangeD5 = ws1.Cells[5, 4];
 		var destinationExcelRangeE5 = ws1.Cells[5, 5];
-		Assert.AreEqual("test1", destinationExcelRangeC5.Comment.Author);
-		Assert.AreEqual("Testing comment 1", destinationExcelRangeC5.Comment.Text);
-		Assert.AreEqual("test1", destinationExcelRangeD5.Comment.Author);
-		Assert.AreEqual("Testing comment 2", destinationExcelRangeD5.Comment.Text);
-		Assert.AreEqual("test1", destinationExcelRangeE5.Comment.Author);
-		Assert.AreEqual("Testing comment 3", destinationExcelRangeE5.Comment.Text);
+		AssertNumberedComments(destinationExcelRangeC5, destinationExcelRangeD5, destinationExcelRangeE5);
+	}
+
+	private static void AssertNumberedComments(params ExcelRange[] cells)
+	{
+		for (var i = 0; i < cells.Length; i++)
+		{
+			Assert.AreEqual("test1", cells[i].Comment.Author);
+			Assert.AreEqual($"Testing comment {i + 1}", cells[i].Comment.Text);
+		}
 	}
 
 	[TestMethod]

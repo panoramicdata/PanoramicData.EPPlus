@@ -7,7 +7,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 public class ArrayLookupNavigator : LookupNavigator
 {
 	private readonly FunctionArgument[] _arrayData;
-	private int _index = 0;
+	private int _index;
 	private object _currentValue;
 
 	public ArrayLookupNavigator(LookupDirection direction, LookupArguments arguments, ParsingContext parsingContext)

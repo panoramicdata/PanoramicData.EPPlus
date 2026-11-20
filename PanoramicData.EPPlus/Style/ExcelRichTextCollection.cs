@@ -44,7 +44,7 @@ namespace OfficeOpenXml.Style;
 public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 {
 	readonly List<ExcelRichText> _list = [];
-	readonly ExcelRangeBase _cells = null;
+	readonly ExcelRangeBase _cells;
 	internal ExcelRichTextCollection(XmlNamespaceManager ns, XmlNode topNode) :
 		base(ns, topNode)
 	{
@@ -100,15 +100,7 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 	public ExcelRichText Insert(int index, string text)
 	{
 		ConvertRichtext();
-		XmlDocument doc;
-		if (TopNode is XmlDocument)
-		{
-			doc = TopNode as XmlDocument;
-		}
-		else
-		{
-			doc = TopNode.OwnerDocument;
-		}
+		var doc = TopNode as XmlDocument ?? TopNode.OwnerDocument;
 
 		var node = doc.CreateElement("d", "r", ExcelPackage.schemaMain);
 		if (index < _list.Count)
@@ -123,36 +115,11 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 		var rt = new ExcelRichText(NameSpaceManager, node, this);
 		if (_list.Count > 0)
 		{
-			var prevItem = _list[index < _list.Count ? index : _list.Count - 1];
-			rt.FontName = prevItem.FontName;
-			rt.Size = prevItem.Size;
-			if (prevItem.Color.IsEmpty)
-			{
-				rt.Color = Color.Black;
-			}
-			else
-			{
-				rt.Color = prevItem.Color;
-			}
-
-			rt.PreserveSpace = rt.PreserveSpace;
-			rt.Bold = prevItem.Bold;
-			rt.Italic = prevItem.Italic;
-			rt.UnderLine = prevItem.UnderLine;
-		}
-		else if (_cells == null)
-		{
-			rt.FontName = "Calibri";
-			rt.Size = 11;
+			CopyFormat(rt, _list[index < _list.Count ? index : _list.Count - 1]);
 		}
 		else
 		{
-			var style = _cells.Offset(0, 0).Style;
-			rt.FontName = style.Font.Name;
-			rt.Size = style.Font.Size;
-			rt.Bold = style.Font.Bold;
-			rt.Italic = style.Font.Italic;
-			_cells.IsRichText = true;
+			ApplyDefaultFormat(rt);
 		}
 
 		rt.Text = text;
@@ -167,6 +134,35 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 		return rt;
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Bug", "S1656:Variables should not be self-assigned", Justification = "The PreserveSpace setter converts the collection to rich text, so the reassignment has an effect.")]
+	private static void CopyFormat(ExcelRichText rt, ExcelRichText prevItem)
+	{
+		rt.FontName = prevItem.FontName;
+		rt.Size = prevItem.Size;
+		rt.Color = prevItem.Color.IsEmpty ? Color.Black : prevItem.Color;
+		rt.PreserveSpace = rt.PreserveSpace;
+		rt.Bold = prevItem.Bold;
+		rt.Italic = prevItem.Italic;
+		rt.UnderLine = prevItem.UnderLine;
+	}
+
+	private void ApplyDefaultFormat(ExcelRichText rt)
+	{
+		if (_cells == null)
+		{
+			rt.FontName = "Calibri";
+			rt.Size = 11;
+			return;
+		}
+
+		var style = _cells.Offset(0, 0).Style;
+		rt.FontName = style.Font.Name;
+		rt.Size = style.Font.Size;
+		rt.Bold = style.Font.Bold;
+		rt.Italic = style.Font.Italic;
+		_cells.IsRichText = true;
+	}
+
 	internal void ConvertRichtext()
 	{
 		if (_cells == null)
@@ -179,7 +175,6 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 		{
 			_cells.Worksheet._flags.SetFlagValue(_cells._fromRow, _cells._fromCol, true, CellFlags.RichText);
 			var s = _cells.Worksheet.GetStyleInner(_cells._fromRow, _cells._fromCol);
-			//var fnt = cell.Style.Font;
 			var fnt = _cells.Worksheet.Workbook.Styles.GetStyleObject(s, _cells.Worksheet.PositionID, ExcelCellBase.GetAddress(_cells._fromRow, _cells._fromCol)).Font;
 			this[0].PreserveSpace = true;
 			this[0].Bold = fnt.Bold;
@@ -234,10 +229,6 @@ public class ExcelRichTextCollection : XmlHelper, IEnumerable<ExcelRichText>
 			_cells.IsRichText = false;
 		}
 	}
-	//public void Insert(int index, string Text)
-	//{
-	//    _list.Insert(index, item);
-	//}
 
 	/// <summary>
 	/// The text

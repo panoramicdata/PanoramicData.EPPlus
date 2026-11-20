@@ -22,63 +22,53 @@ public class Days360 : ExcelFunction
 		var dt2 = System.DateTime.FromOADate(numDate2);
 
 		var calcType = Days360Calctype.Us;
-		if (arguments.Count() > 2)
+		if (arguments.Count() > 2 && ArgToBool(arguments, 2))
 		{
-			var european = ArgToBool(arguments, 2);
-			if (european)
-			{
-				calcType = Days360Calctype.European;
-			}
+			calcType = Days360Calctype.European;
 		}
 
-		var startYear = dt1.Year;
+		var (startDay, endDay) = calcType == Days360Calctype.European
+			? AdjustDaysEuropean(dt1.Day, dt2.Day)
+			: AdjustDaysUs(dt1, dt2);
+
+		var result = (dt2.Year * 12 * 30 + dt2.Month * 30 + endDay) - (dt1.Year * 12 * 30 + dt1.Month * 30 + startDay);
+		return CreateResult(result, DataType.Integer);
+	}
+
+	private static (int StartDay, int EndDay) AdjustDaysEuropean(int startDay, int endDay) =>
+		(startDay == 31 ? 30 : startDay, endDay == 31 ? 30 : endDay);
+
+	private static (int StartDay, int EndDay) AdjustDaysUs(System.DateTime dt1, System.DateTime dt2)
+	{
 		var startMonth = dt1.Month;
 		var startDay = dt1.Day;
-		var endYear = dt2.Year;
 		var endMonth = dt2.Month;
 		var endDay = dt2.Day;
+		var nDaysInFeb = new GregorianCalendar().IsLeapYear(dt1.Year) ? 29 : 28;
+		var startIsEndOfFebruary = startMonth == 2 && startDay == nDaysInFeb;
 
-		if (calcType == Days360Calctype.European)
+		// Both dates on the last day of February: D2 becomes 30.
+		if (startIsEndOfFebruary && endMonth == 2 && endDay == nDaysInFeb)
 		{
-			if (startDay == 31)
-			{
-				startDay = 30;
-			}
-
-			if (endDay == 31)
-			{
-				endDay = 30;
-			}
-		}
-		else
-		{
-			var calendar = new GregorianCalendar();
-			var nDaysInFeb = calendar.IsLeapYear(dt1.Year) ? 29 : 28;
-
-			// If the investment is EOM and (Date1 is the last day of February) and (Date2 is the last day of February), then change D2 to 30.
-			if (startMonth == 2 && startDay == nDaysInFeb && endMonth == 2 && endDay == nDaysInFeb)
-			{
-				endDay = 30;
-			}
-			// If the investment is EOM and (Date1 is the last day of February), then change D1 to 30.
-			if (startMonth == 2 && startDay == nDaysInFeb)
-			{
-				startDay = 30;
-			}
-			// If D2 is 31 and D1 is 30 or 31, then change D2 to 30.
-			if (endDay == 31 && (startDay == 30 || startDay == 31))
-			{
-				endDay = 30;
-			}
-			// If D1 is 31, then change D1 to 30.
-			if (startDay == 31)
-			{
-				startDay = 30;
-			}
+			endDay = 30;
 		}
 
-		var result = (endYear * 12 * 30 + endMonth * 30 + endDay) - (startYear * 12 * 30 + startMonth * 30 + startDay);
-		return CreateResult(result, DataType.Integer);
+		if (startIsEndOfFebruary)
+		{
+			startDay = 30;
+		}
+
+		if (endDay == 31 && (startDay == 30 || startDay == 31))
+		{
+			endDay = 30;
+		}
+
+		if (startDay == 31)
+		{
+			startDay = 30;
+		}
+
+		return (startDay, endDay);
 	}
 
 	private static int GetNumWholeMonths(System.DateTime dt1, System.DateTime dt2)

@@ -20,13 +20,6 @@ public class FormulaParserTests
 	{
 		var provider = A.Fake<ExcelDataProvider>();
 		_parser = new FormulaParser(provider);
-
-	}
-
-	[TestCleanup]
-	public void Cleanup()
-	{
-
 	}
 
 	[TestMethod]
@@ -98,6 +91,6 @@ public class FormulaParserTests
 		Assert.AreEqual(3d, result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
-	public void ParseAtShouldThrowIfAddressIsNull() => _parser.ParseAt(null);
+	[TestMethod]
+	public void ParseAtShouldThrowIfAddressIsNull() => Assert.ThrowsExactly<ArgumentException>(() => _parser.ParseAt(null));
 }

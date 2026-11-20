@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml.FormulaParsing.ExpressionGraph;
+﻿using OfficeOpenXml.FormulaParsing.ExpressionGraph;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.ExpressionGraph;
 
@@ -17,7 +14,7 @@ public class EnumerableExpressionTests
 		var result = expression.Compile();
 
 		Assert.IsInstanceOfType<IEnumerable<object>>(result.Result);
-		var resultList = (IEnumerable<object>)result.Result;
+		var resultList = result.Result as IEnumerable<object>;
 		Assert.AreEqual(2d, resultList.ElementAt(0));
 		Assert.AreEqual(3d, resultList.ElementAt(1));
 	}

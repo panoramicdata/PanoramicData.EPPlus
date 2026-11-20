@@ -2,6 +2,9 @@
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1104:Fields should not have public accessibility", Justification = "Public API of a published library; changing it would break existing consumers.")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1210:Equals and the comparison operators should be overridden when implementing IComparable", Justification = "Public API of a published library; changing it would break existing consumers.")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3898:Value types should implement IEquatable", Justification = "Public API of a published library; changing it would break existing consumers.")]
 public struct ExcelDoubleCellValue : IComparable<ExcelDoubleCellValue>, IComparable
 {
 	public ExcelDoubleCellValue(double val)
@@ -24,7 +27,6 @@ public struct ExcelDoubleCellValue : IComparable<ExcelDoubleCellValue>, ICompara
 	{
 		return d.Value;
 	}
-	//  User-defined conversion from double to Digit
 	public static implicit operator ExcelDoubleCellValue(double d)
 	{
 		return new ExcelDoubleCellValue(d);

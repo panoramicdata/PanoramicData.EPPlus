@@ -61,7 +61,7 @@ internal abstract class ExcelDataValidationFormula : XmlHelper
 	/// <param name="namespaceManager">Namespacemanger of the worksheet</param>
 	/// <param name="topNode">validation top node</param>
 	/// <param name="formulaPath">xml path of the current formula</param>
-	public ExcelDataValidationFormula(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
+	protected ExcelDataValidationFormula(XmlNamespaceManager namespaceManager, XmlNode topNode, string formulaPath)
 		: base(namespaceManager, topNode)
 	{
 		Require.Argument(formulaPath).IsNotNullOrEmpty("formulaPath");
@@ -106,7 +106,6 @@ internal abstract class ExcelDataValidationFormula : XmlHelper
 			{
 				throw new InvalidOperationException("The length of a DataValidation formula cannot exceed 255 characters");
 			}
-			//var val = SqRefUtility.ToSqRefAddress(value);
 			_formula = value;
 			SetXmlNodeString(FormulaPath, value);
 		}

@@ -68,13 +68,6 @@ public interface IExcelConditionalFormattingRule
 	/// </summary>
 	bool StopIfTrue { get; set; }
 
-	///// <summary>
-	///// <para>This is an index to a dxf element in the Styles Part indicating which cell
-	///// formatting to apply when the conditional formatting rule criteria is met.</para>
-	///// <para>The possible values for this attribute are defined by the ST_DxfId simple type
-	///// (§18.18.25).</para>
-	///// </summary>
-	//    int DxfId { get; set; }
 	/// <summary>
 	/// Gives access to the differencial styling (DXF) for the rule.
 	/// </summary>

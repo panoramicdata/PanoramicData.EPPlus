@@ -1,9 +1,8 @@
-﻿using System;
-using System.Globalization;
-using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Globalization;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing;
+
+using PanoramicData.EPPlus.Test.FormulaParsing.TestHelpers;
 
 namespace PanoramicData.EPPlus.Test.FormulaParsing.IntegrationTests.BuiltInFunctions.ExcelRanges;
 
@@ -19,11 +18,7 @@ public class TextExcelRangeTests
 	{
 		_currentCulture = CultureInfo.CurrentCulture;
 		_package = new ExcelPackage();
-		_worksheet = _package.Workbook.Worksheets.Add("Test");
-
-		_worksheet.Cells["A1"].Value = 1;
-		_worksheet.Cells["A2"].Value = 3;
-		_worksheet.Cells["A3"].Value = 6;
+		_worksheet = OneThreeSixSheet.Add(_package);
 	}
 
 	[TestCleanup]

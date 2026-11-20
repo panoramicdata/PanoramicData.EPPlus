@@ -7,8 +7,8 @@ namespace PanoramicData.EPPlus.Test.Utils;
 [TestClass]
 public class SqRefUtilityTests
 {
-	[TestMethod, ExpectedException(typeof(ArgumentNullException))]
-	public void SqRefUtility_ToSqRefAddress_ShouldThrowIfAddressIsNullOrEmpty() => SqRefUtility.ToSqRefAddress(null);
+	[TestMethod]
+	public void SqRefUtility_ToSqRefAddress_ShouldThrowIfAddressIsNullOrEmpty() => Assert.ThrowsExactly<ArgumentNullException>(() => SqRefUtility.ToSqRefAddress(null));
 
 	[TestMethod]
 	public void SqRefUtility_ToSqRefAddress_ShouldRemoveCommas()

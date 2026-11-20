@@ -30,7 +30,6 @@
  *******************************************************************************/
 using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using System.Collections.Generic;
-//using OfficeOpenXml.FormulaParsing.Excel.Functions;
 
 namespace OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 
@@ -39,7 +38,6 @@ public class Lexer : ILexer
 	public Lexer(FunctionRepository functionRepository, INameValueProvider nameValueProvider)
 		: this(new SourceCodeTokenizer(functionRepository, nameValueProvider), new SyntacticAnalyzer())
 	{
-
 	}
 
 	public Lexer(ISourceCodeTokenizer tokenizer, ISyntacticAnalyzer analyzer)

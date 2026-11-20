@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfficeOpenXml;
-using System.IO;
+﻿using OfficeOpenXml;
 
 namespace PanoramicData.EPPlus.Test;
 
@@ -40,20 +38,8 @@ public class Encrypt : TestBase
 	[Ignore]
 	public void WriteEncrypt()
 	{
-		ExcelPackage package = new();
-		//Load the sheet with one string column, one date column and a few random numbers.
-		var ws = package.Workbook.Worksheets.Add("First line test");
+		var package = SharedTestData.CreateFirstLinePackage();
 
-		ws.Cells[1, 1].Value = "1; 1";
-		ws.Cells[2, 1].Value = "2; 1";
-		ws.Cells[1, 2].Value = "1; 2";
-		ws.Cells[2, 2].Value = "2; 2";
-
-		ws.Row(1).Style.Font.Bold = true;
-		ws.Column(1).Style.Font.Bold = true;
-
-		//package.Encryption.Algorithm = EncryptionAlgorithm.AES256;
-		//package.SaveAs(new FileInfo(@"c:\temp\encrTest.xlsx"), "ABxsw23edc");
 		package.Encryption.Password = "test";
 		package.Encryption.IsEncrypted = true;
 		package.SaveAs(new FileInfo(@"c:\temp\encrTest.xlsx"));
@@ -63,9 +49,6 @@ public class Encrypt : TestBase
 	public void WriteProtect()
 	{
 		ExcelPackage package = new(new FileInfo(@"c:\temp\workbookprot2.xlsx"), "");
-		//Load the sheet with one string column, one date column and a few random numbers.
-		//package.Workbook.Protection.LockWindows = true;
-		//package.Encryption.IsEncrypted = true;
 		package.Workbook.Protection.SetPassword("t");
 		package.Workbook.Protection.LockStructure = true;
 		package.Workbook.View.Left = 585;
@@ -89,7 +72,7 @@ public class Encrypt : TestBase
 	{
 		var p = new ExcelPackage(new FileInfo(@"c:\temp\encr.xlsx"), "test");
 
-		var n = p.Workbook.Worksheets[1].Name;
+		_ = p.Workbook.Worksheets[1].Name;
 		p.Encryption.Password = null;
 		p.SaveAs(new FileInfo(@"c:\temp\encrNew.xlsx"));
 
@@ -99,7 +82,7 @@ public class Encrypt : TestBase
 	{
 		var p = new ExcelPackage(new FileInfo(@"c:\temp\bug\TestExcel_2040.xlsx"), "");
 
-		var n = p.Workbook.Worksheets[1].Name;
+		_ = p.Workbook.Worksheets[1].Name;
 		p.Encryption.Password = null;
 		p.SaveAs(new FileInfo(@"c:\temp\encrNew.xlsx"));
 

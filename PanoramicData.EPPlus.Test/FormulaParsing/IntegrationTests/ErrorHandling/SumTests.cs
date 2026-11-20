@@ -48,16 +48,4 @@ public class SumTests : FormulaErrorHandlingTestBase
 
 	[TestMethod]
 	public void ArrayInclText() => Assert.AreEqual(7d, Worksheet.Cells["J9"].Value);
-
-	//[TestMethod]
-	//public void NameError()
-	//{
-	//    Assert.AreEqual("#NAME?", Worksheet.Cells["L9"].Value);
-	//}
-
-	//[TestMethod]
-	//public void DivByZeroError()
-	//{
-	//    Assert.AreEqual("#DIV/0!", Worksheet.Cells["M9"].Value);
-	//}
 }

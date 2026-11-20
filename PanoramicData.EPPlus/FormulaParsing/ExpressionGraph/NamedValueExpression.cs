@@ -46,7 +46,6 @@ public class NamedValueExpression : AtomicExpression
 	{
 		var c = _parsingContext.Scopes.Current;
 		var name = _parsingContext.ExcelDataProvider.GetName(c.Address.Worksheet, ExpressionString);
-		//var result = _parsingContext.Parser.Parse(value.ToString());
 
 		if (name == null)
 		{
@@ -80,9 +79,5 @@ public class NamedValueExpression : AtomicExpression
 			var factory = new CompileResultFactory();
 			return factory.Create(name.Value);
 		}
-
-
-
-		//return new CompileResultFactory().Create(result);
 	}
 }

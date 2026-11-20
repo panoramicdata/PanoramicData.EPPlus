@@ -47,7 +47,7 @@ public class ExcelAddressCacheTests
 		var id = cache.GetNewId();
 		Assert.AreEqual(1, id);
 		var address = "A1";
-		var result = cache.Add(id, address);
+		cache.Add(id, address);
 		Assert.AreEqual(1, cache.Count);
 		var id2 = cache.GetNewId();
 		Assert.AreEqual(2, id2);

@@ -41,11 +41,6 @@ namespace OfficeOpenXml.Drawing.Chart;
 /// </summary>
 public class ExcelOfPieChart : ExcelPieChart
 {
-	//internal ExcelOfPieChart(ExcelDrawings drawings, XmlNode node) :
-	//    base(drawings, node)
-	//{
-
-	//}
 	internal ExcelOfPieChart(ExcelDrawings drawings, XmlNode node, eChartType type, bool isPivot) :
 		base(drawings, node, type, isPivot)
 	{

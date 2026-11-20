@@ -55,19 +55,11 @@ public sealed class ExcelRadarChartSerie : ExcelChartSerie
 			Marker = eMarkerStyle.None;
 		}
 	}
-	ExcelChartSerieDataLabel _DataLabel = null;
+	ExcelChartSerieDataLabel _DataLabel;
 	/// <summary>
 	/// Datalabel
 	/// </summary>
-	public ExcelChartSerieDataLabel DataLabel
-	{
-		get
-		{
-			_DataLabel ??= new ExcelChartSerieDataLabel(_ns, _node);
-
-			return _DataLabel;
-		}
-	}
+	public ExcelChartSerieDataLabel DataLabel => GetDataLabel(ref _DataLabel);
 	const string markerPath = "c:marker/c:symbol/@val";
 	/// <summary>
 	/// Marker symbol 
@@ -81,7 +73,7 @@ public sealed class ExcelRadarChartSerie : ExcelChartSerie
 		}
 		internal set
 		{
-			SetXmlNodeString(markerPath, value.ToString().ToLower(CultureInfo.InvariantCulture));
+			SetMarker(value);
 		}
 	}
 	const string MARKERSIZE_PATH = "c:marker/c:size/@val";
@@ -101,5 +93,4 @@ public sealed class ExcelRadarChartSerie : ExcelChartSerie
 			SetXmlNodeString(MARKERSIZE_PATH, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-
 }

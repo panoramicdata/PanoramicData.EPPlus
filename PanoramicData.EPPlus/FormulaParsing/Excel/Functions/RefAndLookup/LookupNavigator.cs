@@ -22,6 +22,7 @@
  *******************************************************************************
  * Mats Alm   		                Added		                2013-12-03
  *******************************************************************************/
+using System.Diagnostics.CodeAnalysis;
 using OfficeOpenXml.FormulaParsing.Utilities;
 
 namespace OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
@@ -32,8 +33,7 @@ public abstract class LookupNavigator
 	protected readonly LookupArguments Arguments;
 	protected readonly ParsingContext ParsingContext;
 
-
-
+	[SuppressMessage("Major Code Smell", "S3442:\"abstract\" classes should not have \"public\" constructors", Justification = "Published API: narrowing this constructor to protected is a breaking change for reflection and API compatibility.")]
 	public LookupNavigator(LookupDirection direction, LookupArguments arguments, ParsingContext parsingContext)
 	{
 		Require.That(arguments).Named("arguments").IsNotNull();

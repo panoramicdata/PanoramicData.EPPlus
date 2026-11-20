@@ -40,7 +40,6 @@ public class LookupArguments
 	public LookupArguments(IEnumerable<FunctionArgument> arguments, ParsingContext context)
 		: this(arguments, new ArgumentParsers(), context)
 	{
-
 	}
 
 	public LookupArguments(IEnumerable<FunctionArgument> arguments, ArgumentParsers argumentParsers, ParsingContext context)
@@ -55,7 +54,6 @@ public class LookupArguments
 		}
 		else
 		{
-			//if (arg1 is ExcelDataProvider.INameInfo) arg1 = ((ExcelDataProvider.INameInfo) arg1).Value;
 			if (arg1 is ExcelDataProvider.IRangeInfo rangeInfo)
 			{
 				RangeAddress = string.IsNullOrEmpty(rangeInfo.Address.WorkSheet) ? rangeInfo.Address.Address : "'" + rangeInfo.Address.WorkSheet + "'!" + rangeInfo.Address.Address;

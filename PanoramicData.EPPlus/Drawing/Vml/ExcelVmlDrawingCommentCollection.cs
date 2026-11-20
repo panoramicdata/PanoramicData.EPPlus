@@ -73,27 +73,9 @@ internal class ExcelVmlDrawingCommentCollection : ExcelVmlDrawingBaseCollection,
 			}
 		}
 
-		list.Sort(new Comparison<IRangeID>((r1, r2) => (r1.RangeID < r2.RangeID ? -1 : r1.RangeID > r2.RangeID ? 1 : 0)));  //Vml drawings are not sorted. Sort to avoid missmatches.
+		// Vml drawings are not sorted. Sort to avoid mismatches.
+		list.Sort((r1, r2) => r1.RangeID.CompareTo(r2.RangeID));
 		_drawings = new RangeCollection(list);
-	}
-	private static string CreateVmlDrawings()
-	{
-		var vml = string.Format("<xml xmlns:v=\"{0}\" xmlns:o=\"{1}\" xmlns:x=\"{2}\">",
-			ExcelPackage.schemaMicrosoftVml,
-			ExcelPackage.schemaMicrosoftOffice,
-			ExcelPackage.schemaMicrosoftExcel);
-
-		vml += "<o:shapelayout v:ext=\"edit\">";
-		vml += "<o:idmap v:ext=\"edit\" data=\"1\"/>";
-		vml += "</o:shapelayout>";
-
-		vml += "<v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\" path=\"m,l,21600r21600,l21600,xe\">";
-		vml += "<v:stroke joinstyle=\"miter\" />";
-		vml += "<v:path gradientshapeok=\"t\" o:connecttype=\"rect\" />";
-		vml += "</v:shapetype>";
-		vml += "</xml>";
-
-		return vml;
 	}
 	internal ExcelVmlDrawingComment Add(ExcelRangeBase cell)
 	{
@@ -123,7 +105,6 @@ internal class ExcelVmlDrawingCommentCollection : ExcelVmlDrawingBaseCollection,
 		node.SetAttribute("id", GetNewId());
 		node.SetAttribute("type", "#_x0000_t202");
 		node.SetAttribute("style", "position:absolute;z-index:1; visibility:hidden");
-		//node.SetAttribute("style", "position:absolute; margin-left:59.25pt;margin-top:1.5pt;width:108pt;height:59.25pt;z-index:1; visibility:hidden"); 
 		node.SetAttribute("fillcolor", "#ffffe1");
 		node.SetAttribute("insetmode", ExcelPackage.schemaMicrosoftOffice, "auto");
 
@@ -138,14 +119,14 @@ internal class ExcelVmlDrawingCommentCollection : ExcelVmlDrawingBaseCollection,
 		vml += "<x:SizeWithCells />";
 		vml += string.Format("<x:Anchor>{0}, 15, {1}, 2, {2}, 31, {3}, 1</x:Anchor>", col, row - 1, col + 2, row + 3);
 		vml += "<x:AutoFill>False</x:AutoFill>";
-		vml += string.Format("<x:Row>{0}</x:Row>", row - 1); ;
+		vml += string.Format("<x:Row>{0}</x:Row>", row - 1);
 		vml += string.Format("<x:Column>{0}</x:Column>", col - 1);
 		vml += "</x:ClientData>";
 
 		node.InnerXml = vml;
 		return node;
 	}
-	int _nextID = 0;
+	int _nextID;
 	/// <summary>
 	/// returns the next drawing id.
 	/// </summary>

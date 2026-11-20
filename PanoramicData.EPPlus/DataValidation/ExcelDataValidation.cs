@@ -59,7 +59,7 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 	protected readonly string _formula1Path = "d:formula1";
 	protected readonly string _formula2Path = "d:formula2";
 
-	internal ExcelDataValidation(ExcelWorksheet worksheet, string address, ExcelDataValidationType validationType)
+	private protected ExcelDataValidation(ExcelWorksheet worksheet, string address, ExcelDataValidationType validationType)
 		: this(worksheet, address, validationType, null)
 	{ }
 
@@ -70,7 +70,7 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 	/// <param name="itemElementNode">Xml top node (dataValidations)</param>
 	/// <param name="validationType">Data validation type</param>
 	/// <param name="address">address for data validation</param>
-	internal ExcelDataValidation(ExcelWorksheet worksheet, string address, ExcelDataValidationType validationType, XmlNode itemElementNode)
+	private protected ExcelDataValidation(ExcelWorksheet worksheet, string address, ExcelDataValidationType validationType, XmlNode itemElementNode)
 		: this(worksheet, address, validationType, itemElementNode, null)
 	{
 
@@ -84,18 +84,16 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 	/// <param name="validationType">Data validation type</param>
 	/// <param name="address">address for data validation</param>
 	/// <param name="namespaceManager">Xml Namespace manager</param>
-	internal ExcelDataValidation(ExcelWorksheet worksheet, string address, ExcelDataValidationType validationType, XmlNode itemElementNode, XmlNamespaceManager namespaceManager)
+	private protected ExcelDataValidation(ExcelWorksheet worksheet, string address, ExcelDataValidationType validationType, XmlNode itemElementNode, XmlNamespaceManager namespaceManager)
 		: base(namespaceManager != null ? namespaceManager : worksheet.NameSpaceManager)
 	{
 		Require.Argument(address).IsNotNullOrEmpty("address");
 		address = CheckAndFixRangeAddress(address);
 		if (itemElementNode == null)
 		{
-			//var xmlDoc = worksheet.WorksheetXml;
 			TopNode = worksheet.WorksheetXml.SelectSingleNode("//d:dataValidations", worksheet.NameSpaceManager);
 			// did not succeed using the XmlHelper methods here... so I'm creating the new node using XmlDocument...
 			var nsUri = NameSpaceManager.LookupNamespace("d");
-			//itemElementNode = TopNode.OwnerDocument.CreateElement(_itemElementNodeName, nsUri);
 			itemElementNode = TopNode.OwnerDocument.CreateElement(_itemElementNodeName.Split(':')[1], nsUri);
 			TopNode.AppendChild(itemElementNode);
 		}
@@ -233,9 +231,12 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 		get
 		{
 			var operatorString = GetXmlNodeString(_operatorPath);
-			return !string.IsNullOrEmpty(operatorString)
-				? Enum.Parse<ExcelDataValidationOperator>(operatorString)
-				: default;
+			if (string.IsNullOrEmpty(operatorString))
+			{
+				return default;
+			}
+
+			return Enum.Parse<ExcelDataValidationOperator>(operatorString);
 		}
 		set
 		{
@@ -256,9 +257,12 @@ public abstract class ExcelDataValidation : XmlHelper, IExcelDataValidation
 		get
 		{
 			var errorStyleString = GetXmlNodeString(_errorStylePath);
-			return !string.IsNullOrEmpty(errorStyleString)
-				? Enum.Parse<ExcelDataValidationWarningStyle>(errorStyleString)
-				: ExcelDataValidationWarningStyle.undefined;
+			if (string.IsNullOrEmpty(errorStyleString))
+			{
+				return ExcelDataValidationWarningStyle.undefined;
+			}
+
+			return Enum.Parse<ExcelDataValidationWarningStyle>(errorStyleString);
 		}
 		set
 		{

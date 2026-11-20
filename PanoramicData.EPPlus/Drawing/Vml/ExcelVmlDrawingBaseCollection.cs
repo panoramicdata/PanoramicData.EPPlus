@@ -69,4 +69,13 @@ public class ExcelVmlDrawingBaseCollection
 	internal Packaging.ZipPackagePart? Part { get; set; }
 
 	internal XmlNamespaceManager NameSpaceManager { get; set; }
+
+	private protected static string CreateVmlDrawings() => string.Format(
+		"<xml xmlns:v=\"{0}\" xmlns:o=\"{1}\" xmlns:x=\"{2}\">" +
+		"<o:shapelayout v:ext=\"edit\"><o:idmap v:ext=\"edit\" data=\"1\"/></o:shapelayout>" +
+		"<v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\" path=\"m,l,21600r21600,l21600,xe\">" +
+		"<v:stroke joinstyle=\"miter\" /><v:path gradientshapeok=\"t\" o:connecttype=\"rect\" /></v:shapetype></xml>",
+		ExcelPackage.schemaMicrosoftVml,
+		ExcelPackage.schemaMicrosoftOffice,
+		ExcelPackage.schemaMicrosoftExcel);
 }

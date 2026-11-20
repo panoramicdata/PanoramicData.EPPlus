@@ -32,7 +32,7 @@ using System;
 using System.Reflection;
 namespace OfficeOpenXml.Compatibility;
 
-internal class TypeCompat
+internal static class TypeCompat
 {
 	public static bool IsPrimitive(object v)
 		=> v.GetType().GetTypeInfo().IsPrimitive;

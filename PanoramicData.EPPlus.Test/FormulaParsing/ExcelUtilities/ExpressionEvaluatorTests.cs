@@ -1,7 +1,4 @@
 ﻿using System;
-
-
-//using System.Diagnostics.Design;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
@@ -51,10 +48,10 @@ public class ExpressionEvaluatorTests
 		Assert.IsTrue(result);
 	}
 
-	[TestMethod, ExpectedException(typeof(ArgumentException))]
+	[TestMethod]
 	public void EvaluateShouldThrowIfOperatorIsNotBoolean()
 	{
-		var result = _evaluator.Evaluate(1d, "+1");
+		Assert.ThrowsExactly<ArgumentException>(() => _evaluator.Evaluate(1d, "+1"));
 	}
 	#endregion
 

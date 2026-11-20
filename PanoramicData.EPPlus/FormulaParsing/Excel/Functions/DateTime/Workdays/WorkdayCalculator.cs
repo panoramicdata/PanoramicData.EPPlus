@@ -103,6 +103,21 @@ public class WorkdayCalculator
 		return new WorkdayCalculatorResult(calculatedResult.NumberOfWorkdays - nAdditionalHolidayDays, startDate, endDate, calculatedResult.Direction);
 	}
 
+	internal WorkdayCalculatorResult CalculateNumberOfWorkdays(System.DateTime startDate, System.DateTime endDate, FunctionArgument[] functionArguments, int holidayArgumentIndex)
+	{
+		var result = CalculateNumberOfWorkdays(startDate, endDate);
+		if (functionArguments.Length > holidayArgumentIndex)
+		{
+			result = ReduceWorkdaysWithHolidays(result, functionArguments[holidayArgumentIndex]);
+		}
+
+		return result;
+	}
+
+	private static bool IsOutsideCalculatedRange(System.DateTime date, System.DateTime startDate, System.DateTime endDate, WorkdayCalculationDirection direction) =>
+		(direction == WorkdayCalculationDirection.Forward && (date < startDate || date > endDate))
+		|| (direction == WorkdayCalculationDirection.Backward && (date > startDate || date < endDate));
+
 	public WorkdayCalculatorResult AdjustResultWithHolidays(WorkdayCalculatorResult calculatedResult,
 													 FunctionArgument holidayArgument)
 	{
@@ -113,17 +128,7 @@ public class WorkdayCalculator
 		var additionalDays = new AdditionalHolidayDays(holidayArgument);
 		foreach (var date in additionalDays.AdditionalDates)
 		{
-			if (direction == WorkdayCalculationDirection.Forward && (date < startDate || date > endDate))
-			{
-				continue;
-			}
-
-			if (direction == WorkdayCalculationDirection.Backward && (date > startDate || date < endDate))
-			{
-				continue;
-			}
-
-			if (_holidayWeekdays.IsHolidayWeekday(date))
+			if (IsOutsideCalculatedRange(date, startDate, endDate, direction) || _holidayWeekdays.IsHolidayWeekday(date))
 			{
 				continue;
 			}

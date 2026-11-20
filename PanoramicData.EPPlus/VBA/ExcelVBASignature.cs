@@ -44,7 +44,7 @@ namespace OfficeOpenXml.VBA;
 public class ExcelVbaSignature
 {
 	const string schemaRelVbaSignature = "http://schemas.microsoft.com/office/2006/relationships/vbaProjectSignature";
-	readonly Packaging.ZipPackagePart _vbaPart = null;
+	readonly Packaging.ZipPackagePart _vbaPart;
 	internal ExcelVbaSignature(Packaging.ZipPackagePart vbaPart)
 	{
 		_vbaPart = vbaPart;
@@ -66,44 +66,16 @@ public class ExcelVbaSignature
 			var stream = Part.GetStream();
 			BinaryReader br = new(stream);
 			var cbSignature = br.ReadUInt32();
-			var signatureOffset = br.ReadUInt32();     //44 ??
-			var cbSigningCertStore = br.ReadUInt32();
-			var certStoreOffset = br.ReadUInt32();
-			var cbProjectName = br.ReadUInt32();
-			var projectNameOffset = br.ReadUInt32();
-			var fTimestamp = br.ReadUInt32();
-			var cbTimestampUrl = br.ReadUInt32();
-			var timestampUrlOffset = br.ReadUInt32();
+			// signatureOffset, cbSigningCertStore, certStoreOffset, cbProjectName, projectNameOffset, fTimestamp, cbTimestampUrl, timestampUrlOffset
+			SkipUInt32(br, 8);
 			var signature = br.ReadBytes((int)cbSignature);
-			var version = br.ReadUInt32();
-			var fileType = br.ReadUInt32();
-
-			var id = br.ReadUInt32();
-			while (id != 0)
-			{
-				var encodingType = br.ReadUInt32();
-				var length = br.ReadUInt32();
-				if (length > 0)
-				{
-					var value = br.ReadBytes((int)length);
-					switch (id)
-					{
-						//Add property values here...
-						case 0x20:
-							Certificate = X509CertificateLoader.LoadCertificate(value);
-							break;
-						default:
-							break;
-					}
-				}
-
-				id = br.ReadUInt32();
-			}
-
-			var endel1 = br.ReadUInt32();  //0
-			var endel2 = br.ReadUInt32();  //0
-			var rgchProjectNameBuffer = br.ReadUInt16();
-			var rgchTimestampBuffer = br.ReadUInt16();
+			// version, fileType
+			SkipUInt32(br, 2);
+			ReadCertificateEntries(br);
+			// endel1, endel2, rgchProjectNameBuffer, rgchTimestampBuffer
+			SkipUInt32(br, 2);
+			_ = br.ReadUInt16();
+			_ = br.ReadUInt16();
 			Verifier = new EnvelopedCms();
 			Verifier.Decode(signature);
 		}
@@ -113,39 +85,34 @@ public class ExcelVbaSignature
 			Verifier = null;
 		}
 	}
-	//Create Oid from a bytearray
-	//private string ReadHash(byte[] content)
-	//{
-	//    StringBuilder builder = new StringBuilder();
-	//    int offset = 0x6;
-	//    if (0 < (content.Length))
-	//    {
-	//        byte num = content[offset];
-	//        byte num2 = (byte)(num / 40);
-	//        builder.Append(num2.ToString(null, null));
-	//        builder.Append(".");
-	//        num2 = (byte)(num % 40);
-	//        builder.Append(num2.ToString(null, null));
-	//        ulong num3 = 0L;
-	//        for (int i = offset + 1; i < content.Length; i++)
-	//        {
-	//            num2 = content[i];
-	//            num3 = (ulong)(ulong)(num3 << 7) + ((byte)(num2 & 0x7f));
-	//            if ((num2 & 0x80) == 0)
-	//            {
-	//                builder.Append(".");
-	//                builder.Append(num3.ToString(null, null));
-	//                num3 = 0L;
-	//            }
-	//            //1.2.840.113549.2.5
-	//        }
-	//    }
+	private static void SkipUInt32(BinaryReader br, int count)
+	{
+		for (var i = 0; i < count; i++)
+		{
+			_ = br.ReadUInt32();
+		}
+	}
 
+	private void ReadCertificateEntries(BinaryReader br)
+	{
+		var id = br.ReadUInt32();
+		while (id != 0)
+		{
+			// encodingType
+			_ = br.ReadUInt32();
+			var length = br.ReadUInt32();
+			if (length > 0)
+			{
+				var value = br.ReadBytes((int)length);
+				if (id == 0x20)
+				{
+					Certificate = X509CertificateLoader.LoadCertificate(value);
+				}
+			}
 
-	//    string oId = builder.ToString();
-
-	//    return oId;
-	//}
+			id = br.ReadUInt32();
+		}
+	}
 	internal void Save(ExcelVbaProject proj)
 	{
 		if (Certificate == null)
@@ -153,33 +120,48 @@ public class ExcelVbaSignature
 			return;
 		}
 
-		if (Certificate.HasPrivateKey == false)    //No signature. Remove any Signature part
+		//No signature. Remove any Signature part
+		if (Certificate.HasPrivateKey == false && !TryUseStoreCertificate())
 		{
-			var storeCert = GetCertFromStore(StoreLocation.CurrentUser);
-			storeCert ??= GetCertFromStore(StoreLocation.LocalMachine);
-
-			if (storeCert != null && storeCert.HasPrivateKey == true)
-			{
-				Certificate = storeCert;
-			}
-			else
-			{
-				foreach (var r in Part.GetRelationships())
-				{
-					Part.DeleteRelationship(r.Id);
-				}
-
-				Part.Package.DeletePart(Part.Uri);
-				return;
-			}
+			RemoveSignaturePart();
+			return;
 		}
 
+		var certStore = GetCertStore();
+		var cert = SignProject(proj);
+		var b = BuildSignatureStream(cert, certStore);
+		EnsureSignaturePart(proj);
+		Part.GetStream(FileMode.Create).Write(b, 0, b.Length);
+	}
+
+	private bool TryUseStoreCertificate()
+	{
+		var storeCert = GetCertFromStore(StoreLocation.CurrentUser);
+		storeCert ??= GetCertFromStore(StoreLocation.LocalMachine);
+
+		if (storeCert != null && storeCert.HasPrivateKey == true)
+		{
+			Certificate = storeCert;
+			return true;
+		}
+
+		return false;
+	}
+
+	private void RemoveSignaturePart()
+	{
+		foreach (var r in Part.GetRelationships())
+		{
+			Part.DeleteRelationship(r.Id);
+		}
+
+		Part.Package.DeletePart(Part.Uri);
+	}
+
+	private static byte[] BuildSignatureStream(byte[] cert, byte[] certStore)
+	{
 		var ms = new MemoryStream();
 		var bw = new BinaryWriter(ms);
-
-		var certStore = GetCertStore();
-
-		var cert = SignProject(proj);
 		bw.Write((uint)cert.Length);
 		bw.Write((uint)44);                  //?? 36 ref inside cert ??
 		bw.Write((uint)certStore.Length);    //cbSigningCertStore
@@ -195,11 +177,14 @@ public class ExcelVbaSignature
 		bw.Write((ushort)0);//rgchTimestampBuffer
 		bw.Write((ushort)0);
 		bw.Flush();
+		return ms.ToArray();
+	}
 
+	private void EnsureSignaturePart(ExcelVbaProject proj)
+	{
 		var rel = proj.Part.GetRelationshipsByType(schemaRelVbaSignature).FirstOrDefault();
 		if (Part == null)
 		{
-
 			if (rel != null)
 			{
 				Uri = rel.TargetUri;
@@ -216,9 +201,6 @@ public class ExcelVbaSignature
 		{
 			proj.Part.CreateRelationship(UriHelper.ResolvePartUri(proj.Uri, Uri), Packaging.TargetMode.Internal, schemaRelVbaSignature);
 		}
-
-		var b = ms.ToArray();
-		Part.GetStream(FileMode.Create).Write(b, 0, b.Length);
 	}
 
 	private X509Certificate2 GetCertFromStore(StoreLocation loc)
@@ -284,7 +266,6 @@ public class ExcelVbaSignature
 	{
 		if (!Certificate.HasPrivateKey)
 		{
-			//throw (new InvalidOperationException("The certificate doesn't have a private key"));
 			Certificate = null;
 			return null;
 		}
@@ -339,14 +320,6 @@ public class ExcelVbaSignature
 
 			if (reference.ReferenceRecordID == 0x0E)
 			{
-				//var r = (ExcelVbaReferenceProject)reference;
-				//BinaryWriter bwTemp = new BinaryWriter(new MemoryStream());
-				//bwTemp.Write((uint)r.Libid.Length);
-				//bwTemp.Write(enc.GetBytes(r.Libid));              
-				//bwTemp.Write((uint)r.LibIdRelative.Length);
-				//bwTemp.Write(enc.GetBytes(r.LibIdRelative));
-				//bwTemp.Write(r.MajorVersion);
-				//bwTemp.Write(r.MinorVersion);
 				foreach (var b in BitConverter.GetBytes((uint)reference.Libid.Length))  //Length will never be an UInt with 4 bytes that aren't 0 (> 0x00FFFFFF), so no need for the rest of the properties.
 				{
 					if (b != 0)

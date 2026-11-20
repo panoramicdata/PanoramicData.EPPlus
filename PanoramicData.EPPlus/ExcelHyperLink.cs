@@ -70,7 +70,7 @@ public class ExcelHyperLink : Uri
 		_referenceAddress = referenceAddress;
 		_display = display;
 	}
-	string? _referenceAddress = null;
+	string? _referenceAddress;
 	/// <summary>
 	/// The Excel address for internal links.
 	/// </summary>
@@ -108,7 +108,7 @@ public class ExcelHyperLink : Uri
 		get;
 		set;
 	}
-	int _colSpann = 0;
+	int _colSpann;
 	/// <summary>
 	/// If the hyperlink spans multiple columns
 	/// </summary>
@@ -123,7 +123,7 @@ public class ExcelHyperLink : Uri
 			_colSpann = value;
 		}
 	}
-	int _rowSpann = 0;
+	int _rowSpann;
 	/// <summary>
 	/// If the hyperlink spans multiple rows
 	/// </summary>

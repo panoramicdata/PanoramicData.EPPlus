@@ -108,7 +108,7 @@ class Sample6
 		ws.Select("A2");
 		//height is 20 pixels 
 		var height = 20 * 0.75;
-		//Start at row 2;
+		//Start at row 2
 		var row = 2;
 
 		//Load the directory content to sheet 1
@@ -283,7 +283,6 @@ class Sample6
 		barChart.SetPosition(22, 0, 2, 0);
 		barChart.SetSize(800, 398);
 		barChart.Series.Add(ExcelCellBase.GetAddress(30, 2, row - 1, 2), ExcelCellBase.GetAddress(30, 1, row - 1, 1));
-		//barChart.Series[0].Header = "Size";
 		barChart.Title.Text = "Top File size";
 
 		//Format the Size and Count column
@@ -487,7 +486,7 @@ class Sample6
 			_extStat.Add(file.Extension, new StatItem() { Name = ext, Count = 1, Size = file.Length });
 		}
 
-		//File top 10;
+		//File top 10
 		if (_fileSize.Count < 10)
 		{
 			_fileSize.Add(new StatItem { Name = file.Name, Size = file.Length });

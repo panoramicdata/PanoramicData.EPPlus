@@ -22,7 +22,6 @@ public class NameValueProvider : INameValueProvider
 {
 	private NameValueProvider()
 	{
-
 	}
 
 	public static INameValueProvider Empty => new NameValueProvider();
@@ -33,6 +32,6 @@ public class NameValueProvider : INameValueProvider
 
 	public void Reload()
 	{
-
+		// The empty provider has no names to reload.
 	}
 }

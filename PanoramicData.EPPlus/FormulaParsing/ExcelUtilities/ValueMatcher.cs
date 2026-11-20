@@ -34,23 +34,16 @@ namespace OfficeOpenXml.FormulaParsing.ExcelUtilities;
 
 public class ValueMatcher
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S2339:Public constant members should not be used", Justification = "Public API of a published library; changing to static readonly would break consumers compiled against the constant.")]
 	public const int IncompatibleOperands = -2;
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1449:Culture should be specified for string operations", Justification = "Matching uses the current culture by design; specifying another culture would change results.")]
 	public virtual int IsMatch(object o1, object o2)
 	{
-		if (o1 != null && o2 == null)
+		var nullComparison = CompareNulls(o1, o2);
+		if (nullComparison.HasValue)
 		{
-			return 1;
-		}
-
-		if (o1 == null && o2 != null)
-		{
-			return -1;
-		}
-
-		if (o1 == null && o2 == null)
-		{
-			return 0;
+			return nullComparison.Value;
 		}
 		//Handle ranges and defined names
 		o1 = CheckGetRange(o1);
@@ -72,15 +65,20 @@ public class ValueMatcher
 		return Convert.ToDouble(o1).CompareTo(Convert.ToDouble(o2));
 	}
 
+	private static int? CompareNulls(object o1, object o2)
+	{
+		if (o1 == null)
+		{
+			return o2 == null ? 0 : -1;
+		}
+
+		return o2 == null ? 1 : null;
+	}
+
 	private static object CheckGetRange(object v)
 	{
 		if (v is ExcelDataProvider.IRangeInfo r)
 		{
-			if (r.GetNCells() > 1)
-			{
-				v = ExcelErrorValue.Create(eErrorType.NA);
-			}
-
 			v = r.GetOffset(0, 0);
 		}
 		else if (v is ExcelDataProvider.INameInfo n)
@@ -91,6 +89,7 @@ public class ValueMatcher
 		return v;
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1449:Culture should be specified for string operations", Justification = "Comparison uses the current culture by design; specifying another culture would change results.")]
 	protected virtual int CompareStringToString(string s1, string s2) => s1.CompareTo(s2);
 
 	protected virtual int CompareStringToObject(string o1, object o2)

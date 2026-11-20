@@ -34,6 +34,7 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions;
 using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -105,11 +106,9 @@ public abstract class ExcelCellBase
 		var tokens = lexer.Tokenize(value, null);
 		foreach (var token in tokens)
 		{
-			//Console.WriteLine($"{token.TokenType} : {token.Value}");
 			if (token.TokenType == TokenType.ExcelAddress || token.TokenType.Equals(TokenType.NameValue) || token.TokenType == TokenType.ExcelAddressR1C1)
 			{
 				var part = addressTranslator(token.Value, row, col);
-				//Console.Write($"==> " + part);
 				token.Value = part;
 			}
 
@@ -211,8 +210,6 @@ public abstract class ExcelCellBase
 		// Bug
 		var rStart = check.IndexOf("R");
 		var cStart = check.IndexOf("C");
-		//if (rStart != 0)
-		//    return part;
 		if (rStart != 0 && cStart != 0)
 		{
 			return part;
@@ -222,7 +219,6 @@ public abstract class ExcelCellBase
 		{
 			if (rStart == 0)
 			{
-				//return GetAddress(row);
 				return $"{row}:{row}";
 			}
 			else
@@ -384,18 +380,17 @@ public abstract class ExcelCellBase
 
 		if (iColumnNumber < 1)
 		{
-			//throw new Exception("Column number is out of range");
 			return "#REF!";
 		}
 
-		var sCol = "";
+		var sCol = new StringBuilder();
 		do
 		{
-			sCol = ((char)('A' + ((iColumnNumber - 1) % 26))).ToString() + sCol;
+			sCol.Insert(0, (char)('A' + ((iColumnNumber - 1) % 26)));
 			iColumnNumber = (iColumnNumber - ((iColumnNumber - 1) % 26)) / 26;
 		}
 		while (iColumnNumber > 0);
-		return fixedCol ? "$" + sCol : sCol;
+		return fixedCol ? "$" + sCol : sCol.ToString();
 	}
 	#endregion
 
@@ -413,6 +408,7 @@ public abstract class ExcelCellBase
 	/// <param name="fixedToRow">Is the to row fixed?</param>
 	/// <param name="fixedToColumn">Is the to column fixed?</param>
 	/// <returns></returns>
+	[SuppressMessage("Minor Bug", "S2692:IndexOf checks should not be for positive numbers", Justification = "Upstream EPPlus behaviour: a bracket or space at index 0 is deliberately not treated as a separator.")]
 	internal static bool GetRowColFromAddress(string CellAddress, out int FromRow, out int FromColumn, out int ToRow, out int ToColumn, out bool fixedFromRow, out bool fixedFromColumn, out bool fixedToRow, out bool fixedToColumn)
 	{
 		bool ret;
@@ -499,6 +495,7 @@ public abstract class ExcelCellBase
 	/// <param name="throwException">throw exception if invalid, otherwise returns false</param>
 	/// <returns></returns>
 	internal static bool GetRowCol(string address, out int row, out int col, bool throwException) => GetRowCol(address, out row, out col, throwException, out var fixedRow, out var fixedCol);
+	[SuppressMessage("Major Code Smell", "S112:General or reserved exceptions should never be thrown", Justification = "Published behaviour: callers may catch this exact exception type, so it is kept.")]
 	internal static bool GetRowCol(string address, out int row, out int col, bool throwException, out bool fixedRow, out bool fixedCol)
 	{
 		var colPart = true;
@@ -529,13 +526,13 @@ public abstract class ExcelCellBase
 			if (colPart && (c >= 'A' && c <= 'Z') && colLength <= 3)
 			{
 				col *= 26;
-				col += ((int)c) - 64;
+				col += (int)c - 64;
 				colLength++;
 			}
 			else if (c is >= '0' and <= '9')
 			{
 				row *= 10;
-				row += ((int)c) - 48;
+				row += (int)c - 48;
 				colPart = false;
 			}
 			else if (c == '$')
@@ -555,7 +552,7 @@ public abstract class ExcelCellBase
 			{
 				row = 0;
 				col = 0;
-				return throwException ? throw (new Exception(string.Format("Invalid Address format {0}", address))) : false;
+				return throwException ? throw new Exception(string.Format("Invalid Address format {0}", address)) : false;
 			}
 		}
 
@@ -568,13 +565,15 @@ public abstract class ExcelCellBase
 		var len = sCol.Length - 1;
 		for (var i = len; i >= 0; i--)
 		{
-			col += (((int)sCol[i]) - 64) * (int)(Math.Pow(26, len - i));
+			col += ((int)sCol[i] - 64) * (int)Math.Pow(26, len - i);
 		}
 
 		return col;
 	}
 	#region GetAddress
+	[SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads would break binary compatibility.")]
 	public static string GetAddressRow(int Row, bool Absolute = false) => Absolute ? $"${Row}" : $"{Row}";
+	[SuppressMessage("Major Code Smell", "S2360:Optional parameters should not be used", Justification = "Public API: replacing the optional parameter with overloads would break binary compatibility.")]
 	public static string GetAddressCol(int Col, bool Absolute = false)
 	{
 		var colLetter = GetColumnLetter(Col);
@@ -745,7 +744,7 @@ public abstract class ExcelCellBase
 		var addrs = address.Split(',');
 		foreach (var a in addrs)
 		{
-			string r1 = "", c1 = "", r2 = "", c2 = "";
+			StringBuilder r1b = new(), c1b = new(), r2b = new(), c2b = new();
 			var isSecond = false;
 			for (var i = 0; i < a.Length; i++)
 			{
@@ -753,26 +752,26 @@ public abstract class ExcelCellBase
 				{
 					if (isSecond == false)
 					{
-						if (r1 != "")
+						if (r1b.Length != 0)
 						{
 							return false;
 						}
 
-						c1 += a[i];
-						if (c1.Length > 3)
+						c1b.Append(a[i]);
+						if (c1b.Length > 3)
 						{
 							return false;
 						}
 					}
 					else
 					{
-						if (r2 != "")
+						if (r2b.Length != 0)
 						{
 							return false;
 						}
 
-						c2 += a[i];
-						if (c2.Length > 3)
+						c2b.Append(a[i]);
+						if (c2b.Length > 3)
 						{
 							return false;
 						}
@@ -782,16 +781,16 @@ public abstract class ExcelCellBase
 				{
 					if (isSecond == false)
 					{
-						r1 += a[i];
-						if (r1.Length > 7)
+						r1b.Append(a[i]);
+						if (r1b.Length > 7)
 						{
 							return false;
 						}
 					}
 					else
 					{
-						r2 += a[i];
-						if (r2.Length > 7)
+						r2b.Append(a[i]);
+						if (r2b.Length > 7)
 						{
 							return false;
 						}
@@ -809,8 +808,8 @@ public abstract class ExcelCellBase
 				else if (a[i] == '$')
 				{
 					if (i == a.Length - 1 || a[i + 1] == ':' ||
-						(i > 1 && (IsCol(a[i - 1]) && (IsCol(a[i + 1])))) ||
-						(i > 1 && (IsRow(a[i - 1]) && (IsRow(a[i + 1])))))
+						(i > 1 && IsCol(a[i - 1]) && IsCol(a[i + 1])) ||
+						(i > 1 && IsRow(a[i - 1]) && IsRow(a[i + 1])))
 					{
 						return false;
 					}
@@ -821,12 +820,13 @@ public abstract class ExcelCellBase
 				}
 			}
 
+			string r1 = r1b.ToString(), c1 = c1b.ToString(), r2 = r2b.ToString(), c2 = c2b.ToString();
 			bool ret;
 			if (r1 != "" && c1 != "" && r2 == "" && c2 == "")   //Single Cell
 			{
 				var column = GetColumn(c1);
 				var row = int.Parse(r1);
-				ret = (column >= 1 && column <= ExcelPackage.MaxColumns && row >= 1 && row <= ExcelPackage.MaxRows);
+				ret = column >= 1 && column <= ExcelPackage.MaxColumns && row >= 1 && row <= ExcelPackage.MaxRows;
 			}
 			else if (r1 != "" && r2 != "" && c1 != "" && c2 != "") //Range
 			{
@@ -838,7 +838,6 @@ public abstract class ExcelCellBase
 				ret = iC1 <= iC2 && iR1 <= iR2 &&
 					iC1 >= 1 && iC2 <= ExcelPackage.MaxColumns &&
 					iR1 >= 1 && iR2 <= ExcelPackage.MaxRows;
-
 			}
 			else if (r1 == "" && r2 == "" && c1 != "" && c2 != "") //Full Column
 			{
@@ -895,7 +894,10 @@ public abstract class ExcelCellBase
 				}
 			}
 		}
-		catch { }
+		catch
+		{
+			// An unparsable address is reported as invalid
+		}
 
 		return result;
 	}
@@ -917,12 +919,11 @@ public abstract class ExcelCellBase
 	/// <returns>The updated version of the <paramref name="formula"/>.</returns>
 	internal static string UpdateFormulaReferences(string formula, int rowIncrement, int colIncrement, int afterRow, int afterColumn, string currentSheet, string modifiedSheet, bool setFixed = false)
 	{
-		var d = new Dictionary<string, object>();
 		try
 		{
 			var sct = new SourceCodeTokenizer(FunctionNameProvider.Empty, NameValueProvider.Empty);
 			var tokens = sct.Tokenize(formula);
-			var f = "";
+			var f = new StringBuilder();
 			foreach (var t in tokens)
 			{
 				if (t.TokenType == TokenType.ExcelAddress)
@@ -933,13 +934,13 @@ public abstract class ExcelCellBase
 					if (!setFixed && (!string.IsNullOrEmpty(a._wb) || !referencesModifiedWorksheet))
 					{
 						// This address is in a different worksheet or workbook; no update is required.
-						f += a.Address;
+						f.Append(a.Address);
 						continue;
 					}
 					// Persist fully-qualified worksheet references.
 					if (!string.IsNullOrEmpty(a._ws))
 					{
-						f += $"'{a._ws}'!";
+						f.Append($"'{a._ws}'!");
 					}
 
 					if (rowIncrement > 0)
@@ -962,7 +963,7 @@ public abstract class ExcelCellBase
 
 					if (a == null || !a.IsValidRowCol())
 					{
-						f += "#REF!";
+						f.Append("#REF!");
 					}
 					else
 					{
@@ -970,23 +971,21 @@ public abstract class ExcelCellBase
 						var address = a.Address.Split('!');
 						if (address.Length > 1)
 						{
-							f += address[1];
+							f.Append(address[1]);
 						}
 						else
 						{
-							f += a.Address;
+							f.Append(a.Address);
 						}
 					}
-
-
 				}
 				else
 				{
-					f += t.Value;
+					f.Append(t.Value);
 				}
 			}
 
-			return f;
+			return f.ToString();
 		}
 		catch //Invalid formula, skip updating addresses
 		{
@@ -1013,12 +1012,11 @@ public abstract class ExcelCellBase
 			throw new ArgumentNullException(nameof(newSheetName));
 		}
 
-		var d = new Dictionary<string, object>();
 		try
 		{
 			var sct = new SourceCodeTokenizer(FunctionNameProvider.Empty, NameValueProvider.Empty);
 			var tokens = sct.Tokenize(formula);
-			var f = "";
+			var f = new StringBuilder();
 			foreach (var t in tokens)
 			{
 				if (t.TokenType == TokenType.ExcelAddress)
@@ -1026,21 +1024,21 @@ public abstract class ExcelCellBase
 					var a = new ExcelAddressBase(t.Value);
 					if (a == null || !a.IsValidRowCol())
 					{
-						f += "#REF!";
+						f.Append("#REF!");
 					}
 					else
 					{
 						a.ChangeWorksheet(oldSheetName, newSheetName);
-						f += a.Address;
+						f.Append(a.Address);
 					}
 				}
 				else
 				{
-					f += t.Value;
+					f.Append(t.Value);
 				}
 			}
 
-			return f;
+			return f.ToString();
 		}
 		catch //Invalid formula, skip updating addresses
 		{

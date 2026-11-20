@@ -36,6 +36,7 @@ namespace OfficeOpenXml.Utils;
 /// An argument
 /// </summary>
 /// <typeparam name="T">Argument Type</typeparam>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S3246:Generic type parameters should be co/contravariant when possible", Justification = "Public API: adding variance changes the published interface signature.")]
 public interface IArgument<T>
 {
 	T Value { get; }

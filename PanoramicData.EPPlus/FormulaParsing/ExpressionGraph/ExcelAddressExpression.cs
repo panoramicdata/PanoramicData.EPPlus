@@ -50,12 +50,10 @@ public class ExcelAddressExpression : AtomicExpression
 	public ExcelAddressExpression(string expression, ExcelDataProvider excelDataProvider, ParsingContext parsingContext)
 		: this(expression, excelDataProvider, parsingContext, new RangeAddressFactory(excelDataProvider), false)
 	{
-
 	}
 	public ExcelAddressExpression(string expression, ExcelDataProvider excelDataProvider, ParsingContext parsingContext, bool negate)
 		: this(expression, excelDataProvider, parsingContext, new RangeAddressFactory(excelDataProvider), negate)
 	{
-
 	}
 
 	public ExcelAddressExpression(string expression, ExcelDataProvider excelDataProvider, ParsingContext parsingContext, RangeAddressFactory rangeAddressFactory, bool negate)
@@ -74,14 +72,6 @@ public class ExcelAddressExpression : AtomicExpression
 
 	public override CompileResult Compile()
 	{
-		//if (ParentIsLookupFunction)
-		//{
-		//    return new CompileResult(ExpressionString, DataType.ExcelAddress);
-		//}
-		//else
-		//{
-		//    return CompileRangeValues();
-		//}
 		var cache = _parsingContext.AddressCache;
 		var cacheId = cache.GetNewId();
 		if (!cache.Add(cacheId, ExpressionString))

@@ -16,15 +16,8 @@ public class TokenFactoryTests
 	public void Setup()
 	{
 		var context = ParsingContext.Create();
-		var excelDataProvider = A.Fake<ExcelDataProvider>();
 		_nameValueProvider = A.Fake<INameValueProvider>();
 		_tokenFactory = new TokenFactory(context.Configuration.FunctionRepository, _nameValueProvider);
-	}
-
-	[TestCleanup]
-	public void Cleanup()
-	{
-
 	}
 
 	[TestMethod]

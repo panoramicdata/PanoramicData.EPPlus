@@ -41,40 +41,24 @@ namespace OfficeOpenXml.Drawing.Chart;
 /// </summary>
 public class ExcelDoughnutChart : ExcelPieChart
 {
-	//internal ExcelDoughnutChart(ExcelDrawings drawings, XmlNode node) :
-	//    base(drawings, node)
-	//{
-	//    SetPaths();
-	//}
 	internal ExcelDoughnutChart(ExcelDrawings drawings, XmlNode node, eChartType type, bool isPivot) :
 		base(drawings, node, type, isPivot)
 	{
-		//SetPaths();
 	}
 	internal ExcelDoughnutChart(ExcelDrawings drawings, XmlNode node, eChartType type, ExcelChart topChart, ExcelPivotTable PivotTableSource) :
 		base(drawings, node, type, topChart, PivotTableSource)
 	{
-		//SetPaths();
 	}
 	internal ExcelDoughnutChart(ExcelDrawings drawings, XmlNode node, Uri uriChart, Packaging.ZipPackagePart part, XmlDocument chartXml, XmlNode chartNode) :
 	   base(drawings, node, uriChart, part, chartXml, chartNode)
 	{
-		//SetPaths();
 	}
 
 	internal ExcelDoughnutChart(ExcelChart topChart, XmlNode chartNode) :
 		base(topChart, chartNode)
 	{
-		//SetPaths();
 	}
 
-	//private void SetPaths()
-	//{
-	//    string chartNodeText = GetChartNodeText();
-	//    _firstSliceAngPath = string.Format(_firstSliceAngPath, chartNodeText);
-	//    _holeSizePath = string.Format(_holeSizePath, chartNodeText);
-	//}
-	//string _firstSliceAngPath = "c:chartSpace/c:chart/c:plotArea/{0}/c:firstSliceAng/@val";
 	readonly string _firstSliceAngPath = "c:firstSliceAng/@val";
 	/// <summary>
 	/// Angle of the first slize
@@ -90,7 +74,6 @@ public class ExcelDoughnutChart : ExcelPieChart
 			_chartXmlHelper.SetXmlNodeString(_firstSliceAngPath, value.ToString(CultureInfo.InvariantCulture));
 		}
 	}
-	//string _holeSizePath = "c:chartSpace/c:chart/c:plotArea/{0}/c:holeSize/@val";
 	readonly string _holeSizePath = "c:holeSize/@val";
 	/// <summary>
 	/// Size of the doubnut hole

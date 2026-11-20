@@ -66,8 +66,6 @@ public class DoubleEnumerableArgConverter : CollectionFlattener<ExcelDoubleCellV
 
 	public virtual IEnumerable<ExcelDoubleCellValue> ConvertArgsIncludingOtherTypes(IEnumerable<FunctionArgument> arguments) => base.FuncArgsToFlatEnumerable(arguments, (arg, argList) =>
 																																	 {
-																																		 //var cellInfo = arg.Value as EpplusExcelDataProvider.CellInfo;
-																																		 //var value = cellInfo != null ? cellInfo.Value : arg.Value;
 																																		 if (arg.Value is ExcelDataProvider.IRangeInfo)
 																																		 {
 																																			 foreach (var cell in (ExcelDataProvider.IRangeInfo)arg.Value)

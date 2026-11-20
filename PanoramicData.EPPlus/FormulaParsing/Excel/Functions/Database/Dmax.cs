@@ -33,18 +33,13 @@ public class Dmax : DatabaseFunction
 	public Dmax()
 		: this(new RowMatcher())
 	{
-
 	}
 
 	public Dmax(RowMatcher rowMatcher)
 		: base(rowMatcher)
 	{
+	}
 
-	}
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-	{
-		ValidateArguments(arguments, 3);
-		var values = GetMatchingValues(arguments, context);
-		return !values.Any() ? CreateResult(0d, DataType.Integer) : CreateResult(values.Max(), DataType.Integer);
-	}
+		=> ExecuteAggregate(arguments, context, values => values.Max());
 }

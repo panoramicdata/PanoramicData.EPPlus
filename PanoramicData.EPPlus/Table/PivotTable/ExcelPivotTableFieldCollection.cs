@@ -193,8 +193,8 @@ public class ExcelPivotTableRowColumnFieldCollection : ExcelPivotTableFieldColle
 				field.IsPageField = value;
 				field.Axis = ePivotFieldAxis.Page;
 				break;
-			case "dataFields":
-
+			default:
+				// Data fields carry no axis flag
 				break;
 		}
 	}
@@ -255,7 +255,6 @@ public class ExcelPivotTableDataFieldCollection : ExcelPivotTableFieldCollection
 		node.SetAttribute("fld", field.Index.ToString());
 		dataFieldsNode.AppendChild(node);
 
-		//XmlElement node = field.AppendField(dataFieldsNode, field.Index, "dataField", "fld");
 		field.SetXmlNodeBool("@dataField", true, false);
 
 		var dataField = new ExcelPivotTableDataField(field.NameSpaceManager, node, field);

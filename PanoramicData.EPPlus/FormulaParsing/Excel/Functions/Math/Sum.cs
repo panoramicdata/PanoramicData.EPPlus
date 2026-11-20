@@ -31,19 +31,7 @@ namespace OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 public class Sum : HiddenValuesHandlingFunction
 {
 	public override CompileResult Execute(IEnumerable<FunctionArgument> arguments, ParsingContext context)
-	{
-		var retVal = 0d;
-		if (arguments != null)
-		{
-			foreach (var arg in arguments)
-			{
-				retVal += Calculate(arg, context);
-			}
-		}
-
-		return CreateResult(retVal, DataType.Decimal);
-	}
-
+		=> SumOverArguments(arguments, arg => Calculate(arg, context));
 
 	private double Calculate(FunctionArgument arg, ParsingContext context)
 	{
@@ -53,23 +41,16 @@ public class Sum : HiddenValuesHandlingFunction
 			return retVal;
 		}
 
-		if (arg.Value is IEnumerable<FunctionArgument>)
+		if (arg.Value is IEnumerable<FunctionArgument> items)
 		{
-			foreach (var item in (IEnumerable<FunctionArgument>)arg.Value)
+			foreach (var item in items)
 			{
 				retVal += Calculate(item, context);
 			}
 		}
-		else if (arg.Value is ExcelDataProvider.IRangeInfo)
+		else if (arg.Value is ExcelDataProvider.IRangeInfo range)
 		{
-			foreach (var c in (ExcelDataProvider.IRangeInfo)arg.Value)
-			{
-				if (ShouldIgnore(c, context) == false)
-				{
-					CheckForAndHandleExcelError(c);
-					retVal += c.ValueDouble;
-				}
-			}
+			retVal += SumVisibleCells(range, context, value => value);
 		}
 		else
 		{

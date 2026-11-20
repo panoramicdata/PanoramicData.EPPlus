@@ -75,7 +75,7 @@ public class ExcelTableColumnCollection : IEnumerable<ExcelTableColumn>
 		{
 			return Index < 0 || Index >= _cols.Count
 				?              throw (new ArgumentOutOfRangeException("Column index out of range"))
-				: _cols[Index] as ExcelTableColumn;
+				: _cols[Index];
 		}
 	}
 	/// <summary>
@@ -98,7 +98,7 @@ public class ExcelTableColumnCollection : IEnumerable<ExcelTableColumn>
 	{
 		if (_colNames.ContainsKey(name))
 		{
-			var newName = name;
+			string newName;
 			var i = 2;
 			do
 			{
