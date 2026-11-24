@@ -2,9 +2,14 @@
 
 [![NuGet version](https://img.shields.io/nuget/v/PanoramicData.EPPlus.svg)](https://www.nuget.org/packages/PanoramicData.EPPlus/)
 
-[![Codacy Badge](https://app.codacy.com/project/badge/grade/PanoramicData.EPPlus)](https://app.codacy.com/gh/panoramicdata/PanoramicData.EPPlus/dashboard)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/77eeba5b52ff47139d1c95370dc88c3e)](https://app.codacy.com/gh/panoramicdata/PanoramicData.EPPlus/dashboard)
 
 # Continuous Version of EPPlus Free Edition 4.5.3.3
+
+> **Need help with APIs or .NET?** Panoramic Data are experts in APIs and .NET, and we can help with your development. [Contact us](https://www.panoramicdata.com/contact-us) or see our [software services](https://www.panoramicdata.com/services/software).
+
+Supports .NET 11.0.
+
 **The [JanKallman/EPPlus](https://github.com/JanKallman/EPPlus) repository has been archived by the owner. So I fork it to my repository and continue to maintain the source code.**
 
 ---
