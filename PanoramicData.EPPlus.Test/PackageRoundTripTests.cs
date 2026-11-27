@@ -30,7 +30,8 @@ public class PackageRoundTripTests
 	[DynamicData(nameof(Workbooks))]
 	public void Workbook_SaveAndReopen_KeepsSheetsCellsPartsAndContentTypes(string fileName)
 	{
-		var path = Path.Combine(WorkbooksDirectory, Path.GetFileName(fileName));
+		var safeFileName = Path.GetFileName(fileName);
+		var path = Path.Combine(WorkbooksDirectory, safeFileName);
 		var original = File.ReadAllBytes(path);
 
 		byte[] saved;
