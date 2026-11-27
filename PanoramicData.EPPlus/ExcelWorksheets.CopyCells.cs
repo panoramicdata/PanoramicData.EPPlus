@@ -1,4 +1,4 @@
-﻿using OfficeOpenXml.Drawing;
+using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
 using OfficeOpenXml.Utils;
 using System.Xml;
@@ -220,8 +220,53 @@ public partial class ExcelWorksheets
 		//Now create the new relationship to the copied chart xml
 		var prevRelID = chart.TopNode.SelectSingleNode("xdr:graphicFrame/a:graphic/a:graphicData/c:chart/@r:id", Copy.Drawings.NameSpaceManager).Value;
 		var rel = part.CreateRelationship(UriHelper.GetRelativeUri(uriDraw, UriChart), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/chart");
-		var relAtt = drawXml.SelectSingleNode(string.Format("//c:chart/@r:id[.='{0}']", prevRelID), Copy.Drawings.NameSpaceManager) as XmlAttribute;
+		var relAtt = FindAttributeByValue(drawXml.SelectNodes("//c:chart/@r:id", Copy.Drawings.NameSpaceManager), prevRelID);
 		relAtt.Value = rel.Id;
+	}
+
+	// Values are compared in code, not placed in an XPath expression, so names and ids cannot alter the query.
+	private static XmlAttribute FindAttributeByValue(XmlNodeList attributes, string value)
+	{
+		if (attributes == null)
+		{
+			return null;
+		}
+
+		foreach (XmlNode node in attributes)
+		{
+			if (node is XmlAttribute attribute && attribute.Value == value)
+			{
+				return attribute;
+			}
+		}
+
+		return null;
+	}
+
+	private static XmlNode FindPictureEmbedAttribute(XmlDocument drawXml, string pictureName, XmlNamespaceManager nameSpaceManager)
+	{
+		var names = drawXml.SelectNodes("//xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name", nameSpaceManager);
+		if (names == null)
+		{
+			return null;
+		}
+
+		foreach (XmlNode node in names)
+		{
+			if (node is XmlAttribute name && name.Value == pictureName && GetPictureEmbedAttribute(name, nameSpaceManager) is XmlNode embed)
+			{
+				return embed;
+			}
+		}
+
+		return null;
+	}
+
+	// cNvPr/@name sits in xdr:pic/xdr:nvPicPr, so the picture element is two levels above the attribute's owner.
+	private static XmlNode GetPictureEmbedAttribute(XmlAttribute name, XmlNamespaceManager nameSpaceManager)
+	{
+		var picture = name.OwnerElement?.ParentNode?.ParentNode;
+		return picture?.SelectSingleNode("xdr:blipFill/a:blip/@r:embed", nameSpaceManager);
 	}
 
 	private void CopyPicturePart(ExcelWorksheet Copy, ExcelWorksheet workSheet, Packaging.ZipPackagePart part, XmlDocument drawXml, ExcelPicture pic)
@@ -236,11 +281,7 @@ public partial class ExcelWorksheets
 
 		var rel = part.CreateRelationship(UriHelper.GetRelativeUri(workSheet.WorksheetUri, uri), Packaging.TargetMode.Internal, ExcelPackage.schemaRelationships + "/image");
 		//Fixes problem with invalid image when the same image is used more than once.
-		var relAtt =
-			drawXml.SelectSingleNode(
-				string.Format(
-					"//xdr:pic/xdr:nvPicPr/xdr:cNvPr/@name[.='{0}']/../../../xdr:blipFill/a:blip/@r:embed",
-					pic.Name), Copy.Drawings.NameSpaceManager);
+		var relAtt = FindPictureEmbedAttribute(drawXml, pic.Name, Copy.Drawings.NameSpaceManager);
 		if (relAtt != null)
 		{
 			relAtt.Value = rel.Id;

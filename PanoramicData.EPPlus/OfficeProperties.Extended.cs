@@ -119,15 +119,27 @@ public sealed partial class OfficeProperties
 	/// <returns>The value</returns>
 	public string GetExtendedPropertyValue(string propertyName)
 	{
-		string retValue = null;
-		var searchString = string.Format("xp:Properties/xp:{0}", propertyName);
-		var node = ExtendedPropertiesXml.SelectSingleNode(searchString, NameSpaceManager);
-		if (node != null)
+		return FindExtendedPropertyNode(propertyName)?.InnerText;
+	}
+
+	// The name is compared in code, not placed in an XPath expression, so it cannot alter the query.
+	private XmlElement FindExtendedPropertyNode(string propertyName)
+	{
+		var properties = ExtendedPropertiesXml.SelectNodes("xp:Properties/xp:*", NameSpaceManager);
+		if (properties == null)
 		{
-			retValue = node.InnerText;
+			return null;
 		}
 
-		return retValue;
+		foreach (XmlNode property in properties)
+		{
+			if (property is XmlElement element && element.LocalName == propertyName)
+			{
+				return element;
+			}
+		}
+
+		return null;
 	}
 	/// <summary>
 	/// Set the value for an extended property
@@ -136,7 +148,20 @@ public sealed partial class OfficeProperties
 	/// <param name="value">The value</param>
 	public void SetExtendedPropertyValue(string propertyName, string value)
 	{
-		var propertyPath = string.Format("xp:Properties/xp:{0}", propertyName);
+		// The name becomes an XPath step below, so it must be a plain XML name with no XPath syntax.
+		var propertyPath = string.Format("xp:Properties/xp:{0}", GetValidExtendedPropertyName(propertyName));
 		_extendedHelper.SetXmlNodeString(propertyPath, value);
+	}
+
+	private static string GetValidExtendedPropertyName(string propertyName)
+	{
+		try
+		{
+			return XmlConvert.VerifyNCName(propertyName);
+		}
+		catch (XmlException ex)
+		{
+			throw new ArgumentException($"'{propertyName}' is not a valid extended property name.", nameof(propertyName), ex);
+		}
 	}
 }

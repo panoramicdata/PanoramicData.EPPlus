@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using System.Security.Cryptography;
 
 namespace SampleApp;
 
@@ -27,13 +28,12 @@ class Sample7
 			cols.Style.Fill.PatternType = ExcelFillStyle.Solid;
 			cols.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
 
-			var rnd = new Random();
 			for (var row = 1; row <= rows; row++)
 			{
 				ws.SetValue(row, 1, row);                               //The SetValue method is a little bit faster than using the Value property
 				ws.SetValue(row, 2, string.Format("Row {0}", row));
 				ws.SetValue(row, 3, DateTime.Today.AddDays(row));
-				ws.SetValue(row, 4, rnd.NextDouble() * 10000);
+				ws.SetValue(row, 4, RandomNumberGenerator.GetInt32(1_000_000) / 100.0);
 				if (row % 10000 == 0)
 				{
 					Console.WriteLine("{0:HH.mm.ss}\tWriting row {1}...", DateTime.Now, row);
