@@ -1,4 +1,5 @@
 using OfficeOpenXml;
+using OfficeOpenXml.ConditionalFormatting;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Drawing.Chart;
 using System.Xml;
@@ -6,7 +7,7 @@ using System.Xml;
 namespace PanoramicData.EPPlus.Test;
 
 /// <summary>
-/// OPS-161211: caller-supplied names and addresses must not change the XPath queries built from them.
+/// OPS-161211: caller-supplied names and addresses must not change XPath queries, and lookups rewritten to use fixed XPath keep their behaviour.
 /// </summary>
 [TestClass]
 public class XPathInputTests
@@ -143,6 +144,106 @@ public class XPathInputTests
 		var copied = reopened.Workbook.Worksheets["Copy"].Drawings["Kept"] as ExcelChart;
 		Assert.IsNotNull(copied);
 		Assert.AreEqual(1, copied.Series.Count);
+	}
+
+	[TestMethod]
+	public void StyleFlags_SurviveSaveAndReload()
+	{
+		byte[] saved;
+		using (var package = new ExcelPackage())
+		{
+			var worksheet = package.Workbook.Worksheets.Add("Styles");
+			var first = worksheet.Cells["A1"].Style;
+			first.Font.Bold = true;
+			first.Font.Strike = true;
+			first.Border.DiagonalUp = true;
+			var second = worksheet.Cells["A2"].Style;
+			second.Font.Italic = true;
+			second.Border.DiagonalDown = true;
+			worksheet.Cells["A3"].Value = "plain";
+			saved = package.GetAsByteArray();
+		}
+
+		using var reopened = new ExcelPackage(new MemoryStream(saved));
+		var sheet = reopened.Workbook.Worksheets["Styles"];
+		AssertFlags(sheet.Cells["A1"].Style, bold: true, italic: false, strike: true, diagonalUp: true, diagonalDown: false);
+		AssertFlags(sheet.Cells["A2"].Style, bold: false, italic: true, strike: false, diagonalUp: false, diagonalDown: true);
+		AssertFlags(sheet.Cells["A3"].Style, bold: false, italic: false, strike: false, diagonalUp: false, diagonalDown: false);
+
+		static void AssertFlags(OfficeOpenXml.Style.ExcelStyle style, bool bold, bool italic, bool strike, bool diagonalUp, bool diagonalDown)
+		{
+			Assert.AreEqual(bold, style.Font.Bold, "bold");
+			Assert.AreEqual(italic, style.Font.Italic, "italic");
+			Assert.AreEqual(strike, style.Font.Strike, "strike");
+			Assert.AreEqual(diagonalUp, style.Border.DiagonalUp, "diagonalUp");
+			Assert.AreEqual(diagonalDown, style.Border.DiagonalDown, "diagonalDown");
+		}
+	}
+
+	[TestMethod]
+	public void ColorScaleTypes_SurviveSaveAndReload()
+	{
+		byte[] saved;
+		using (var package = new ExcelPackage())
+		{
+			var worksheet = package.Workbook.Worksheets.Add("Scales");
+			var three = worksheet.ConditionalFormatting.AddThreeColorScale(new ExcelAddress("A1:A5"));
+			three.MiddleValue.Type = eExcelConditionalFormattingValueObjectType.Num;
+			three.MiddleValue.Value = 50;
+			three.HighValue.Type = eExcelConditionalFormattingValueObjectType.Num;
+			three.HighValue.Value = 90;
+			var two = worksheet.ConditionalFormatting.AddTwoColorScale(new ExcelAddress("B1:B5"));
+			two.HighValue.Type = eExcelConditionalFormattingValueObjectType.Num;
+			two.HighValue.Value = 80;
+			saved = package.GetAsByteArray();
+		}
+
+		using var reopened = new ExcelPackage(new MemoryStream(saved));
+		var rules = reopened.Workbook.Worksheets["Scales"].ConditionalFormatting;
+		Assert.AreEqual(1, rules.Count(rule => rule.Type == eExcelConditionalFormattingRuleType.ThreeColorScale));
+		Assert.AreEqual(1, rules.Count(rule => rule.Type == eExcelConditionalFormattingRuleType.TwoColorScale));
+	}
+
+	[TestMethod]
+	public void GetCfvoNodeByPosition_PicksTheCfvoByOrder()
+	{
+		var document = new XmlDocument();
+		document.LoadXml($"<colorScale xmlns=\"{MainNamespace}\"><cfvo type=\"min\"/><cfvo type=\"percentile\"/><cfvo type=\"max\"/></colorScale>");
+		var namespaces = new XmlNamespaceManager(document.NameTable);
+		namespaces.AddNamespace("d", MainNamespace);
+		var top = document.DocumentElement;
+
+		Assert.AreEqual("min", CfvoType(eExcelConditionalFormattingValueObjectPosition.Low, eExcelConditionalFormattingRuleType.ThreeColorScale));
+		Assert.AreEqual("percentile", CfvoType(eExcelConditionalFormattingValueObjectPosition.Middle, eExcelConditionalFormattingRuleType.ThreeColorScale));
+		Assert.AreEqual("max", CfvoType(eExcelConditionalFormattingValueObjectPosition.High, eExcelConditionalFormattingRuleType.ThreeColorScale));
+		Assert.AreEqual("percentile", CfvoType(eExcelConditionalFormattingValueObjectPosition.High, eExcelConditionalFormattingRuleType.TwoColorScale));
+
+		top.RemoveChild(top.LastChild);
+		Assert.ThrowsExactly<InvalidOperationException>(() => CfvoType(eExcelConditionalFormattingValueObjectPosition.High, eExcelConditionalFormattingRuleType.ThreeColorScale));
+
+		string CfvoType(eExcelConditionalFormattingValueObjectPosition position, eExcelConditionalFormattingRuleType ruleType)
+			=> ExcelConditionalFormattingValueObjectType.GetCfvoNodeByPosition(position, ruleType, top, namespaces).Attributes["type"].Value;
+	}
+
+	[TestMethod]
+	public void ChartDataLabelsAndDataTable_AreInsertedAfterTheirSchemaPredecessors()
+	{
+		using var package = new ExcelPackage();
+		var worksheet = package.Workbook.Worksheets.Add("Chart");
+		worksheet.Cells["A1"].Value = 1;
+		worksheet.Cells["A2"].Value = 2;
+		var chart = (ExcelBarChart)worksheet.Drawings.AddChart("Bars", eChartType.ColumnClustered);
+		chart.Series.Add("A1:A2", "A1:A2");
+
+		chart.DataLabel.ShowValue = true;
+		chart.PlotArea.CreateDataTable();
+
+		var namespaces = new XmlNamespaceManager(chart.ChartXml.NameTable);
+		namespaces.AddNamespace("c", ExcelPackage.schemaChart);
+		var dataLabels = chart.ChartXml.SelectSingleNode("//c:barChart/c:dLbls", namespaces);
+		var dataTable = chart.ChartXml.SelectSingleNode("//c:plotArea/c:dTable", namespaces);
+		Assert.AreEqual("ser", dataLabels?.PreviousSibling?.LocalName);
+		Assert.AreEqual("valAx", dataTable?.PreviousSibling?.LocalName);
 	}
 
 	private static int CountCustomProperties(OfficeProperties properties)

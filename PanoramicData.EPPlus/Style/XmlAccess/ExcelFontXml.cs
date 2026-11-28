@@ -64,9 +64,9 @@ public sealed class ExcelFontXml : StyleXmlHelper
 		_family = GetXmlNodeIntNull(familyPath) ?? int.MinValue;
 		_scheme = GetXmlNodeString(schemePath);
 		_color = new ExcelColorXml(nsm, topNode.SelectSingleNode(_colorPath, nsm));
-		_bold = GetBoolValue(topNode, boldPath);
-		_italic = GetBoolValue(topNode, italicPath);
-		_strike = GetBoolValue(topNode, strikePath);
+		_bold = GetBoolValue(topNode.SelectSingleNode(boldPath, nsm));
+		_italic = GetBoolValue(topNode.SelectSingleNode(italicPath, nsm));
+		_strike = GetBoolValue(topNode.SelectSingleNode(strikePath, nsm));
 		_verticalAlign = GetXmlNodeString(verticalAlignPath);
 		if (topNode.SelectSingleNode(underLinedPath, NameSpaceManager) != null)
 		{

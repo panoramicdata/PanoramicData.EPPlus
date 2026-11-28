@@ -50,8 +50,8 @@ public sealed class ExcelBorderXml : StyleXmlHelper
 		_top = new ExcelBorderItemXml(nsm, topNode.SelectSingleNode(topPath, nsm));
 		_bottom = new ExcelBorderItemXml(nsm, topNode.SelectSingleNode(bottomPath, nsm));
 		_diagonal = new ExcelBorderItemXml(nsm, topNode.SelectSingleNode(diagonalPath, nsm));
-		_diagonalUp = GetBoolValue(topNode, diagonalUpPath);
-		_diagonalDown = GetBoolValue(topNode, diagonalDownPath);
+		_diagonalUp = GetBoolValue(topNode.SelectSingleNode(diagonalUpPath, nsm));
+		_diagonalDown = GetBoolValue(topNode.SelectSingleNode(diagonalDownPath, nsm));
 	}
 	internal override string Id => Left.Id + Right.Id + Top.Id + Bottom.Id + Diagonal.Id + DiagonalUp.ToString() + DiagonalDown.ToString();
 	const string leftPath = "d:left";

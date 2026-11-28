@@ -87,9 +87,9 @@ internal static class ExcelConditionalFormattingValueObjectType
 		XmlNode topNode,
 		XmlNamespaceManager nameSpaceManager)
 	{
-		var node = topNode.SelectSingleNode(
-			string.Format("{0}[position()={1}]", ExcelConditionalFormattingConstants.Paths.Cfvo, GetOrderByPosition(position, ruleType)),
-			nameSpaceManager);
+		var order = GetOrderByPosition(position, ruleType);
+		var cfvoNodes = topNode.SelectNodes("d:cfvo", nameSpaceManager);
+		var node = cfvoNodes != null && order > 0 && order <= cfvoNodes.Count ? cfvoNodes[order - 1] : null;
 
 		return node ?? throw new InvalidOperationException(ExcelConditionalFormattingConstants.Errors.MissingCfvoNode);
 	}

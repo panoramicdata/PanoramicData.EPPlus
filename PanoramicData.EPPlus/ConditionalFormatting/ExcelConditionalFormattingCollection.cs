@@ -122,7 +122,7 @@ public class ExcelConditionalFormattingCollection
 		  conditionalFormattingNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Sqref].Value);
 
 		var cfRuleNodes = conditionalFormattingNode.SelectNodes(
-		  ExcelConditionalFormattingConstants.Paths.CfRule,
+		  "d:cfRule",
 		  _worksheet.NameSpaceManager);
 
 		// Checking the count of cfRuleNodes "materializes" the collection which prevents a rare infinite loop bug

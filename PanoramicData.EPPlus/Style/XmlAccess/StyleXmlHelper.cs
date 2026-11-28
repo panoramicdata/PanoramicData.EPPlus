@@ -51,9 +51,8 @@ public abstract class StyleXmlHelper : XmlHelper
 	}
 	internal long useCnt;
 	internal int newID = int.MinValue;
-	protected bool GetBoolValue(XmlNode topNode, string path)
+	protected static bool GetBoolValue(XmlNode node)
 	{
-		var node = topNode.SelectSingleNode(path, NameSpaceManager);
 		if (node is XmlAttribute)
 		{
 			return node.Value != "0";
