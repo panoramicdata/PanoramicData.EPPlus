@@ -103,7 +103,7 @@ public abstract class ExcelConditionalFormattingRule
 			// {1}
 			ExcelConditionalFormattingConstants.Paths.SqrefAttribute,
 			// {2}
-			address.AddressSpaceSeparated,          //CF node don't what to have comma between multi addresses, use space instead.
+			GetSqrefForPath(address),          //CF node don't what to have comma between multi addresses, use space instead.
 													// {3}
 			ExcelConditionalFormattingConstants.Paths.CfRule,
 			//{4}
@@ -194,7 +194,7 @@ public abstract class ExcelConditionalFormattingRule
 					// {1}
 					ExcelConditionalFormattingConstants.Paths.SqrefAttribute,
 					// {2}
-					value.AddressSpaceSeparated));
+					GetSqrefForPath(value)));
 
 				// Move the <cfRule> node to the new <conditionalFormatting> parent node
 				TopNode = newParentNode.AppendChild(Node);
@@ -207,6 +207,18 @@ public abstract class ExcelConditionalFormattingRule
 				}
 			}
 		}
+	}
+
+	// The sqref is placed inside a quoted XPath literal; a quote can only come from a quoted sheet name, which a valid sqref never has, and would end the literal.
+	private static string GetSqrefForPath(ExcelAddress address)
+	{
+		var sqref = address.AddressSpaceSeparated;
+		if (sqref.Contains('\''))
+		{
+			throw new ArgumentException($"The conditional formatting address '{address.Address}' cannot contain a quoted worksheet name.", nameof(address));
+		}
+
+		return sqref;
 	}
 
 	/// <summary>

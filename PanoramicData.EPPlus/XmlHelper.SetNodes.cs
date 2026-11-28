@@ -103,11 +103,11 @@ public abstract partial class XmlHelper
 	/// <param name="newNode">The new node to be inserted</param>
 	internal void InserAfter(XmlNode parentNode, string beforeNodes, XmlNode newNode)
 	{
-		var nodePaths = beforeNodes.Split(',');
+		var nodeNames = beforeNodes.Split(',');
 
-		foreach (var nodePath in nodePaths)
+		foreach (var nodeName in nodeNames)
 		{
-			var node = parentNode.SelectSingleNode(nodePath, NameSpaceManager);
+			var node = FindChildElement(parentNode, nodeName);
 			if (node != null)
 			{
 				parentNode.InsertAfter(newNode, node);
@@ -116,5 +116,24 @@ public abstract partial class XmlHelper
 		}
 
 		parentNode.InsertAfter(newNode, null);
+	}
+
+	// Matches a "prefix:name" child as an XPath child step would, without building an XPath expression from the name.
+	private XmlElement FindChildElement(XmlNode parentNode, string qualifiedName)
+	{
+		var separator = qualifiedName.IndexOf(':');
+		var localName = separator < 0 ? qualifiedName : qualifiedName[(separator + 1)..];
+		var namespaceUri = separator < 0 ? string.Empty : NameSpaceManager.LookupNamespace(qualifiedName[..separator])
+			?? throw new InvalidOperationException($"Namespace prefix in '{qualifiedName}' is not defined.");
+
+		foreach (XmlNode child in parentNode.ChildNodes)
+		{
+			if (child is XmlElement element && element.LocalName == localName && element.NamespaceURI == namespaceUri)
+			{
+				return element;
+			}
+		}
+
+		return null;
 	}
 }

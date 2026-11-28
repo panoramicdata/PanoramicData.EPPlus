@@ -128,8 +128,8 @@ internal static class ExcelConditionalFormattingRuleType
 	  XmlNode topNode,
 	  XmlNamespaceManager nameSpaceManager)
 	{
-		var cfvoNodes = SelectColorScaleChildren(topNode, ExcelConditionalFormattingConstants.Paths.Cfvo, nameSpaceManager);
-		var colorNodes = SelectColorScaleChildren(topNode, ExcelConditionalFormattingConstants.Paths.Color, nameSpaceManager);
+		var cfvoNodes = topNode.SelectNodes("d:colorScale/d:cfvo", nameSpaceManager);
+		var colorNodes = topNode.SelectNodes("d:colorScale/d:color", nameSpaceManager);
 
 		if (!HasColorScaleNodeCount(cfvoNodes) || !HasColorScaleNodeCount(colorNodes) || cfvoNodes.Count != colorNodes.Count)
 		{
@@ -141,10 +141,6 @@ internal static class ExcelConditionalFormattingRuleType
 		  ? eExcelConditionalFormattingRuleType.TwoColorScale
 		  : eExcelConditionalFormattingRuleType.ThreeColorScale;
 	}
-
-	private static XmlNodeList SelectColorScaleChildren(XmlNode topNode, string childPath, XmlNamespaceManager nameSpaceManager) => topNode.SelectNodes(
-		string.Format("{0}/{1}", ExcelConditionalFormattingConstants.Paths.ColorScale, childPath),
-		nameSpaceManager);
 
 	private static bool HasColorScaleNodeCount(XmlNodeList nodes) => nodes != null && nodes.Count is >= 2 and <= 3;
 

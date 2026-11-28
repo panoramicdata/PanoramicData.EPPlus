@@ -30,8 +30,7 @@ public sealed partial class OfficeProperties
 	/// <returns>The current value of the property</returns>
 	public object GetCustomPropertyValue(string propertyName)
 	{
-		var searchString = string.Format("ctp:Properties/ctp:property[@name='{0}']", propertyName);
-		if (CustomPropertiesXml.SelectSingleNode(searchString, NameSpaceManager) is XmlElement node)
+		if (FindCustomPropertyNode(propertyName) is XmlElement node)
 		{
 			return ParseCustomPropertyValue(node.LastChild.LocalName, node.LastChild.InnerText);
 		}
@@ -77,8 +76,7 @@ public sealed partial class OfficeProperties
 	{
 		var allProps = CustomPropertiesXml.SelectSingleNode(@"ctp:Properties", NameSpaceManager);
 
-		var prop = string.Format("ctp:Properties/ctp:property[@name='{0}']", propertyName);
-		if (CustomPropertiesXml.SelectSingleNode(prop, NameSpaceManager) is not XmlElement node)
+		if (FindCustomPropertyNode(propertyName) is not XmlElement node)
 		{
 			node = CreateCustomPropertyNode(allProps, propertyName);
 		}
@@ -91,6 +89,26 @@ public sealed partial class OfficeProperties
 		}
 
 		node.AppendChild(CreateCustomPropertyValueElement(value));
+	}
+
+	// The name is compared in code, not placed in an XPath expression, so it cannot alter the query.
+	private XmlElement FindCustomPropertyNode(string propertyName)
+	{
+		var properties = CustomPropertiesXml.SelectNodes("ctp:Properties/ctp:property", NameSpaceManager);
+		if (properties == null)
+		{
+			return null;
+		}
+
+		foreach (XmlNode property in properties)
+		{
+			if (property is XmlElement element && element.GetAttributeNode("name") is XmlAttribute name && name.Value == (propertyName ?? string.Empty))
+			{
+				return element;
+			}
+		}
+
+		return null;
 	}
 
 	private XmlElement CreateCustomPropertyNode(XmlNode allProps, string propertyName)

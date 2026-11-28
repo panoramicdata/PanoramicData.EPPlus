@@ -7,6 +7,7 @@ using OfficeOpenXml.Table;
 using System;
 using System.Data;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -92,12 +93,11 @@ public class HomeController(IWebHostEnvironment hostingEnvironment) : Controller
 		var dataTable = new DataTable("Users");
 		dataTable.Columns.Add("Name", typeof(string));
 		dataTable.Columns.Add("Age", typeof(int));
-		var rnd = new Random();
 		for (var i = 0; i < 100; i++)
 		{
 			var row = dataTable.NewRow();
 			row["Name"] = $"User {i}";
-			row["Age"] = rnd.Next(20, 100);
+			row["Age"] = RandomNumberGenerator.GetInt32(20, 100);
 			dataTable.Rows.Add(row);
 		}
 
