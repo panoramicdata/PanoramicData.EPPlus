@@ -207,7 +207,7 @@ public class XPathInputTests
 	[TestMethod]
 	public void GetCfvoNodeByPosition_PicksTheCfvoByOrder()
 	{
-		var document = new XmlDocument();
+		var document = new XmlDocument { XmlResolver = null };
 		document.LoadXml($"<colorScale xmlns=\"{MainNamespace}\"><cfvo type=\"min\"/><cfvo type=\"percentile\"/><cfvo type=\"max\"/></colorScale>");
 		var namespaces = new XmlNamespaceManager(document.NameTable);
 		namespaces.AddNamespace("d", MainNamespace);

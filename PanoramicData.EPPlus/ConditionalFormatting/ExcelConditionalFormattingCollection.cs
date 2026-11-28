@@ -121,9 +121,7 @@ public class ExcelConditionalFormattingCollection
 		ExcelAddress address = new(
 		  conditionalFormattingNode.Attributes[ExcelConditionalFormattingConstants.Attributes.Sqref].Value);
 
-		var cfRuleNodes = conditionalFormattingNode.SelectNodes(
-		  "d:cfRule",
-		  _worksheet.NameSpaceManager);
+		var cfRuleNodes = conditionalFormattingNode.SelectNodes("d:cfRule", _worksheet.NameSpaceManager);
 
 		// Checking the count of cfRuleNodes "materializes" the collection which prevents a rare infinite loop bug
 		if (cfRuleNodes.Count == 0)
